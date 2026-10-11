@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p work
-          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI.zip -d work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
           python3 work/tools/check_assets.py
       - name: Verify desktop C renderer
         shell: bash
