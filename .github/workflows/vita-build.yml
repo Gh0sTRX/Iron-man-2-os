@@ -21,6 +21,8 @@ jobs:
           mkdir -p work
           unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
           python3 work/tools/check_assets.py
+          # Temporary CI linker augmentation; will be merged into source CMakeLists.txt after validation.
+          printf '\nif(DEFINED ENV{VITASDK})\n  target_link_libraries(im2_beta stdc++ mathneon taihen_stub SceKernelDmacMgr_stub SceLibcBridge_stub)\nendif()\n' >> work/CMakeLists.txt
       - name: Verify desktop C renderer
         shell: bash
         run: |
