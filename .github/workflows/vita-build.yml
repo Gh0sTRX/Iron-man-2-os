@@ -1,0 +1,46 @@
+name: Build Iron Man 2 Vita Asset Beta
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/vita-build.yml"
+      - "source/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Extract checked-in private source bundle
+        shell: bash
+        run: |
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI.zip -d work
+          python3 work/tools/check_assets.py
+      - name: Verify desktop C renderer
+        shell: bash
+        run: |
+          cmake -S work -B work/build-local -DCMAKE_BUILD_TYPE=Release
+          cmake --build work/build-local --parallel 4
+          work/build-local/im2_preview work/models/mark6.im2t work/mark6-ci.ppm 3.1 0 1
+          test -s work/mark6-ci.ppm
+      - name: Compile PS Vita VPK in official VitaSDK Docker
+        shell: bash
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE/work:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc 'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Verify VPK structure
+        shell: bash
+        run: |
+          test -s work/build-vita/IronMan2_Asset_Beta.vpk
+          unzip -l work/build-vita/IronMan2_Asset_Beta.vpk
+          unzip -Z1 work/build-vita/IronMan2_Asset_Beta.vpk | grep -Fx eboot.bin
+      - name: Upload PS Vita VPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_Asset_Beta_VPK
+          path: work/build-vita/IronMan2_Asset_Beta.vpk
+          if-no-files-found: error
