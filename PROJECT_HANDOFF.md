@@ -158,3 +158,15 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - Extracted VPK `IronMan2_Armor_B9.vpk`: **5,801,802 bytes**, SHA256 `4308973a55018a0a6853c3a8c9336b1b525d9c69a613928d504d9bc6ab57869e`. Archive CRC correct; contains `eboot.bin`, 5 validated `.im2t` and 12 validated `.im2v` binary files. `param.sfo` shows app ID **IM2F00006**, title "Iron Man 2 - Armor B9", version 01.06.
 - Previous B8 app ID IM2E00005 unchanged. **B9 real Vita hardware test PENDING.** Ask user to install B9 next to B8 and test Mark V visuals, Mark IV/Stealth animation, Mark VI horizontal flight, WarMachine landing and target range; record FPS/CPU/SDL and glitches.
 - B8 hardware HUD snapshots show ~18-23 FPS for armored animated models, ~27 FPS Stealth, **SDL 28-29ms** almost independent of CPU drawing (~8-25ms). A probable video/presentation cap remains; profiling Vulkan/SDL VSync and GPU path is next performance investigation; NOT yet proven.
+
+
+## B10 FIVE-STAGE FRAME PROFILER — SUCCESSFUL BUILD 2026-10-12
+- Built isolated new VPK from known-good B9: `IronMan2_Profile_B10.vpk`. User is away from Vita; hardware results pending.
+- Sources: `profile_b10/b10_overlay.zip`; reproducible workflow: `.github/workflows/profile-b10.yml`. New app ID `IM2G00007`, separate from B9 `IM2F00006`; does not overwrite previous tests.
+- CI successful: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38259073854 (artifact `IronMan2_FrameProfile_B10_VPK` ID `11752115961`).
+- VPK exactly 5,803,293 bytes; SHA256 `caaaca6a61b0adb25d14cb61576dd8cd90ed5b3c83876383ca22226212aff008`. Artifact ZIP and VPK CRC tests passed. Verified `eboot.bin`, five original suit `.im2t`, 12 `.im2v`, SFO app ID `IM2G00007`.
+- Instrumented HUD now measures per completed frame `AN` (apply baked animation), `CPU` (software 480x272 draw), `UP` (`SDL_UpdateTexture`), `COPY` (`SDL_RenderClear` + `SDL_RenderCopy`) and `PRES` (`SDL_RenderPresent` wall-time), in addition to FPS. These counters are CPU wall-time calls, NOT hardware GPU cycles.
+- **SELECT toggles VSync** on/off by recreating SDL_Renderer + texture; default ON. When requested VSync unsupported, status shows FALL, otherwise VS ON/OFF. Keyboard `V` toggles VSync and `Z` wireframe only on computer; old SELECT wireframe function intentionally replaced for this standalone profiler. On toggle it attempts no-VSync recovery if new renderer fails.
+- Native builds/tests: `b7_validate`, `b8_validate`, `b9_validate`, `b10_validate` all pass; original five suit and combat systems kept.
+- Known B8/B9 user hardware measurements: FPS roughly 18–27, `SDL 28–29MS` combined, CPU ~8–25ms. **No proof VSync is actual limiter** yet; need user to compare 15-second idle scenes at matching camera+armor with VS ON then OFF, report FPS, AN/CPU/UP/COPY/PRES and tearing. Do not claim performance gain before hardware test.
+- Next: if PRES dominates, explore GPU/SDL present; if UP dominates, upload format/persistent streaming; if CPU dominates, hardware 3D acceleration/vitaGL or faster raster pipeline. Preserve B9 last user-untested suit build and B8 last hardware-confirmed animation build.
