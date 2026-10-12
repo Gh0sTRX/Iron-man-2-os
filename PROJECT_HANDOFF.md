@@ -83,3 +83,13 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - This is NOT a keyframe decoder, skinning implementation, or original animation reproduction.
 - Reproducible script + full 972-entry inventory (file names/sizes): `research/IronMan2_Animasyon_Tarama_2026-10-12.zip`. Findings: `research/ANIMATION_AUDIT_2026-10-12.md`.
 - Next research: decode original per-bone keyframe data and skeleton-parent graph, then skeletal weights, after prioritizing actual PS Vita B5 profiling (CPU vs SDL) when user returns. No new Vita install is needed to do that offline.
+
+
+## B6 MAJOR BREAKTHROUGH — FULL ANIMATION TRANSFORM STREAMS (2026-10-12)
+- User authorized continued technical progress. Original `.anim` streams for **both complete iOS IPAs** were reverse engineered end-to-end: iOS 1.0.0 **972/972** valid, iOS 1.0.3 **989/989** valid. Every clip's bytes consumed with no leftovers; all names and transform channels parsed.
+- Both IPAs share **972 byte-identical clips**, while iOS 1.0.3 adds **17 iPad civilian clips** (man1/woman1). These are not Iron Man armor additions.
+- Format: for each named joint, position channel constant 3*f32 or dynamic signed i32 timestamp+3*f32; next, for each named joint, quaternion channel constant 4*i16 or dynamic signed i32 timestamp+4*i16. Quaternion normalized by 32767. Spider enemy clip has -66/-33ms preroll. 1.0.0 contains 962,221 keyframe/static samples (5419 animated position and 18,619 animated rotation channels), 1.0.3 contains 983,310 samples.
+- A functional **C11 .im2a loader/player** with normalized interpolated bone positions/quaternions was compiled under GCC with -Wall -Wextra -Werror, passed 45 sample tests and 5 exact binary reserializations. Six example clips + conversion scripts, both full CSV inventories and an offline local joint quaternion motion inspector HTML are saved.
+- **New immutable source bundle** `research/B6_Animation_Decoder_Runtime.zip`; technical report: `research/B6_ANIMATION_DECODER_REPORT.md`; commit `2d522aaf99c9ea6d1481b2047949c86473fee0a3`. Nothing changed B4/B5 versions.
+- **NOT YET accomplished**: animating 3D armor itself. Missing original BDAE skeleton parent hierarchy, bind matrices and per-vertex skinning weights; quaternion convention orientation needs 3D confirmation. This is a data/runtime breakthrough, **not a working B6 VPK**. Do not claim otherwise.
+- Next crucial engineering step: parse bone hierarchy, transforms and skin weights from `Iron_man_mark6.bdae` or `warmachine.bdae`, connect one of the newly decoded motion tracks, then compile isolated actual animated Vita hardware test. B5 FPS/CPU MS/SDL MS hardware test still pending.
