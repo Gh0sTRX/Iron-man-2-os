@@ -1,0 +1,29 @@
+name: Inspect Original B7 Skinning Pipeline
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/b13-source-audit.yml"]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect B7 research files and pipeline signatures
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          p="research/B7_Skinning_Tools.zip"
+          with zipfile.ZipFile(p) as z:
+              for i in z.infolist():
+                  print("ENTRY",i.filename,i.file_size)
+              for n in z.namelist():
+                  if n.endswith(".py"):
+                      print("\n### BEGIN "+n)
+                      s=z.read(n).decode("utf-8","replace")
+                      print(s[:45000])
+                      print("### END "+n)
+          PY
