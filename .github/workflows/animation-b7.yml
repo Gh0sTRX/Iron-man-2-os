@@ -38,15 +38,36 @@ jobs:
               assert len(b)==20+frames*n*12 and duration>=500
               print(name,'frames',frames,'vertices',n,'duration',duration)
           PY
-          printf '\nif(DEFINED ENV{VITASDK})\n  target_link_libraries(im2_beta stdc++ mathneon taihen_stub SceKernelDmacMgr_stub)\nendif()\n' >> work/CMakeLists.txt
-          printf '%s\n' \
-            'if(DEFINED ENV{VITASDK})' \
-            '  foreach(lib vitaGL vitashark SceShaccCg_stub SceShaccCgExt SceAudio_stub SceAudioIn_stub SceAudioOut_stub SceCommonDialog_stub SceMotion_stub SceIme_stub SceMsgDialog_stub SceHid_stub ScePower_stub)' \
-            '    if(EXISTS "$ENV{VITASDK}/arm-vita-eabi/lib/lib${lib}.a")' \
-            '      target_link_libraries(im2_beta ${lib})' \
-            '    endif()' \
-            '  endforeach()' \
-            'endif()' >> work/CMakeLists.txt
+          # Replace the base link list with a group: SDL2's Vita backends pull
+          # in vitaGL / GXM / C++ / mathneon / taiHEN libraries transitively.
+          # GNU ld only resolves static references left-to-right unless grouped.
+          cat >> work/CMakeLists.txt <<'CMAKE'
+          if(DEFINED ENV{VITASDK})
+            set_property(TARGET im2_beta PROPERTY LINK_LIBRARIES "")
+            set(b7_vita_libs)
+            foreach(lib
+              SDL2 vitaGL vitashark SceShaccCgExt
+              stdc++ mathneon m
+              taihen_stub
+              SceAppMgr_stub SceAppUtil_stub SceAudio_stub
+              SceAudioIn_stub SceAudioOut_stub SceCtrl_stub
+              SceCommonDialog_stub SceDisplay_stub SceGxm_stub
+              SceShaccCg_stub SceSysmodule_stub ScePower_stub
+              SceTouch_stub SceVshBridge_stub SceKernelDmacMgr_stub
+              SceMotion_stub SceIme_stub SceMsgDialog_stub SceHid_stub
+              SceSharedFb_stub SceGxmInternalForVsh_stub SceLibKernel_stub
+              SceLibcBridge_stub SceFios2_stub SceDisplayUser_stub
+              )
+              if(EXISTS "$ENV{VITASDK}/arm-vita-eabi/lib/lib${lib}.a")
+                list(APPEND b7_vita_libs ${lib})
+              elseif(NOT lib MATCHES "^Sce" AND NOT lib STREQUAL "taihen_stub")
+                message(FATAL_ERROR "Required Vita library not found: ${lib}")
+              endif()
+            endforeach()
+            target_link_libraries(im2_beta "-Wl,--start-group" ${b7_vita_libs} "-Wl,--end-group")
+            message(STATUS "B7 grouped Vita libraries: ${b7_vita_libs}")
+          endif()
+          CMAKE
           grep -q IM2D00004 work/CMakeLists.txt
       - name: Native C engine and animation restore test
         shell: bash
