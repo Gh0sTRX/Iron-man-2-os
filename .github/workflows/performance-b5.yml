@@ -1,0 +1,66 @@
+name: Build Iron Man 2 Vita Performance Beta B5
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/performance-b5.yml"
+      - "performance_b5/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Reconstruct B4 then apply optimized B5 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq flight_b4/flight_b4_overlay.zip -d work
+          unzip -oq performance_b5/b5_optimized_renderer.zip -d work
+          python3 work/tools/check_assets.py
+          sed -i \
+            -e 's/IronMan2_Asset_Beta\.vpk/IronMan2_Perf_B5.vpk/g' \
+            -e 's/IM2A00001/IM2C00003/g' \
+            -e 's/VERSION 01.01/VERSION 01.03/g' \
+            -e 's/Iron Man 2 - Asset Beta/Iron Man 2 - Performance B5/g' \
+            work/CMakeLists.txt
+          printf '\nif(DEFINED ENV{VITASDK})\n  target_link_libraries(im2_beta stdc++ mathneon taihen_stub SceKernelDmacMgr_stub)\nendif()\n' >> work/CMakeLists.txt
+          grep -q IM2C00003 work/CMakeLists.txt
+          grep -q 'CPU %.0fMS' work/src/renderer.c
+      - name: Build and test 4 models on Linux
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S work -B work/build-local -DCMAKE_BUILD_TYPE=Release
+          cmake --build work/build-local --parallel 4
+          for model in mark6 mark4 warmachine stealth; do
+            work/build-local/im2_preview work/models/${model}.im2t work/${model}-b5.ppm 3.1 0 1
+            test -s work/${model}-b5.ppm
+          done
+      - name: Compile PS Vita VPK in official VitaSDK Docker
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE/work:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc 'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Verify B5 VPK structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s work/build-vita/IronMan2_Perf_B5.vpk
+          unzip -t work/build-vita/IronMan2_Perf_B5.vpk | tail -1
+          unzip -Z1 work/build-vita/IronMan2_Perf_B5.vpk | grep -Fx eboot.bin
+          for model in mark6 mark4 warmachine stealth; do
+            unzip -Z1 work/build-vita/IronMan2_Perf_B5.vpk | grep -Fx "models/${model}.im2t"
+          done
+      - name: Upload PS Vita Performance B5
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_Performance_B5_VPK
+          path: work/build-vita/IronMan2_Perf_B5.vpk
+          if-no-files-found: error
