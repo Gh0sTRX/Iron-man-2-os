@@ -36,7 +36,7 @@ jobs:
           echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
           unzip -oq /tmp/b16-overlay.zip -d work
           # Keep the existing, separately successful action_b16 title ID IM2L00011 untouched.
-          sed -i -e 's/IM2L00011/IM2M00012/g' -e 's/IronMan2_Combat_B16_Expanded.vpk/IronMan2_Combat_B16_Expanded.vpk/g' -e 's/Iron Man 2 - Combat B16/Iron Man 2 - Combat B16E/g' work/CMakeLists.txt
+          sed -i -e 's/IM2L00011/IM2M00012/g' -e 's/IronMan2_Combat_B16.vpk/IronMan2_Combat_B16_Expanded.vpk/g' -e 's/Iron Man 2 - Combat B16/Iron Man 2 - Combat B16E/g' work/CMakeLists.txt
           python3 work/tools/check_assets.py
           python3 - <<'PY'
           from pathlib import Path
@@ -191,7 +191,7 @@ jobs:
           with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16_Expanded.vpk') as z:
             names=set(z.namelist())
             assert all('animations/'+e['asset']+'.im2v' in names for e in manifest)
-            assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==36
+            assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==59
             assert len([x for x in names if x.startswith('models/') and x.endswith('.im2t')])==5
           print('B15 VPK: five armors and 36 animation payloads')
           PY
