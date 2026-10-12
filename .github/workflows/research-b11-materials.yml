@@ -16,6 +16,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/b11_material_inventory.py
+          python3 research/b11_pointer_audit.py
       - name: Archive non-asset manifest
         uses: actions/upload-artifact@v4
         with:
