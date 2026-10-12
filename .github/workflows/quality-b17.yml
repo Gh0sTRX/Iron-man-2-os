@@ -36,6 +36,18 @@ jobs:
           echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
           unzip -oq /tmp/b16-overlay.zip -d work
           python3 work/tools/check_assets.py
+          # Original B10 regression has non-portable exact floating-point == assertions.
+          # Adapt only this reconstructed QA working copy; DO NOT modify source ZIPs or VPK.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('work/tools/test_b10.c')
+          s=p.read_text()
+          needle='p.upload_ms==3 && p.copy_ms==4'
+          assert s.count(needle)==1, 'B10 source changed; re-audit before applying patch'
+          s=s.replace(needle, '(p.upload_ms>2.999f && p.upload_ms<3.001f) && (p.copy_ms>3.999f && p.copy_ms<4.001f)')
+          p.write_text(s)
+          print('Applied QA-only epsilon fix to original B10 floating-point test.')
+          PY
           printf 'Native regression source reconstructed; B15/B16 known-good builds remain unchanged.\n'
       - name: Compile real Debug build (assert enabled) with ASan and UBSan
         shell: bash
