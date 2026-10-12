@@ -126,3 +126,14 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - All six archive resources passed binary header/length/frame validation and native C restore test; four assets passed, VitaSDK compiled; GitHub successful artifact upload.
 - **B7 NOT YET TESTED on actual PS Vita hardware**, so FPS, character animation visibility, performance and fluidity are unknown. Please ask user to install new B7 VPK, choose MarkVI/WarMachine, test walk, Circle ground/flight, WarMachine forward fly, landing, and send screenshots/FPS + CPU MS/SDL MS. Ask specifically if zırh arms/legs genuinely move and any deformations/crashes. Compare B4 ~13–15fps and B5 unknown. Do not declare full game port.
 - Latest correct code snapshot: `skinning_b7/b7_vita_overlay.zip` + baseline/B4/B5; workflow `.github/workflows/animation-b7.yml`. Keep old apps as rollback.
+
+
+## B8 FIRST TARGET COMBAT RANGE — CI SUCCESS; HARDWARE PENDING (2026-10-12)
+- New independent prototype built from exact B7 + B5/B4 baseline. `combat_b8/b8_overlay.zip`, README `combat_b8/README.md`, workflow `.github/workflows/combat-b8.yml` tracked at commit `d0ad1335fbeb6301f894de4b3fcfd37a85fae1e9`.
+- B8 implements **screen-space** right-stick aimed three-target repulsor practice, not the original game weapons: Square fires, 220ms cooldown, 21px radius hit, hit/shot counters, win state, 2D beam/spark. Ground/Flight, selected armor and six B7 original baked animation motion clips preserved.
+- Right analog now aims reticle **instead of** B7 camera orbit; D-pad L/R rotates armor, D-pad U/D zooms. Left analog move; Circle fly/land; L/R altitude down/up; Cross next armor; Select wireframe; Triangle reset arena; Start exit.
+- GCC C11 -Wall -Wextra -Werror native combat test PASS (miss, debouncing, 3 hits, victory, HUD). Four model assets verify. B7 native animation test PASS.
+- VitaSDK CI **SUCCESS** run https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38241156963 . GitHub artifact `IronMan2_Combat_B8_VPK`, ID `11742264631`.
+- Actual file `IronMan2_Combat_B8.vpk` **4,311,543 bytes**; SHA256 `1f849dbc21ce1e59bdb901fe75b58b4bfecbfe3a7b5ceb97730c01b16d43060a`. ZIP integrity passes, `eboot.bin`, 4 model .im2t and 6 original-motion .im2v found. `param.sfo` includes `IM2E00005` (new independent title ID), Combat B8.
+- **B8 NOT YET TESTED ON REAL PS VITA**; the user has the actual VPK in previous chat. Request screenshots + FPS and report success/fail for three target hits and the B7 arm/leg animation. No claim that its performance improved over hardware-tested B4 13-15 FPS (B5 hardware metrics pending).
+- Separate graphics/gameplay improvement track: optimization to >30 FPS and future GPU path + actual 3D ray/collision, repulsor projectile and real-world enemy/missions. B8 is a REPRODUCIBLE PLAYABLE PROTOTYPE, not a faithful port of Iron Man 2 campaign.
