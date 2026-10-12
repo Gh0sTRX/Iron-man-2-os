@@ -32,9 +32,11 @@ jobs:
           unzip -oq /tmp/b13-overlay.zip -d work
           unzip -oq third_person_b14/b14_overlay.zip -d work
           unzip -oq mechanics_b15/b15_overlay.zip -d work
-          cat combat_b16/b16-overlay.part?? > /tmp/b16-overlay.zip
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done > /tmp/b16-overlay.zip
           echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
           unzip -oq /tmp/b16-overlay.zip -d work
+          # Keep the existing, separately successful action_b16 title ID IM2L00011 untouched.
+          sed -i -e 's/IM2L00011/IM2M00012/g' -e 's/IronMan2_Combat_B16_Expanded.vpk/IronMan2_Combat_B16_Expanded.vpk/g' -e 's/Iron Man 2 - Combat B16/Iron Man 2 - Combat B16E/g' work/CMakeLists.txt
           python3 work/tools/check_assets.py
           python3 - <<'PY'
           from pathlib import Path
@@ -126,7 +128,7 @@ jobs:
               assert len(d['palm_anchors'][prefix])==2
           print('B16 verify: 23 authentic-skinned clips and 3 mask files')
           PY
-          grep -q IM2L00011 work/CMakeLists.txt
+          grep -q IM2M00012 work/CMakeLists.txt
           test -s work/models/suitcase.im2t
       - name: Native C animation and combat tests
         shell: bash
@@ -163,7 +165,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          P=work/build-vita/IronMan2_Combat_B16.vpk
+          P=work/build-vita/IronMan2_Combat_B16_Expanded.vpk
           test -s "$P"
           unzip -t "$P" | tail -1
           unzip -Z1 "$P" | grep -Fx eboot.bin
@@ -176,7 +178,7 @@ jobs:
           python3 - <<'PY'
           import json,zipfile
           manifest=json.load(open('work/docs/B13_ANIMATION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16_Expanded.vpk') as z:
               names=set(z.namelist())
               assert all('animations/'+x['asset']+'.im2v' in names for x in manifest)
               assert all('models/'+x+'.im2t' in names for x in ['mark6','mark4','stealth','warmachine','suitcase'])
@@ -186,7 +188,7 @@ jobs:
           python3 - <<'PY'
           import zipfile,json
           manifest=json.load(open('work/docs/B15_NEW_MOTION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16_Expanded.vpk') as z:
             names=set(z.namelist())
             assert all('animations/'+e['asset']+'.im2v' in names for e in manifest)
             assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==36
@@ -196,7 +198,7 @@ jobs:
           python3 - <<'PY'
           import zipfile,json
           manifest=json.load(open('work/docs/B16_ANIMATION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16_Expanded.vpk') as z:
               names=set(z.namelist())
               assert all('animations/'+x['asset']+'.im2v' in names for x in manifest['animations'])
               for prefix in ['mark6','suitcase','warmachine']:
@@ -209,6 +211,6 @@ jobs:
       - name: Upload B16 VPK
         uses: actions/upload-artifact@v4
         with:
-          name: IronMan2_Combat_B16_VPK
-          path: work/build-vita/IronMan2_Combat_B16.vpk
+          name: IronMan2_Combat_B16_Expanded_VPK
+          path: work/build-vita/IronMan2_Combat_B16_Expanded.vpk
           if-no-files-found: error
