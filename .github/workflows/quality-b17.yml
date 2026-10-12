@@ -1,0 +1,81 @@
+name: Iron Man 2 Vita B17 Native QA (Debug and Sanitizers)
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/quality-b17.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  native-sanitizers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout private source
+        uses: actions/checkout@v4
+      - name: Reconstruct B16E without changing stable VPKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq flight_b4/flight_b4_overlay.zip -d work
+          unzip -oq performance_b5/b5_optimized_renderer.zip -d work
+          unzip -oq skinning_b7/b7_vita_overlay.zip -d work
+          unzip -oq combat_b8/b8_overlay.zip -d work
+          unzip -oq armor_b9/b9_overlay.zip -d work
+          unzip -oq profile_b10/b10_overlay.zip -d work
+          cat animation_b13/b13-overlay.part?? > /tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done > /tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 work/tools/check_assets.py
+          printf 'Native regression source reconstructed; B15/B16 known-good builds remain unchanged.\n'
+      - name: Compile real Debug build (assert enabled) with ASan and UBSan
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S work -B work/build-b17-asan \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_FLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_CXX_FLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+          cmake --build work/build-b17-asan --parallel 3
+      - name: Assert-enabled B7-B16 regression tests under memory sanitizers
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ASAN_OPTIONS="detect_leaks=1:halt_on_error=1:print_stacktrace=1"
+          export UBSAN_OPTIONS="halt_on_error=1:print_stacktrace=1"
+          cd work
+          for testname in b7_validate b8_validate b9_validate b10_validate b13_validate b14_validate b15_validate b16_validate; do
+            echo "::group::${testname} - Debug+ASan+UBSan"
+            "./build-b17-asan/${testname}"
+            echo "::endgroup::"
+          done
+          echo 'All eight assert-enabled native test programs passed under ASan/UBSan.'
+      - name: Inspect manifest consistency separately from assert()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,struct
+          from pathlib import Path
+          root=Path('work')
+          manifest=json.loads((root/'docs/B16_ANIMATION_MANIFEST.json').read_text())
+          assert len(manifest['animations'])==23
+          for e in manifest['animations']:
+              b=(root/'animations'/f"{e['asset']}.im2v").read_bytes()
+              magic,vert,frames,fps,duration=struct.unpack_from('<4s4I',b)
+              assert magic==b'IM2V' and vert==e['vertices'] and frames==e['frames']
+              assert fps==20 and duration==e['duration_ms']
+              assert len(b)==20+12*vert*frames
+              assert hashlib.sha256(b).hexdigest()==e['sha256']
+          print('B17: 23 original-derived B16 motion payloads verified against manifest.')
+          PY
