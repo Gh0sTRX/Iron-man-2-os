@@ -42,9 +42,12 @@ jobs:
           from pathlib import Path
           p=Path('work/tools/test_b10.c')
           s=p.read_text()
-          needle='p.upload_ms==3 && p.copy_ms==4'
-          assert s.count(needle)==1, 'B10 source changed; re-audit before applying patch'
-          s=s.replace(needle, '(p.upload_ms>2.999f && p.upload_ms<3.001f) && (p.copy_ms>3.999f && p.copy_ms<4.001f)')
+          import re
+          print('B10 source before test-only tolerance fix:')
+          print(s[:2400])
+          pattern=r'p\\.upload_ms\\s*==\\s*3\\s*&&\\s*p\\.copy_ms\\s*==\\s*4'
+          s, n=re.subn(pattern, '(p.upload_ms>2.999f && p.upload_ms<3.001f) && (p.copy_ms>3.999f && p.copy_ms<4.001f)', s)
+          assert n==1, 'B10 source assertion not found uniquely; inspect printed source before modifying'
           p.write_text(s)
           print('Applied QA-only epsilon fix to original B10 floating-point test.')
           PY
@@ -66,12 +69,19 @@ jobs:
           export ASAN_OPTIONS="detect_leaks=1:halt_on_error=1:print_stacktrace=1"
           export UBSAN_OPTIONS="halt_on_error=1:print_stacktrace=1"
           cd work
+          failures=0
           for testname in b7_validate b8_validate b9_validate b10_validate b13_validate b14_validate b15_validate b16_validate; do
             echo "::group::${testname} - Debug+ASan+UBSan"
-            "./build-b17-asan/${testname}"
+            if "./build-b17-asan/${testname}"; then
+              echo "PASSED ${testname}"
+            else
+              echo "::error::FAILED ${testname}"
+              failures=$((failures+1))
+            fi
             echo "::endgroup::"
           done
-          echo 'All eight assert-enabled native test programs passed under ASan/UBSan.'
+          echo "B17 regression failures: ${failures} / 8"
+          test "${failures}" -eq 0
       - name: Inspect manifest consistency separately from assert()
         shell: bash
         run: |
