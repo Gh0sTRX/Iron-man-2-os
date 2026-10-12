@@ -63,3 +63,14 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - Flight B4 is a successful **hardware-tested movement state prototype**, but is too slow for satisfactory actual gameplay.
 - NEXT PRIORITIES: optimize software rasterizer and presentation pathway; use *actual Vita* frame-rate measurements to validate any gain; then recover authentic rigging and flight animation from original BDAE/ANIM. Optimize before loading levels/enemies. Keep B4 and baseline VPK unchanged as rollback versions.
 - If this project resumes in a fresh conversation, do not ask user to repeat these details: check repo docs and build/run the next independent optimization test variant. Do not pretend the project is running in background.
+
+
+## B5 PERFORMANCE TEST READY (built 2026-10-12; hardware test pending)
+- GitHub commit `0022dd5badd3790828c1f8d4b9fdde47ef631709` introduced a NEW, isolated optimized rasterizer overlay `performance_b5/b5_optimized_renderer.zip` and separate workflow `.github/workflows/performance-b5.yml`.
+- Successful GitHub Actions workflow `Build Iron Man 2 Vita Performance Beta B5`: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38230545688 (all build, asset, desktop render, VPK verification steps green).
+- Artifact `IronMan2_Performance_B5_VPK`, ID `11737869856`; actual `IronMan2_Perf_B5.vpk` 2,958,871 bytes; SHA256 `f94c00beb9b7226d2cefad19681a3fc7f3d93e9374be200771899e9310ab5b01`. VPK archive CRC verified. `TITLE_ID=IM2C00003` distinct from B3 and B4; includes all four .im2t and eboot.bin.
+- B5 code improves inner triangle raster loop with incremental barycentric coordinate/depth/texture calculations, reduces expensive per-pixel calls while retaining perspective-correct texture mapping.
+- Desktop test at fixed camera: FOUR models match B4 image within 0–1 changed pixels per model (excluding HUD). Across 9 repeated native benchmarks the median per-frame raster time improved by about 1.3x–1.5x. This is **NOT** a measured Vita performance gain.
+- New upper-right performance HUD shows `FPS`, `CPU NNMS` (CPU 3D raster), `SDL NNMS` (texture upload + present). This diagnostic will identify the 13–15fps B4 bottleneck.
+- **HARDWARE TEST B5 STILL PENDING**. Next ask: install B5 beside B4, wait 15 seconds with War Machine/Mark VI idle in same camera settings, report three numbers FPS/CPU/SDL and if flight mode remains stable. Do not promise 30/60 FPS until measurements.
+- True skeletal animation / hand thrusters are not restored. Still independent prototype, not original game port.
