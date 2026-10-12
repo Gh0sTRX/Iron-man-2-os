@@ -27,3 +27,16 @@ jobs:
                       print(s[:45000])
                       print("### END "+n)
           PY
+
+      - name: Dump original B6 tree and sampling helpers
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          with zipfile.ZipFile("research/B6_Rig_Hierarchy_Prototype.zip") as z:
+              for n in z.namelist():
+                  if n.endswith((".py",)):
+                      print("### BEGIN RIG "+n)
+                      print(z.read(n).decode("utf-8","replace")[:22000])
+                      print("### END RIG "+n)
+          PY
