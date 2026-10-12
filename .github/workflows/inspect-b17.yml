@@ -25,7 +25,7 @@ jobs:
             fi
             unzip -oq "$z" -d work
           done
-          cat combat_b16/b16-overlay.part?? > /tmp/b16.zip
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done > /tmp/b16.zip
           echo "c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16.zip" | sha256sum -c -
           unzip -oq /tmp/b16.zip -d work
       - name: Print source map, controls, animation names and relevant code
