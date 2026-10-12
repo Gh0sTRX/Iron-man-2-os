@@ -209,6 +209,37 @@ jobs:
               assert 'eboot.bin' in names
           print('B17 VPK verified: original motion assets, 5 armors, and independent TITLE_ID')
           PY
+      - name: Verify B17 binary identity and exact package SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import struct,hashlib,zipfile
+          from pathlib import Path
+          p=Path('work/build-vita/IronMan2_Arena_B17.vpk')
+          b=p.read_bytes()
+          digest=hashlib.sha256(b).hexdigest()
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None, 'Damaged ZIP member'
+              sf=z.read('sce_sys/param.sfo')
+              magic,version,keybase,datbase,n=struct.unpack_from('<5I',sf,0)
+              assert magic==0x46535000, 'Invalid PSF header'
+              result={}
+              for i in range(n):
+                  keyoff,fmt,length,maxlen,off=struct.unpack_from('<HHIII',sf,20+i*16)
+                  keybytes=sf[keybase+keyoff:].split(b'\x00',1)[0]
+                  key=keybytes.decode('ascii','replace')
+                  value=sf[datbase+off:datbase+off+length]
+                  result[key]=value.split(b'\x00',1)[0].decode('ascii','replace') if fmt==0x204 else value
+              assert result.get('TITLE_ID')=='IM2N00013', result.get('TITLE_ID')
+              assert result.get('TITLE','').startswith('Iron Man 2 - Arena B17'),result.get('TITLE')
+              print('B17 VERIFIED TITLE_ID:',result['TITLE_ID'])
+              print('B17 VERIFIED TITLE:',result['TITLE'])
+              print('B17 BINARY SIZE:',len(b))
+              print('B17 VPK SHA256:',digest)
+              print('B17 model count:',len([x for x in z.namelist() if x.startswith('models/') and x.endswith('.im2t')]))
+              print('B17 animation count:',len([x for x in z.namelist() if x.startswith('animations/') and x.endswith('.im2v')]))
+          PY
       - name: Upload B17 VPK
         uses: actions/upload-artifact@v4
         with:
