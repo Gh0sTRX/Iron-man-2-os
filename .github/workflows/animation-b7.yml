@@ -1,0 +1,76 @@
+name: Build Iron Man 2 Vita Original Animation B7
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/animation-b7.yml"
+      - "skinning_b7/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout private sources
+        uses: actions/checkout@v4
+      - name: Combine known-good viewer and original animation B7
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq flight_b4/flight_b4_overlay.zip -d work
+          unzip -oq performance_b5/b5_optimized_renderer.zip -d work
+          unzip -oq skinning_b7/b7_vita_overlay.zip -d work
+          python3 work/tools/check_assets.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          base=Path('work/animations')
+          files={'mark6_hover':802,'mark6_walk':802,'mark6_land':802,
+                 'warmachine_hover':1292,'warmachine_walk':1292,'warmachine_fly':1292}
+          for name,nv in files.items():
+              b=(base/(name+'.im2v')).read_bytes()
+              magic,n,frames,fps,duration=struct.unpack_from('<4s4I',b)
+              assert magic==b'IM2V' and n==nv and frames>2 and fps==20
+              assert len(b)==20+frames*n*12 and duration>=500
+              print(name,'frames',frames,'vertices',n,'duration',duration)
+          PY
+          printf '\nif(DEFINED ENV{VITASDK})\n  target_link_libraries(im2_beta stdc++ mathneon taihen_stub SceKernelDmacMgr_stub)\nendif()\n' >> work/CMakeLists.txt
+          grep -q IM2D00004 work/CMakeLists.txt
+      - name: Native C engine and animation restore test
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S work -B work/build-local -DCMAKE_BUILD_TYPE=Release
+          cmake --build work/build-local --parallel 4
+          (cd work && ./build-local/b7_validate)
+          work/build-local/im2_preview work/models/mark6.im2t work/mark6-preview.ppm 3.1 0 1
+          test -s work/mark6-preview.ppm
+      - name: Compile Vita VPK with VitaSDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE/work:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc 'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Check independent B7 VPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=work/build-vita/IronMan2_Anim_B7.vpk
+          test -s "$P"
+          unzip -t "$P" | tail -1
+          unzip -Z1 "$P" | grep -Fx eboot.bin
+          for name in mark6 mark4 warmachine stealth; do
+            unzip -Z1 "$P" | grep -Fx "models/${name}.im2t"
+          done
+          for name in mark6_hover mark6_walk mark6_land warmachine_hover warmachine_walk warmachine_fly; do
+            unzip -Z1 "$P" | grep -Fx "animations/${name}.im2v"
+          done
+      - name: Upload B7 VPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_OriginalAnimation_B7_VPK
+          path: work/build-vita/IronMan2_Anim_B7.vpk
+          if-no-files-found: error
