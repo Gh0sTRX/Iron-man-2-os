@@ -1,0 +1,116 @@
+name: Build Iron Man 2 Vita Frame Profile B10
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/profile-b10.yml"
+      - "profile_b10/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout private sources
+        uses: actions/checkout@v4
+      - name: Combine known-good viewer and original animation B7
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq flight_b4/flight_b4_overlay.zip -d work
+          unzip -oq performance_b5/b5_optimized_renderer.zip -d work
+          unzip -oq skinning_b7/b7_vita_overlay.zip -d work
+          unzip -oq combat_b8/b8_overlay.zip -d work
+          unzip -oq armor_b9/b9_overlay.zip -d work
+          unzip -oq profile_b10/b10_overlay.zip -d work
+          python3 work/tools/check_assets.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          base=Path('work/animations')
+          files={'mark6_hover':802,'mark6_walk':802,'mark6_land':802,
+                 'warmachine_hover':1292,'warmachine_walk':1292,'warmachine_fly':1292}
+          for name,nv in files.items():
+              b=(base/(name+'.im2v')).read_bytes()
+              magic,n,frames,fps,duration=struct.unpack_from('<4s4I',b)
+              assert magic==b'IM2V' and n==nv and frames>2 and fps==20
+              assert len(b)==20+frames*n*12 and duration>=500
+              print(name,'frames',frames,'vertices',n,'duration',duration)
+          PY
+          # Replace the base link list with a group: SDL2's Vita backends pull
+          # in vitaGL / GXM / C++ / mathneon / taiHEN libraries transitively.
+          # GNU ld only resolves static references left-to-right unless grouped.
+          cat >> work/CMakeLists.txt <<'CMAKE'
+          if(DEFINED ENV{VITASDK})
+            set_property(TARGET im2_beta PROPERTY LINK_LIBRARIES "")
+            set(b7_vita_libs)
+            foreach(lib
+              SDL2 vitaGL vitashark SceShaccCgExt
+              stdc++ mathneon m
+              taihen_stub
+              SceAppMgr_stub SceAppUtil_stub SceAudio_stub
+              SceAudioIn_stub SceAudioOut_stub SceCtrl_stub
+              SceCommonDialog_stub SceDisplay_stub SceGxm_stub
+              SceShaccCg_stub SceSysmodule_stub ScePower_stub
+              SceTouch_stub SceVshBridge_stub SceKernelDmacMgr_stub
+              SceMotion_stub SceIme_stub SceMsgDialog_stub SceHid_stub
+              SceSharedFb_stub SceGxmInternalForVsh_stub SceLibKernel_stub
+              SceLibcBridge_stub SceFios2_stub SceDisplayUser_stub
+              )
+              if(EXISTS "$ENV{VITASDK}/arm-vita-eabi/lib/lib${lib}.a")
+                list(APPEND b7_vita_libs ${lib})
+              elseif(NOT lib MATCHES "^Sce" AND NOT lib STREQUAL "taihen_stub")
+                message(FATAL_ERROR "Required Vita library not found: ${lib}")
+              endif()
+            endforeach()
+            target_link_libraries(im2_beta "-Wl,--start-group" ${b7_vita_libs} "-Wl,--end-group")
+            message(STATUS "B7 grouped Vita libraries: ${b7_vita_libs}")
+          endif()
+          CMAKE
+          grep -q IM2G00007 work/CMakeLists.txt
+          test -s work/models/suitcase.im2t
+      - name: Native C animation and combat tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S work -B work/build-local -DCMAKE_BUILD_TYPE=Release
+          cmake --build work/build-local --parallel 4
+          (cd work && ./build-local/b7_validate)
+          (cd work && ./build-local/b8_validate)
+          (cd work && ./build-local/b9_validate)
+          (cd work && ./build-local/b10_validate)
+          (cd work && ./build-local/b8_preview b8-shot.ppm)
+          test -s work/b8-shot.ppm
+          work/build-local/im2_preview work/models/mark6.im2t work/mark6-preview.ppm 3.1 0 1
+          work/build-local/im2_preview work/models/suitcase.im2t work/suitcase-preview.ppm 3.1 0 1
+          test -s work/suitcase-preview.ppm
+          test -s work/mark6-preview.ppm
+      - name: Compile Vita VPK with VitaSDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE/work:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc 'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Check independent B10 VPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=work/build-vita/IronMan2_Profile_B10.vpk
+          test -s "$P"
+          unzip -t "$P" | tail -1
+          unzip -Z1 "$P" | grep -Fx eboot.bin
+          for name in mark6 mark4 warmachine stealth suitcase; do
+            unzip -Z1 "$P" | grep -Fx "models/${name}.im2t"
+          done
+          for name in mark6_hover mark6_walk mark6_land mark6_fly warmachine_hover warmachine_walk warmachine_fly warmachine_land suitcase_hover suitcase_walk suitcase_land suitcase_fly; do
+            unzip -Z1 "$P" | grep -Fx "animations/${name}.im2v"
+          done
+      - name: Upload B10 VPK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_FrameProfile_B10_VPK
+          path: work/build-vita/IronMan2_Profile_B10.vpk
+          if-no-files-found: error
