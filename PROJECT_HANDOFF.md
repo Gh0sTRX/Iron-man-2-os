@@ -93,3 +93,12 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - **New immutable source bundle** `research/B6_Animation_Decoder_Runtime.zip`; technical report: `research/B6_ANIMATION_DECODER_REPORT.md`; commit `2d522aaf99c9ea6d1481b2047949c86473fee0a3`. Nothing changed B4/B5 versions.
 - **NOT YET accomplished**: animating 3D armor itself. Missing original BDAE skeleton parent hierarchy, bind matrices and per-vertex skinning weights; quaternion convention orientation needs 3D confirmation. This is a data/runtime breakthrough, **not a working B6 VPK**. Do not claim otherwise.
 - Next crucial engineering step: parse bone hierarchy, transforms and skin weights from `Iron_man_mark6.bdae` or `warmachine.bdae`, connect one of the newly decoded motion tracks, then compile isolated actual animated Vita hardware test. B5 FPS/CPU MS/SDL MS hardware test still pending.
+
+
+## B6 ORIGINAL BDAE RIG RECOVERY — 2026-10-12
+- Continued analysis reached a SECOND B6 breakthrough: original version `0,0,0,133` BDAE scene nodes are 72-byte records: node-name u32 at +0, pos 3*f32 at +0x0C, quaternion 4*f32 at +0x18, scale 3*f32 at +0x28, child count u32 at +0x34 and absolute children array pointer at +0x38; children contiguous 72-byte records.
+- Verified real **96 nodes for Iron Man Mark VI and 112 nodes for War Machine** with complete parent-child graph, valid local transforms and no cycles/duplicate names.
+- Bound real decoded .anim channels to those named nodes, evaluated true graph-propagated positions and orientations with quaternion composition. Produced 31-frame **diagnostic moving skeleton GIFs** for `IronMan_Air_land.anim` and `Warmachine_Aim_Float_idle.anim`; animations have changing joint positions as expected.
+- Rig prototype code + JSON + GIFs: `research/B6_Rig_Hierarchy_Prototype.zip`; report `research/B6_RIG_PARENT_HIERARCHY.md`; commit `985c04b5d57c72f5e1c6ae2aee4ac357491679cb`.
+- **Still no skinned 3D armor animation nor new B6 VPK.** Missing vertex joint indices/weights, bind-pose inverse matrices and mesh-node association. Do not misrepresent skeleton preview as textured original-game animation.
+- Priority: reverse engineer skinning layout in Mark VI / War Machine BDAE and apply B6 animations to existing Vita armor renderer. Preserve B4/B5. Actual B5 FPS/CPU/SDL hardware values remain unknown.
