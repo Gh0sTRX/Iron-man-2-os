@@ -1,15 +1,16 @@
-# B16 — real original 2010 armors / 3D combat sandbox
-
-Built independently from B15; uses 2010 IPA original meshes and 27 new original animation clips with original BDAE skinning, in addition to B15's 36 streams (63 total). Code and gameplay behavior are independent reimplementations, **not a recovered original game engine**.
-
-## User-verified issues B15 -> B16
-- Idle hover wrongly held repulsor arms up (Aim_Float_idle). New *authentic* IronMan_Air_Idel arms-down animation retargets for Mark IV/V/VI/Stealth.
-- WarMachine Aim_Ground_idle/Float_idle raised a palm; selects lower-arms `Warmachine_Aim_M_Ground_idle` and `Warmachine_Aim_M_Float_idle` (genuine original clips).
-- Flight Stage 1 analog 0.16–0.77, Stage 2 >0.77; 0.70/0.77 hysteresis. Normal fast/RUSH unchanged otherwise.
-- Repulsor muzzle now from original skinned palm mesh vertex for each armor, with native palette-derived per-vertex arm weight masks; Unibeam from original mesh chest vertex, not screen fixed line.
-- New 3D ray-vs-sphere hit tests, simple auto-regenerating 3-target waves, missile target cone and projectile preview, Unibeam press/hold/release energy charge, 3D proximity melee and throw, combat Combo1-3, strong punch, air strike, dodge, solid-world AABB test obstacles. Targets use 3D coords. Projectile missile damage is currently computed at lock time rather than physical collision along the way.
-- SELECT now cycles *Repulsor/Unibeam/Missile/Melee/Grab/Dodge*, Square fires; holding Square charges Unibeam. Old SELECT VSync moved to desktop V diagnostic. Analog/head-pivot and user inversion toggles preserved.
-- All 27 new skinning clips plus exported vertex masks validated and archived in private `combat_b16/b16-overlay.part00..06`. Joined ZIP SHA256 `e488190ea10b2de53ab624efb64c475e15404c2eeb47e1b959be70cf428b2e33`.
-- Native regression tests B7-B16 green, plus two neutral/beam rendered previews from C renderer (not PS Vita screenshots).
-- **Not original game fidelity**: attack values/energy/missile mechanics newly authored. No original enemy AI, stage mission script, full QTE system, grab animation for all suits, continuous 3D missile collision or GPU rendering. Original catalog contains 304 named player character clips; *not 304 separate skills*.
-- New experimental title ID IM2L00011 (does not overwrite known-good B15 IM2K00010); VPK `IronMan2_Combat_B16.vpk`, official VitaSDK build must pass CI. Real Vita hardware test REQUIRED before runtime claims.
+# Iron Man 2 Vita – B16 Original Idle & Weapon Core (2026-10-13)
+This is an independent experimental Vita game mechanics build, NOT a port of Gameloft's original 2010 iOS engine.
+## User-verified B15 problems and B16 fixes
+- B15 camera and movement feel good on real PS Vita; retain all existing camera and stick controls.
+- Idle hover in five suits incorrectly uses Aim_Float_idle and raises palms as if already firing. Recovered native `IronMan_Air_Idel` and baked for Mark VI, Mark V and retargeted War Machine. Mark IV and Stealth reuse verified identical Mark VI topology. War Machine grounded relaxed stance is retargeted authentic `IronMan_Ground_Idel`, not its native Aim_Ground_idle.
+- Air Stage 1 extends until **0.78 stick magnitude**; hysteresis lowers Stage 2→1 exit to 0.67 to prevent threshold flicker. Stage 2 is horizontal flight; Stage 3 is original RUSH pose with our authored speed/trigger. No original dedicated War Machine RUSH source proven.
+- Added 18 original `IronMan_Aim_Ground/Float_Beam1/2/3` skinned datasets (Mark VI/Mark V/War Machine, latter retargeted). Upper arm deformation uses authenticated joint-weight masks from original BDAE, instead of rotating a guessed shoulder. Real animated hand vertex (via original bone weights) now anchors the on-screen repulsor beam. Mark IV and Stealth use same geometry and UV topology as Mark VI.
+- New separate C11 B16Combat module adds selectable prototype Repulsor/Unibeam/Missile/Melee, energy recharge, target HP, simple 3-step proximity melee, homing missile marker, continuous target waves and actual ray-vs-3D-sphere collision from camera to world target and hand to hit. These values/controls are OUR prototype, **NOT** decompiled original iOS weapon damage/physics/lock-on/combos.
+- Vita D-pad Up/Down cycles weapon; D-pad Left/Right still toggles direction inversion. Left analog move, right camera, Circle ground/flight, Triangle Run/Boost, R/L altitude, Square fire, Cross suit, Select VSync, Start exit.
+## QA
+- Source generated from the user's original 1.0.0 IPA, BDAE skeleton/inverse bind, per-vertex skinning. B16 zip includes 23 new original-derived IM2V clips and 3 BDAE-derived IM2M arm masks. 36 older clips stay in the build => 59 total. `docs/B16_ANIMATION_MANIFEST.json` stores SHA256 and palm anchors.
+- The native C b16_validate test has *NDEBUG explicitly disabled* so assert checks remain active in Release builds. Checks three flight thresholds, world collision/weapon state, all 5 suits, pose switching, emission anchors and SHA-verifiable resources. Real hardware FPS/animation quality remain UNKNOWN until user tests.
+- Reproducible repo sources: `combat_b16/b16-overlay.part00..05` concatenated in order. Full ZIP SHA256: `c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b`. CI build workflow: `.github/workflows/combat-b16.yml`.
+- New separate Vita title ID: **IM2L00011**, `IronMan2_Combat_B16.vpk`; does not overwrite B15.
+## Still missing / do not misrepresent
+Original animation names + native Mach-O function symbols indicate Unibeam, projectiles, missiles, 22 combo clips, throws, enemy attacks and QTE; but native rules and full game logic NOT recovered. B16 hits spheres in a prototype range, not original first mission enemies or map collision. Later work: original-authentic melee animations/damage, proper model hitboxes, missile multi-lock, projectile collision, charge-up timing, real C1L1 scene/physics and GPU rendering. Leave B15 last proven user rollback untouched.

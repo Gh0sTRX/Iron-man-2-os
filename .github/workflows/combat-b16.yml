@@ -1,4 +1,4 @@
-name: Build Iron Man 2 Vita Combat Mechanics B16
+name: Build Iron Man 2 Vita B16 Original Beam Combat
 on:
   push:
     branches: [main]
@@ -33,7 +33,7 @@ jobs:
           unzip -oq third_person_b14/b14_overlay.zip -d work
           unzip -oq mechanics_b15/b15_overlay.zip -d work
           cat combat_b16/b16-overlay.part?? > /tmp/b16-overlay.zip
-          echo 'e488190ea10b2de53ab624efb64c475e15404c2eeb47e1b959be70cf428b2e33  /tmp/b16-overlay.zip' | sha256sum -c -
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
           unzip -oq /tmp/b16-overlay.zip -d work
           python3 work/tools/check_assets.py
           python3 - <<'PY'
@@ -109,23 +109,22 @@ jobs:
           print('Verified B15 original-authored five motion streams and hashes')
           PY
           python3 - <<'PY'
-          import hashlib,json,struct
           from pathlib import Path
-          rows=json.loads(Path('work/docs/B16_AUTHENTIC_ANIMATION_MANIFEST.json').read_text())
-          assert len(rows)==27
-          for e in rows:
-              p=Path('work/animations')/(e['asset']+'.im2v')
-              b=p.read_bytes()
-              magic,nv,frames,fps,duration=struct.unpack_from('<4s4I',b)
+          import json,hashlib,struct
+          d=json.loads(Path('work/docs/B16_ANIMATION_MANIFEST.json').read_text())
+          assert len(d['animations'])==23 and len(d['palm_anchors'])==3
+          for e in d['animations']:
+              b=(Path('work/animations')/(e['asset']+'.im2v')).read_bytes()
+              magic,nv,frames,fps,ms=struct.unpack_from('<4s4I',b)
               assert magic==b'IM2V' and nv==e['vertices'] and frames==e['frames']
-              assert fps==20 and duration==e['duration_ms'] and len(b)==20+nv*frames*12
+              assert ms==e['duration_ms'] and fps==20 and len(b)==20+nv*frames*12
               assert hashlib.sha256(b).hexdigest()==e['sha256']
-          for prefix,expected in [('mark6',802),('suitcase',629),('warmachine',1292)]:
-              b=(Path('work/animations')/(prefix+'_bodymask.b16s')).read_bytes()
-              magic,nv,l,r,chest=struct.unpack_from('<4s4I',b)
-              assert magic==b'B16S' and nv==expected
-              assert all(x<nv for x in (l,r,chest)) and len(b)==20+nv*4
-          print('B16 VERIFIED: 27 native IPA-based clips, three genuine mesh skin-weight/weapon sockets')
+          for prefix,n in [('mark6',802),('suitcase',629),('warmachine',1292)]:
+              raw=(Path('work/animations')/(prefix+'_arm_mask.im2m')).read_bytes()
+              magic,verts=struct.unpack_from('<4sI',raw)
+              assert magic==b'IM2M' and verts==n and len(raw)==8+n
+              assert len(d['palm_anchors'][prefix])==2
+          print('B16 verify: 23 authentic-skinned clips and 3 mask files')
           PY
           grep -q IM2L00011 work/CMakeLists.txt
           test -s work/models/suitcase.im2t
@@ -143,10 +142,10 @@ jobs:
           (cd work && ./build-local/b14_validate)
           (cd work && ./build-local/b15_validate)
           (cd work && ./build-local/b16_validate)
-          (cd work && ./build-local/b16_preview models/mark6.im2t b16-neutral-mark6.ppm 0)
-          (cd work && ./build-local/b16_preview models/warmachine.im2t b16-warmachine-beam.ppm 2 FIRE)
-          test -s work/b16-neutral-mark6.ppm
-          test -s work/b16-warmachine-beam.ppm
+          (cd work && ./build-local/b16_preview 0 b16-mark6-neutral.ppm)
+          (cd work && ./build-local/b16_preview 2 b16-warmachine-neutral.ppm)
+          test -s work/b16-mark6-neutral.ppm
+          test -s work/b16-warmachine-neutral.ppm
           (cd work && ./build-local/b14_preview models/mark6.im2t b14-preview.ppm)
           test -s work/b14-preview.ppm
           (cd work && ./build-local/b8_preview b8-shot.ppm)
@@ -196,15 +195,16 @@ jobs:
           PY
           python3 - <<'PY'
           import zipfile,json
-          rows=json.load(open('work/docs/B16_AUTHENTIC_ANIMATION_MANIFEST.json'))
+          manifest=json.load(open('work/docs/B16_ANIMATION_MANIFEST.json'))
           with zipfile.ZipFile('work/build-vita/IronMan2_Combat_B16.vpk') as z:
               names=set(z.namelist())
-              assert len([x for x in names if x.endswith('.im2v')])==63
+              assert all('animations/'+x['asset']+'.im2v' in names for x in manifest['animations'])
+              for prefix in ['mark6','suitcase','warmachine']:
+                  assert 'animations/'+prefix+'_arm_mask.im2m' in names
+              assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==59
               assert len([x for x in names if x.startswith('models/') and x.endswith('.im2t')])==5
-              for e in rows:assert 'animations/'+e['asset']+'.im2v' in names
-              for prefix in ('mark6','suitcase','warmachine'):assert 'animations/'+prefix+'_bodymask.b16s' in names
               assert 'eboot.bin' in names
-          print('B16 VPK: 5 models, 63 skinned motion streams, 3 mesh masks and eboot')
+          print('B16 VPK archive verified: 59 pose datasets, 3 bone masks, 5 armors')
           PY
       - name: Upload B16 VPK
         uses: actions/upload-artifact@v4
