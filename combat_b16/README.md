@@ -1,3 +1,5 @@
+> **Current B16 Expanded build (13 October 2026):** GitHub Actions [run 38318942314](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38318942314) PASSED; actual independent package is `IronMan2_Combat_B16_Expanded.vpk` with `TITLE_ID=IM2M00012` (not the earlier B16 `IM2L00011`). It includes 5 armors, 59 .im2v animation datasets and 3 arm-mask resources. SHA256: `7faa602c89ecabc951ca35ebf70c4f171d095724f52d3977a9cfba1be82e1ff0`. Real Vita performance and controls are **not yet hardware verified**. The material below describes the development source and earlier working name/ID; the Expanded CI intentionally rewrites title ID and VPK filename to install side by side.
+
 # Iron Man 2 Vita – B16 Original Idle & Weapon Core (2026-10-13)
 This is an independent experimental Vita game mechanics build, NOT a port of Gameloft's original 2010 iOS engine.
 ## User-verified B15 problems and B16 fixes
