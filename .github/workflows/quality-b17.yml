@@ -45,7 +45,7 @@ jobs:
           import re
           print('B10 source before test-only tolerance fix:')
           print(s[:2400])
-          pattern=r'p\\.upload_ms\\s*==\\s*3\\s*&&\\s*p\\.copy_ms\\s*==\\s*4'
+          pattern=r'p\.upload_ms\s*==\s*3\s*&&\s*p\.copy_ms\s*==\s*4'
           s, n=re.subn(pattern, '(p.upload_ms>2.999f && p.upload_ms<3.001f) && (p.copy_ms>3.999f && p.copy_ms<4.001f)', s)
           assert n==1, 'B10 source assertion not found uniquely; inspect printed source before modifying'
           p.write_text(s)
