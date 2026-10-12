@@ -42,3 +42,15 @@ Ask: "Continue the Iron Man 2 PS Vita reverse-engineering project. Read the priv
 
 ## User preference
 Prioritize visibly useful milestones, efficient engineering, rigorous verification and straightforward instructions (the user isn't a programmer). The user mentioned future selectable fan-made armor packs; defer until engine/movement is established.
+
+## NEW MILESTONE — Flight Beta B4 CI GREEN (2026-10-12)
+- NEW movement + hovering prototype code was implemented as an isolated overlay in `flight_b4/flight_b4_overlay.zip`. It replaces only src/main.c, src/renderer.c, src/renderer.h while reusing the original protected model assets from the baseline source archive.
+- Separate workflow: `.github/workflows/flight-b4.yml`.
+- Successful workflow: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38226936652 (run #2).
+- Produced downloadable artifact `IronMan2_Flight_B4_VPK` (artifact ID 11736559138).
+- Independent VPK: `IronMan2_Flight_B4.vpk`; verified SFO `TITLE_ID=IM2B00002`, `TITLE=Iron Man 2 - Flight B4`, `APP_VER=01.02`; it does NOT replace existing `IM2A00001`.
+- VPK archive includes eboot.bin and all four original derived model .im2t files. Archive CRC test passed. GitHub CI checked source, desktop rendering, VitaSDK and ZIP structure.
+- B4 controls: left analog move, right analog camera, Circle toggle hover/takeoff/land, R/L climb/descend, D-pad zoom, Cross change armor, Square wireframe, Triangle reset, Start exit.
+- B4 on actual Vita hardware is NOT YET TESTED. Ask user to install, send screenshot and report controls & FPS. Preserve known-good original asset viewer.
+- The B4 'flight' is an original basic movement and hover simulation with STATIC ARMOR POSE, NOT authentic Iron Man 2 flight animations, missions, enemies, collision, or port of engine.
+- Next engineering priority after hardware verification: reverse engineer rig/animation BDAE from the original IPA; compare https://github.com/fata1error404/oac-bdae-viewer and https://github.com/lOlbas/Game-Engines-Filetypes-Reverse-Engineering/tree/master/engines/Gameloft/bdae . Their BDAE format revisions may differ; adapt to OUR files before assuming compatibility.
