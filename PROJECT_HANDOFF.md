@@ -102,3 +102,18 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - Rig prototype code + JSON + GIFs: `research/B6_Rig_Hierarchy_Prototype.zip`; report `research/B6_RIG_PARENT_HIERARCHY.md`; commit `985c04b5d57c72f5e1c6ae2aee4ac357491679cb`.
 - **Still no skinned 3D armor animation nor new B6 VPK.** Missing vertex joint indices/weights, bind-pose inverse matrices and mesh-node association. Do not misrepresent skeleton preview as textured original-game animation.
 - Priority: reverse engineer skinning layout in Mark VI / War Machine BDAE and apply B6 animations to existing Vita armor renderer. Preserve B4/B5. Actual B5 FPS/CPU/SDL hardware values remain unknown.
+
+
+## B7 SKINNING BREAKTHROUGH (2026-10-12) — AUTHENTIC TEXTURED VERTEX DEFORMATION
+- Original Iron Man 2 iOS 1.0.0 BDAE v0.0.0.133 **skinning tables are recovered**, not guessed.
+- Original Iron Man Mark VI (802 vertices / 970 triangles): 25 bone palette entries, 945 total joint influences, 659 one-bone + 143 two-bone vertices, 19 unique weight floats. Descriptor offset 0xB848.
+- Original War Machine (1,292 vertices / 1,410 triangles): 29 palette entries, 1,484 influences, 1,100 one-bone + 192 two-bone vertices, 15 unique weight floats. Descriptor offset 0x12A28.
+- Skin descriptor has bone name pointers, a float32 4x4 inverse bind matrix for each palette bone, palette weight values, a uint8 per-vertex influence-count array, and joint-index/weight-index u16 pairs.
+- ACTUAL bone labels: scene node offset+8 maps e.g. Bone1->Bip01_Head-node and Bone11->Bip01_L_UpperArm-node, fully resolves all palette bones.
+- CRITICAL B6 CORRECTION: original scene/animation quaternion [x,y,z,w] vector parts require conjugation [-x,-y,-z,w] for our conventional transforms. Previous B6 diagnostic GIFs used incorrect quaternion sign and should not be trusted as final visual poses. The corrected joint hierarchy yields world_rest[joint] * original_inverse_bind[bone] == identity to maximum coefficient ~1.02e-5 for BOTH model skeletons. This verifies rig/bind mapping exactly.
+- Original .anim keyframes are now applied to actual fully textured meshes via LINEAR BLEND SKINNING, validated in Mark VI landing and hover, War Machine hover/fly. Generated animated preview GIFs from CPU-rendered 3D (NOT AI-created): IronMan_Original_Hover_Skinned.gif, IronMan_Original_Landing_Skinned.gif, WarMachine_Original_Fly_Skinned.gif.
+- Separate, CPU-friendly independent Vita demo B7 authored. Six original animations baked at 20 fps from authentic .anim + bone influences: Mark VI idle-hover, walk, landing, War Machine idle-hover, walk, forward flight. Files .im2v hold per-frame vertex coordinates, so Vita plays original precomputed poses cheaply; not yet a native Vita runtime skeletal animation parser. Mark IV/Stealth intentionally static in this beta.
+- New app/title ID IM2D00004, base B4/B5 not overwritten. Source: `skinning_b7/b7_vita_overlay.zip`; reproducible Python analytical tools + GIFs: `research/B7_Skinning_Tools.zip`. Overview: `research/B7_SKINNING_OVERVIEW.md`.
+- The new workflow `.github/workflows/animation-b7.yml` ran. First job 38238551244 failed linking SDL2 backend platform stubs, NOT code compile. Follow-up run 38239085595 adds available Vita SDK SDL/graphics/audio/dialog/motion link libraries. Check current result in GitHub Actions; only declare B7 VPK build successful after green CI.
+- Real PS Vita B7 **NOT YET TESTED**, pending successful build and user's device test. B4 measured 13-15fps; B5 actual measurements still needed.
+- Next step after B7 hardware pass: optimizations of software rasterizer or native Vita GPU, blend original animation transitions smoothly, authentic flight/repulsor effects, and first level/collision.
