@@ -1,0 +1,24 @@
+name: Research Iron Man 2 C1L1 materials inventory
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/research-b11-materials.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect original BDAE source metadata and mission audit archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b11_material_inventory.py
+      - name: Archive non-asset manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: B11_material_inventory_manifest
+          path: B11_asset_inventory.json
+          if-no-files-found: error
