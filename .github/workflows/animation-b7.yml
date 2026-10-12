@@ -39,6 +39,14 @@ jobs:
               print(name,'frames',frames,'vertices',n,'duration',duration)
           PY
           printf '\nif(DEFINED ENV{VITASDK})\n  target_link_libraries(im2_beta stdc++ mathneon taihen_stub SceKernelDmacMgr_stub)\nendif()\n' >> work/CMakeLists.txt
+          printf '%s\n' \
+            'if(DEFINED ENV{VITASDK})' \
+            '  foreach(lib vitaGL vitashark SceShaccCg_stub SceShaccCgExt SceAudio_stub SceAudioIn_stub SceAudioOut_stub SceCommonDialog_stub SceMotion_stub SceIme_stub SceMsgDialog_stub SceHid_stub ScePower_stub)' \
+            '    if(EXISTS "$ENV{VITASDK}/arm-vita-eabi/lib/lib${lib}.a")' \
+            '      target_link_libraries(im2_beta ${lib})' \
+            '    endif()' \
+            '  endforeach()' \
+            'endif()' >> work/CMakeLists.txt
           grep -q IM2D00004 work/CMakeLists.txt
       - name: Native C engine and animation restore test
         shell: bash
