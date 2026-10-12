@@ -170,3 +170,12 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - Native builds/tests: `b7_validate`, `b8_validate`, `b9_validate`, `b10_validate` all pass; original five suit and combat systems kept.
 - Known B8/B9 user hardware measurements: FPS roughly 18–27, `SDL 28–29MS` combined, CPU ~8–25ms. **No proof VSync is actual limiter** yet; need user to compare 15-second idle scenes at matching camera+armor with VS ON then OFF, report FPS, AN/CPU/UP/COPY/PRES and tearing. Do not claim performance gain before hardware test.
 - Next: if PRES dominates, explore GPU/SDL present; if UP dominates, upload format/persistent streaming; if CPU dominates, hardware 3D acceleration/vitaGL or faster raster pipeline. Preserve B9 last user-untested suit build and B8 last hardware-confirmed animation build.
+
+
+## ORIGINAL LEVEL DATA ARCHIVE DISCOVERY (2026-10-12, user away from Vita)
+- Inspected user-provided original `IronMan2_1.0.0_ios_2.2.1.ipa`, not a fan recreation.
+- Named pack `Payload/IronMan2.app/clev` (2,939,343 bytes) extracts **10 original `.bclara` records**: `level1.bclara` to `level10.bclara`. Every offset/name/size validated and catalogued with SHA256.
+- Visible binary schema markers include `Mission`, `Objective`, `NextMission`, `FightBoss`, `SpawnPoint`, `MCondition_KillEnemy`, `MCondition_Collect`, `MCondition_Protect`, `OnStart`, `OnComplete`, `OnFail`.
+- **NOT yet actual gameplay**: BCLARA field values and object instances, links to geometry, spawn coordinates and mission graph have NOT been decoded. Ten records ≠ proven count of campaign missions. Do not claim extracted playable levels.
+- Small reproducible standalone Python + 10-level CSV: `research/Original_Level_BCLARA_Audit.zip`; findings `research/ORIGINAL_LEVEL_ARCHIVE_AUDIT.md`. Commit `24762a1166a05fff90ad7432ef97390bf9497914`.
+- Next offline research: parse serialized BCLARA object graph, resolve objective/trigger IDs and original 3D environment assets; separate from B10 Vita performance profiling.
