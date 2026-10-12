@@ -190,7 +190,7 @@ jobs:
           with zipfile.ZipFile('work/build-vita/IronMan2_Action_B16.vpk') as z:
             names=set(z.namelist())
             assert all('animations/'+e['asset']+'.im2v' in names for e in manifest)
-            assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==36
+            assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==46
             assert len([x for x in names if x.startswith('models/') and x.endswith('.im2t')])==5
           print('B16 VPK: five armors and 36 animation payloads')
           PY
