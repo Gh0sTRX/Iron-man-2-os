@@ -23,6 +23,23 @@
 - IGN'in iPad incelemesinde **nesne kaldırma, uçuş, dövüş, hackleme ve upgrade**, Unibeam için atış düğmesini yukarı kaydırma anlatılıyor: https://unvis.it/www.ign.com/articles/2010/05/10/iron-man-2-ipad-review
 - Bu bulgular bütün özelliklerin oyunun *her zırhında/her görevinde* mevcut olduğunu **kanıtlamaz**. Yalnızca PS3/Xbox 360 sürümüne ait silah kısıtlamalarını iOS portuna taşımayın.
 
+## İkinci bağımsız doğrulama: orijinal MainCharacter C++ sembolleri
+
+Kullanıcının önceki çalışmasında çıkarılmış `B15_MAIN_CHARACTER_METHODS.md` belgesindeki **119 demangle edilmiş özgün yerel oyun fonksiyonunun adları** envanterle çapraz karşılaştırıldı. Önemli örnekler:
+
+| Orijinal Mach-O fonksiyon sembolü | Animasyonlarla olası bağlantısı | Kanıt sınırı |
+|---|---|---|
+| `MainCharacter::StartMeleeAttack(float)`, `UpdateComboAttackAction(int)`, `GetCurrentMeleeAttackStep()` | Ground_Att ve 22 Combo kayıtları | Kombo sistemi kodda mevcut; gerçek giriş zinciri ve temas zamanlaması bilinmiyor |
+| `MainCharacter::UpdateJumpKickAttackState(int)` | Jump_Act1/3 ve havada saldırı hareketleri | Orijinal jump-kick durum yöneticisi var; klip eşlemesi kanıtlanmadı |
+| `MainCharacter::StartThrow(Actor*)`, `UpdateThrowNavigation(int, State*)`, `ResetThrowState()` | Ground_Raise / Raise_Throw / Ground_Put_down | Nesne alma/fırlatma oyun mekaniği kodlanmış; bağlar henüz çözülmedi |
+| `MainCharacter::IsInUniBeam()`, `DoUniBeamAttack(...)`, `DrawUnibeamProgress(Sprite*)` | Unibeam gerçek saldırı/enerji döngüsü | B16 prototipindeki 130 damage, 50 enerji özgün değer değil |
+| `MainCharacter::ThrowMissile(ProjectileEntity*)`, `CheckThrowMissile(int)`, `AddToMissileTargetArray(Actor*)` | Çoklu hedef seçimi ve füze davranışı | Kayıtlı hedef listesi yerel kodda var; War Machine'e özgü olup olmadığı ispatlanmadı |
+| `MainCharacter::UpdateAutoFlyNavigation(int)`, `UpdateFlyNavigation(int, State*)`, `OnLanding()` | Fly2Run, Fly2Ground, uçuş yön ve iniş geçişleri | Otomatik uçuş/iniş durumlarının varlığı; fizik/hız sayıları bilinmiyor |
+| `MainCharacter::StartQTE(Actor*)`, `ResetQTEState()`, `UpdateUltimoBossState(int)` | QTE_tank / boss / utah_machine sahneleri | Özel boss/QTE kontrol akışının varlığı; kesin görev eşleşmesi bilinmiyor |
+| `MainCharacter::UseItemCollect(InteractiveEntity*)`, `FindInteractiveTarget()` | Sahne nesneleri, collectibles, puzzle | 304 kliple bire bir bağ kurulmadı |
+
+Bu çapraz kontrol **sadece isim benzerliğinden daha kuvvetli bir mekanik kanıtı** sağlıyor: orijinal oyunun ARM ikilisinde ilgili sistemlerin fonksiyon girişleri var. Bununla birlikte isimleri görmek fonksiyon gövdelerini decompile etmek veya parametrelerin gerçek kullanımını bilmek değildir. Oynanışın tüm kurallarını keşfettiğimizi iddia etmiyoruz.
+
 ## Tüm 304 kayıt — grup sayımı
 
 | Karakter / animasyon ailesi | Kayıt |
