@@ -54,3 +54,12 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - B4 on actual Vita hardware is NOT YET TESTED. Ask user to install, send screenshot and report controls & FPS. Preserve known-good original asset viewer.
 - The B4 'flight' is an original basic movement and hover simulation with STATIC ARMOR POSE, NOT authentic Iron Man 2 flight animations, missions, enemies, collision, or port of engine.
 - Next engineering priority after hardware verification: reverse engineer rig/animation BDAE from the original IPA; compare https://github.com/fata1error404/oac-bdae-viewer and https://github.com/lOlbas/Game-Engines-Filetypes-Reverse-Engineering/tree/master/engines/Gameloft/bdae . Their BDAE format revisions may differ; adapt to OUR files before assuming compatibility.
+
+
+## REAL DEVICE B4 VALIDATION — USER REPORT 2026-10-12
+- The user **installed and ran** `IronMan2_Flight_B4.vpk` on real PS Vita. Screenshot shows War Machine armor in the application, heading `VITA FLIGHT B4`, `FLIGHT MODE`, coordinate/altitude HUD, FPS overlay reading `14`.
+- User confirms switching between `GROUND MODE` and `FLIGHT MODE` is **seamless**. In flight mode the armor rises slightly and bobs up/down but remains upright in the original static pose, without articulated arms/legs, character flight pose or engine/thruster particles.
+- User-reported performance: approximately **13–15 FPS**. This is the new measured device baseline. Do not claim B4 flies with original game animations.
+- Flight B4 is a successful **hardware-tested movement state prototype**, but is too slow for satisfactory actual gameplay.
+- NEXT PRIORITIES: optimize software rasterizer and presentation pathway; use *actual Vita* frame-rate measurements to validate any gain; then recover authentic rigging and flight animation from original BDAE/ANIM. Optimize before loading levels/enemies. Keep B4 and baseline VPK unchanged as rollback versions.
+- If this project resumes in a fresh conversation, do not ask user to repeat these details: check repo docs and build/run the next independent optimization test variant. Do not pretend the project is running in background.
