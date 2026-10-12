@@ -218,4 +218,12 @@ old='''      camera->b16_active?"L MOVE R CAM SQ ACT O FLY TRI BOOST D-UP WEAPON
 new='''      camera->b16_active?"L WALK/RUN R CAM SQ ACT O FLY TRI AIR BOOST"'''
 assert s.count(old)==1;s=s.replace(old,new)
 renderer.write_text(s)
+
+# The historic B15 regression encoded "War Machine has NO distinct boost pose".
+# B17 intentionally introduces a *temporary* lean via B14_RUSHFULL, so only
+# the reconstructed B17 test expectation needs to be updated.
+replace("tools/test_b15.c",
+  'b15_pose_pick(&(B13Motion){.armor=2},1,1,3,1,0,650)==B14_FLY',
+  'b15_pose_pick(&(B13Motion){.armor=2},1,1,3,1,0,650)==B14_RUSHFULL')
+
 print('B17 arena source applied; original B16 ZIP, B15 VPKs, and original private IPA assets unchanged.')
