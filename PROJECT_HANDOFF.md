@@ -74,3 +74,12 @@ Prioritize visibly useful milestones, efficient engineering, rigorous verificati
 - New upper-right performance HUD shows `FPS`, `CPU NNMS` (CPU 3D raster), `SDL NNMS` (texture upload + present). This diagnostic will identify the 13–15fps B4 bottleneck.
 - **HARDWARE TEST B5 STILL PENDING**. Next ask: install B5 beside B4, wait 15 seconds with War Machine/Mark VI idle in same camera settings, report three numbers FPS/CPU/SDL and if flight mode remains stable. Do not promise 30/60 FPS until measurements.
 - True skeletal animation / hand thrusters are not restored. Still independent prototype, not original game port.
+
+
+## ANIMATION TABLE DISCOVERY — 2026-10-12 (while user away from device)
+- Verified `anims` in original iOS v1.0.0 IPA: **972 .anim records**, each leading length-prefixed name table parsed successfully (972/972).
+- 248 `IronMan*` clips, 56 `Warmachine*` clips. Key originals: `IronMan_Aim_Float_idle.anim`, `IronMan_Air_land.anim`, `IronMan_Aim_Ground_move_F.anim`, `Warmachine_Aim_Fly_M.anim`.
+- Bone-name mapping: IronMan float idle has 38 name strings; 31/37 non-path names occur in both Mark IV and Mark VI BDAEs. WarMachine flight has 42 strings; 41/41 non-path names occur in WarMachine BDAE. Contains `Bip01`, limb joints and `Gun01`.. `Gun04`.
+- This is NOT a keyframe decoder, skinning implementation, or original animation reproduction.
+- Reproducible script + full 972-entry inventory (file names/sizes): `research/IronMan2_Animasyon_Tarama_2026-10-12.zip`. Findings: `research/ANIMATION_AUDIT_2026-10-12.md`.
+- Next research: decode original per-bone keyframe data and skeleton-parent graph, then skeletal weights, after prioritizing actual PS Vita B5 profiling (CPU vs SDL) when user returns. No new Vita install is needed to do that offline.
