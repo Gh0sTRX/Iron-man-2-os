@@ -55,6 +55,6 @@ jobs:
               if p.exists():
                   print('===SOURCE===',n,'bytes',p.stat().st_size)
                   for i,s in enumerate(p.read_text(errors='replace').splitlines(),1):
-                      if n=='src/renderer.c' and i>160:break
+                      if n=='src/renderer.c' and i>500:break
                       print('%04d'%i,s)
           PY
