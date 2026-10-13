@@ -38,6 +38,17 @@ replace("src/main.c",
         "b16_attack_begin(&attack,now,world.flying,palm==attack.palm_l,combat.shots%3);",
         "b16_attack_begin(&attack,now,world.flying,palm==attack.palm_l,0);")
 
+# Update the B15 source REGRESSION, not disable it: .80 is now deliberately
+# Stage1 hover, whereas .99 is Stage2 flight. The old .80->Stage2 expectation
+# was incompatible with the user's full-stick control decision.
+replace("tools/test_b15.c",
+        "b14_world_tick(&w,.04f,0,.8f,0,0,0);",
+        "b14_world_tick(&w,.04f,0,.99f,0,0,0);",expected=2)
+replace("tools/test_b15.c",
+        "b14_world_tick(&w,.04f,0,.99f,0,0,0);TEST(w.flight_stage==2);",
+        """b14_world_tick(&w,.04f,0,.80f,0,0,0);TEST(w.flight_stage==1);
+ b14_world_tick(&w,.04f,0,.99f,0,0,0);TEST(w.flight_stage==2);""")
+
 # Keep user-proven B17 movement & original pose as authoritative.
 replace("src/main.c", '#include "b16_action.h"',
         '#include "b16_action.h"\n#include "../b24/b24_unified/b24_unified.h"\n#include "../b24/b18_gpu_probe/b17_input_landing_gate.h"')
