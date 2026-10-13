@@ -25,3 +25,5 @@
 
 ## Net taahhüt
 B17'ye dönüp sıfırdan başlama yok; tek B24 geliştirilmeye devam eder. B22.6 ve öncesi modüller silinmez, sadece bağımsız host durumundan tek gameplay runtime durumuna bağlanır. GPU entegrasyonu bu çalışmanın paralel **render** ayağıdır, ilerleme için önce bitirilmesi gereken ayrı oyun demosu değildir.
+
+- B24 Actions #2 (`38436614662`) native B7/B8/B9/B10/B13/B14/B15 PASS; B16 legacy `.85` Stage2 assertion failed because this was written for old `.78/.67` thresholds. Updated B16 native test to `.99` enter, `.91` hold, `.82` exit with `.96/.88` rules; no test bypass. Next combined build checks the full host loop and VitaSDK.
