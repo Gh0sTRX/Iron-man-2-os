@@ -21,4 +21,20 @@ void glDisableClientState(GLenum);
 void glVertexPointer(int,GLenum,GLsizei,const void *);
 void glColorPointer(int,GLenum,GLsizei,const void *);
 void glDrawElements(GLenum,GLsizei,GLenum,const void *);
+#define GL_FALSE 0
+#define GL_COLOR_BUFFER_BIT 0x00004000
+#define GL_DEPTH_BUFFER_BIT 0x00000100
+#define GL_LESS 0x0201
+#define GL_PROJECTION 0x1701
+#define GL_MODELVIEW 0x1700
+typedef unsigned char GLboolean;
+typedef unsigned GLbitfield;
+GLboolean vglInit(int);
+void vglSwapBuffers(GLboolean);
+void glViewport(int,int,GLsizei,GLsizei);
+void glDepthFunc(GLenum);
+void glClearColor(float,float,float,float);
+void glClear(GLbitfield);
+void glMatrixMode(GLenum);
+void glLoadMatrixf(const float *);
 #endif
