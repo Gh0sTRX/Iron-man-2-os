@@ -116,3 +116,5 @@ jobs:
 # B11 mesh-node presentation rotation validated: source Z-up must remain Z-up.
 
 # Source-only GPU owner/projection tests; no Vita package output.
+
+# Re-run after completing GL_TRUE in the source-only vitaGL mock.
