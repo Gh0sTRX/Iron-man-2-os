@@ -63,3 +63,5 @@ jobs:
           if-no-files-found: error
 
 # Original 2010 C1L1 node coordinate audit in host runner, no Vita VPK.
+
+# B11 mesh-node presentation rotation validated: source Z-up must remain Z-up.
