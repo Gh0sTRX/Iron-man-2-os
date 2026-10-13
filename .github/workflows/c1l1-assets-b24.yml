@@ -1,0 +1,39 @@
+name: B24-C1 Original Chapter 1 Asset Staging Audit
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/c1l1-assets-b24.yml"
+      - "research/B11_C1L1_Source_Parser.zip"
+      - "research/B11_C1L1_Scene_GLBS.zip"
+      - "research/b24_unified/prepare_c1l1_assets.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout private sources
+        uses: actions/checkout@v4
+      - name: Verify and extract actual C1L1 model/scene sources
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/prepare_c1l1_assets.py --out /tmp/b24-c1-src
+      - name: Verify that C1L1 is not falsely called a restored original mission
+        run: |
+          python3 - <<'PY'
+          import json,os,pathlib
+          p=pathlib.Path('/tmp/b24-c1-src')
+          d=json.loads((p/'C1L1_source_manifest.json').read_text())
+          assert not d['original_level_spawn_decoded']
+          assert not d['c1l1_to_level1_bclara_verified']
+          assert not d['gpu_renderer_integrated']
+          assert len(d['original_bdae'])==14
+          assert (p/'C1L1_environment.glb').stat().st_size>1000000
+          assert d['environment_glb']['primitives']>=300
+          for name,info in d['original_bdae'].items():
+              assert (p/name).stat().st_size==info['bytes']
+          print('PASS: authentic C1L1 scene + BDAE staging, manifest and collision candidates, NO Vita render claims')
+          PY
