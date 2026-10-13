@@ -158,9 +158,15 @@ jobs:
           assert d['raw_keyframes_in_this_B15_audit'] is False
           print('B24 REAL animation inventory QA PASS, uncooked original clips are NOT playable')
           PY
+      - name: Forensic source audit of real B24 SDL framebuffer and GPU takeover points
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_active_render_owner.py
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
           name: B24_Original_Animation_Audit_JSON_NOT_VPK
-          path: /tmp/B24_ANIMATION_COVERAGE.json
+          path: |
+            /tmp/B24_ANIMATION_COVERAGE.json
+            /tmp/B24_GRAPHICS_OWNER_AUDIT.json
           if-no-files-found: error
