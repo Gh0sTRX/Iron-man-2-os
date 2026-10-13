@@ -42,3 +42,11 @@ The read-only scanner was also run on the actual already-built `IronMan2_Arena_B
 python3 original_ui_asset_probe.py /private/path/original.ipa --out /private/ui_inventory
 ```
 Output `UI_ASSET_CANDIDATES.csv` and `SUMMARY.json` (asset-candidate offsets, not extracted sprites). Manually validate SWF container, per-asset IDs, images and original appearance before remaking menus.
+
+
+## Current B22 improvements verified after initial README (13 Oct 2026)
+- Exactly recovered (byte-identical private GitHub blobs) latest `b22_visor.c` and `test_b22_visor.c` and reran native GCC C11 -Wall -Wextra -Werror -pedantic with AddressSanitizer and UndefinedBehaviorSanitizer: **PASS**. Blob `b22_visor.c` = `668094dc0d8e4d542d80b5d603e528f5a1e29080`, tests = `216cb42963092215df1d021d4792ddf75f72a0ed`.
+- Not just color variants now: **Iron Man reactor-inspired circular upper-right diagnostic**, **War Machine angular ammo rails and independently shaded six ammunition segments**, same numeric game state. Locked target gets a small functional `target_hp` bar. The real source iOS HUD atlas is still absent; these are visual Vita additions.
+- Additional **bounded/read-only** scanner `ui_asset_inventory.py` + `test_ui_asset_inventory.py` was added as a conservative companion to existing `original_ui_asset_probe.py`. It records *all* ZIP entry categories and sizes with a configurable default 16 MiB per-entry upper scan bound; hidden embedded SWF signatures deeper than that can be missed and should not be considered absence. Its byte-identical GitHub source and synthetic 4-file IPA unit test PASSED; scanner blob `8c1592d36a68c4a53b19bbd381b46a1db8f53042`, test `f292ad8c01c205dff15623a5b98af4a33d2fd56e`.
+- Original full-depth unbounded probe remains `original_ui_asset_probe.py`; bounded scanner is better for quick source reconnaissance and entry-level totals. Both produce **candidates, not extracted valid original SWFs**; neither has scanned the real user's full original IPA yet. This is intentionally not a GitHub Actions workflow or another Vita VPK.
+- Additional complete sourced HUD architecture audit: `research/B22_ORIGINAL_IOS_HUD_ASSET_AUDIT_AND_VISOR_DESIGN.md` (original gameplay UI classes, Flash menu symbols, exact B15/B16/B17 VPK contents, provenance/limits, visor design).
