@@ -66,21 +66,22 @@ def export(path,manifest):
         raw=z.read(MEMBER)
     d,bb=decode_glb(raw)
     if len(d["meshes"])!=370:raise ValueError("unexpected source mesh count")
-    # World parent node encodes export-only Z-up->Y-up rotation. Child mesh
-    # nodes are expected to be identity, not secretly displaced. Fail closed.
+    # Actual GitHub CI source audit: ALL 370 mesh nodes contain an export-only
+    # -90 deg rotation about X:
+    # [1,0,0,0, 0,0,-1,0, 0,1,0,0, 0,0,0,1].
+    # Source POSITION bytes are STILL BDAE-native Z-up: DO NOT apply this
+    # glTF Y-up presentation rotation when writing the B17 Z-up runtime.
     nodes=d["nodes"]
     if not nodes or nodes[0].get("name")!="world":raise ValueError("world root missing")
     child_meshes=[x for x in nodes[1:] if "mesh" in x]
     if len(child_meshes)!=370:raise ValueError("mesh-node count mismatch")
+    export_rot=[1.,0.,0.,0., 0.,0.,-1.,0., 0.,1.,0.,0., 0.,0.,0.,1.]
     for n in child_meshes:
-        for key in ("matrix","translation","rotation","scale"):
-            if key in n:
-                v=n[key]
-                expected={"translation":[0.,0.,0.],"rotation":[0.,0.,0.,1.],
-                          "scale":[1.,1.,1.],
-                          "matrix":[1.,0.,0.,0.,0.,1.,0.,0.,0.,0.,1.,0.,0.,0.,0.,1.]}[key]
-                if len(v)!=len(expected) or any(abs(float(a)-b)>1e-4 for a,b in zip(v,expected)):
-                    raise ValueError("nonidentity child transform, bake required "+str(n.get("name")))
+        if set(n).intersection(("translation","rotation","scale")) or "matrix" not in n:
+            raise ValueError("unexpected extra transform on "+str(n.get("name")))
+        mat=n["matrix"]
+        if len(mat)!=16 or any(abs(float(a)-b)>1e-4 for a,b in zip(mat,export_rot)):
+            raise ValueError("unknown glTF transform on "+str(n.get("name")))
     V=bytearray();I=bytearray();B=bytearray();verts=0;inds=0;total=0
     ranges=[]
     origins=[]
