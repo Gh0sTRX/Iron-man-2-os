@@ -164,6 +164,15 @@ jobs:
           work/build-local/im2_preview work/models/suitcase.im2t work/suitcase-preview.ppm 3.1 0 1
           test -s work/suitcase-preview.ppm
           test -s work/mark6-preview.ppm
+      - name: Native B24-C2 controller pause regression and generated SDL guard
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/test_b24_input_patch.py
+          gcc -std=c11 -Wall -Wextra -Werror -pedantic -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer \
+            research/b21_controls/b21_control_lab.c research/b24_unified/test_b24_start_only.c \
+            -lm -o /tmp/test_b24_start_only
+          /tmp/test_b24_start_only
       - name: Native validation of original C1L1 map loader
         shell: bash
         run: |
