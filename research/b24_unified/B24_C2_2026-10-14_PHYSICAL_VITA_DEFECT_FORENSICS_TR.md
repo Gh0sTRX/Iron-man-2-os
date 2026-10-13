@@ -65,3 +65,10 @@ Kaynak: `research/b24_unified/apply_b24.py` ile `research/b24_unified/apply_b24_
 - **CİHAZDA KANITLANDI**: FPS 12-14, CPU 41-54ms, UP29-30ms, `C1L1 READY` but terrible map appearance, any-button pause, unreadable camera/control.
 - **ARAŞTIRILACAK**: exact rig chest muzzle direction, original env GLB node transform world placement, scene camera frustum, stage/hover mismatched states, original full source anim bytes.
 - Yeni tam GPU/anim derlemesi kullanıcıya verilene kadar **C2 artefaktı mevcut hatalı ürün olarak etiketlenir**. GitHub CI kaynak testleri ile real Vita gözlemlerini ayrı koru.
+
+
+## 9. Sonradan gerçek CI ile doğrulandı — Kaynak doğruluğu ve asıl UV eksikliği
+- `.github/workflows/b24-audit-only.yml` yalnız kaynak audit çalıştırdı; **yeni Vita VPK çıkarılmadı**. GitHub Actions run `38478323072`: [source-only test success](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38478323072), `PASS regenerated B24 SDL input: START event latch explicitly guarded`, `PASS B24 regression: ONLY START enters pause; Circle resumes; all other controller inputs stable`. Bu üretilen gerçek `work/src/main.c` kodunun doğrulanmasıdır fakat henüz fiziksel konsol testi değildir.
+- Aynı run, özgün B15 `B15_COMPLETE_304_PLAYER_CLIPS.md` arşivinden tam `248 IronMan + 56 WarMachine = 304` ad doğruladı, B24 `work/animations/*.im2v = 59` çıktı. Ayrıntılı JSON `B24_Original_Animation_Audit_JSON_NOT_VPK` adlı source-only CI artefaktı olarak yüklendi. Animasyonu kaynak isim listesinde bulmak `.anim` binary keyframe ve Vita'da oynayabilmek anlamına gelmez.
+- B11 GLB audit run `38442190102`, `FIRST MESH` doğrudan `C1L1_ground_001_0` `attributes = {POSITION:1,COLOR_0:2}` gösteriyor; `TEXCOORD_0` eksik. Mevcut B24 converter UV/material aktarımı yapmıyor. Harita doku restorasyonu için B11 ilk GLB'ye PNG eklemek yetmez, orijinal BDAE'den UV0/UV1+material binding çıkarılacak.
+- Kabul şartlarını kapsayan `research/b24_unified/B24_GPU_AND_FULL_ANIMATION_IMPLEMENTATION_GATES_TR.md` artık source dalında. GPU pipeline henüz implement/derlenmiş/deployed değildir, source-only test başarıyı öyle göstermemeli.
