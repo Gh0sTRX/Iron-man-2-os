@@ -14,6 +14,21 @@ jobs:
     steps:
       - name: Checkout recovered private C1L1 assets and GPU sources
         uses: actions/checkout@v4
+      - name: Inspect original glTF mesh node transforms before coordinate baking
+        run: |
+          python3 - <<'PY'
+          import zipfile
+          from research.b24_unified.export_b24_c1_gpu_mesh import SOURCE,MEMBER,decode_glb
+          with zipfile.ZipFile(SOURCE) as z: d,_=decode_glb(z.read(MEMBER))
+          for i,n in enumerate(d['nodes'][:8]):
+            print('C1L1 NODE',i,repr(n)[:950])
+          trans={}
+          for n in d['nodes'][1:]:
+            if 'mesh' in n:
+              keys=tuple(k for k in ('matrix','translation','rotation','scale') if k in n)
+              trans[keys]=trans.get(keys,0)+1
+          print('TRANSFORM PROFILE',trans)
+          PY
       - name: Convert authentic C1L1 indexed GLB to GPU draw-data
         run: |
           set -euo pipefail
