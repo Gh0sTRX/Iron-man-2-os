@@ -29,3 +29,11 @@ Output:
 7. Re-run host Debug+ASan/UBSan, integrate VitaSDK compilation in a single non-spam run, preserve B15/B16/B17.
 
 The user explicitly cannot test Vita yet. Do not generate a new B19 VPK just to show prototype boxes/spheres; next VPK must make a meaningful visible/interactive improvement over B17.
+
+
+## 2026-10-13 addendum — fast projectile hit geometry (standalone, not integrated)
+- New source: `b19_hit_geometry.h`, `b19_hit_geometry.c`, `test_b19_hit_geometry.c`.
+- World-space **closed segment vs sphere first-contact**; unlike an endpoint-only overlap it catches high-speed projectile tunneling at low frame rate, including endpoints; validates finite coordinates and positive radius.
+- **Actually compiled and passed on host with** `gcc -std=c11 -Wall -Wextra -Werror -pedantic -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer b19_hit_geometry.c test_b19_hit_geometry.c -lm -o test_b19_hit_geometry`. Output: `PASS B19 sweep: high-speed hit, miss, behind, inside, finite guards, tangent`. SHA-256 of tested `c` file: `c7e4c636dc85436bb0360e56253e63f84f190cdf5cb61e67aeff827d93788935`.
+- **Verbatim source equivalence was checked** via local `git hash-object` and GitHub file blob SHA: header `1974f41ff5a063ea62f5ca19e672bf49733d086a`, C `834f08e5329829129ca41f9801d004fea73f231a`, test `b29aee25f3187c8678e0c5dce8bdf664349ac463`.
+- This does NOT automatically simulate trajectory, original projectile spawning, damage, splash, armor sockets or enemy AI and is **not yet wired to** `b19_gameplay_core` nor `B17`. Next when real original BDAE enemies and source data are recovered: expose projectile owner and delta, sweep each tick, resolve nearest hit, emit typed damage/SFX event, test against world geometry. Keep original models, not stand-in spheres for final on-device acceptance.
