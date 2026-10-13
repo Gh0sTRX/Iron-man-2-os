@@ -72,6 +72,15 @@ jobs:
             research/b24_unified/test_b24_gpu_owner_mock.c \
             -lm -o /tmp/b24-owner
           /tmp/b24-owner /tmp/C1L1_original_gpu.c1g2
+      - name: Original five-suit dynamic IM2V GPU vertex and UV atlas regression
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iresearch/b24_unified/mock_gpu -Iresearch/b24_unified \
+            research/b24_unified/b24_gpu_suit_vitagl.c \
+            research/b24_unified/test_b24_gpu_suit_mock.c \
+            -lm -o /tmp/b24-suit-gpu
+          /tmp/b24-suit-gpu
       - name: Native B24 world-space right repulsor / chest Unibeam regression
         run: |
           set -euo pipefail
@@ -102,7 +111,10 @@ jobs:
               arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
                 -Iresearch/b24_unified \
                 -c research/b24_unified/b24_gpu_owner_vitagl.c -o /tmp/b24_gpu_owner.o
-              echo "PASS real VitaSDK GPU owner + Z-up camera + scene + weapon OBJECT compilation: no eboot, no VPK"
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_gpu_suit_vitagl.c -o /tmp/b24_gpu_suit.o
+              echo "PASS REAL VitaSDK GPU suit + owner + C1L1 + camera + weapon object compilation: NO executable, NO VPK"
             '
       - name: Publish diagnostics only - no original 2010 game data exported
         uses: actions/upload-artifact@v4
