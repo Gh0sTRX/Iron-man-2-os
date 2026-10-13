@@ -55,6 +55,23 @@ jobs:
             research/b24_unified/test_b24_c1_gpu_mock.c \
             -lm -o /tmp/b24-gpu-test
           /tmp/b24-gpu-test /tmp/C1L1_original_gpu.c1g2
+      - name: B24 Z-up camera and single VitaGL owner frame graph host gates
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_gpu_camera.c \
+            research/b24_unified/test_b24_gpu_camera.c \
+            -lm -o /tmp/b24-gpu-camera
+          /tmp/b24-gpu-camera
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iresearch/b24_unified/mock_gpu -Iresearch/b24_unified \
+            research/b24_unified/b24_gpu_camera.c \
+            research/b24_unified/b24_gpu_owner_vitagl.c \
+            research/b24_unified/b24_c1_gpu_mesh.c \
+            research/b24_unified/b24_c1_gpu_vitagl.c \
+            research/b24_unified/test_b24_gpu_owner_mock.c \
+            -lm -o /tmp/b24-owner
+          /tmp/b24-owner /tmp/C1L1_original_gpu.c1g2
       - name: Native B24 world-space right repulsor / chest Unibeam regression
         run: |
           set -euo pipefail
@@ -79,7 +96,13 @@ jobs:
               arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
                 -Iresearch/b24_unified \
                 -c research/b24_unified/b24_weapon_aim.c -o /tmp/b24_weapon_aim_vita.o
-              echo "PASS real VitaSDK GPU adapter + weapon transform object compilation: NO executable, NO VPK"
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_gpu_camera.c -o /tmp/b24_gpu_camera.o
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_gpu_owner_vitagl.c -o /tmp/b24_gpu_owner.o
+              echo "PASS real VitaSDK GPU owner + Z-up camera + scene + weapon OBJECT compilation: no eboot, no VPK"
             '
       - name: Publish diagnostics only - no original 2010 game data exported
         uses: actions/upload-artifact@v4
