@@ -42,3 +42,10 @@ Source research/B15_Original_All_Mechanics_Audit.zip B15_ALL_972_ANIMATIONS.csv:
 ## Intended B22-integration acceptance
 
 No new build until user confirms B17 real-device behavior. Subsequent real Vita gameplay: player HP/shield from B19 game state, lock and soft aim on true enemy 3D model in LOS, genuine Unibeam chest and missile hardpoint, 2-wave combat start/clear/fail, pause/resume with audio state and save, no previous B15/B16 regression. Preserve a debug FPS/pipeline profiler panel via pause instead of permanent button reservation.
+
+
+## Underwater case regression — fixed 2026-10-13
+Original `B15_ALL_972_ANIMATIONS.csv` contains `underwater_bomb/cannon` with lowercase `u`, while ship/cargo has `Underwater_ship*` with uppercase `U`. Earlier metadata script used case-sensitive scene clip lookup and **would incorrectly treat six scene ship clips as 38-joint playable suit clips**. This is now fixed in `underwater_manifest.py` with `name.casefold() in SCENE_CLIPS` (commit 7d852a2).
+- Original archived metadata independently verified 43 records: **34 at 38 channels**, other **9 at 4/5/7 channels**. Two 0-ms suit pose records, `Underwater_Dead_Float_idle` and `Underwater_Dead_Swim_idle`, are excluded from timed-bake candidates.
+- `python3 test_underwater_manifest.py` supplies a **synthetic 972-clip CSV** with realistic upper/lower case scene entries. Checks 34/9 split, 38-channel suit, static poses, missing data, invalid non-underwater names. 3/3 regression tests passed with an equivalent local copy of the parser's classification/build logic; actual full original IPA baking remains blocked.
+- This is a corrected **metadata classification**, not an exported `.im2v`, not a sixth installed Vita suit, and not a claim that we recovered Underwater BDAE geometry.
