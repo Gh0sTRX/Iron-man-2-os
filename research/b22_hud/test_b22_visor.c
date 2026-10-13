@@ -10,7 +10,7 @@ static void start(void){memset(pixels,0,sizeof pixels);pixels[0]=0x4badcafe;pixe
 static void guards(void){assert(pixels[0]==0x4badcafe && pixels[LEN+1]==0xdeadbaba);}
 static B22UI state(B22Suit suit,B22UiMode mode){
     B22UI ui={0};ui.suit=suit;ui.page=B22_GAME;ui.mode=mode;ui.armor=78;ui.shield=67;ui.energy=54;
-    ui.charge=39;ui.locked=1;ui.target_x=240;ui.target_y=131;ui.show_minimap=1;ui.show_objective=1;
+    ui.charge=39;ui.target_hp=65;ui.ammo=4;ui.locked=1;ui.target_x=240;ui.target_y=131;ui.show_minimap=1;ui.show_objective=1;
     return ui;
 }
 int main(void){
@@ -26,11 +26,16 @@ int main(void){
     start();b22_draw_hud(pixels+1,B22_W,&ui);guards();
     assert(pixels[1+50*B22_W+4]==b22_palette(B22_IRONMAN).suit_main);
     assert(pixels[1+131*B22_W+240]==0);
+    assert(pixels[1+79*B22_W+397]==0); /* Iron Man has no tactical ammo rail */
+    assert(pixels[1+94*B22_W+444]==b22_palette(B22_IRONMAN).suit_accent);
     uint32_t cyan=pixels[1+50*B22_W+4];
     ui.suit=B22_WARMACHINE;
     start();b22_draw_hud(pixels+1,B22_W,&ui);guards();
     assert(pixels[1+50*B22_W+4]!=cyan);
     assert(pixels[1+50*B22_W+4]==b22_palette(B22_WARMACHINE).suit_main);
+    assert(pixels[1+79*B22_W+397]==b22_palette(B22_WARMACHINE).suit_accent);
+    assert(pixels[1+88*B22_W+405]==b22_palette(B22_WARMACHINE).suit_accent);
+    assert(pixels[1+88*B22_W+455]==b22_palette(B22_WARMACHINE).soft);
     ui.mode=B22_IMMERSIVE;ui.target_x=-20;ui.target_y=280;ui.damage_warning=1;
     start();b22_draw_hud(pixels+1,B22_W,&ui);guards();
     ui.page=B22_PAUSE;
