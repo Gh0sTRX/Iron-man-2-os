@@ -162,6 +162,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/b24_unified/audit_active_render_owner.py
+      - name: Inspect real original armor geometry and pose update API
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_armor_renderer_layout.py
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
