@@ -38,3 +38,17 @@
 5. Oyun oynanabilir ve gerçek GPU render yoluyla fiziksel doğrulamaya layık hâle gelene kadar **hiç VPK release etme**. User bu kuralı değiştirdiğinde yeni test paketi hazırlanabilir.
 
 **Günlük ilerleme etiketi:** HOST PASS / VitaSDK SOURCE OBJECT PASS / GPU ACTIVE RUNTIME NOT DONE / FULL ANIMATION NOT DONE / HUMAN PS VITA NOT TESTED on new code.
+
+
+## B24 gerçek render sahibi — yeni kaynak denetimi PASS
+- Source-only CI run `38480294916`: gerçek B17+B24 yeniden kurulmuş C ağacı üzerinden **412 satırlık `src/main.c` / 522 satırlık `src/renderer.c`** denetlendi; sonuç GitHub CI'daki JSON raporunda, hiçbir VPK üretilmedi.
+- **Gerçek CPU→SDL sunum zinciri:**
+  - `main.c:102–107` `SDL_CreateRenderer` → `SDL_CreateTexture(..., SDL_TEXTUREACCESS_STREAMING, 480x272)`;
+  - `main.c:392` `im2_render(pixels,zbuffer,&model,&camera,...)` CPU zırh/şehir raster;
+  - `main.c:393` `b24_unified_draw_overlay(...)` ikinci HUD CPU çizimi;
+  - `main.c:395` `SDL_UpdateTexture(display,NULL,pixels,...)` tüm CPU yüzeyini video sistemine taşır;
+  - `main.c:397–400` `SDL_RenderClear/SDL_RenderCopy/SDL_RenderPresent` **eski SDL video render sahibi**;
+  - `main.c:146` `SDL_Init(SDL_INIT_VIDEO|SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER)`, `main.c:147` `SDL_CreateWindow`; kontrolcü okuması `main.c:243–270`. Bunu yeniden yazarken donanım kontrolcü eşlemesi kaybedilmemeli.
+  - `renderer.c:306` `b24_c1_scene` eski piksel CPU harita, `renderer.c:392` `im2_render` dışa sunulan frame render.
+- **Gerçek GPU geçiş programı:** Önce B24 render owner için **compile-time opt-in** VitaGL single-context create/init + tek `vglSwapBuffers` ile CPU `SDL_UpdateTexture/SDL_RenderPresent` hattının birbirini dışlayan iki seçenek olduğundan emin ol. Ardından gerçek `IM2Camera` Z-up view/proj ile `b24_gpu_c1_draw_vitagl` city indexed draw ve 5 IM2T/IM2V per-frame original suit GPU geometry; sonra VFX, 2D HUD ve pause aynı frame'e. Son CPU overlay'i GPU HUD olmadan atılırsa arayüz kaybolacağı için **ikisini birlikte taşı**.
+- VitaGL kaynak sözdizimi resmi upstream'den teyit edildi: `vglInitExtended(int legacy_pool, int width, int height, int ram_threshold, SceGxmMultisampleMode msaa)`; `vglSwapBuffers(GLboolean has_commondialog)`. GPU draw source gerçek VitaSDK object build `38479901595` PASS; **tek GPU runtime henüz bağlı değil, Vita FPS yok.** vitaGL homebrew cihazda `libshacccg.suprx` shader compiler gerektirebilir, kullanıcıda olup olmadığı henüz cihazda kontrol edilmedi.
