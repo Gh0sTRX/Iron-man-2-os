@@ -63,4 +63,24 @@ needle="b17_world_floor(pixels,zbuffer,camera);"
 assert s.count(needle)==1
 s=s.replace(needle,"if(!b24_c1_scene(pixels,zbuffer,camera))b17_world_floor(pixels,zbuffer,camera);")
 r.write_text(s)
+# All original B7/B8/B13/B14/B16 native regression/preview executables which
+# compile renderer.c also need the C1L1 parser linked, not only im2_beta.
+cmake=ROOT/"CMakeLists.txt"
+s=cmake.read_text()
+assert "B24_C1L1_MAP_LINK" not in s
+s+='''
+
+# B24_C1L1_MAP_LINK: original stage source module for every renderer target.
+get_property(b24c1_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(_b24c1_target IN LISTS b24c1_targets)
+  get_target_property(_b24c1_kind ${_b24c1_target} TYPE)
+  if(_b24c1_kind STREQUAL "EXECUTABLE" OR
+     _b24c1_kind STREQUAL "STATIC_LIBRARY" OR
+     _b24c1_kind STREQUAL "SHARED_LIBRARY")
+    target_sources(${_b24c1_target} PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_c1l1_map.c)
+  endif()
+endforeach()
+'''
+cmake.write_text(s)
 print("B24 original C1L1 map CPU-LOD scene renderer hooked: replacing repeated tiles when map valid; fallback preserved.")
