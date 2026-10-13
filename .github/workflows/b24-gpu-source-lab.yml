@@ -55,6 +55,21 @@ jobs:
             research/b24_unified/test_b24_c1_gpu_mock.c \
             -lm -o /tmp/b24-gpu-test
           /tmp/b24-gpu-test /tmp/C1L1_original_gpu.c1g2
+      - name: Compile real GPU scene adapter against VitaSDK headers - object files ONLY
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_c1_gpu_mesh.c -o /tmp/b24_c1_gpu_mesh_vita.o
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror -D__vita__ \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_c1_gpu_vitagl.c -o /tmp/b24_c1_gpu_vitagl_vita.o
+              echo "PASS real VitaSDK C11 GPU adapter object compilation: NO executable, NO VPK"
+            '
       - name: Publish diagnostics only - no original 2010 game data exported
         uses: actions/upload-artifact@v4
         with:
