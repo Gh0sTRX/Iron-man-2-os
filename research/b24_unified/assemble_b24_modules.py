@@ -33,6 +33,7 @@ SOURCES = [
     "b22_4_6/im2_speed_fx.c",
     "b22_4_6/im2_melee_focus.c",
     "b24_unified/b24_unified.c",
+    "b24_unified/b24_camera_recenter.c",
     "b18_gpu_probe/b17_input_landing_gate.c",
     "b18_gpu_probe/gpu_floor_mesh.c",
 ]
