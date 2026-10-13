@@ -38,4 +38,23 @@ void glClearColor(float,float,float,float);
 void glClear(GLbitfield);
 void glMatrixMode(GLenum);
 void glLoadMatrixf(const float *);
+#define GL_TEXTURE_COORD_ARRAY 0x8078
+#define GL_TEXTURE_MIN_FILTER 0x2801
+#define GL_TEXTURE_MAG_FILTER 0x2800
+#define GL_TEXTURE_WRAP_S 0x2802
+#define GL_TEXTURE_WRAP_T 0x2803
+#define GL_CLAMP_TO_EDGE 0x812F
+#define GL_LINEAR 0x2601
+#define GL_RGBA 0x1908
+typedef unsigned GLuint;
+void glGenTextures(GLsizei,GLuint *);
+void glBindTexture(GLenum,GLuint);
+void glTexParameteri(GLenum,GLenum,int);
+void glTexImage2D(GLenum,int,int,GLsizei,GLsizei,int,GLenum,GLenum,const void *);
+void glDeleteTextures(GLsizei,const GLuint *);
+void glPushMatrix(void);
+void glPopMatrix(void);
+void glMultMatrixf(const float *);
+void glColor4f(float,float,float,float);
+void glTexCoordPointer(int,GLenum,GLsizei,const void *);
 #endif
