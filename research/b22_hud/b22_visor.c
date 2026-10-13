@@ -49,6 +49,19 @@ static void suit_layer(uint32_t *f,int s,const B22UI *ui,B22Palette p){
     line(f,s,10,258,90,258,p.soft);line(f,s,391,258,469,258,p.soft);
     bar(f,s,169,246,64,5,ui->shield,p.suit_main);
     bar(f,s,246,246,64,5,ui->energy,p.suit_accent);
+    if(ui->suit==B22_WARMACHINE){
+        /* Heavy weapon status rail. These are new Vita graphics, not original artwork. */
+        line(f,s,397,79,465,79,p.suit_accent);
+        line(f,s,397,79,397,105,p.suit_accent);
+        int active=clampi(ui->ammo,0,6);
+        for(int k=0;k<6;k++)for(int dx=0;dx<6;dx++)
+            pixel(f,s,405+k*10+dx,88,k<active?p.suit_accent:p.soft);
+    }else{
+        /* Arc-reactor inspired, delicate circular energy diagnostic. */
+        ring(f,s,444,94,14,p.suit_main);
+        line(f,s,444,85,444,103,p.suit_accent);
+        line(f,s,436,94,452,94,p.suit_accent);
+    }
     if(ui->mode==B22_IMMERSIVE){
         for(int k=0;k<3;k++){
             line(f,s,9,177+k*13,18+k*4,173+k*13,p.soft);
@@ -90,7 +103,12 @@ void b22_draw_hud(uint32_t *frame,int stride,const B22UI *ui){
     if(ui->page==B22_GAME){
         legacy(frame,stride,ui);
         if(ui->mode!=B22_ORIGINAL_LAYOUT)suit_layer(frame,stride,ui,palette);
-        if(ui->locked)lock_brackets(frame,stride,ui->target_x,ui->target_y,
-                                     ui->mode==B22_ORIGINAL_LAYOUT?0x3ef7e0u:palette.suit_accent);
+        if(ui->locked){
+            lock_brackets(frame,stride,ui->target_x,ui->target_y,
+                          ui->mode==B22_ORIGINAL_LAYOUT?0x3ef7e0u:palette.suit_accent);
+            if(ui->target_hp>=0.f)
+                bar(frame,stride,ui->target_x-19,ui->target_y-23,38,3,
+                    ui->target_hp,ui->mode==B22_ORIGINAL_LAYOUT?0x3ef7e0u:palette.suit_accent);
+        }
     }else{page_panel(frame,stride,ui,palette);}
 }
