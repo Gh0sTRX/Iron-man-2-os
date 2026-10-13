@@ -166,6 +166,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/b24_unified/audit_armor_renderer_layout.py
+      - name: Audit B16 original arm mask and exact right-palm / chest attack source
+        run: |
+          python3 research/b24_unified/audit_b24_attack_mask.py
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
