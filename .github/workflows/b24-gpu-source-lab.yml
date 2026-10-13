@@ -61,3 +61,5 @@ jobs:
           name: B24_C1L1_GPU_Source_Manifest_JSON_ONLY
           path: /tmp/C1L1_gpu_manifest.json
           if-no-files-found: error
+
+# Original 2010 C1L1 node coordinate audit in host runner, no Vita VPK.
