@@ -1,10 +1,11 @@
-name: Build Iron Man 2 Vita B24 Unified Gameplay Candidate
+name: Build Iron Man 2 Vita B24 C1L1 Original Map Test
 on:
   push:
     branches: [feature/b24-unified-gameplay]
     paths:
       - ".github/workflows/unified-b24.yml"
       - "research/b24_unified/**"
+      - "research/B11_C1L1_Scene_GLBS.zip"
   workflow_dispatch:
 permissions:
   contents: read
@@ -38,8 +39,11 @@ jobs:
           python3 research/b17/apply_b17.py
           python3 research/b24_unified/assemble_b24_modules.py
           python3 research/b24_unified/apply_b24.py
+          # Authentic original C1L1 geometry: 22,919 original triangles (no demo Mark VI).
+          python3 research/b24_unified/build_c1l1_map.py --output work/maps/C1L1_environment.im2map --manifest work/maps/c1l1_map_manifest.json
+          python3 research/b24_unified/apply_b24_c1.py
           # Keep the existing, separately successful action_b16 title ID IM2L00011 untouched.
-          sed -i -e 's/IM2L00011/IM2B00024/g' -e 's/IronMan2_Combat_B16.vpk/IronMan2_Unified_B24.vpk/g' -e 's/Iron Man 2 - Combat B16/Iron Man 2 - Unified B24/g' work/CMakeLists.txt
+          sed -i -e 's/IM2L00011/IM2C00024/g' -e 's/IronMan2_Combat_B16.vpk/IronMan2_Unified_B24_C1.vpk/g' -e 's/Iron Man 2 - Combat B16/Iron Man 2 - B24 C1L1 Test/g' work/CMakeLists.txt
           python3 work/tools/check_assets.py
           python3 - <<'PY'
           from pathlib import Path
@@ -131,7 +135,7 @@ jobs:
               assert len(d['palm_anchors'][prefix])==2
           print('B16 verify: 23 authentic-skinned clips and 3 mask files')
           PY
-          grep -q IM2B00024 work/CMakeLists.txt
+          grep -q IM2C00024 work/CMakeLists.txt
           test -s work/models/suitcase.im2t
       - name: Native C animation and combat tests
         shell: bash
@@ -159,6 +163,27 @@ jobs:
           work/build-local/im2_preview work/models/suitcase.im2t work/suitcase-preview.ppm 3.1 0 1
           test -s work/suitcase-preview.ppm
           test -s work/mark6-preview.ppm
+      - name: Native validation of original C1L1 map loader
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -Wall -Wextra -Werror -pedantic -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer \
+            research/b24_unified/b24_c1l1_map.c research/b24_unified/test_b24_c1l1_map.c \
+            -lm -o /tmp/test_b24_c1l1_loader
+          /tmp/test_b24_c1l1_loader work/maps/C1L1_environment.im2map
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          f=Path("work/maps/C1L1_environment.im2map")
+          m=json.loads(Path("work/maps/c1l1_map_manifest.json").read_text())
+          magic,version,count,stride=struct.unpack_from("<4sIII",f.read_bytes())
+          assert magic==b"C1M1" and version==1 and stride==44
+          assert 21000<count<=22919
+          assert f.stat().st_size==16+stride*count
+          assert m["mission_spawn_known"] is False
+          assert m["triangle_groups"]["0"]>0 and m["triangle_groups"]["1"]>0
+          print("PASS B24-C1 original map:",count,"real triangles in same Vita gameplay build")
+          PY
       - name: Native C11 B24 all-modules gameplay integration smoke
         shell: bash
         run: |
@@ -195,11 +220,27 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm -v "$GITHUB_WORKSPACE/work:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc 'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Install C1L1 original game geometry into the unified Vita VPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd work && zip -q build-vita/IronMan2_Unified_B24_C1.vpk maps/C1L1_environment.im2map)
+          unzip -Z1 work/build-vita/IronMan2_Unified_B24_C1.vpk | grep -Fx maps/C1L1_environment.im2map
+          python3 - <<'PY'
+          import zipfile,hashlib
+          from pathlib import Path
+          p=Path("work/build-vita/IronMan2_Unified_B24_C1.vpk")
+          with zipfile.ZipFile(p) as z:
+              raw=z.read("maps/C1L1_environment.im2map")
+              assert raw==Path("work/maps/C1L1_environment.im2map").read_bytes()
+              assert "eboot.bin" in z.namelist()
+          print("PASS B24-C1 packaged and hashed authentic map:",len(raw),"bytes")
+          PY
       - name: Check isolated B17 VPK and five suits
         shell: bash
         run: |
           set -euo pipefail
-          P=work/build-vita/IronMan2_Unified_B24.vpk
+          P=work/build-vita/IronMan2_Unified_B24_C1.vpk
           test -s "$P"
           unzip -t "$P" | tail -1
           unzip -Z1 "$P" | grep -Fx eboot.bin
@@ -212,7 +253,7 @@ jobs:
           python3 - <<'PY'
           import json,zipfile
           manifest=json.load(open('work/docs/B13_ANIMATION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24_C1.vpk') as z:
               names=set(z.namelist())
               assert all('animations/'+x['asset']+'.im2v' in names for x in manifest)
               assert all('models/'+x+'.im2t' in names for x in ['mark6','mark4','stealth','warmachine','suitcase'])
@@ -222,7 +263,7 @@ jobs:
           python3 - <<'PY'
           import zipfile,json
           manifest=json.load(open('work/docs/B15_NEW_MOTION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24_C1.vpk') as z:
             names=set(z.namelist())
             assert all('animations/'+e['asset']+'.im2v' in names for e in manifest)
             assert len([x for x in names if x.startswith('animations/') and x.endswith('.im2v')])==59
@@ -232,7 +273,7 @@ jobs:
           python3 - <<'PY'
           import zipfile,json
           manifest=json.load(open('work/docs/B16_ANIMATION_MANIFEST.json'))
-          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24.vpk') as z:
+          with zipfile.ZipFile('work/build-vita/IronMan2_Unified_B24_C1.vpk') as z:
               names=set(z.namelist())
               assert all('animations/'+x['asset']+'.im2v' in names for x in manifest['animations'])
               for prefix in ['mark6','suitcase','warmachine']:
@@ -249,7 +290,7 @@ jobs:
           python3 - <<'PY'
           import struct,hashlib,zipfile
           from pathlib import Path
-          p=Path('work/build-vita/IronMan2_Unified_B24.vpk')
+          p=Path('work/build-vita/IronMan2_Unified_B24_C1.vpk')
           b=p.read_bytes()
           digest=hashlib.sha256(b).hexdigest()
           with zipfile.ZipFile(p) as z:
@@ -264,8 +305,8 @@ jobs:
                   key=keybytes.decode('ascii','replace')
                   value=sf[datbase+off:datbase+off+length]
                   result[key]=value.split(b'\x00',1)[0].decode('ascii','replace') if fmt==0x204 else value
-              assert result.get('TITLE_ID')=='IM2B00024', result.get('TITLE_ID')
-              assert result.get('TITLE','').startswith('Iron Man 2 - Unified B24'),result.get('TITLE')
+              assert result.get('TITLE_ID')=='IM2C00024', result.get('TITLE_ID')
+              assert result.get('TITLE','').startswith('Iron Man 2 - B24 C1L1 Test'),result.get('TITLE')
               print('B17 VERIFIED TITLE_ID:',result['TITLE_ID'])
               print('B17 VERIFIED TITLE:',result['TITLE'])
               print('B17 BINARY SIZE:',len(b))
@@ -276,6 +317,6 @@ jobs:
       - name: Upload B17 VPK
         uses: actions/upload-artifact@v4
         with:
-          name: IronMan2_Unified_B24_VPK
-          path: work/build-vita/IronMan2_Unified_B24.vpk
+          name: IronMan2_Unified_B24_C1_VPK
+          path: work/build-vita/IronMan2_Unified_B24_C1.vpk
           if-no-files-found: error
