@@ -16,7 +16,19 @@ void b24_c1l1_unload(void) {
 }
 int b24_c1l1_load(const char *path) {
     if(!path)return 0;
-    FILE *f=fopen(path,"rb");
+    /* Vita uses explicit app0: asset URLs (as do the original .im2t loaders).
+       Never rely on SDL's process current-working-directory for bundled maps. */
+    FILE *f=NULL;
+#ifdef __vita__
+    if(strncmp(path,"app0:",5)==0)f=fopen(path,"rb");
+    else {
+        char resolved[256];
+        if(snprintf(resolved,sizeof(resolved),"app0:%s",path)<(int)sizeof(resolved))
+            f=fopen(resolved,"rb");
+    }
+#else
+    f=fopen(path,"rb");
+#endif
     if(!f)return 0;
     unsigned char header[16]={0};
     int ok=fread(header,1,sizeof(header),f)==sizeof(header);
