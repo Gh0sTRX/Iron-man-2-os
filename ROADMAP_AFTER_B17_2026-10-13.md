@@ -81,3 +81,13 @@ Mevcut renderer `src/renderer.c`: `render_triangle()` + CPU `uint32_t pixels[480
 - Guardian 2010 iPhone incelemesi: seslendirmeler: https://www.theguardian.com/technology/gamesblog/2010/jun/02/iron-man-2-iphone-game-review
 - TouchArcade 2010 iOS: spoken dialogue/voice acting: https://toucharcade.com/2010/05/04/iron-man-2-arrives-on-us-app-store/
 - vitaGL OpenGL wrapper / native GPU: https://github.com/Rinnegatamante/vitaGL
+
+
+## B18 erken çalışma — özgün kod API'leri bulundu (13 Ekim 2026)
+- Tam `B15_NATIVE_10760_SYMBOLS.csv` arşivi **read-only** açılarak 10.760 orijinal Mach-O C++ sembolü üzerinde tarama yapıldı. Kanıt belgesi: `research/B18_AUDIO_CINEMATIC_NATIVE_SYMBOL_AUDIT.md`.
+- **Ses:** `SoundManager::PlaySFX/PlayMusic/SetSFXVolume/SetMusicVolume/PlayRandomSFX/Stop/Pause/Resume`, `SoundPlayer::LoadSound`, `MainCharacter::PlayAttackSound` özgün fonksiyonları bulundu. Sound ID tabloları, codec ve ses kaynakları henüz bilinmiyor.
+- **Sinematik:** `GamePlayUI::StartCutscene/UpdateCutscene/RenderCutscene/EndCutscene`, `GS_GamePlay::EnterCinematic/SkipCinematic`, `CameraPath::BuildSpline/GetInterpolatedPosInSplineByTime` özgün fonksiyonları bulundu. **Ara sahnenin FMV mi yoksa canlı 3D mi olduğu hâlâ belirsiz.**
+- **Görev:** `MissionMgr::SetCurrentMission/SaveLoad/OnAllMissionComleted`, `IMissionCondition::EvaluateComplete/EvaluateFail`, `checkpoint::CMissionCommand::DoCmd/UnDoCmd` sembolleri var. BCLARA gerçek instance değerleri henüz çözülmedi.
+- **Yeni test edilmiş okuyucu:** `research/b18/ipa_media_inventory.py` yalnızca kullanıcının kendi orijinal IPA ZIP girişlerinin dosya adını, boyutunu, SHA-256 değerini, 64 bayt imzasını ve video/ses/altyazı adayı sınıfını CSV+JSON olarak listeler; varsa 1.0.0 ve 1.0.3 dosya farklarını verir. Python 3 stdlib, sentetik 4 dosyalı IPA ile çalıştırılıp test edildi. Gerçek oyun sesleri henüz **sayılmadı, çıkarılmadı, dönüştürülmedi**, bu nedenle B18 tamamlanmış sayılamaz.
+- Kullanıcının önceki orijinal 248/275 MB IPA dosyaları şu anda GitHub deposunda mevcut değil; bağlı Drive aranmasına rağmen bulunamadı. Tam ses/cutscene sayımı için gerçek dosya veya erişilebilir bağlantı gerekiyor.
+- Bu araştırma için yeni VPK, VitaSDK build veya GitHub Actions job başlatılmadı.
