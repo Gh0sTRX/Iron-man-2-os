@@ -22,6 +22,7 @@ void glVertexPointer(int,GLenum,GLsizei,const void *);
 void glColorPointer(int,GLenum,GLsizei,const void *);
 void glDrawElements(GLenum,GLsizei,GLenum,const void *);
 #define GL_FALSE 0
+#define GL_TRUE 1
 #define GL_COLOR_BUFFER_BIT 0x00004000
 #define GL_DEPTH_BUFFER_BIT 0x00000100
 #define GL_LESS 0x0201
