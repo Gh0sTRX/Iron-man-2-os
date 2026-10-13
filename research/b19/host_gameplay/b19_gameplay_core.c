@@ -85,7 +85,7 @@ int b19_fire_repulsor(B19Game *g,B19Vec3 origin,B19Vec3 direction){
     }
     g->shot_cooldown=.2f;emit(g,B19_EV_PLAYER_FIRE,best<0?0:g->enemies[best].id,0);
     if(best<0)return 0;
-    B19Enemy *e=&g->enemies[best];e->hp-=30.f;
+    B19Enemy *e=&g->enemies[best];int hit_id=e->id;e->hp-=30.f;
     emit(g,B19_EV_ENEMY_HIT,e->id,30);
     if(e->hp<=0.f){
         e->hp=0.f;e->alive=0;g->alive--;g->kills++;
@@ -95,5 +95,5 @@ int b19_fire_repulsor(B19Game *g,B19Vec3 origin,B19Vec3 direction){
             else {g->state=B19_WON;emit(g,B19_EV_MISSION_WIN,0,g->kills);}
         }
     }
-    return e->id;
+    return hit_id;
 }
