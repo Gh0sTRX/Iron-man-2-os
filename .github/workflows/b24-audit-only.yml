@@ -169,6 +169,14 @@ jobs:
       - name: Audit B16 original arm mask and exact right-palm / chest attack source
         run: |
           python3 research/b24_unified/audit_b24_attack_mask.py
+      - name: Apply and verify corrected original RIGHT repulsor source-only
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/test_b24_right_arm_patch.py
+          gcc -std=c11 -O1 -Wall -Wextra -pedantic -Iwork/src \
+            -c work/src/b16_action.c -o /tmp/b24_right_arm_action.o
+          echo "PASS original B16 source compiles with right-only attack mask; NO VPK"
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
