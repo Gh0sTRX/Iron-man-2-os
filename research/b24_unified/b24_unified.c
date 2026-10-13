@@ -3,6 +3,53 @@
 #include <stddef.h>
 #include <string.h>
 
+/* B24-C1 readable in-game pause labels, replacing B22's silent blank panel.
+ * The HUD is a drawing layer, not a claim to have restored original iOS menus. */
+static const unsigned char b24_font[26][5]={
+ {0x7e,0x11,0x11,0x11,0x7e}, /* A */
+ {0x7f,0x49,0x49,0x49,0x36}, /* B */
+ {0x3e,0x41,0x41,0x41,0x22}, /* C */
+ {0x7f,0x41,0x41,0x22,0x1c}, /* D */
+ {0x7f,0x49,0x49,0x49,0x41}, /* E */
+ {0x7f,0x09,0x09,0x09,0x01}, /* F */
+ {0x3e,0x41,0x49,0x49,0x7a}, /* G */
+ {0x7f,0x08,0x08,0x08,0x7f}, /* H */
+ {0x41,0x41,0x7f,0x41,0x41}, /* I */
+ {0x20,0x40,0x41,0x3f,0x01}, /* J */
+ {0x7f,0x08,0x14,0x22,0x41}, /* K */
+ {0x7f,0x40,0x40,0x40,0x40}, /* L */
+ {0x7f,0x02,0x0c,0x02,0x7f}, /* M */
+ {0x7f,0x04,0x08,0x10,0x7f}, /* N */
+ {0x3e,0x41,0x41,0x41,0x3e}, /* O */
+ {0x7f,0x09,0x09,0x09,0x06}, /* P */
+ {0x3e,0x41,0x51,0x21,0x5e}, /* Q */
+ {0x7f,0x09,0x19,0x29,0x46}, /* R */
+ {0x46,0x49,0x49,0x49,0x31}, /* S */
+ {0x01,0x01,0x7f,0x01,0x01}, /* T */
+ {0x3f,0x40,0x40,0x40,0x3f}, /* U */
+ {0x1f,0x20,0x40,0x20,0x1f}, /* V */
+ {0x7f,0x20,0x18,0x20,0x7f}, /* W */
+ {0x63,0x14,0x08,0x14,0x63}, /* X */
+ {0x03,0x04,0x78,0x04,0x03}, /* Y */
+ {0x61,0x51,0x49,0x45,0x43}  /* Z */
+};
+static void b24_label(uint32_t *px,int stride,int x,int y,
+                      const char *text,uint32_t rgb,int scale){
+    if(!px||!text||scale<1||scale>3)return;
+    for(const unsigned char *c=(const unsigned char*)text;*c;c++,x+=6*scale){
+        if(*c==' ')continue;
+        if(*c<'A'||*c>'Z')continue;
+        const unsigned char *font=b24_font[*c-'A'];
+        for(int col=0;col<5;col++)for(int row=0;row<7;row++)
+            if(font[col]&(1u<<row))
+                for(int dy=0;dy<scale;dy++)for(int dx=0;dx<scale;dx++){
+                    int sx=x+col*scale+dx,sy=y+row*scale+dy;
+                    if(sx>=0&&sx<480&&sy>=0&&sy<272)px[(size_t)sy*stride+sx]=rgb;
+                }
+    }
+}
+
+
 static float lim(float x,float lo,float hi) {
     return !isfinite(x)?lo:(x<lo?lo:x>hi?hi:x);
 }
@@ -158,6 +205,13 @@ void b24_unified_draw_overlay(B24Unified *g,uint32_t *pixels,int stride) {
     if(g->controls.state==IM2_PLAYING)
         im2_speed_fx_draw(pixels,stride,&g->speed_fx,g->hud.suit==B22_WARMACHINE);
     b22_draw_hud(pixels,stride,&g->hud);
+    if(g->hud.page==B22_PAUSE){
+        b24_label(pixels,stride,169,69,"PAUSED",0x55dff8u,2);
+        b24_label(pixels,stride,141,111,"START RESUME",0xe8bb5du,1);
+        b24_label(pixels,stride,141,139,"CIRCLE RESUME",0xc8e5eeu,1);
+        b24_label(pixels,stride,141,164,"CROSS OPTIONS",0xc8e5eeu,1);
+        b24_label(pixels,stride,141,187,"BETA MENU",0x7cb2c5u,1);
+    }
     b23_draw_missile_hud(pixels,stride,&g->missile,
                           g->hud.suit,g->hud.mode,g->hud.page);
 }
