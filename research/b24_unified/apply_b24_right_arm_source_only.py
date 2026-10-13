@@ -20,7 +20,7 @@ change("main.c",
  '(attack.hand?(int)attack.palm_l:(int)attack.palm_r);',
  '(int)attack.palm_r; /* B24: HUD muzzle uses SAME right arm */')
 change("b16_action.c",
- '  fclose(f);return 1;',
+ 'fclose(f);return 1;',
  '''  fclose(f);
   /* Keep genuine upper-body source pose only on the right half of suit.
      Mid-plane inferred from known BOTH original palm vertices; no guessed
