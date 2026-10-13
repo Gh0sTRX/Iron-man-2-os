@@ -1,3 +1,5 @@
+> **GÜNCEL DURUM — 13.10.2026 AKŞAM / B17 GERÇEK PS VITA TEST EDİLDİ:** Bu dokümanın B17 cihaz testi bekleniyor ve yeni geliştirmenin koşulu olan paragrafları tarihsel plan kaydıdır; kullanıcı B17'yi gerçekten test etti. Hareketleri başarılı buldu; repulsor/WM animasyonları, analog erken hızlanma, yere değmeden iniş ve çok düşük FPS bildirdi. Öncelik GPU gerçek render hattı + doğru animasyon durum makinesi. Gerçek B17 raporu ve ilk host C11 GPU/kontrol laboratuvarı: `research/b18_gpu_probe/README.md`; kanonik son durum `PROJECT_HANDOFF.md`. Eski B15 ve B17 korunuyor, yeni VPK henüz yok.
+
 # Iron Man 2 (Gameloft iOS 2010) → PS Vita | B17 Bekleme Dönemi / Toplu Entegrasyon ve Test Planı
 **Tarih:** 13.10.2026 · **Durum:** PLAN + KAYNAK DOĞRULAMA, Vita cihaz testi yok, yeni VPK yok. Bu belge PRIVATE repoda saklanır.
 
