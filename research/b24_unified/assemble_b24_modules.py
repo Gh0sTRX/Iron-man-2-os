@@ -54,11 +54,11 @@ def assemble():
     if marker in cmake:
         raise RuntimeError("B24 assembler already applied")
     rootvar = "$" + "{CMAKE_CURRENT_SOURCE_DIR}"
-    block = "\n" + marker + "\n" + "target_sources(im2_beta PRIVATE\n"
+    block = "\n" + marker + "\n" + "if(TARGET im2_beta)\ntarget_sources(im2_beta PRIVATE\n"
     block += "".join("  " + rootvar + "/b24/" + p + "\n" for p in SOURCES)
     block += ")\ntarget_include_directories(im2_beta PRIVATE\n"
     block += "".join("  " + rootvar + "/b24/" + p + "\n" for p in SOURCE_DIRS.values())
-    block += ")\n"
+    block += ")\nendif()\n"
     cmake_path.write_text(cmake + block)
     print("B24 unified build target: " + str(len(SOURCES)) + " actual source modules assembled")
     print("Linkage is not gameplay integration; B24 per-frame adapter/GPU must be validated separately.")
