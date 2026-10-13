@@ -74,6 +74,7 @@ assert s.count("VITA ARENA B17")>=1
 assert s.count("world_grid(pixels,camera);")==1
 s=s.replace("world_grid(pixels,camera);","/* Original C1L1 environment, no B17 grid lines. */")
 s=s.replace("VITA ARENA B17","B24 C1L1 TEST")
+s=s.replace("MELEE: ORIGINAL ANIMATION NOT YET PORTED","MELEE COMBO CLIPS FOUND - NOT BAKED")
 renderer.write_text(s)
 
 # Real B14 orbit is the only on-screen camera authority; B22 camera remains
