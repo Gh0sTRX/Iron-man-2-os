@@ -7,6 +7,7 @@ on:
       - "research/B11_C1L1_Source_Parser.zip"
       - "research/B11_C1L1_Scene_GLBS.zip"
       - "research/b24_unified/prepare_c1l1_assets.py"
+      - "research/b24_unified/inspect_c1l1_scene.py"
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,6 +22,8 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/b24_unified/prepare_c1l1_assets.py --out /tmp/b24-c1-src
+      - name: Inspect real source geometry bounds and transforms
+        run: python3 research/b24_unified/inspect_c1l1_scene.py
       - name: Verify that C1L1 is not falsely called a restored original mission
         run: |
           python3 - <<'PY'
