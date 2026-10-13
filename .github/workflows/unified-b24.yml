@@ -224,6 +224,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sudo chown "$(id -u):$(id -g)" work/build-vita/IronMan2_Unified_B24_C1.vpk
           (cd work && zip -q build-vita/IronMan2_Unified_B24_C1.vpk maps/C1L1_environment.im2map)
           unzip -Z1 work/build-vita/IronMan2_Unified_B24_C1.vpk | grep -Fx maps/C1L1_environment.im2map
           python3 - <<'PY'
