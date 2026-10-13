@@ -49,6 +49,22 @@ replace("tools/test_b15.c",
         """b14_world_tick(&w,.04f,0,.80f,0,0,0);TEST(w.flight_stage==1);
  b14_world_tick(&w,.04f,0,.99f,0,0,0);TEST(w.flight_stage==2);""")
 
+# Update B16 native regression too: old .85/.72/.62 hysteresis was for
+# .78/.67. For full-analog B24: .99 enters Stage2, .91 stays Stage2,
+# and .82 returns Stage1. Tests are strengthened, not skipped.
+replace("tools/test_b16.c",
+        "b14_world_tick(&w,.016f,0,.85f,0,0,0);assert(w.flight_stage==2);",
+        "b14_world_tick(&w,.016f,0,.99f,0,0,0);assert(w.flight_stage==2);")
+replace("tools/test_b16.c",
+        "b14_world_tick(&w,.016f,0,.72f,0,0,0);assert(w.flight_stage==2);",
+        "b14_world_tick(&w,.016f,0,.91f,0,0,0);assert(w.flight_stage==2);")
+replace("tools/test_b16.c",
+        "b14_world_tick(&w,.016f,0,.62f,0,0,0);assert(w.flight_stage==1);",
+        "b14_world_tick(&w,.016f,0,.82f,0,0,0);assert(w.flight_stage==1);")
+replace("tools/test_b16.c",
+        "expanded .78/.67 hysteresis",
+        "B24 full-stick .96/.88 hysteresis")
+
 # Keep user-proven B17 movement & original pose as authoritative.
 replace("src/main.c", '#include "b16_action.h"',
         '#include "b16_action.h"\n#include "../b24/b24_unified/b24_unified.h"\n#include "../b24/b18_gpu_probe/b17_input_landing_gate.h"')
