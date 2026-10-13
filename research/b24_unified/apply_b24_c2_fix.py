@@ -102,7 +102,8 @@ mark='''if(e.cbutton.button==SDL_CONTROLLER_BUTTON_START)running=0;'''
 mark='''/* B24: START toggles pause in unified controls. */'''
 assert s.count(mark)==1
 s=s.replace(mark,'''/* START is event-latched so a quick press can't be lost at low FPS. */
-                b24_input_latched|=IM2_BT_START;''')
+                if(e.cbutton.button==SDL_CONTROLLER_BUTTON_START)
+                    b24_input_latched|=IM2_BT_START;''')
 mark='''        world.camera_distance=clip(world.camera_distance-zoom*dt*1.8f,2.8f,6.4f);'''
 assert s.count(mark)==1
 s=s.replace(mark,'''        b24_buttons|=b24_input_latched;
