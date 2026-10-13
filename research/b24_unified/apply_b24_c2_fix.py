@@ -65,8 +65,14 @@ old="if(!b24_c1_scene(pixels,zbuffer,camera))b17_world_floor(pixels,zbuffer,came
 assert s.count(old)==1
 # On load failure do NOT silently go back to the costly B17 CPU checkerboard.
 # Diagnostic old floor was measured at 235-839ms on physical Vita by user.
-s=s.replace(old,"b24_c1_scene(pixels,zbuffer,camera);")
+s=s.replace(old,'''int b24_map_ok=b24_c1_scene(pixels,zbuffer,camera);
+        /* On-screen diagnostic: distinguishes missing app0: asset from camera culling. */
+        write_text(pixels,337,181,b24_map_ok?"C1L1 READY":"C1L1 FAIL",
+                   b24_map_ok?packrgb(120,230,168):packrgb(255,108,89),1);''')
 assert s.count("VITA ARENA B17")>=1
+# Original B17 grid overlay would overpaint the real Chapter1 geometry.
+assert s.count("world_grid(pixels,camera);")==1
+s=s.replace("world_grid(pixels,camera);","/* Original C1L1 environment, no B17 grid lines. */")
 s=s.replace("VITA ARENA B17","B24 C1L1 TEST")
 renderer.write_text(s)
 
