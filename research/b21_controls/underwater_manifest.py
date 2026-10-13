@@ -22,7 +22,7 @@ SCENE_CLIPS = {
 }
 
 def classify(name):
-    if name in SCENE_CLIPS:
+    if name.casefold() in SCENE_CLIPS:
         return 'scene_object'
     if name.startswith('Underwater_'):
         if '_Dead_' in name:
