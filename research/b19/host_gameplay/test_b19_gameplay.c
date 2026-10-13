@@ -21,7 +21,8 @@ int main(void){
     assert(aim_and_hit(&g,0)>0);wait(&g);
     assert(aim_and_hit(&g,0)>0);assert(g.alive==1);wait(&g);
     assert(aim_and_hit(&g,1)>0);wait(&g);
-    assert(aim_and_hit(&g,1)>0);
+    int final_first_wave_id=g.enemies[1].id;
+    assert(aim_and_hit(&g,1)==final_first_wave_id);
     assert(g.wave==1&&g.alive==3);
     for(int i=0;i<3;i++){wait(&g);assert(aim_and_hit(&g,i)>0);wait(&g);assert(aim_and_hit(&g,i)>0);}
     assert(g.state==B19_WON&&g.kills==5&&g.alive==0);
