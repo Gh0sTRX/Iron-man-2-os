@@ -22,7 +22,16 @@ replace("src/b14_world.c",
         "(len>=.96f?2.4f:1.1f);")
 replace("src/main.c",
         "const int ground_run=!world.flying && world.speed>=.78f;",
-        "const int ground_run=!world.flying && world.speed>=.96f;")
+        """B17GateInput b24_analog={0};
+        b24_analog.stick_x=move_x;b24_analog.stick_forward=move_y;
+        b24_analog.airborne=world.flying;
+        b17_gate_step(&b24_gate,&b24_gate_cfg,&b24_analog);
+        const int ground_run=b24_gate.is_ground_running;""")
+# Real weapon animations should not restart on a still-active attack clip.
+replace("src/main.c",
+        "if(fired>=0 && combat.mode==B16_REPULSOR)",
+        "if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active)")
+
 # The first repulsor fix: prevent arbitrary Beam1/2/3 on each consecutive shot.
 # Clip retarget verification / proper firing animation still required.
 replace("src/main.c",
@@ -31,11 +40,11 @@ replace("src/main.c",
 
 # Keep user-proven B17 movement & original pose as authoritative.
 replace("src/main.c", '#include "b16_action.h"',
-        '#include "b16_action.h"\n#include "../b24/b24_unified/b24_unified.h"')
+        '#include "b16_action.h"\n#include "../b24/b24_unified/b24_unified.h"\n#include "../b24/b18_gpu_probe/b17_input_landing_gate.h"')
 replace("src/main.c", "static B8Combat range={0};",
-        "static B8Combat range={0};\nstatic B24Unified b24_game={0};")
+        "static B8Combat range={0};\nstatic B24Unified b24_game={0};\nstatic B17GateState b24_gate={0};\nstatic B17GateConfig b24_gate_cfg={0};")
 replace("src/main.c", "B16Combat combat; b16_combat_init(&combat);",
-        "B16Combat combat; b16_combat_init(&combat);\n    b24_unified_init(&b24_game);")
+        "B16Combat combat; b16_combat_init(&combat);\n    b24_unified_init(&b24_game);\n    b17_gate_defaults(&b24_gate_cfg);b17_gate_init(&b24_gate);")
 
 # New B21-style map. For this early integration, SELECT = test-suit-cycle.
 # R = held fire; L = missile lock; Square = melee (genuine animations pending);
