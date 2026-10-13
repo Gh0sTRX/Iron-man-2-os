@@ -185,3 +185,5 @@ jobs:
             /tmp/B24_ANIMATION_COVERAGE.json
             /tmp/B24_GRAPHICS_OWNER_AUDIT.json
           if-no-files-found: error
+
+# Re-run exact B16 right-palm-only source patch after audited whitespace correction.
