@@ -1,0 +1,40 @@
+# B24 / B17'DEN BUGÜNE GELEN TÜM EKSİK İŞLERİN TEK CANLI İZLEME KAYDI
+**Karar (14 Ekim 2026):** Kullanıcı özellikle **yeni VPK İSTEMİYOR**. Araştırma, kaynak kurtarma, gerçek GPU motor geçişi ve eksik/yarım animasyonları düzeltmeye odaklan. `feature/b24-unified-gameplay` aktif geliştirme dalıdır. B15/B17 iyi hareket referansı ve C1/C2 başarısız fiziksel testleri tarihi korunur. Herhangi bir GitHub CI/audit bu dönemde sadece **host kaynak testi** ve **VitaSDK .o obje dosyası derlemesi** yapabilir; `vpk`, Vita executable, yayın veya release **OLMAYACAK** (kullanıcı yeni test istediğinde ayrı onay ve build).
+
+## Kanıtlı BUG/İstek kaydı — yanlışlıkla 'bitti' denemez
+
+| Alan | Önceki B17→B24 istekleri / kalan işler | Doğrulanmış durum | Tamamlanma şartı |
+|---|---|---|---|
+| C2 acil giriş | *Her* tuşun Pause açması | **SOURCE FIX + HOST PASS**, gerçek Vita doğrulanmadı | yalnız START pause, Circle resume; SELECT gerçek suit, Dpad altitude/weapon, R fire, Square melee; gerçek cihaz |
+| GPU ana motor | B17 CPU 480×272 raster + SDL_UpdateTexture ~29ms | B24 yeni C1G2 orijinal indeksli mesh exporter + GPU draw adapter var; VitaSDK objesi derleniyor/derlendi; **gerçek context/present henüz yok** | tek VitaGL GXM context, gerçek z-up projection, 3D env+5 skinned armor+HUD depth GPU; CPU framebuffer kalktı; cihaz FPS |
+| Chapter 1 model | C1L1 kaynak binalar/araçlar tam görünsün | 370 B11 mesh → **37946 vtx / 22919 tris / 68757 uint16 indices / 4 draw groups**, kaynak PASS; B24-C2 365 tri + 4×4 CPU debug başarısız | gerçek batched GPU geometri ve doğru dünya spawn+frustum+collision; cihazda görünür sokak |
+| C1L1 texture/material | 2010 orijinal oyun şehir dokuları | B12 39 exact texture refs / 42 PNG, B11 GLB **TEXCOORD_0 YOK** | gerçek BDAE UV0/lightmap UV1, material-to-texture ID, texture atlas shader/draw |
+| 3D uçuş | hover→Stage2 full stick→RUSH, gerçek yukarı/aşağı eğim, sağ/sol yatış | B22.2 host sim, B17 Z-up model root'a **tam bağlanmadı** | gerçek B17 actor state tek authority, quaternion root pose, z-up camera & HUD, pitch climbs/dive & bank device |
+| Uçuş kamerası | ground/hover sağ omuz, Stage2 tam arka, RUSH zoom/FOV; sağ stick serbest, bırakınca takip | B22.3 ve B24 rear follow source math var, C2 Pause nedeniyle cihazda denenemedi | kamera-çapraz-zırh-bone tek view/proj ve smooth recenter; collision wall |
+| Stage VFX | hover sadece 2 ayak; Stage2 el+ayak; **RUSH** iki sırt ek, motion streak ve soft blur | host thruster/FX math var, orijinal nozul animation socket + GPU parçacık render yok | per-frame rig socket, sahnede 2/4/6 on-screen doğru particles ve yalnız RUSH sırt |
+| Çapraz nişan HUD | W/M visor stiller, füze dışında LOCK kapalı, merkez uyumu | B22+B23 module var; B17 legacy HUD ile çift/yanlış screen coordinates | uçuşta gerçek merkez reticle, omuz aşamasında offset, raycast+HUD aynı projection |
+| Repulsor | tüm zırhlarda **yalnız sağ kol kalksın**, yürüyüş sürerken sağ elden ateş; doğru aim | random `shots%3` kaldırıldı; **right arm masked genuine animation yok**; yeni `b24_weapon_aim` math kaynak modülü | bone/rig mask + özgün sağ hedefe bakış klibi, aim hold+fire+recover, animated right palm socket, no reentry |
+| Unibeam | chest reactor origin, hedefe öne doğru doğru ışın | C2 rastgele geriye yayıyor; yeni b24_weapon_aim doğru world basis **host** | real chest animated bone socket + world target ray + GPU line / effects + device |
+| Melee | Ground Combo1/2/3/Power, hit windows, yakın dövüş kamerası center | B15 **304 sadece kaynak adı**, B24 **59 baked**; melee klipleri baked+hooked değil | ham .anim keyframes recovery, 5 suit compat bake, authored hit timing, enemy focus |
+| War Machine | yavaş doğal walk, iyi hover korunur, uçuşta anormal bacak kalkmasın, inişte gereksiz kol kalkmasın | 56 original named source WM / bazı retarget B24, real wrong transitions | genuine source and verified compatible fallback retarget, pose-by-pose device |
+| İniş/zemin | temas olmadan iniş anim başlamasın | b18 landing gate host, C1L1 original collision chưa connected | C1L1 floor/body physics, hit/contact+velocity gate |
+| Dövüş ve görev | B19 düşman 2 wave, projectiles, original first level | host AI proto + C1L1 original static geo; `level1.bclara` spawn/objectives not parsed | original enemy model/HP/hit positions + C1L1 mission logic |
+| Ses ve UI | orijinal VFX/SFX, pause selectable coherent HUD | çoğu placeholder veya asset missing | gameplay audio emitter/mixer/UI navigation, GPU HUD, performance profiled |
+
+## Yeni gerçek kaynak kodları ve testler (14 Ekim)
+- `export_b24_c1_gpu_mesh.py`: doğrulanmış B11 GLB kaynak, **TÜM 370 submesh ve 22.919 özgün triangle** korunarak 16-bit indexed `C1G2` 4 materyal kategorili GPU batch formatına derleniyor; eski 365 tri/4×4 CPU sampling kullanılmıyor. Asıl UV/lightmap yok, gerçek materyal gibi gösterilmez.
+- Kaynak düğüm matrisleri gerçek CI ile incelendi: **370 child mesh node'un tümünde -90° X görsel GLB Y-up dönüşümü** var, raw accessor koordinatları BDAE **Z-up** olarak saklanıyor. GPU exporter bu geçici görüntü dönüşümünü **B17 orijinal Z-up pozisyonuna ikinci kez uygulamıyor**. Bu, önceki map rendering karmaşasının gerçek veri açısından güvenli açıklamasıdır; C2 bloklarının tek nedeni olduğunu iddia etme.
+- `b24_c1_gpu_mesh.[ch]`: tam vtx/index/batch doğrulayan sınır kontrollü loader.
+- `b24_c1_gpu_vitagl.c`: gerçek OpenGL tipleriyle tek `glVertexPointer/glColorPointer` ve dört `glDrawElements` materyal renk geçişli çizim. **Aktif VitaGL context/view/proj ve swap dışarıdan gereklidir; henüz çalışan renderer değildir.**
+- `b24_weapon_aim.[ch]`: doğrulanmış rig konumundan **sağ palm** ve **chest unibeam** dünya-uzayı shot origin/direction, kamera karakteri önden gösterince yanlışlıkla geriye ateşlememe ve yürüyüşten bağımsız üst kol aim weight protokolü. **Bugünkü runtime'a ve gerçek orijinal animasyon klibine bağlı değil**.
+- `.github/workflows/b24-gpu-source-lab.yml`: sadece 2010 iOS private kaynak arşivinden PC manifest, mock GL host call test, gerçek `arm-vita-eabi-gcc` ile obje compile ve weapon/camera host regression. **NO VPK**. JSON manifest orijinal game geometry binary'yi dışarıya vermez.
+- 304 original animation name /59 baked clip audited in `.github/workflows/b24-audit-only.yml` CI `38478323072`; START source fix PASS. Raw 304 clips henüz erişilebilir / baked kabul edilmez.
+
+## Öncelik ve bağlanma kapıları
+1. Önce single-GPU-context ownership, SDL GPU conflict araştırması, B17 gerçek renderer source owner, draw order `C1L1→5 armor→FX→HUD→swap`; actual Vita SDK object code pass yeterli değil.
+2. Aynı anda B11/B12 authentic UV+material atlas; önce gerçek 22 araç submesh UV referansı, sonra şehir; source authenticity and no fake textures.
+3. 304-name vs 59-baked tabloda **raw keyframe availability**; eksik Ground Combo, Upper right arm aim/repulsor, WM, landing ve Stage2/RUSH pose baker B13. Uydurma dosya "original" diye etiketlenemez.
+4. Giriş/hud/reticle/flight real world math ve efekt soketlerini gerçek B24 input+pose single authority'ye bağla; Stage2 sırt daima off.
+5. Oyun oynanabilir ve gerçek GPU render yoluyla fiziksel doğrulamaya layık hâle gelene kadar **hiç VPK release etme**. User bu kuralı değiştirdiğinde yeni test paketi hazırlanabilir.
+
+**Günlük ilerleme etiketi:** HOST PASS / VitaSDK SOURCE OBJECT PASS / GPU ACTIVE RUNTIME NOT DONE / FULL ANIMATION NOT DONE / HUMAN PS VITA NOT TESTED on new code.
