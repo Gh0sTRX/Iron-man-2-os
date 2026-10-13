@@ -18,6 +18,7 @@ SOURCE_DIRS = {
     "b22_camera": "b22_camera",
     "b22_4_6": "b22_4_6",
     "b24_unified": "b24_unified",
+    "b18_gpu_probe": "b18_gpu_probe",
 }
 SOURCES = [
     "b19/host_gameplay/b19_gameplay_core.c",
@@ -32,6 +33,8 @@ SOURCES = [
     "b22_4_6/im2_speed_fx.c",
     "b22_4_6/im2_melee_focus.c",
     "b24_unified/b24_unified.c",
+    "b18_gpu_probe/b17_input_landing_gate.c",
+    "b18_gpu_probe/gpu_floor_mesh.c",
 ]
 def assemble():
     cmake_path = WORK / "CMakeLists.txt"
