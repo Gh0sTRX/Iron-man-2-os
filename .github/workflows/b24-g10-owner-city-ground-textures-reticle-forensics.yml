@@ -1,4 +1,4 @@
-name: G10 Original 2010 C1L1 Ground Floor And Real City Textures and Crosshair Inventory NO VPK
+name: G10 ORIGINAL C1L1 Ground plus 37 actual atlas metadata pointer forensic and HUD reticle NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -23,10 +23,17 @@ jobs:
           python3 research/b24_unified/b24_g9_city_ground_and_texture_forensic.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/B24_G10_ORIGINAL_C1L1_GROUND_AND_RETICLE_SOURCE_REPORT.json
+      - name: Identify exact original BDAE-to-texture strings and 2010 HUD crosshair asset families
+        run: |
+          python3 research/b24_unified/b24_g10_city_material_pointer_and_cross_source.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
-          path: /tmp/B24_G10_ORIGINAL_C1L1_GROUND_AND_RETICLE_SOURCE_REPORT.json
+          path: |
+            /tmp/B24_G10_ORIGINAL_C1L1_GROUND_AND_RETICLE_SOURCE_REPORT.json
+            /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
