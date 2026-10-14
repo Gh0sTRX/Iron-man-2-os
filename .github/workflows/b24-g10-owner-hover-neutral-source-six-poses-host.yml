@@ -1,0 +1,81 @@
+name: G10 Original 2010 Mark VI neutral hover vs raised repulsor idle 6 real source screenshots no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g10-owner-hover-neutral-source-six-poses-host.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  true_idle_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse G8 397 real player motion file bank without owner IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g10_verified_2010_source_motions
+      - name: Recover known-good G8 actual CPU model original suit viewer
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          for f in source/IronMan2_Vita_GitHub_Ready_CI_R2.zip flight_b4/flight_b4_overlay.zip performance_b5/b5_optimized_renderer.zip skinning_b7/b7_vita_overlay.zip combat_b8/b8_overlay.zip armor_b9/b9_overlay.zip profile_b10/b10_overlay.zip; do unzip -oq "$f" -d work; done
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done >/tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          test -s work/models/mark6.im2t
+          test -s work/animations/mark6_hover.im2v
+          test -s /tmp/g10_verified_2010_source_motions/animations/ironman_ironman_aim_float_idle.im2v
+      - name: Render six real C11 original owner hover choice visual frames
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Wno-unused-function -Werror \
+            -Iwork/src -Iresearch/b24_unified \
+            research/b24_unified/b24_g10_host_original_hover_neutral_compare.c \
+            research/b24_unified/b24_original_im2v_stream.c \
+            work/src/renderer.c \
+            -lm -o /tmp/g10_source_original_hover_pose_check
+          mkdir -p /tmp/G10_REAL_ORIGINAL_PASSIVE_HOVER_COMPARE
+          /tmp/g10_source_original_hover_pose_check \
+            work/models/mark6.im2t \
+            /tmp/g10_verified_2010_source_motions/animations \
+            work/animations \
+            /tmp/G10_REAL_ORIGINAL_PASSIVE_HOVER_COMPARE
+      - name: Compose true original 2010 idle/aim source diagnostic contact
+        run: |
+          python3 -m pip install -q pillow
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          out=Path('/tmp/G10_REAL_ORIGINAL_PASSIVE_HOVER_COMPARE')
+          png=sorted(out.glob('*.ppm'))
+          assert len(png)==6
+          collage=Image.new('RGB',(3*480,2*315+55),(13,24,40))
+          d=ImageDraw.Draw(collage)
+          d.text((16,15),'ACTUAL 2010 MARK VI - NEUTRAL FLOAT vs AIM / ATTACK | G8 ORIGINAL TEXTURED CPU MODEL',fill='white')
+          for i,p in enumerate(png):
+            im=Image.open(p).convert('RGB')
+            assert im.size==(480,272)
+            x=(i%3)*480;y=55+(i//3)*315
+            collage.paste(im,(x,y))
+            d.text((x+8,y+280),p.stem,fill='white')
+            im.save(p.with_suffix('.png'));p.unlink()
+          collage.save(out/'G10_ORIGINAL_TRUE_NEUTRAL_HOVER_SIX_ANIMATIONS_COMPARE.png')
+          print('PASS 6 real original sourced full-body hover poses, author idle and attack separated for final G10 route decision')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_Original_2010_MarkVI_Neutral_Hover_Vs_Repulsor_Aim_7_Host_PNGs
+          path: /tmp/G10_REAL_ORIGINAL_PASSIVE_HOVER_COMPARE/
+          if-no-files-found: error
