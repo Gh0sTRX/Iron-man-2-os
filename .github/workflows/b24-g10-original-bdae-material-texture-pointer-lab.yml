@@ -1,4 +1,4 @@
-name: G10 2010 C1L1 BRES original TGA offset pointers and exact face materials NO VPK
+name: G10 2010 genuine city material to TGA neighborhood reverse-engineering NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -53,4 +53,14 @@ jobs:
         with:
           name: G10_C1L1_Exact_Source_TGA_Pointer_Offsets_Original_BRES
           path: /tmp/G10_BRES_C1L1_NATIVE_TGA_POINTERS.json
+          if-no-files-found: error
+
+      - name: Cross-validate original BRES material and TGA authoring pointer adjacency
+        run: |
+          python3 research/b24_unified/b24_g10_material_tga_link_window_probe.py \
+             --out /tmp/G10_NATIVE_MATERIAL_TGA_POINTER_NEIGHBORS.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_BRES_2010_Material_To_Actual_PVR_Pointer_Adjacency_Research
+          path: /tmp/G10_NATIVE_MATERIAL_TGA_POINTER_NEIGHBORS.json
           if-no-files-found: error
