@@ -13,7 +13,7 @@ typedef struct {
  uint32_t nv,nt,tw,th;
  float center_z;
 } B24GpuSuitSource;
-typedef struct {float x,y,z,heading;} B24GpuSuitPose;
+typedef struct {float x,y,z,heading,pitch,roll;} B24GpuSuitPose;
 typedef struct {
  unsigned texture_id;
  uint32_t nv,nt,tw,th;
