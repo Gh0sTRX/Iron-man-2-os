@@ -9,6 +9,12 @@ typedef struct {
     float fov_y_degrees,aspect,near_z,far_z;
 } B24GpuCamera;
 typedef struct {float projection[16],view[16];} B24GpuCameraMatrices;
+/* Framing ONLY: shift both camera eye and look-at target to the player's
+   RIGHT so the real avatar renders left-of-center, while the HUD reticle
+   remains at pixel (480,272). 0 = centered cruise/rush, 1 = shoulder view.
+   Does not aim weapons, move simulation, or alter lens FOV. */
+int b24_gpu_camera_apply_shoulder(B24GpuCamera *camera,
+ float world_right_x,float world_right_y,float offset);
 int b24_gpu_camera_matrices(const B24GpuCamera *camera,B24GpuCameraMatrices *out);
 /* Project a world position to native Vita 960x544 pixel x,y (top-left origin)
    so HUD lock-on and visible 3D scene share one set of matrices. */
