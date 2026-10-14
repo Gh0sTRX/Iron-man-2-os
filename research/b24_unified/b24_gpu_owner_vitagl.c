@@ -1,4 +1,5 @@
 #include "b24_gpu_owner.h"
+#include "b24_gpu_boot_trace.h"
 #include <vitaGL.h>
 #include <stddef.h>
 /* This is the future B24 ENGINE frame owner.
@@ -7,7 +8,12 @@
  * Does not pretend to have original armored mesh/HUD callbacks yet. */
 int b24_gpu_owner_init(B24GpuOwner *o,int sdl_renderer_exists){
  if(!o||o->initialized||sdl_renderer_exists)return 0;
- if(!vglInit(0x1000000))return 0;
+ (void)b24_gpu_boot_trace_mark("31 VITAGL_INIT_BEGIN");
+ if(!vglInit(0x1000000)){
+  (void)b24_gpu_boot_trace_mark("31 VITAGL_INIT_FAILED");
+  return 0;
+ }
+ (void)b24_gpu_boot_trace_mark("32 VITAGL_INIT_OK");
  glViewport(0,0,960,544);
  glEnable(GL_DEPTH_TEST);
  glDepthFunc(GL_LESS);
