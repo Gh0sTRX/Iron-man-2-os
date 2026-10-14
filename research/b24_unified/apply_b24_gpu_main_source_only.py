@@ -16,6 +16,7 @@ rep('#include "../b24/b24_unified/b24_unified.h"',
 '''#include "../b24/b24_unified/b24_unified.h"
 #ifdef B24_GPU_ENGINE
 #include "../b24/b24_unified/b24_gpu_runtime.h"
+#include "../b24/b24_unified/b24_gpu_boot_trace.h"
 static B24GpuRuntime b24_gpu_rt={0};
 #endif''')
 rep('#include <SDL2/SDL.h>', '''#include <SDL2/SDL.h>
@@ -41,7 +42,10 @@ before='''    if(SDL_Init(SDL_INIT_VIDEO|SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER)
 after='''#ifdef B24_GPU_ENGINE
     /* SDL gamepad/timer retained, SDL graphics subsystem not initialized:
        exactly one GPU owner (vitaGL/sceGxm). */
+    (void)b24_gpu_boot_trace_reset();
+    (void)b24_gpu_boot_trace_mark("10 SDL_GAMECONTROLLER_TIMER_INIT_BEGIN");
     if(SDL_Init(SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER)<0)return 1;
+    (void)b24_gpu_boot_trace_mark("11 SDL_INIT_OK");
     SDL_Window *window=NULL;
     SDL_Renderer *sdl=NULL;
     SDL_Texture *display=NULL;
@@ -65,6 +69,7 @@ rep(before,'''#ifdef B24_GPU_ENGINE
 rep("    int idx=0,running=load(idx);",
 '''    int idx=0,running=load(idx);
 #ifdef B24_GPU_ENGINE
+    (void)b24_gpu_boot_trace_mark(running?"12 FIRST_ORIGINAL_SUIT_LOADED":"12 FIRST_ORIGINAL_SUIT_LOAD_FAILED");
     if(running&&!b24_gpu_runtime_open(&b24_gpu_rt,"app0:maps/C1L1_environment.c1g2"))
         running=0;
     if(running&&!b24_gpu_runtime_set_clock(&b24_gpu_rt,b24_gpu_ticks,NULL,
@@ -144,6 +149,7 @@ sources=[
  "b24_gpu_reticle.c",
  "b24_gpu_hud_native.c","b24_gpu_hud_native_vitagl.c",
  "b24_gpu_cpu_profile.c",
+ "b24_gpu_boot_trace.c",
  "b24_gpu_runtime.c"
 ]
 cmroot="$"+"{CMAKE_CURRENT_SOURCE_DIR}"
@@ -163,6 +169,10 @@ if(B24_ENABLE_GPU)
   option(B24_ENABLE_NATIVE_HUD "GPU-native shapes/text; no HUD bitmap transfer" ON)
   if(B24_ENABLE_NATIVE_HUD)
     target_compile_definitions(im2_beta PRIVATE B24_GPU_NATIVE_HUD=1)
+  endif()
+  option(B24_ENABLE_GPU_BOOT_TRACE "Write early VitaGL boot-stage crash breadcrumbs to ux0:data" OFF)
+  if(B24_ENABLE_GPU_BOOT_TRACE)
+    target_compile_definitions(im2_beta PRIVATE B24_GPU_BOOT_TRACE=1)
   endif()
   option(B24_ENABLE_GPU_PROFILE_LOG "Log CPU-side submission/vblank time; GPU BUSY unknown" OFF)
   if(B24_ENABLE_GPU_PROFILE_LOG)
