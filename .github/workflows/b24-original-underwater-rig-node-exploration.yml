@@ -1,0 +1,70 @@
+name: B24 Underwater Rig Alternative Roots and Bone Palette Audit - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-underwater-rig-node-exploration.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Inspect authentic root-node hierarchy and linked source bones
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy
+          python3 - <<'PY'
+          import sys,re,zipfile,struct,collections
+          from pathlib import Path
+          sys.path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              raw=z.read('Payload/IronMan2.app/models')
+          names=['LC_MC_UnderWater.bdae','Iron_man_mark6.bdae','underwater02.bdae']
+          records=decode(raw,'.bdae')
+          for target in names:
+              if not any(x.name==target for x in records):
+                  print('MODEL_NOT_FOUND',target);continue
+              model=get_exact(raw,records,target)
+              strings=sorted({m.group().decode('latin1','replace')
+                for m in re.finditer(rb'[ -~]{5,}',model)
+                if any(s in m.group().lower() for s in (b'node',b'bip01',b'underwater',b'bone'))})
+              print('ORIGINAL_BRES_TREE_STRINGS',target,'size',len(model),'first',strings[:80])
+              roots=[x for x in strings if x.endswith('-node')]
+              print('ORIGINAL_CANDIDATE_ROOTS',target,len(roots),'first',roots[:80])
+              counts=collections.Counter()
+              for x in ('Bip01-node','Bip01_Pelvis-node','UnderWater-node','underwater01-node','Root-node'):
+                  counts[x]=model.count(x.encode()+b'\0')
+              print('ORIGINAL_ROOT_COUNTS',target,dict(counts))
+              # Verify actual 72-byte scene node representations for alternative roots.
+              for nam in roots[:32]:
+                  key=nam.encode('latin1')+b'\0'
+                  at=model.find(key)
+                  if at<0:continue
+                  refs=[off for off in range(0,len(model)-72,4) if model[off:off+4]==struct.pack('<I',at)]
+                  valid=[]
+                  for off in refs:
+                      if off+72<=len(model):
+                          cnt,ch=struct.unpack_from('<II',model,off+52)
+                          if cnt<32 and (cnt==0 or ch+cnt*72<=len(model)):valid.append((off,cnt))
+                  if valid: print('VALID_2010_SCENE_NODE',target,nam,valid[:4])
+          print('PASS inspection-only of actual original rig strings, not claiming underwater player skin solved')
+          PY
+      - name: Owner IPA cleanup
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa
