@@ -24,7 +24,7 @@ jobs:
           gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
           test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
           echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
-      - name: Decode 34 original 38-joint Underwater player source clips into Vita track-only IM2A
+      - name: Validate 34 original named 38-joint Underwater clips with source-specific track ordering
         run: |
           set -euo pipefail
           python3 research/b24_unified/export_b24_underwater_original_motions.py \
