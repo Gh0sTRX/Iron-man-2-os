@@ -1,0 +1,35 @@
+name: G10 2010 Source BDAE Material Texture Pointer Parser Internals NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g10-original-bdae-material-texture-pointer-lab.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect actual B11 original parser material graph not guessed diffuse atlas
+        run: |
+          python3 - <<'PY'
+          import ast,re,zipfile
+          z=zipfile.ZipFile('research/B11_C1L1_Source_Parser.zip')
+          code=z.read('bdae_scene_parser.py').decode()
+          print('B11_SOURCE_FILES',z.namelist()[:30])
+          tree=ast.parse(code)
+          lines=code.splitlines()
+          print('B11_PARSER_APIS',[(n.name,n.lineno,n.end_lineno) for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))])
+          for n in tree.body:
+             if not isinstance(n,(ast.FunctionDef,ast.ClassDef)):continue
+             if any(v in n.name.casefold() for v in ('parse','material','texture','skin','mesh','sub')):
+                s='\n'.join(lines[n.lineno-1:min(n.end_lineno,n.lineno+95)])
+                print('B11_PARSER_IMPLEMENTATION',n.name,'LINE',n.lineno)
+                print(s[:12500])
+          print('B11_SOURCE_TEXTURE_REFERENCES')
+          for k,line in enumerate(lines,1):
+             if any(t in line.casefold() for t in ('texture','material','submesh','tga','pvr')):
+                print('SOURCE',k,line[:200])
+          PY
