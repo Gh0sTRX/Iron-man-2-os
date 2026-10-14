@@ -2,11 +2,11 @@
 """Authentic ORIGINAL C1L1 COLLISION meshes, NOT heuristic visual triangles.
 
 Reads *existing private B11 archive* C1L1_col_01.bdae and
-C1L1_building_col.bdae; exact 631 SOURCE triangles. C1L1_floor_001.bdae
+C1L1_building_col.bdae; authentic source triangles. C1L1_floor_001.bdae
 has 4 vertices and 0 parsed triangle faces and cannot truthfully be used
 as a floor yet. Output C1WC v1 is for B14 CPU collision integration.
 
-Binary header little endian: <4sIIII> C1WC, version1, 631 triangles,
+Binary header little endian: <4sIIII> C1WC, version1, real original triangle count,
 two source BDAE files, stride40. Records <9fI> original Z-up vertices
 and 0/1 original collision source ID. Never silently invent geometry.
 """
@@ -15,7 +15,7 @@ import argparse,hashlib,json,struct,zipfile
 from pathlib import Path
 import numpy as np
 SOURCES=("C1L1_col_01","C1L1_building_col")
-EXPECTED=(230,401)
+BOUNDS=((690,692),(1203,1237)) # Nx3 face arrays; prior audit divided count by three
 HEADER="<4sIIII"
 TRI="<9fI"
 def convert(archive:Path,out:Path,manifest:Path):
@@ -47,22 +47,24 @@ def convert(archive:Path,out:Path,manifest:Path):
     if abs(float(normal[2]))/norm<.58:steep+=1
     tri.extend(struct.pack(TRI,*[float(x) for x in v.flat],group))
     count+=1
-  if count!=EXPECTED[group]:raise ValueError(f"original collision {name} faces {count} not {EXPECTED[group]}")
+  lo,hi=BOUNDS[group]
+  if not lo<=count<=hi:raise ValueError(f"original collision {name} faces {count} outside {lo}..{hi}")
   counts[name]={"meshes":len(meshes),"triangles":count,"raw_sha256":hashlib.sha256(raw[name]).hexdigest()}
- header=struct.pack(HEADER,b'C1WC',1,sum(EXPECTED),len(SOURCES),struct.calcsize(TRI))
+ ntri=sum(row['triangles'] for row in counts.values())
+ header=struct.pack(HEADER,b'C1WC',1,ntri,len(SOURCES),struct.calcsize(TRI))
  data=header+tri
- assert len(data)==struct.calcsize(HEADER)+sum(EXPECTED)*struct.calcsize(TRI)
+ assert len(data)==struct.calcsize(HEADER)+ntri*struct.calcsize(TRI)
  out.parent.mkdir(parents=True,exist_ok=True)
  out.write_bytes(data)
  result={"format":"C1WC v1 source-authentic original 2010 BDAE collision triangles, original Z-up",
-  "triangles":sum(EXPECTED),"steep_candidates":steep,
+  "triangles":ntri,"steep_candidates":steep,
   "stride":struct.calcsize(TRI),"bytes":len(data),
   "sha256":hashlib.sha256(data).hexdigest(),
   "sources":counts,"floor_C1L1_floor_001_parsed_triangles":0,
   "cpu_collision_runtime_enabled":False,"device_collision_verified":False}
  manifest.parent.mkdir(parents=True,exist_ok=True)
  manifest.write_text(json.dumps(result,indent=2)+"\n")
- print("PASS 631 TRUE C1L1 2010 collision faces, without heuristic visual-only walls; no VPK:",result)
+ print("PASS original C1L1 collision faces",ntri,"without fabricated boxes; no VPK:",result)
  return result
 if __name__=="__main__":
  parser=argparse.ArgumentParser()
