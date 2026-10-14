@@ -64,3 +64,23 @@ jobs:
                 print(f'{i+1:04} {lines[i][:185]}')
                 shown+=1
           PY
+
+      - name: Enumerate original CPU 3D preview and asset API for true host screenshots
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path("work/src")
+          print("HOST_3D_SOURCES",[p.name for p in src.glob("*.c") if "preview" in p.name or "render" in p.name or "model" in p.name])
+          for name in ("renderer.h","renderer.c","preview.c","im2_preview.c","model.h","model.c"):
+              p=src/name
+              if not p.exists():continue
+              print("ORIGINAL_G8_HOST_MODULE",name)
+              lines=p.read_text().splitlines()
+              for i,line in enumerate(lines[:115],1):
+                  if name=="renderer.c" and i>65:break
+                  print(f"API:{name}:{i:03} {line[:210]}")
+          cm=Path("work/CMakeLists.txt").read_text().splitlines()
+          print("G8_HOST_CMAKE_LINES")
+          for line in cm:
+              if any(w in line for w in ("preview","renderer","model","SDL","im2_beta","target_include","add_executable")):print(line[:210])
+          PY
