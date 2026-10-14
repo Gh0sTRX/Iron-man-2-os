@@ -81,6 +81,13 @@ def convert(ipa:Path,destination:Path,manifest:Path):
       "Vita_animated_underwater_playable":False}
  manifest.parent.mkdir(parents=True,exist_ok=True)
  manifest.write_text(json.dumps(out,ensure_ascii=False,indent=2)+"\n")
+ print("PALETTE_SOURCE_COMPARISON same_bone_set",sum(x["palette_same_bone_set_as_first_clip"] for x in result),
+       "same_order",sum(x["palette_order_same_as_first_clip"] for x in result),
+       "bip01_named_tracks_min",min(x["bip01_named_tracks"] for x in result),
+       "bip01_named_tracks_max",max(x["bip01_named_tracks"] for x in result))
+ for x in result:
+  if not x["palette_same_bone_set_as_first_clip"]:
+   print("ORIGINAL_CLIP_NAMES_DIFFER",x["original"],"symmetric_diff",x["new_or_missing_bones"][:14])
  print("PASS 34 genuine 2010 Underwater player motions decoded to original B6 IM2A; 38 named source tracks preserved per clip; NOT playable skinned sixth suit yet")
  return out
 if __name__=="__main__":
