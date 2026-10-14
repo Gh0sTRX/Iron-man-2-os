@@ -111,6 +111,13 @@ void b24_g8_motion_repulsor_trigger(B24G8LiveOriginalMotion *a,uint32_t now){
   a->repulsor_started_ms=now;a->repulsor_pending=1;
  }
 }
+void b24_g8_motion_melee_trigger(B24G8LiveOriginalMotion *a,uint32_t now){
+ if(!a||a->suit_index!=0||!a->nv)return;
+ b24_g8_melee_press(&a->melee,now);
+}
+int b24_g8_motion_melee_source_active(const B24G8LiveOriginalMotion *a){
+ return a&&b24_g8_melee_active(&a->melee)&&a->active&&!a->missing;
+}
 int b24_g8_motion_whole_body_fire(const B24G8LiveOriginalMotion *a){
  return a&&a->whole_body_repulsor_active&&a->active&&!a->missing;
 }
@@ -148,7 +155,14 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
     (uint32_t)(now-a->repulsor_started_ms)>=a->stream.duration_ms){
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
  }
- if(a->repulsor_pending&&shot)desired=shot;
+ /* Original melee has priority over aim/repulsor _Att; the right-arm
+    B16 mask must not fight a full-body 2010 punch pose. */
+ const char *melee=NULL;
+ if(suit==0 && mode<=B24M_RUN)
+    melee=b24_g8_melee_tick(&a->melee,now);
+ else a->melee=(B24G8MeleeChain){0};
+ if(melee)desired=melee;
+ else if(a->repulsor_pending&&shot)desired=shot;
  else if(a->repulsor_pending&&!shot){
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
  }
@@ -185,7 +199,7 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
   a->started_ms=now;a->previous_ms=now;
   a->active=!a->missing;
   a->whole_body_repulsor_active=(a->active&&a->repulsor_pending&&shot&&
-                                 desired==shot);
+                                 desired==shot&&!melee);
   if(a->missing&&a->repulsor_pending){
     /* Preserve B16 single right-palm attack if source file missing. */
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
