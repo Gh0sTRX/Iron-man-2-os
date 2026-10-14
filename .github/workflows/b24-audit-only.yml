@@ -221,6 +221,13 @@ jobs:
           assert Path("work/maps/C1L1_environment.c1g2").stat().st_size>500000
           print("PASS B24 actual gameplay, original animation & C1 GPU opt-in source integration, no SDL second renderer")
           PY
+      - name: B24 shoulder to center target crosshair host regression
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_gpu_reticle.c \
+            research/b24_unified/test_b24_gpu_reticle.c -lm -o /tmp/b24-reticle
+          /tmp/b24-reticle
       - name: B24 real five-armored GPU cache invalidation and animation rebind regression
         run: |
           set -euo pipefail
@@ -242,6 +249,7 @@ jobs:
               for src in work/src/main.c \
                 work/b24/b24_unified/b24_gpu_runtime.c \
                 work/b24/b24_unified/b24_gpu_hud_bridge_vitagl.c \
+                work/b24/b24_unified/b24_gpu_reticle.c \
                 work/b24/b24_unified/b24_gpu_camera.c \
                 work/b24/b24_unified/b24_gpu_owner_vitagl.c \
                 work/b24/b24_unified/b24_c1_gpu_mesh.c \
@@ -257,7 +265,7 @@ jobs:
                   -Iwork/b24/b22_4_6 -Iwork/b24/b18_gpu_probe \
                   -c "$src" -o "/tmp/$(basename "$src").o"
               done
-              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 9 GPU .o files; NO VPK or executable"
+              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 10 GPU .o files; NO VPK or executable"
             '
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
