@@ -107,8 +107,12 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
             r->city_uv.loaded?&r->city_uv:NULL,
             r->verified_vehicle_atlas))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
+ /* Original B24 CPU flight stage drives the SAME animated armor GPU root.
+    Stage1 retains grounded upright pose; Stage2/RUSH get genuine 3D pitch
+    and lateral bank only (not a second simulation or replacement animation). */
  r->frame_pose=(B24GpuSuitPose){c->player_x,c->player_y,c->player_z,
-                                c->player_heading};
+                 c->player_heading,g->visual_root.visual_pitch_rad,
+                 g->visual_root.visual_roll_rad};
  r->frame_game=g;
  if(!b24_gpu_owner_armor(&r->owner,b24_runtime_armor_draw,r))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_SUIT_CALLS);
