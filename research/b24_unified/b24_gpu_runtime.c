@@ -34,9 +34,15 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
   b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
+ /* Only the original B12 C1L1_Vehicles image, converted privately to C1TX.
+    If absent, stay with diagnostic car colors and do not invent textures. */
+ if(r->city_uv.loaded)
+  (void)b24_gpu_c1_vehicle_atlas_open(&r->verified_vehicle_atlas,
+                                      "app0:maps/C1L1_Vehicles.c1tx");
 #ifndef B24_GPU_NATIVE_HUD
  /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
  if(!b24_gpu_hud_bridge_prepare(&r->hud)){
+  b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
   b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
@@ -112,6 +118,7 @@ void b24_gpu_runtime_close(B24GpuRuntime *r){
  b24_gpu_hud_bridge_release(&r->hud);
  b24_gpu_suit_release(&r->suit);
  b24_gpu_im2_stream_free(&r->stream);
+ b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
  b24_c1_uv_free(&r->city_uv);
  b24_gpu_c1_free(&r->city);
  /* vitaGL has no stable public vglEnd in current upstream header.
