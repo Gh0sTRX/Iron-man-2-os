@@ -6,7 +6,8 @@ static void px(uint32_t *f,int stride,int x,int y,uint32_t color){
 }
 B24ReticlePoint b24_reticle_position(float t){
  if(!isfinite(t))t=0.f;
- if(t<0.f)t=0.f;if(t>1.f)t=1.f;
+ if(t<0.f)t=0.f;
+ if(t>1.f)t=1.f;
  return (B24ReticlePoint){278.f+(240.f-278.f)*t,110.f+(136.f-110.f)*t};
 }
 void b24_reticle_draw(uint32_t *rgb,int stride,float t,int locked,int paused){
