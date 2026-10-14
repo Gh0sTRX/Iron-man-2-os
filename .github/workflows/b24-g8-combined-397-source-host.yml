@@ -58,6 +58,64 @@ jobs:
           python3 research/b24_unified/b24_all_player_304_original_bake.py --ipa /tmp/g8-own/source.ipa --out /tmp/g8-bank/304
           python3 research/b24_unified/b24_underwater_source_34_im2v_bake.py --ipa /tmp/g8-own/source.ipa --out /tmp/g8-bank/uw --manifest /tmp/g8-bank/uw/B24_UNDERWATER_34_MOTION_MANIFEST.json
           python3 research/b24_unified/b24_stage_original_complete_animation_bank.py --baseline-dir work/animations --original-dir /tmp/g8-bank/304 --underwater-dir /tmp/g8-bank/uw --out /tmp/g8-bank/staged
+      - name: Connect recovered real 304 player motion to reconstructed G8 host B14 and B16 model renderer
+        run: |
+          set -euo pipefail
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          python3 research/b24_unified/build_c1l1_map.py --output work/maps/C1L1_environment.im2map --manifest /tmp/g8-bank/C1L1_source.json
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+          python3 research/b24_unified/apply_b24_g6_controls_source_only.py
+          python3 research/b24_unified/apply_b24_g7_original_collisions_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
+          cp /tmp/g8-bank/304/*.im2v work/animations/
+          test "$(find work/animations -maxdepth 1 -name '*.im2v' | wc -l)" -eq 363
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Iwork/src -Iwork/b24/b24_unified \
+             research/b24_unified/b24_g8_host_original_cpu_capture.c \
+             work/src/renderer.c work/src/b16_action.c work/src/b14_world.c \
+             work/b24/b24_unified/b24_c1l1_map.c \
+             work/b24/b24_unified/b24_g8_live_original_motion.c \
+             work/b24/b24_unified/b24_original_im2v_stream.c \
+             work/b24/b24_unified/b24_hover_pose_blend.c \
+             -lm -o /tmp/g8-host-original-motion-cpu
+          mkdir -p /tmp/g8-bank/staged/host-screenshots
+          (cd work && /tmp/g8-host-original-motion-cpu models animations /tmp/g8-bank/staged/host-screenshots)
+      - name: Convert actual 480x272 original model host-render frames into labeled PNG contact sheets
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from PIL import Image,ImageDraw
+          folder=Path('/tmp/g8-bank/staged/host-screenshots')
+          rows=[]
+          for armor,expected in (('mark6',8),('warmachine',7)):
+              paths=sorted(folder.glob(armor+'_*.ppm'))
+              assert len(paths)==expected,(armor,len(paths))
+              sheet=Image.new('RGB',(4*480,2*310+45),(13,22,39))
+              draw=ImageDraw.Draw(sheet)
+              draw.text((15,14),'ORIGINAL G8 IM2T SOURCE + 2010 IM2V + B16 CPU PREVIEW / '+armor,fill='white')
+              for idx,p in enumerate(paths):
+                  im=Image.open(p).convert('RGB')
+                  assert im.size==(480,272)
+                  varied=len(set(im.resize((40,30)).getdata()))
+                  assert varied>12,(p,varied)
+                  x=(idx%4)*480;y=45+(idx//4)*310
+                  sheet.paste(im,(x,y));draw.text((x+8,y+279),p.stem,fill='white')
+                  im.save(p.with_suffix('.png'));p.unlink()
+                  rows.append({'frame':p.stem,'color_samples':varied,'actual_vita_gpu':False})
+              sheet.save(folder/('HOST_G8_REAL_2010_'+armor+'_ORIGINAL_MOTION_COMBAT.png'))
+              print('PASS G8 HOST SOURCE GAMEPLAY',armor,expected,'CPU frames rendered')
+          (folder/'G8_HOST_REAL_SOURCE_CPU_SCREENSHOTS.json').write_text(
+              json.dumps({'original_model_and_animation_source':True,'not_vita_gpu':True,'frames':rows},indent=2))
+          PY
       - name: Upload source motion bank (never an executable)
         uses: actions/upload-artifact@v4
         with:
