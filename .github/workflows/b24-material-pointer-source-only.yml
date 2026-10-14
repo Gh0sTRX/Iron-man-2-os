@@ -1,0 +1,36 @@
+name: B24 C1L1 Original Material Pointer Forensics - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-material-pointer-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_structure_audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout original privately held BDAE source and forensics scripts
+        uses: actions/checkout@v4
+      - name: Audit original validated material and texture pointer structures
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_b11_material_texture_pointer_graph.py \
+            --out /tmp/B24_MATERIAL_POINTER_FORENSICS.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/B24_MATERIAL_POINTER_FORENSICS.json').read_text())
+          assert d['counts']['texture_records']>=190
+          assert d['counts']['material_records']>0
+          assert d['actual_mat_to_diffuse_link_proven'] is False
+          print('PASS material pointer forensic source scan; no guessed original diffuse mappings')
+          PY
+      - name: Save pointer graph METADATA ONLY
+        uses: actions/upload-artifact@v4
+        with:
+          name: B24_C1L1_Material_Pointer_Metadata_only
+          path: /tmp/B24_MATERIAL_POINTER_FORENSICS.json
+          if-no-files-found: error
