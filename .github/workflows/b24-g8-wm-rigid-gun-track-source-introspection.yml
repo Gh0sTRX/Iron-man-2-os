@@ -1,0 +1,29 @@
+name: G8 2010 B13 War Machine gun transform introspection host only
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-wm-rigid-gun-track-source-introspection.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect original B13 implementation for rigid gun animation matrices no IPA
+        run: |
+          python3 - <<'PY'
+          import ast,zipfile
+          z=zipfile.ZipFile("animation_b13/B13_Reproducible_Source.zip")
+          source=z.read("tools/b13_bake.py").decode()
+          tree=ast.parse(source)
+          keys=("parse_rig","worlds","decode_anim","bake_pose","pose","sample","local","node")
+          for n in ast.walk(tree):
+              if isinstance(n,(ast.FunctionDef,ast.ClassDef)) and (n.name in keys or n.name.startswith(("world","eval","sample","pose","parse_rig"))):
+                  snip='\n'.join(source.splitlines()[n.lineno-1:min(n.end_lineno,n.lineno+78)])
+                  print("2010_B13_API",n.name,"LINES",n.lineno,n.end_lineno)
+                  print(snip[:9000])
+          print("2010_B13_NONPRIVATE_SYMBOLS",[n.name for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))])
+          PY
