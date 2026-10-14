@@ -37,6 +37,13 @@ def run(ipa,out):
  out.parent.mkdir(parents=True,exist_ok=True)
  out.write_text(json.dumps(result,indent=2)+"\n")
  print("ORIGINAL_IPA_2010_SPRITES_META",len(sprites),result["sprite_packed_names_valid"])
+ print("ORIGINAL_2010_SPRITES_FIRST64",result["sprite_archive_first_64_bytes_hex"])
+ print("ORIGINAL_2010_SPRITES_DIRECT_INDEX_ERROR",result.get("decode_error"))
+ print("ORIGINAL_2010_SPRITES_U32_FIRST16",[
+     int.from_bytes(sprites[i:i+4],"little") for i in range(0,64,4)])
+ print("ORIGINAL_2010_OTHER_TOP_LEVEL_GAME_RESOURCE_FILES",[
+     n for n in names if n.startswith("Payload/IronMan2.app/") and
+     n.count("/")==2 and n.rsplit(".",1)[-1].lower() not in ("www","png","wav","aif","caf")][:180])
  print("ORIGINAL_2010_SPRITES_SOURCE_TARGET_NAMES",result["crosshair_keyword_candidates"][:100])
  print("ORIGINAL_2010_SPRITES_NAMES_SAMPLE",result["decoded_names"][:85])
  print("ORIGINAL_2010_SPRITES_EMBEDDED_ASCII",result.get("embedded_named_ascii",[])[:80])
