@@ -1,0 +1,72 @@
+name: B24 Original Underwater IM2T And PVRTC Source Test - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-underwater-im2t-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Install original B11 BRES and independent PVRTC decoder dependencies
+        run: python3 -m pip install -q numpy texture2ddecoder
+      - name: Validate original BRES -> IM2T and original texture codec, no released armor
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_original_underwater_armor.py \
+            --ipa /tmp/ironman-owner-ipa/source_v1.0.0.ipa \
+            --out /tmp/underwater-source-review.im2t \
+            --manifest /tmp/underwater_manifest.json
+          python3 - <<'PY'
+          import json,struct,zipfile,sys
+          from pathlib import Path
+          import numpy as np
+          sys.path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          from b24_original_underwater_armor import decode_pvr
+          b=Path('/tmp/underwater-source-review.im2t').read_bytes()
+          magic,nv,nt,w,h=struct.unpack_from('<4sIIII',b)
+          assert (magic,nv,nt,w,h)==(b'IM2T',840,359,512,512)
+          with zipfile.ZipFile('source/IronMan2_Vita_GitHub_Ready_CI_R2.zip') as z:
+              original=z.read('models/warmachine.im2t')
+          omagic,ovn,otri,ow,oh=struct.unpack_from('<4sIIII',original)
+          print('KNOWN_B9_SOURCE_IM2T_HEADER',(omagic,ovn,otri,ow,oh))
+          offset=20+ovn*20+otri*6
+          native=np.frombuffer(original[offset:],dtype=np.uint8)
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              textures=z.read('Payload/IronMan2.app/textures')
+          rows=decode(textures,'.tga')
+          wm=[r.name for r in rows if 'warmachine' in r.name.lower()]
+          print('ORIGINAL_WM_ATLASES',wm)
+          for name in wm:
+              raw=get_exact(textures,rows,name)
+              if len(raw)!=131124:continue
+              dec=np.frombuffer(decode_pvr(raw),dtype=np.uint8)
+              assert dec.size==native.size
+              def mae(x,y):
+                  return float(np.abs(x.astype(np.int16)-y.astype(np.int16)).mean())
+              swizzled=dec.reshape(-1,4)[:,[2,1,0,3]].reshape(-1)
+              print('DECODER_SOURCE_MATCH',name,'straight',round(mae(native,dec),3),
+                  'swapped_RGB',round(mae(native,swizzled),3),
+                  'existing_real_rgba_len',native.size)
+          print('PASS prototype owner source Underwater IM2T generated locally, not publicly uploaded, not added to VPK')
+          PY
+      - name: Delete original and generated temporary private files
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/underwater-source-review.im2t /tmp/underwater_manifest.json
