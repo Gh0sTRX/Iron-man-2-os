@@ -234,6 +234,10 @@ jobs:
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -ffunction-sections -fdata-sections \
             -Iwork/src -Iresearch/b24_unified \
+            -Iwork/b24/b22_flight -Iwork/b24/b22_camera \
+            -Iwork/b24/b19/host_gameplay -Iwork/b24/b21_controls \
+            -Iwork/b24/b22_hud -Iwork/b24/b23_missile_lock \
+            -Iwork/b24/b22_4_6 \
             research/b24_unified/b24_gpu_suit_im2_adapter.c \
             research/b24_unified/b24_gpu_runtime.c \
             research/b24_unified/test_b24_gpu_runtime_suit_rebind.c \
