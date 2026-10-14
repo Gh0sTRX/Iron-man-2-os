@@ -56,6 +56,33 @@ static void run_source(int suit,unsigned nv,const char *left,const char *right){
  char file[256];snprintf(file,sizeof(file),"%s.im2v",left);remove(file);
  snprintf(file,sizeof(file),"%s.im2v",right);remove(file);
 }
+static void run_repulsor_attack(int suit,unsigned nv,
+                                const char *base,const char *firing){
+ author_file(base,nv,2);
+ author_file(firing,nv,12);
+ Vertex *verts=calloc(nv,sizeof(*verts));assert(verts);
+ B24G8LiveOriginalMotion live={0};
+ assert(b24_g8_motion_tick(&live,".",verts,sizeof(*verts),nv,suit,
+                          B24M_DRIFT,-.8f,0.f,1000));
+ b24_g8_motion_repulsor_trigger(&live,1001);
+ assert(b24_g8_motion_tick(&live,".",verts,sizeof(*verts),nv,suit,
+                          B24M_DRIFT,-.8f,0.f,1016));
+ assert(!strcmp(live.selected,firing));
+ assert(b24_g8_motion_whole_body_fire(&live));
+ assert(b24_g8_motion_tick(&live,".",verts,sizeof(*verts),nv,suit,
+                          B24M_DRIFT,-.8f,0.f,1100));
+ assert(b24_g8_motion_whole_body_fire(&live));
+ /* Zero clips invented: source test IM2V declared 200ms. Fullbody play
+    must end at SOURCE duration, not a made-up timer. */
+ assert(b24_g8_motion_tick(&live,".",verts,sizeof(*verts),nv,suit,
+                          B24M_DRIFT,-.8f,0.f,1201));
+ assert(!b24_g8_motion_whole_body_fire(&live));
+ assert(!strcmp(live.selected,base));
+ b24_g8_motion_release(&live);
+ char file[256];snprintf(file,sizeof(file),"%s.im2v",base);remove(file);
+ snprintf(file,sizeof(file),"%s.im2v",firing);remove(file);
+ free(verts);
+}
 int main(void){
  assert(!strcmp(b24_g8_motion_route(0,B24M_RUSH,0,1),
                 "ironman_ironman_fly_f_rush"));
@@ -72,6 +99,15 @@ int main(void){
                      "ironman_ironman_aim_float_move_r");
  run_source(2,1292,"warmachine_warmachine_aim_float_move_l",
                       "warmachine_warmachine_aim_float_move_r");
+ run_repulsor_attack(0,802,"ironman_ironman_aim_float_move_l",
+                             "ironman_ironman_aim_float_move_l_att");
+ run_repulsor_attack(2,1292,"warmachine_warmachine_aim_float_move_l",
+                              "warmachine_warmachine_aim_float_move_l_att");
+ assert(!strcmp(b24_g8_motion_repulsor_clip(0,B24M_WALK,-1.f,0.f),
+                "ironman_ironman_aim_ground_move_l_att"));
+ assert(!strcmp(b24_g8_motion_repulsor_clip(2,B24M_DRIFT,1.f,0.f),
+                "warmachine_warmachine_aim_float_move_r_att"));
+ assert(b24_g8_motion_repulsor_clip(0,B24M_CRUISE,0.f,1.f)==NULL);
  B24G8LiveOriginalMotion missing={0};
  Vertex v[802];memset(v,0,sizeof(v));
  v[0].x=99.f;
@@ -84,6 +120,7 @@ int main(void){
  b24_g8_motion_release(&missing);
  puts("PASS G8 B14 source-motion integration 802/1292: real routed source"
       " stream, no snap on L/R interrupt, unchanged UV, unchanged 59 fallback,"
+      " repulsor on accepted shot without B16 double-arm source,"
       " unsupported suit preserved, no VPK");
  return 0;
 }
