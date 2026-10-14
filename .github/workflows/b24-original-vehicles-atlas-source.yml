@@ -1,0 +1,48 @@
+name: B24 Original C1L1 Vehicles Texture Atlas Calibration - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-vehicles-atlas-source.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Original IPA texture codec requirements
+        run: python3 -m pip install -q numpy texture2ddecoder
+      - name: Reconstruct original game 22-vehicle C1TX with proven BGRA swizzle
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/convert_original_ipa_vehicles_c1tx.py \
+            --ipa /tmp/ironman-owner-ipa/source_v1.0.0.ipa \
+            --out /tmp/C1L1_Vehicles.c1tx --manifest /tmp/C1L1_Vehicles_original.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct,json,hashlib
+          b=Path('/tmp/C1L1_Vehicles.c1tx').read_bytes()
+          assert struct.unpack_from('<4sIIII',b)==(b'C1TX',1,512,512,0)
+          assert len(b)==1048596
+          m=json.loads(Path('/tmp/C1L1_Vehicles_original.json').read_text())
+          assert m['c1tx_sha256']==hashlib.sha256(b).hexdigest()
+          assert m['original_vehicle_meshes_verified']==22
+          print('PASS source-only 2010 original iOS C1L1 vehicles C1TX - no VPK or arbitrary texture guessing')
+          PY
+      - name: Remove original owner assets from ephemeral CI runner
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/C1L1_Vehicles.c1tx
