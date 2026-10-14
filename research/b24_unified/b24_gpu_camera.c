@@ -10,6 +10,18 @@ static int normalize(V *v){
  if(!isfinite(n)||n<1.e-8f)return 0;
  n=1.f/sqrtf(n);v->x*=n;v->y*=n;v->z*=n;return 1;
 }
+int b24_gpu_camera_apply_shoulder(B24GpuCamera *camera,
+ float world_right_x,float world_right_y,float offset){
+ if(!camera||!isfinite(world_right_x)||!isfinite(world_right_y)||
+    !isfinite(offset)||fabsf(offset)>2.f)return 0;
+ float norm=world_right_x*world_right_x+world_right_y*world_right_y;
+ if(!isfinite(norm)||norm<.0001f)return 0;
+ float s=offset/sqrtf(norm);
+ float dx=world_right_x*s,dy=world_right_y*s;
+ camera->eye.x+=dx;camera->eye.y+=dy;
+ camera->target.x+=dx;camera->target.y+=dy;
+ return 1;
+}
 int b24_gpu_camera_matrices(const B24GpuCamera *c,B24GpuCameraMatrices *out){
  if(!c||!out||!isfinite(c->fov_y_degrees)||!isfinite(c->aspect)||
    !isfinite(c->near_z)||!isfinite(c->far_z)||
