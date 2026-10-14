@@ -14,7 +14,7 @@ static void synthetic(const char *path){
   /* Synthetic triangle for test ONLY, never exported to the game.
      Original source collision file instead tested by separate arg path. */
   float x=i==0?0.f:1000.f+(float)i*6.f;
-  float xyz[9]={x,-2.f,0.f,x,2.f,0.f,x,-2.f,3.f};
+  float xyz[9]={x,-2.f,0.f,x,2.f,0.f,x,2.f,3.f};
   unsigned group=0;
   assert(fwrite(xyz,sizeof(float),9,f)==9);
   assert(fwrite(&group,sizeof(group),1,f)==1);
