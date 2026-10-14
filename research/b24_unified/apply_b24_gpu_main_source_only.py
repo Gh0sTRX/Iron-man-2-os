@@ -18,6 +18,13 @@ rep('#include "../b24/b24_unified/b24_unified.h"',
 #include "../b24/b24_unified/b24_gpu_runtime.h"
 static B24GpuRuntime b24_gpu_rt={0};
 #endif''')
+rep('#include <SDL2/SDL.h>', '''#include <SDL2/SDL.h>
+#ifdef B24_GPU_ENGINE
+static uint64_t b24_gpu_ticks(void *unused){
+    (void)unused;
+    return (uint64_t)SDL_GetPerformanceCounter();
+}
+#endif''')
 rep("static int b10_make_display(", "#ifndef B24_GPU_ENGINE\nstatic int b10_make_display(")
 rep("static float clip(float a,float lo,float hi)",
     "#endif /* SDL graphics owner functions excluded in GPU mode */\nstatic float clip(float a,float lo,float hi)")
@@ -59,6 +66,9 @@ rep("    int idx=0,running=load(idx);",
 '''    int idx=0,running=load(idx);
 #ifdef B24_GPU_ENGINE
     if(running&&!b24_gpu_runtime_open(&b24_gpu_rt,"app0:maps/C1L1_environment.c1g2"))
+        running=0;
+    if(running&&!b24_gpu_runtime_set_clock(&b24_gpu_rt,b24_gpu_ticks,NULL,
+                                          (double)SDL_GetPerformanceFrequency()))
         running=0;
 #endif''')
 before='''                  if(!b10_switch_display(window,&sdl,&display,&vsync_requested,&vsync_active,&profile_error))running=0;
@@ -103,6 +113,23 @@ rep(before,'''#ifdef B24_GPU_ENGINE
     SDL_DestroyTexture(display);SDL_DestroyRenderer(sdl);SDL_DestroyWindow(window);
 #endif
     SDL_Quit();return 0;''')
+rep('''        frame++;
+        const Uint64 t5=SDL_GetPerformanceCounter();''',
+'''        frame++;
+#ifdef B24_GPU_PROFILE_LOG
+        if(frame%120u==0u){
+            const B24CpuGpuProfile *p=&b24_gpu_rt.profile;
+            fprintf(stderr,"B24 CPU ms: stream %.2f camera %.2f scene-call %.2f armor-call %.2f HUD-call %.2f swap-wall %.2f | REAL GPU BUSY UNKNOWN\n",
+                p->average_ms[B24P_MODEL_STREAM],
+                p->average_ms[B24P_CAMERA_SETUP],
+                p->average_ms[B24P_SCENE_CALLS],
+                p->average_ms[B24P_SUIT_CALLS],
+                p->average_ms[B24P_HUD_CALLS],
+                p->average_ms[B24P_SWAP_WALL]);
+        }
+#endif
+        const Uint64 t5=SDL_GetPerformanceCounter();''')
+
 p.write_text(s)
 cmake=W/"CMakeLists.txt"
 body=cmake.read_text()
@@ -113,6 +140,7 @@ sources=[
  "b24_gpu_suit_im2_adapter.c","b24_gpu_hud_bridge_vitagl.c",
  "b24_gpu_reticle.c",
  "b24_gpu_hud_native.c","b24_gpu_hud_native_vitagl.c",
+ "b24_gpu_cpu_profile.c",
  "b24_gpu_runtime.c"
 ]
 cmroot="$"+"{CMAKE_CURRENT_SOURCE_DIR}"
@@ -132,6 +160,10 @@ if(B24_ENABLE_GPU)
   option(B24_ENABLE_NATIVE_HUD "GPU-native shapes/text; no HUD bitmap transfer" ON)
   if(B24_ENABLE_NATIVE_HUD)
     target_compile_definitions(im2_beta PRIVATE B24_GPU_NATIVE_HUD=1)
+  endif()
+  option(B24_ENABLE_GPU_PROFILE_LOG "Log CPU-side submission/vblank time; GPU BUSY unknown" OFF)
+  if(B24_ENABLE_GPU_PROFILE_LOG)
+    target_compile_definitions(im2_beta PRIVATE B24_GPU_PROFILE_LOG=1)
   endif()
   target_sources(im2_beta PRIVATE
 '''+''.join("    "+base+f+"\n" for f in sources)+'''  )
