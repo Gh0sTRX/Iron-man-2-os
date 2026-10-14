@@ -7,7 +7,8 @@
 static unsigned ctx=0,swap=0,clears=0,draws=0,indices=0,matrices=0;
 static int simulate_fail=0;
 unsigned b24_mock_draws=0,b24_mock_indices=0,b24_mock_vertex_calls=0,b24_mock_color_calls=0;
-GLboolean vglInit(int bytes){assert(bytes==0x1000000);ctx++;return GL_TRUE;}
+/* Upstream vitaGL returns GL_FALSE on NORMAL native 960x544 init. */
+GLboolean vglInit(int bytes){assert(bytes==0x1000000);ctx++;return GL_FALSE;}
 void vglSwapBuffers(GLboolean common){assert(common==GL_FALSE);swap++;}
 void glViewport(int x,int y,GLsizei w,GLsizei h){
  assert(x==0&&y==0&&w==960&&h==544);
