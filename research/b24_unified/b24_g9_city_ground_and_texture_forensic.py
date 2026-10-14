@@ -59,7 +59,7 @@ def report(owner_ipa,out):
     with zipfile.ZipFile(owner_ipa) as z:
         textures=z.read("Payload/IronMan2.app/textures")
     rows=decode(textures,".tga")
-    names=sorted(x["name"] for x in rows.values()) if isinstance(rows,dict) else []
+    names=sorted(r.name for r in rows)
     # name-only texture index, no raw original PVR texture contents in report
     city=[n for n in names if "C1L1" in n.upper() or "CITY" in n.upper()
           or "BUILD" in n.upper() or "ROAD" in n.upper()]
