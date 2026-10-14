@@ -26,7 +26,7 @@ def convert(ipa:Path,out:Path,manifest:Path):
  size,height,width=struct.unpack_from("<III",pvr)
  if (size,width,height)!=(52,512,512):
   raise ValueError(f"original PVR header drift {(size,width,height)}")
- decoded=texture2ddecoder.decode_pvrtc(pvr[52:],width,height)
+ decoded=texture2ddecoder.decode_pvrtc(pvr[52:52+base_bytes],width,height)
  if len(decoded)!=width*height*4:raise ValueError("PVRTC decoder returned wrong RGBA size")
  bgra=np.frombuffer(decoded,dtype=np.uint8).reshape(-1,4)
  rgba=np.ascontiguousarray(bgra[:,[2,1,0,3]]).tobytes()
