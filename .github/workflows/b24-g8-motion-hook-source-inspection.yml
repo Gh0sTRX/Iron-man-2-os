@@ -1,0 +1,66 @@
+name: G8 motion hook source inspection no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-motion-hook-source-inspection.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct active gameplay C files without game build or owner IPA
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          for zip in source/IronMan2_Vita_GitHub_Ready_CI_R2.zip flight_b4/flight_b4_overlay.zip performance_b5/b5_optimized_renderer.zip skinning_b7/b7_vita_overlay.zip combat_b8/b8_overlay.zip armor_b9/b9_overlay.zip profile_b10/b10_overlay.zip; do unzip -oq "$zip" -d work; done
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done >/tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+          python3 research/b24_unified/apply_b24_g6_controls_source_only.py
+          python3 research/b24_unified/apply_b24_g7_original_collisions_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
+      - name: Print focused real source pose/load/control call sites
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          checks={
+            'main.c':['static int load','running=load(idx)','b14_world_tick','b14_pose','b16_attack','b24_unified_tick','b24_gpu_runtime_draw','im2_camera','SDL_GetTicks','SDL_CONTROLLERBUTTON','float now','b16_action_apply','motion13','b7_'],
+            'b14_pose.c':['void b14','int b14','B14_','b13','b7','pose'],
+            'b14_world.h':['typedef struct','B14_','int flying','flight_stage'],
+            'b16_action.c':['void b16','int b16','b16_action','b16_attack'],
+            'main.h':['IM2Model']}
+          for name,keys in checks.items():
+            p=Path('work/src')/name
+            if not p.exists():continue
+            lines=p.read_text().splitlines()
+            indexes=[i for i,x in enumerate(lines) if any(key in x for key in keys)]
+            windows=set()
+            for i in indexes:
+                before,after=(max(0,i-8),min(len(lines),i+13))
+                if name=='main.c':
+                    before,after=(max(0,i-5),min(len(lines),i+13))
+                windows.update(range(before,after))
+            print('### REAL SOURCE',name,'TOTAL',len(lines),'FOCUSED_LINES',min(len(windows),290))
+            shown=0
+            for i in sorted(windows):
+                if shown>=290:break
+                print(f'{i+1:04} {lines[i][:185]}')
+                shown+=1
+          PY
