@@ -35,8 +35,8 @@ rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_acti
               b24_g8_motion_repulsor_trigger(&b24_original_motion,(uint32_t)now);
 #endif
           }''')
-/* This is source-only in G8. The B24 Square event is consumed by the
-   existing controls in b24_unified_tick; NO synthetic collision actors. */
+# This source-only bridge uses the existing B24 Square controller event.
+# Never fabricates collision/hostile actors.
 rep("        b24_unified_tick(&b24_game,&b24_obs);",
 '''        b24_unified_tick(&b24_game,&b24_obs);
 #ifdef B24_GPU_ENGINE
