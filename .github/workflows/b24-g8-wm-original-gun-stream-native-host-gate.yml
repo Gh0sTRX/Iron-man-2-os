@@ -1,0 +1,36 @@
+name: G8 original War Machine 2010 Gun01-04 source stream C host and ARM gate - no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-wm-original-gun-stream-native-host-gate.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rigid_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: C11 strict ASan UBSan authenticated source format reader regression
+        run: |
+          set -euo pipefail
+          cd research/b24_unified
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+             -fsanitize=address,undefined -fno-omit-frame-pointer \
+             b24_wm_2010_gun_stream.c test_b24_wm_2010_gun_stream.c \
+             -lm -o /tmp/g8_original_wm_gun_stream_test
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
+             /tmp/g8_original_wm_gun_stream_test
+      - name: Strict Vita ARM object syntax compile only - zero packages
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                -c research/b24_unified/b24_wm_2010_gun_stream.c \
+                -o /tmp/g8_source_gun_stream.o
+              test -s /tmp/g8_source_gun_stream.o
+              echo "PASS portable ARM VitaSDK five-node original Gun01-04 stream object; no link, no VPK"
+            '
