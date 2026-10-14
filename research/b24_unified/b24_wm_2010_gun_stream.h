@@ -8,7 +8,7 @@
    composed. Source graph proven, exact fired-muzzle identity UNPROVEN.
    Original fixed node order:
    Gun01, Gun02, Gun03, Gun04, Dummy_Green_Gun, DummyE_Green_Gun.
-   LE IM2K <4sIIII>, 5*16 float32 matrices per timestamp, 20Hz + final.
+   LE IM2K <4sIIII>, 6*16 float32 matrices per timestamp, 20Hz + final.
    No complete clip RAM preload. NOT included in any current G8 VPK. */
 #define B24_WM_GUN_NODES 6u
 #define B24_WM_GUN_MAT_FLOATS 16u
