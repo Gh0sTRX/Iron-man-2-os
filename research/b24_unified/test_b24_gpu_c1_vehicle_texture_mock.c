@@ -31,7 +31,7 @@ static void write_fixture(int kind){
  FILE *f=fopen("/tmp/IM2_original_vehicle_test.c1tx","wb");assert(f);
  unsigned char hdr[20]={'C','1','T','X',1,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0};
  if(kind==1)hdr[0]='Z';
- if(kind==2)hdr[8]=0;
+ if(kind==2)hdr[9]=0; /* width=0, not the already-zero low byte of 512 */
  if(kind==3)hdr[16]=4;
  assert(fwrite(hdr,1,sizeof hdr,f)==sizeof hdr);
  size_t n=512u*512u*4u;
