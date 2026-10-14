@@ -1,4 +1,4 @@
-name: G10 authentic original iOS heightmaps C1L1 floor and scene container decode NO VPK
+name: G10 real 2010 Lua character COMBO states and level1.bclara mission scene NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -44,6 +44,11 @@ jobs:
           python3 research/b24_unified/b24_g10_original_heightmaps_and_scene_config_probe.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
+      - name: Analyze ORIGINAL 2010 Lua state machine actions and authentic level1 mission/map source
+        run: |
+          python3 research/b24_unified/b24_g10_original_lua_states_and_level1_inspect.py \
+             --ipa /tmp/b24_g10_owner/source.ipa \
+             --out /tmp/G10_2010_LUA_ORIGINAL_COMBO_AND_LEVEL1_SCENE_INDEX.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
@@ -53,6 +58,7 @@ jobs:
             /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
             /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
             /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
+            /tmp/G10_2010_LUA_ORIGINAL_COMBO_AND_LEVEL1_SCENE_INDEX.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
