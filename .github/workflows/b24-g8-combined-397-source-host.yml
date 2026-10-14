@@ -81,6 +81,7 @@ jobs:
              work/src/renderer.c work/src/b16_action.c work/src/b14_world.c \
              work/b24/b24_unified/b24_c1l1_map.c \
              work/b24/b24_unified/b24_g8_live_original_motion.c \
+             work/b24/b24_unified/b24_g8_melee_source_chain.c \
              work/b24/b24_unified/b24_original_im2v_stream.c \
              work/b24/b24_unified/b24_hover_pose_blend.c \
              -lm -o /tmp/g8-host-original-motion-cpu
