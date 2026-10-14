@@ -1,0 +1,59 @@
+name: B24 Original Underwater Skeletal Motion and B6 Decoder Audit - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-underwater-animation-skeleton-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Decode original Underwater 43 motion names and inspect proven 2010 B6 bone decoder
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,struct,sys,re,collections
+          sys.path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              raw=z.read('Payload/IronMan2.app/anims')
+          entries=decode(raw,'.anim')
+          selected=[r for r in entries if 'underwater' in r.name.lower()]
+          print('UNDERWATER_ANIM_EXACT_COUNT',len(selected))
+          for r in selected:
+              print('ACTUAL_UNDERWATER_ANIM',r.name,'bytes',r.end-r.start,
+                    'header16',raw[r.start:r.start+16].hex())
+          with zipfile.ZipFile('research/B6_Animation_Decoder_Runtime.zip') as z:
+              for f in ('anim_decoder_b6.py','export_im2a.py'):
+                  s=z.read(f).decode()
+                  print('===== ORIGINAL_VERIFIED_DECODER',f,'SIZE',len(s),'=====')
+                  for i,l in enumerate(s.splitlines()[:270],1):
+                      print('DECODER_SOURCE',f,i,l[:195])
+              print('SOURCE_B6_ARCHIVE_FILES',z.namelist())
+          with zipfile.ZipFile('research/B13_Original_Armor_Animation_Audit.zip') as z:
+              print('SOURCE_B13_ANIM_TOOLCHAIN',[f for f in z.namelist() if f.endswith('.py')])
+              for f in z.namelist():
+                  if f.endswith('rush_variants.py'):
+                      t=z.read(f).decode().splitlines()
+                      for i,l in enumerate(t[:145],1):
+                          print('B13_RUSH_DECODE',i,l[:210])
+          PY
+      - name: Clean owner's original private IPA after source investigation
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa
