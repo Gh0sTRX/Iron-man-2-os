@@ -1,4 +1,4 @@
-name: G11 Original 2010 C1L1 source PVR city atlas and UI 23 PNG evidence NO VPK
+name: G11 original C1L1 complete 39 native PVRTC plus accurate RGBA4444 minimap NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
