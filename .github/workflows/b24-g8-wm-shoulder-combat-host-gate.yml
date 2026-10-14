@@ -1,0 +1,37 @@
+name: B24 G8 War Machine Shoulder Independent Combat Host QA No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g8-wm-shoulder-combat-host-gate.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_gameplay_wm_weapons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: C11 sanitized independent turret, entity validation and reload tests
+        run: |
+          set -euo pipefail
+          cd research/b24_unified
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            b24_g8_wm_shoulder_gameplay.c test_b24_g8_wm_shoulder_gameplay.c \
+            -lm -o /tmp/b24_wm_shoulder_host
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
+             /tmp/b24_wm_shoulder_host
+      - name: Strict ARM Vita C object compile without executable or VPK
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                -c research/b24_unified/b24_g8_wm_shoulder_gameplay.c \
+                -o /tmp/b24_g8_wm_shoulder_gameplay.o
+              test -s /tmp/b24_g8_wm_shoulder_gameplay.o
+              echo "PASS WM independent turret and rocket portable ARM object; source-only"
+            '
