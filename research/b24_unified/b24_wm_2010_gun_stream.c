@@ -61,7 +61,7 @@ static int fetch(B24WM2010GunStream *s,uint32_t i,float *dst){
  return 1;
 }
 int b24_wm_gun_stream_sample(B24WM2010GunStream *s,uint32_t ms,
-                             int loop,float out[5][16]){
+                             int loop,float out[6][16]){
  if(!s||!s->file||!out)return 0;
  uint32_t time=s->duration_ms?
    (loop?ms%s->duration_ms:
@@ -88,5 +88,26 @@ int b24_wm_gun_stream_sample(B24WM2010GunStream *s,uint32_t ms,
  for(size_t k=0;k<B24_WM_GUN_FRAME_FLOATS;k++)
   out[k/16][k%16]=s->frame_a[k]+
      (s->frames>1?(s->frame_b[k]-s->frame_a[k])*weight:0.f);
+ return 1;
+}
+
+int b24_wm_gun_original_marker_axis(const float m[6][16],
+                                   float tip[3],float dir[3]){
+ if(!m||!tip||!dir)return 0;
+ /* The two source markers are distinct Gun03 children in original BRES.
+    Matrix layout is row-major and position is column 3. */
+ float delta[3];
+ float sq=0.f;
+ for(int k=0;k<3;k++){
+   const float a=m[4][k*4+3],b=m[5][k*4+3];
+   if(!isfinite(a)||!isfinite(b))return 0;
+   delta[k]=b-a;sq+=delta[k]*delta[k];
+ }
+ if(!isfinite(sq)||sq<1e-12f||sq>1e8f)return 0;
+ const float inv=1.f/sqrtf(sq);
+ for(int k=0;k<3;k++){
+   tip[k]=m[5][k*4+3];
+   dir[k]=delta[k]*inv;
+ }
  return 1;
 }
