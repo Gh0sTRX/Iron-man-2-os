@@ -105,6 +105,11 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
   }
  }
  if(strcmp(a->selected,desired)!=0){
+  /* B14 has just recomputed its legacy pose for this frame. Source-to-source
+     interruption MUST start at the previous actually rendered original pose,
+     not that intermediary: e.g. L_MOVE -> R_MOVE should not snap to idle. */
+  if(a->active&&!a->missing&&a->successful_frames>0)
+   memcpy(a->snapshot_xyz,a->result_xyz,n*sizeof(float));
   /* Source missing? Transactional read never damages previous valid pose.
      Suppress repeated storage probes for same missing name. */
   a->missing=0;
