@@ -63,17 +63,17 @@ jobs:
       - name: Original 94-material GPU draw schedule; preserve ALL genuine faces
         run: |
           set -euo pipefail
-          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \\
-            --out /tmp/verified_C1L1_material_gpu.c1g2 \\
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+            --out /tmp/verified_C1L1_material_gpu.c1g2 \
             --manifest /tmp/material_batch_gpu_manifest.json
-          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \\
-            research/b24_unified/b24_c1_gpu_mesh.c \\
-            research/b24_unified/b24_c1_material_source.c \\
-            research/b24_unified/b24_c1_material_batches.c \\
-            research/b24_unified/test_b24_c1_material_batches.c \\
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_gpu_mesh.c \
+            research/b24_unified/b24_c1_material_source.c \
+            research/b24_unified/b24_c1_material_batches.c \
+            research/b24_unified/test_b24_c1_material_batches.c \
             -lm -o /tmp/b24-authentic-material-batches
-          /tmp/b24-authentic-material-batches \\
-            /tmp/verified_C1L1_material_gpu.c1g2 \\
+          /tmp/b24-authentic-material-batches \
+            /tmp/verified_C1L1_material_gpu.c1g2 \
             /tmp/C1L1_original_materials.c1ma
           # This is source-only preparation, NOT GPU output or texture binding.
       - name: Native C11 original UV sidecar decoding and corruption guards
