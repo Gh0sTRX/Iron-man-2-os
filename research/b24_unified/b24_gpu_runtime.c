@@ -9,7 +9,8 @@ static int b24_runtime_armor_draw(void *userdata){
  B24GpuRuntime *r=(B24GpuRuntime *)userdata;
  return b24_gpu_suit_draw(&r->suit,&r->stream.source,
                 &(B24GpuSuitPose){r->frame_pose.x,r->frame_pose.y,
-                r->frame_pose.z,r->frame_pose.heading});
+                r->frame_pose.z,r->frame_pose.heading,
+                r->frame_pose.pitch,r->frame_pose.roll});
 }
 static int b24_runtime_hud_draw(void *userdata){
  B24GpuRuntime *r=(B24GpuRuntime *)userdata;
