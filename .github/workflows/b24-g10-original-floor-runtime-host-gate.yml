@@ -1,0 +1,82 @@
+name: G10 original C1L1 ground visual real G9 gameplay source patch and Vita ARM test NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g10-original-floor-runtime-host-gate.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild exact B14 B16 G9 native CPU/GPU render source without owner IPA or Vita package
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          for zip in source/IronMan2_Vita_GitHub_Ready_CI_R2.zip flight_b4/flight_b4_overlay.zip performance_b5/b5_optimized_renderer.zip skinning_b7/b7_vita_overlay.zip combat_b8/b8_overlay.zip armor_b9/b9_overlay.zip profile_b10/b10_overlay.zip; do unzip -oq "$zip" -d work; done
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done >/tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+          python3 research/b24_unified/apply_b24_g6_controls_source_only.py
+          python3 research/b24_unified/apply_b24_g7_original_collisions_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
+          python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
+          python3 - <<'PY'
+          from pathlib import Path
+          c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
+          main=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert c.count('b24_g10_foot_visual_source_offset(')==1
+          assert c.count('cam.eye.z+=g10_original_foot_dz;')==1
+          assert c.count('cam.target.z+=g10_original_foot_dz;')==1
+          assert 'c->player_z+g10_original_foot_dz' in c
+          assert 'b24_c1_true_source_floor.c' in cm
+          assert 'b24_g10_original_foot_contact.c' in cm
+          assert 'b24_c1_original_collision_resolve(&b24_original_walls' in main
+          assert 'b24_g8_motion_tick(' in main
+          assert 'b24_wm_rigid_sync_tick(' in main
+          assert main.count('b24_gpu_runtime_draw(')==1
+          print('PASS G10 true C1L1 visual face-ground contact in real G9 GPU world/armor transform; original G9 combat unchanged')
+          PY
+      - name: Compile & run strict host original armor sole to actual B11 ground support test
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            -Iwork/src -Iwork/b24/b24_unified \
+            research/b24_unified/b24_c1_true_source_floor.c \
+            research/b24_unified/b24_g10_original_foot_contact.c \
+            research/b24_unified/test_b24_g10_original_foot_contact.c \
+            -lm -o /tmp/g10_source_real_suit_foot_sanitized
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g10_source_real_suit_foot_sanitized
+      - name: Strict Vita ARM objects for both C1L1 original ground/source foot modules only
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              for n in b24_c1_true_source_floor b24_g10_original_foot_contact; do
+                arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                  -Iwork/src -Iwork/b24/b24_unified \
+                  -c "research/b24_unified/$n.c" -o "/tmp/$n.o"
+                test -s "/tmp/$n.o"
+              done
+              echo "PASS G10 two C1L1 original triangle to source suit foot placement Vita ARM object files, NO VPK"
+            '
