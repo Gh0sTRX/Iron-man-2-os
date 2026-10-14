@@ -28,8 +28,10 @@ with zipfile.ZipFile(zpath) as z:
         meshes,stats=ns["parse"](b)
         print("=== ORIGINAL MODEL",name,"MESHES",len(meshes),"STATS",stats)
         for m in meshes[:14]:
-            print("MESH",m["name"],"vertices",len(m["vertices"]),
-                  "VERTEX SAMPLE",repr(m["vertices"][:2])[:500])
+            print("MESH",m["name"],"vertices",len(m["positions"]),
+                  "VERTEX SAMPLE",repr(m["positions"][:2].tolist())[:500],
+                  "STRIDE",m["stride"],"UV SAMPLE",repr(m["uv"][:2].tolist())[:240],
+                  "UV RANGE",m["uv"].min(axis=0).tolist(),m["uv"].max(axis=0).tolist())
             for sub in m["submeshes"][:6]:
                 print("SUB", "material",sub.get("material"),"faces",len(sub["faces"]),
                       "face sample",str(sub["faces"][:2])[:190])
