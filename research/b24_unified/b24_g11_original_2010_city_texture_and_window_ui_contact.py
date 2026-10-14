@@ -33,14 +33,35 @@ def pvr_pixels(raw:bytes, name:str):
         rgba=np.frombuffer(decoded,dtype=np.uint8).reshape((height,width,4))[:,:, [2,1,0,3]].copy()
         img=Image.fromarray(rgba,'RGBA')
     elif bpp==16 and fmt in (0x10,0x11,0x12,0x13,0x14):
-        raw16=np.frombuffer(raw[52:52+stride],dtype='<u2').reshape((height,width))
-        if fmt==0x10: # RGB565 only if confirmed by flags
-            r8=((raw16>>11)&31)*255//31;g8=((raw16>>5)&63)*255//63;b8=(raw16&31)*255//31
-            a8=np.full_like(r8,255)
-        else: # unknown native component layout; do NOT silently invent
-            raise ValueError('16-bit PVR texel mask requires decoding by exact channel masks')
-        rgba=np.stack([r8,g8,b8,a8],axis=2).astype(np.uint8)
+        # PVR2 explicitly stores exact channel masks in its 52-byte header.
+        # Critically, the authentic 2010 'sprites' atlases use RGBA4444
+        # (0x0f00/0x00f0/0x000f/0xf000) — not RGB565. Guessing distorted
+        # the original C1L1_map mini-map preview too. Decode SOURCE masks.
+        channel_masks=(r,g,b,a)
+        bits_union=0
+        for mask in channel_masks:
+            if mask<0 or mask>0xffff or mask&bits_union:
+                raise ValueError('original PVR overlapping/bad 16bit channel masks')
+            bits_union|=mask
+        if not all((r,g,b)):
+            raise ValueError('original PVR missing RGB channel mask')
+        native=np.frombuffer(raw[52:52+stride],dtype='<u2').reshape((height,width))
+        channels=[]
+        for i,mask in enumerate(channel_masks):
+            if not mask:
+                if i!=3:raise ValueError('missing non-alpha source channel')
+                channels.append(np.full((height,width),255,dtype=np.uint8))
+                continue
+            shift=(mask&-mask).bit_length()-1
+            bitcount=mask.bit_count()
+            expected=((1<<bitcount)-1)<<shift
+            if mask!=expected:raise ValueError('original PVR noncontiguous channel mask')
+            src=(native&mask)>>shift
+            dst=(src.astype(np.uint32)*255//((1<<bitcount)-1)).astype(np.uint8)
+            channels.append(dst)
+        rgba=np.stack(channels,axis=2)
         img=Image.fromarray(rgba,'RGBA')
+        meta['actual_native_source_rgba_channel_masks']=[hex(q) for q in channel_masks]
     else:
         raise ValueError(f'unsupported original texel type PVR flags={hex(flags)} bpp={bpp} fmt={fmt}')
     return img,meta
