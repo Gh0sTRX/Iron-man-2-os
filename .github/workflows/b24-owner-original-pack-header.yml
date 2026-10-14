@@ -1,0 +1,60 @@
+name: B24 Original Pack Header Underwater Decode - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-owner-original-pack-header.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Verify exact real packed game record layout, Underwater neighbors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import zipfile,struct,re
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              for kind in ('models','textures','anims'):
+                  matches=[n for n in z.namelist() if n.endswith('/'+kind)]
+                  assert len(matches)==1
+                  b=z.read(matches[0])
+                  n=struct.unpack_from('<H',b)[0]
+                  offsets=list(struct.unpack_from('<'+str(n)+'I',b,2))
+                  names_at=2+4*n
+                  print('PACK',kind,'BYTES',len(b),'N',n,'NAMES_AT',names_at,
+                    'OFFSET_FIRST',offsets[:6],'OFFSET_LAST',offsets[-4:],
+                    'RAW_HEX_HEADER',b[:48].hex())
+                  print('NAME_TABLE_FIRST_HEX',b[names_at:names_at+65].hex())
+                  name_n=struct.unpack_from('<H',b,names_at)[0]
+                  print('NAME_COUNT',name_n,'NAME_FIRST_BYTES',repr(b[names_at:names_at+210])[:320])
+                  pat=re.compile(rb'[\x20-\x7e]{3,140}')
+                  named=[]
+                  for m in pat.finditer(b[names_at:names_at+60000]):
+                      if b'underwater' in m.group().lower():
+                          named.append((m.start()+names_at,m.group().decode('ascii','replace')[:100]))
+                  print('UNDERWATER_SOURCE_NAMES',named[:35])
+                  for x in (b'underwater',b'Underwater',b'UNDERWATER'):
+                      at=b.find(x)
+                      if at>=0:
+                          print('EXACT_UNDERWATER_RECORD',kind,at,repr(b[max(0,at-36):at+108])[:280])
+                  print('FIRST_SOURCE_OFFSET_RANGE',[(k,k+1) for k in offsets[:2]])
+          PY
+      - name: Remove original source file from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa
