@@ -69,7 +69,7 @@ jobs:
                   }
           best=min(results,key=lambda k:results[k]['mae'])
           print('B9_AUTHENTIC_SUITCASE_PIXEL_CALIBRATION',json.dumps({'best':best,'scores':results},sort_keys=True))
-          assert results[best]['mae']<18, 'PVRTC output not confidently calibrated against original B9'
+          assert results[best]['mae']<18, 'PVRTC output not confidently calibrated against original B9; do not ship unverified colors'
           print('PASS ORIGINAL UNDERWATER v1 IM2T STRUCTURE + B9 COLOR-CHANNEL calibration (does NOT prove rig animations)')
           PY
       - name: Source-owned binary cleanup
