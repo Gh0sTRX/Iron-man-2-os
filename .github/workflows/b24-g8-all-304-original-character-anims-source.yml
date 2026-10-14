@@ -16,6 +16,7 @@ jobs:
       - name: Verify source-catalog count before converting
         run: |
           set -euo pipefail
+          python3 -m pip install -q numpy scipy
           python3 - <<'PY'
           import sys
           sys.path.insert(0,'research/b24_unified')
