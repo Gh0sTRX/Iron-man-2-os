@@ -1,4 +1,4 @@
-name: G10 inspect 2010 sprite binary crosshair and iOS resource bundles NO VPK
+name: G10 authentic original iOS heightmaps C1L1 floor and scene container decode NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -39,6 +39,11 @@ jobs:
           python3 research/b24_unified/b24_g10_ironman_other_suit_rig_retarget_probe.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
+      - name: Inspect original 2010 iOS heightmaps collision resources and C1L1 level archives
+        run: |
+          python3 research/b24_unified/b24_g10_original_heightmaps_and_scene_config_probe.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
@@ -47,6 +52,7 @@ jobs:
             /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
             /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
             /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
+            /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
