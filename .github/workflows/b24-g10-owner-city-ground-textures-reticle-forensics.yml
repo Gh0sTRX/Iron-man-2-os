@@ -1,4 +1,4 @@
-name: G10 2010 Original sprites crosshair archive plus true C1L1 atlases NO VPK
+name: G10 other 3 suits bone retarget original city sprites and textures NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -33,6 +33,11 @@ jobs:
           python3 research/b24_unified/b24_g10_original_sprite_crosshair_inventory.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
+      - name: Test actual Mark IV Stealth Suitcase 2010 BRES rig skin retargets with Mark VI authored clips
+        run: |
+          python3 research/b24_unified/b24_g10_ironman_other_suit_rig_retarget_probe.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
@@ -40,6 +45,7 @@ jobs:
             /tmp/B24_G10_ORIGINAL_C1L1_GROUND_AND_RETICLE_SOURCE_REPORT.json
             /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
             /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
+            /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
