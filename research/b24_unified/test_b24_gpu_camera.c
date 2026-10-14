@@ -12,6 +12,15 @@ int main(void){
  assert(!b24_gpu_world_to_screen(&m,(B24GpuVec3){0,-30,6},960,544,&x,&y,&z));
  assert(b24_gpu_world_to_screen(&m,(B24GpuVec3){2,2,2},960,544,&x,&y,&z));
  assert(x>480.f);
+ B24GpuCamera shoulder=c;
+ assert(b24_gpu_camera_apply_shoulder(&shoulder,1.f,0.f,1.05f));
+ assert(b24_gpu_camera_matrices(&shoulder,&m));
+ assert(b24_gpu_world_to_screen(&m,c.target,960,544,&x,&y,&z));
+ assert(x<430.f&&x>250.f); /* avatar left in hover */
+ assert(b24_gpu_camera_matrices(&c,&m));
+ assert(b24_gpu_world_to_screen(&m,c.target,960,544,&x,&y,&z));
+ assert(fabsf(x-480.f)<.01f); /* avatar center in cruise */
+ assert(!b24_gpu_camera_apply_shoulder(&shoulder,0.f,0.f,1.f));
  assert(b24_gpu_world_to_screen(&m,(B24GpuVec3){0,2,4},960,544,&x,&y,&z));
  assert(y<272.f);
  B24GpuCamera invalid=c;invalid.target=invalid.eye;
