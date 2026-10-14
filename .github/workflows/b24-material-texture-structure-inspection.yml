@@ -1,0 +1,39 @@
+name: B24 C1L1 Original Material and Texture Pointer Structure - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-material-texture-structure-inspection.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  material_graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify true original C1L1 scene texture dictionary and uncertain material slots
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_b11_material_texture_pointer_graph.py --out /tmp/C1L1_original_material_pointer_graph.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/C1L1_original_material_pointer_graph.json').read_text())
+          rows=[a for a in d['files'] if a['bdae'].startswith('C1L1_')]
+          for r in rows:
+              print('SOURCE_BDAE_TEXTURES',r['bdae'],'mats',r['valid_material_records'],
+                  'texture_records',r['valid_texture_records'],
+                  'distinct_texture_names',len(r['unique_texture_names']),
+                  'names',r['unique_texture_names'][:55])
+              for m in r['material_candidates_only_no_assignments'][:8]:
+                  print('SOURCE_MAT_STRUCT',r['bdae'],m['material'],
+                     'record',m['material_record'],
+                     'parent_references',m['material_record_references'][:6],
+                     'adjacency_candidates',[(x['texture'],x['direct_material_trailing_fields'],
+                                              x['parent_pointer_adjacencies'][:2])
+                                              for x in m['candidate_texture_records'][:10]])
+          assert d['actual_mat_to_diffuse_link_proven']==False
+          print('PASS original C1L1 embedded texture records inventory; diffuse links not fabricated')
+          PY
