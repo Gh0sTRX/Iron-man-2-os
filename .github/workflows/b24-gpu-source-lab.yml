@@ -164,6 +164,7 @@ jobs:
           if-no-files-found: error
 
 # Original 2010 C1L1 node coordinate audit in host runner, no Vita VPK.
+# B24 G2: recheck authentic Z-up GPU suit pose Stage2/RUSH pitch/bank root matrix, strict source + arm-vita-eabi-gcc only.
 
 # B11 mesh-node presentation rotation validated: source Z-up must remain Z-up.
 
