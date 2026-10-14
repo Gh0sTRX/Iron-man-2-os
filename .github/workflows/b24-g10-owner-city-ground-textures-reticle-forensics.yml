@@ -1,4 +1,4 @@
-name: G10 prove Mark IV Stealth Suitcase authored 2010 BRES animation retargeting NO VPK
+name: G10 inspect 2010 sprite binary crosshair and iOS resource bundles NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
