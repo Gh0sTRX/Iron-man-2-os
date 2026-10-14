@@ -10,7 +10,14 @@ static int b24_runtime_armor_draw(void *userdata){
 }
 static int b24_runtime_hud_draw(void *userdata){
  B24GpuRuntime *r=(B24GpuRuntime *)userdata;
+#ifdef B24_GPU_NATIVE_HUD
+ /* HUD is CPU-authored QUADS and GPU-rasterized in one draw call;
+    no full-screen bitmap generation or CPU->GPU texture upload. */
+ if(!b24_native_hud_build(&r->native_hud,r->frame_game))return 0;
+ return b24_native_hud_draw(&r->native_hud);
+#else
  return b24_gpu_hud_bridge_draw(&r->hud,r->frame_game);
+#endif
 }
 int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  if(!r||r->initialized||!city_file)return 0;
@@ -18,9 +25,12 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  if(!b24_gpu_owner_init(&r->owner,0)){
   b24_gpu_c1_free(&r->city);return 0;
  }
+#ifndef B24_GPU_NATIVE_HUD
+ /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
  if(!b24_gpu_hud_bridge_prepare(&r->hud)){
   b24_gpu_c1_free(&r->city);return 0;
  }
+#endif
  r->initialized=1;
  r->loaded_suit_index=-1;
  return 1;
