@@ -1,0 +1,50 @@
+name: B24 Underwater All 34 Original Player Motions IM2A - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-underwater-all-player-motions-im2a.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Decode 34 original 38-joint Underwater player source clips into Vita track-only IM2A
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/export_b24_underwater_original_motions.py \
+            --ipa /tmp/ironman-owner-ipa/source_v1.0.0.ipa \
+            --out /tmp/b24_underwater_original_im2a \
+            --manifest /tmp/b24_underwater_motion_manifest.json
+          python3 - <<'PY'
+          import json,hashlib,struct
+          from pathlib import Path
+          m=json.loads(Path('/tmp/b24_underwater_motion_manifest.json').read_text())
+          assert len(m['palette_joints'])==38
+          assert m['original_underwater_player_clips']==34
+          assert m['original_underwater_nonplayer']==9
+          assert not m['Vita_animated_underwater_playable']
+          for item in m['clips']:
+              blob=(Path('/tmp/b24_underwater_original_im2a')/item['output']).read_bytes()
+              assert hashlib.sha256(blob).hexdigest()==item['im2a_sha256']
+              assert struct.unpack_from('<4sHH',blob)==(b'IM2A',1,38)
+          print('PASS 34 original source motion IM2A data plus 38-joint palette, not yet skinning or attached to released VPK')
+          PY
+      - name: Remove user owned original binaries from runner
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/b24_underwater_original_im2a
