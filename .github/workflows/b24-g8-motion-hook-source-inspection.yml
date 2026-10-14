@@ -95,7 +95,7 @@ jobs:
                   lines=p.read_text().splitlines()
                   print('G8_PROJECTION_SOURCE',name,'TOTAL',len(lines))
                   if name.startswith('renderer'):
-                      for i,line in enumerate(lines[:300],1):print(f'G8PROJ {name}:{i:03} {line[:180]}')
+                      for i,line in enumerate(lines[:600],1):print(f'G8PROJ {name}:{i:03} {line[:180]}')
                   elif name=='b14_world.h':
                       for i,line in enumerate(lines[:145],1):print(f'G8B14 {name}:{i:03} {line[:180]}')
           PY
