@@ -1,4 +1,5 @@
 #include "b24_gpu_hud_bridge.h"
+#include "b24_gpu_reticle.h"
 #include <vitaGL.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,6 +32,10 @@ int b24_gpu_hud_bridge_draw(B24GpuHudBridge *h,B24Unified *game){
  if(!h||!h->prepared||!h->rgb_canvas||!h->rgba_canvas||!game)return 0;
  memset(h->rgb_canvas,0,(size_t)HW*HH*4);
  b24_unified_draw_overlay(game,h->rgb_canvas,HW);
+ b24_reticle_draw(h->rgb_canvas,HW,
+      game->camera_base.shoulder_to_chase,
+      game->missile.phase==B23_LOCKED,
+      game->controls.state==IM2_PAUSED);
  for(size_t i=0;i<(size_t)HW*HH;i++){
    uint32_t c=h->rgb_canvas[i];
    unsigned char *p=h->rgba_canvas+i*4;
