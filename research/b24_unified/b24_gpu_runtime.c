@@ -32,11 +32,12 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  r->verified_vehicle_atlas=0; /* B12 original atlas not packaged yet */
  if(!b24_gpu_owner_init(&r->owner,0)){
   b24_c1_uv_free(&r->city_uv);
- b24_gpu_c1_free(&r->city);return 0;
+  b24_gpu_c1_free(&r->city);return 0;
  }
 #ifndef B24_GPU_NATIVE_HUD
  /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
  if(!b24_gpu_hud_bridge_prepare(&r->hud)){
+  b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
 #endif
@@ -111,6 +112,7 @@ void b24_gpu_runtime_close(B24GpuRuntime *r){
  b24_gpu_hud_bridge_release(&r->hud);
  b24_gpu_suit_release(&r->suit);
  b24_gpu_im2_stream_free(&r->stream);
+ b24_c1_uv_free(&r->city_uv);
  b24_gpu_c1_free(&r->city);
  /* vitaGL has no stable public vglEnd in current upstream header.
     Keep shutdown OS-owned and do not attempt a second SDL GPU teardown. */
