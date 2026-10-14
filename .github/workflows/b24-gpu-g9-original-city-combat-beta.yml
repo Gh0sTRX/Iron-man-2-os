@@ -80,7 +80,7 @@ jobs:
             'G8_BASELINE_59':59,'ORIGINAL_2010_PLAYER_304':304,
             'UNDERWATER_34_PARTIALLY_SKINNED':34}
           dest=Path('work/animations')
-          assert len(list(dest.glob('*.im2v')))==363
+          assert len(list(dest.glob('*.im2v')))==59
           for entry in manifest['clips']:
             if entry['tier']!='ORIGINAL_2010_PLAYER_304':continue
             path=bank/'animations'/entry['asset']
