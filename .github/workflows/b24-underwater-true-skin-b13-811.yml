@@ -50,11 +50,7 @@ jobs:
           # first false text occurrence. Choose the unique referenced offset.
           src=(b/'tools/b13_bake.py').read_text()
           old="target=raw.find(b'Bip01-node\\0');assert target>0"
-          new="""hits=[i for i in range(0,len(raw)-11) if raw[i:i+11]==b'Bip01-node\\0']
-    refs=[i for i in hits if sum(raw[k:k+4]==struct.pack('<I',i)
-                        for k in range(32,len(raw)-72,4))==1]
-    assert len(refs)==1,refs
-    target=refs[0]"""
+          new="hits=[i for i in range(0,len(raw)-11) if raw[i:i+11]==b'Bip01-node\\0']\n    refs=[i for i in hits if sum(raw[k:k+4]==struct.pack('<I',i)\n                        for k in range(32,len(raw)-72,4))==1]\n    assert len(refs)==1,refs\n    target=refs[0]"
           assert src.count(old)==1
           (b/'tools/b13_bake.py').write_text(src.replace(old,new))
           sys.path.insert(0,str(b/'tools'))
