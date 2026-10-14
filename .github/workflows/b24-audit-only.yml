@@ -278,6 +278,7 @@ jobs:
                 work/b24/b24_unified/b24_c1_gpu_mesh.c \
                 work/b24/b24_unified/b24_c1_gpu_uv.c \
                 work/b24/b24_unified/b24_c1_material_source.c \
+                work/b24/b24_unified/b24_c1_material_batches.c \
                 work/b24/b24_unified/b24_gpu_c1_material_vitagl.c \
                 work/b24/b24_unified/b24_gpu_c1_vehicle_texture_vitagl.c \
                 work/b24/b24_unified/b24_gpu_owner_c1_material.c \
@@ -293,7 +294,16 @@ jobs:
                   -Iwork/b24/b22_4_6 -Iwork/b24/b18_gpu_probe \
                   -c "$src" -o "/tmp/$(basename "$src").o"
               done
-              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 18 GPU .o files; NO VPK or executable"
+              undefined="$(arm-vita-eabi-nm -u /tmp/main.c.o)"
+              printf "%s\\n" "$undefined" | grep -q " U b24_gpu_runtime_draw$" || {
+                echo "GPU original-game draw symbol not referenced"; exit 1;
+              }
+              if printf "%s\\n" "$undefined" | grep -Eq " U (SDL_CreateWindow|SDL_CreateRenderer|SDL_UpdateTexture|SDL_RenderPresent|im2_render)$"; then
+                echo "ERROR: legacy software/SDL video frame owner leaks into GPU main"; exit 1;
+              fi
+              test -s /tmp/b24_c1_material_batches.c.o
+              echo "PASS real B24 GPU main references GPU draw and has ZERO OLD CPU/SDL VIDEO PRESENT symbols"
+              echo "PASS REAL VitaSDK B24 main + full GPU/HD geometry and material batch planner: 19 ARM .o files; NO ELF/VPK"
             '
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
