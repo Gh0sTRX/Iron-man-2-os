@@ -36,6 +36,14 @@ jobs:
           assert not d['fully_textured_C1L1']
           print('PASS 2010 C1L1 original UV recovery: 370 meshes in exact B24 C1G2 draw ordering')
           PY
+      - name: Native C11 original UV sidecar decoding and corruption guards
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_gpu_uv.c \
+            research/b24_unified/test_b24_c1_gpu_uv.c \
+            -lm -o /tmp/b24-c1uv-test
+          /tmp/b24-c1uv-test /tmp/original_C1L1_uv.c1uv
       - name: Upload METADATA ONLY, never copyrighted atlas, UV, models
         uses: actions/upload-artifact@v4
         with:
