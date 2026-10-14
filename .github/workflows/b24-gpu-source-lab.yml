@@ -55,6 +55,19 @@ jobs:
             research/b24_unified/test_b24_c1_gpu_mock.c \
             -lm -o /tmp/b24-gpu-test
           /tmp/b24-gpu-test /tmp/C1L1_original_gpu.c1g2
+      - name: Guard G3 crash log from misleading upstream vitaGL return value
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          v=Path("research/b24_unified/b24_gpu_owner_vitagl.c").read_text()
+          t=Path("research/b24_unified/test_b24_gpu_owner_mock.c").read_text()
+          assert "if(!vglInit(" not in v
+          assert "(void)vglInit(0x1000000)" in v
+          assert "return GL_FALSE;" in t
+          assert "VITAGL_INIT_RETURNED_NOT_HEALTH_PROOF" in v
+          print("PASS: pinned vitaGL false-means-no-resolution-fallback contract; startup not incorrectly aborted")
+          PY
       - name: B24 Z-up camera and single VitaGL owner frame graph host gates
         run: |
           set -euo pipefail
