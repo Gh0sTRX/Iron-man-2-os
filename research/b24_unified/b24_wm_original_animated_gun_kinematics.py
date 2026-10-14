@@ -53,6 +53,10 @@ def analyze(ipa,out,figure):
         if len(nodes)!=112 or len(by_name)!=112 or any(n not in by_name for n in GUNS):
             raise ValueError("original source War Machine 112-node graph drift")
         rest=b13.worlds(nodes)
+        children={n["name"]:[] for n in nodes}
+        for n in nodes:
+            if n["parent"]:
+                children[n["parent"]].append(n["name"])
         record={
            "source":"2010 owner IPA warmachine.bdae and authored .anim",
            "rig_count":112,"parent_graph_verified":True,
@@ -65,6 +69,7 @@ def analyze(ipa,out,figure):
             record["nodes"][key]={
                 "offset":n["offset"],"parent":n["parent"],
                 "ancestry_to_root":parent_path(key,by_name),
+                "authentic_child_nodes":children[key],
                 "source_rest_world_xyz":m[:3,3].tolist(),
                 "source_rest_matrix":m.tolist()
             }
@@ -97,7 +102,23 @@ def analyze(ipa,out,figure):
                     "max_world_orientation_delta":float(np.abs(basis-basis[0]).max()),
                     "samples":sample,
                 }
+            base=matrices["Dummy_Green_Gun-node"]
+            tip=matrices["DummyE_Green_Gun-node"]
+            vectors=[]
+            for b,e in zip(base,tip):
+                v=np.asarray(e["world_xyz"])-np.asarray(b["world_xyz"])
+                distance=float(np.linalg.norm(v))
+                if not np.isfinite(distance) or distance<1.e-7:
+                    raise ValueError("original gun marker source vector degeneracy")
+                vectors.append({
+                    "time_ms":b["t_ms"],
+                    "original_Dummy_to_DummyE_distance":distance,
+                    "original_Dummy_to_DummyE_unit_direction":(v/distance).tolist(),
+                    "original_tip_model_space_xyz":e["world_xyz"],
+                })
             record["animations"][name]={
+                "gun03_source_marker_direction_candidate":vectors,
+                "candidate_markers_are_proven_muzzle":False,
                 "duration_ms":ms,"authored_channel_count":len(a.names),
                 "samples_t_ms":times,"gun_nodes":entries
             }
@@ -105,6 +126,10 @@ def analyze(ipa,out,figure):
                   [(key,round(entries[key]["max_world_displacement"],6),
                     round(entries[key]["max_world_orientation_delta"],6),
                     entries[key]["authored_direct_track"]) for key in GUNS[:4]],flush=True)
+        print("2010_WM_GUN04_TRUE_CHILD_NODES",children["Gun04-node"])
+        print("2010_WM_GUN03_SOURCE_MARKER_SEPARATION",
+              {clip:round(entry["gun03_source_marker_direction_candidate"][0]["original_Dummy_to_DummyE_distance"],6)
+               for clip,entry in record["animations"].items()})
         print("2010_WM_GUN_PARENT_LINKS",
              {k:record["nodes"][k]["parent"] for k in GUNS},flush=True)
         out.parent.mkdir(parents=True,exist_ok=True)
