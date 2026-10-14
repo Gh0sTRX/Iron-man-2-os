@@ -1,0 +1,35 @@
+name: B24 Exact C1L1 Original BDAE Collision Triangles - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-c1wc-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_collision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict original 2010 C1L1 BRES collision extraction
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/export_b24_authentic_original_collision.py \
+            --out /tmp/authentic_c1l1_collision.c1wc \
+            --manifest /tmp/authentic_c1l1_collision_manifest.json
+          python3 - <<'PY'
+          import struct,json
+          from pathlib import Path
+          raw=Path('/tmp/authentic_c1l1_collision.c1wc').read_bytes()
+          magic,version,count,ns,stride=struct.unpack_from('<4sIIII',raw)
+          assert magic==b'C1WC' and version==1 and ns==2 and stride==40
+          assert len(raw)==20+count*stride
+          d=json.loads(Path('/tmp/authentic_c1l1_collision_manifest.json').read_text())
+          assert d['triangles']==count
+          assert d['sources']['C1L1_col_01']['triangles']>=690
+          assert d['sources']['C1L1_building_col']['triangles']>=1203
+          print('PASS authentic collision file generated from real original 2010 BDAE source; not a CPU runtime integration',count)
+          PY
