@@ -49,6 +49,16 @@ def inspect(ipa,out):
      valid.append({'offset':start_p,'decode_error':str(e)[:160]})
    cursor=tag+4
   hashes['source_pvr_candidates']=valid
+  # Even-numbered author blobs are the compact atlas sprite rectangle
+  # descriptors for the following genuine PVR. Archiving six small source
+  # descriptor records (not full IPA nor bulk original binaries) permits
+  # deterministic local reverse engineering of the ORIGINAL HUD UV cells.
+  if i%2==0:
+   descriptor=out/f'G11_ORIGINAL_2010_SPRITE_RECT_DESCRIPTOR_{i:02}.bin'
+   descriptor.write_bytes(blob)
+   hashes['source_sprite_rect_descriptor']=descriptor.name
+   hashes['descriptor_magic_hex']=blob[:4].hex()
+   hashes['descriptor_2010_record_count_u16_at_6']=struct.unpack_from('<H',blob,6)[0] if len(blob)>=8 else None
   report.append(hashes)
   print('2010_GENUINE_SPRITES12_ARCHIVE',i,
         'bytes',len(blob),'PNG',hashes['PNG_magic_count'],
