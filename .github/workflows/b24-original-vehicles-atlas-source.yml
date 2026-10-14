@@ -26,7 +26,7 @@ jobs:
           echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
       - name: Original IPA texture codec requirements
         run: python3 -m pip install -q numpy texture2ddecoder
-      - name: Reconstruct original game 22-vehicle C1TX with proven BGRA swizzle
+      - name: Verify original mipmapped PVR base-level 22-vehicle C1TX swizzle
         run: |
           set -euo pipefail
           python3 research/b24_unified/convert_original_ipa_vehicles_c1tx.py \
