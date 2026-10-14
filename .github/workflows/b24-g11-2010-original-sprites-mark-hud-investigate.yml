@@ -1,0 +1,49 @@
+name: G11 original iOS sprites true 12-record archive and mark TGA crosshair forensic NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-2010-original-sprites-mark-hud-investigate.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_game_sprites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download user source transient and install exact PVRTC source decoder
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy pillow texture2ddecoder gdown
+          mkdir -p /tmp/g11_owner_ui
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g11_owner_ui/2010.ipa
+          test "$(wc -c </tmp/g11_owner_ui/2010.ipa)" -eq 248613763
+      - name: Decode exact 2010 sprite record offsets and PVR pixel candidate mark TGA
+        run: |
+          python3 research/b24_unified/b24_g11_original_sprite12_2010_offsets_and_mark_preview.py \
+            --ipa /tmp/g11_owner_ui/2010.ipa \
+            --out /tmp/G11_GENUINE_IOS_SPRITES_MARK_TGA_RESEARCH
+      - name: Assert exact real sprite archive structure and authentic source preview
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/G11_GENUINE_IOS_SPRITES_MARK_TGA_RESEARCH')
+          j=json.loads((root/'G11_AUTHENTIC_2010_IOS_SPRITE_RECORDS_AND_MARK_PVR.json').read_text())
+          assert j['original_archive_size']==6051922
+          assert j['original_game_sprites_records']==12
+          assert j['original_archive_has_correct_sentinel_offsets']
+          assert not j['original_crosshair_identity_verified']
+          assert (root/'G11_ORIGINAL_2010_IOS_MARK_TGA_AUTHOR_TEXTURE.png').stat().st_size>500
+          print('PASS actual 2010 sprites archive 13 uint32 offsets, 12 records, source mark.tga preview and no false crosshair assumption')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_Genuine_2010_iOS_Sprites_12_Blob_Format_And_Source_Mark_TGA
+          path: /tmp/G11_GENUINE_IOS_SPRITES_MARK_TGA_RESEARCH/
+          if-no-files-found: error
+          retention-days: 15
+      - name: Cleanup
+        if: always()
+        run: rm -rf /tmp/g11_owner_ui
