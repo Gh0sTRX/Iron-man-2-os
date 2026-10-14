@@ -541,6 +541,20 @@ jobs:
           set -euo pipefail
           sudo chown -R "$(id -u):$(id -g)" work/build-vita
           (cd work && zip -q build-vita/IronMan2_GPU_B24_G9_BETA.vpk maps/C1L1_environment.im2map maps/C1L1_environment.c1g2 maps/C1L1_environment.c1uv maps/C1L1_environment.c1ma maps/C1L1_original_collision.c1wc maps/C1L1_Vehicles.c1tx)
+          # Current legacy vita_create_vpk enumerates only 59 known files.
+          # G9 source-only original 304 and 6 rigid weapon tracks MUST be
+          # explicitly added to its actual app0:animations ZIP directory.
+          (cd work && zip -q build-vita/IronMan2_GPU_B24_G9_BETA.vpk animations/ironman_*.im2v animations/warmachine_*.im2v animations/*.im2k)
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          p=Path('work/build-vita/IronMan2_GPU_B24_G9_BETA.vpk')
+          with zipfile.ZipFile(p) as z:
+              n=set(z.namelist())
+              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2v')])==363
+              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2k')])==6
+          print('PASS G9 truly PACKAGED 363 animation streams + six original WM IM2K via explicit ZIP append')
+          PY
           unzip -Z1 work/build-vita/IronMan2_GPU_B24_G9_BETA.vpk | grep -Fx maps/C1L1_environment.im2map
           python3 - <<'PY'
           import zipfile,hashlib
