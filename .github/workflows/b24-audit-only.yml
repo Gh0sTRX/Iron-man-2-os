@@ -218,6 +218,8 @@ jobs:
           assert cm.count("option(B24_ENABLE_GPU")==1
           assert 'option(B24_ENABLE_NATIVE_HUD' in cm
           assert 'b24_gpu_hud_native_vitagl.c' in cm
+          assert 'b24_gpu_cpu_profile.c' in cm
+          assert 'B24_ENABLE_GPU_PROFILE_LOG' in cm
           assert "SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER" in s
           assert 'B24_GPU_SINGLE_OWNER_INTEGRATION' in cm
           assert Path("work/maps/C1L1_environment.c1g2").stat().st_size>500000
@@ -258,6 +260,7 @@ jobs:
                 work/b24/b24_unified/b24_gpu_reticle.c \
                 work/b24/b24_unified/b24_gpu_hud_native.c \
                 work/b24/b24_unified/b24_gpu_hud_native_vitagl.c \
+                work/b24/b24_unified/b24_gpu_cpu_profile.c \
                 work/b24/b24_unified/b24_gpu_camera.c \
                 work/b24/b24_unified/b24_gpu_owner_vitagl.c \
                 work/b24/b24_unified/b24_c1_gpu_mesh.c \
@@ -265,7 +268,7 @@ jobs:
                 work/b24/b24_unified/b24_gpu_suit_vitagl.c \
                 work/b24/b24_unified/b24_gpu_suit_im2_adapter.c; do
                 arm-vita-eabi-gcc -std=gnu11 -O1 -Wall -Wextra \
-                  -D__vita__ -DB24_GPU_ENGINE=1 -DB24_GPU_NATIVE_HUD=1 \
+                  -D__vita__ -DB24_GPU_ENGINE=1 -DB24_GPU_NATIVE_HUD=1 -DB24_GPU_PROFILE_LOG=1 \
                   -Iwork/src -Iwork/b24/b24_unified \
                   -Iwork/b24/b22_flight -Iwork/b24/b22_camera \
                   -Iwork/b24/b19/host_gameplay -Iwork/b24/b21_controls \
@@ -273,7 +276,7 @@ jobs:
                   -Iwork/b24/b22_4_6 -Iwork/b24/b18_gpu_probe \
                   -c "$src" -o "/tmp/$(basename "$src").o"
               done
-              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 12 GPU .o files; NO VPK or executable"
+              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 13 GPU .o files; NO VPK or executable"
             '
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
