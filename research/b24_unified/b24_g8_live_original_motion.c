@@ -32,7 +32,7 @@ static const char * const wm_float[]={
 };
 const char *b24_g8_motion_route(int suit,B24MotionStage mode,float x,float y){
  const int d=stage_direction(x,y);
- if(d<0||mode<B24M_IDLE||mode>B24M_LAND)return NULL;
+ if(d<0||mode>B24M_LAND)return NULL;
  /* G8 suit order: Mark VI 0, War Machine 2. Never load 802v Mark VI
     on differently skinned Mark IV, Stealth, Mark V or Underwater. */
  if(suit==0){
