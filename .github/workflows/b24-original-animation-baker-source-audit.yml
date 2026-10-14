@@ -1,0 +1,36 @@
+name: B24 Original B7 B13 Skinning Animation Baker API - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-animation-baker-source-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse verified 2010 original bone skinning and quaternion conversion tools
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          import re
+          archives=['research/B7_Skinning_Tools.zip',
+            'animation_b13/B13_Reproducible_Source.zip',
+            'research/B6_Rig_Hierarchy_Prototype.zip']
+          for path in archives:
+              with ZipFile(path) as z:
+                  print('2010_ORIGINAL_SKIN_BAKER_ARCHIVE',path)
+                  print('CONTENTS',z.namelist()[:85])
+                  for filename in z.namelist():
+                      if not filename.endswith('.py'):continue
+                      content=z.read(filename).decode('utf-8','replace')
+                      print('SOURCE_MODULE',filename,'length',len(content))
+                      for i,line in enumerate(content.splitlines(),1):
+                          if re.match(r'^\s*(class |def |from |import |if __name__|ROOT\s*=|SOURCE\s*=)',line):
+                              print('PYTHON_API',filename,i,line[:185])
+          PY
