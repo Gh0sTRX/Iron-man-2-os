@@ -41,6 +41,16 @@ void glTexSubImage2D(GLenum t,GLint a,GLint b,GLint c,GLsizei d,GLsizei e,
  texture_updates++;
  assert(!"GPU-native B24 HUD must never upload bitmap textures");
 }
+/* The crosshair remains centered even when source camera shoulder/chase blends.
+   These vertices come from four crosshair bars, not a screenshot guess. */
+static int have_reticle_left_bar(void){
+ for(unsigned i=0;i+5<g.count;i+=6u){
+  const float x=g.vertices[i].x,y=g.vertices[i].y;
+  if(fabsf(x-228.f)<.015f&&fabsf(y-135.35f)<.015f &&
+     fabsf(g.vertices[i+1].x-236.f)<.015f)return 1;
+ }
+ return 0;
+}
 static void validate(void){
  assert(b24_native_hud_build(&g,&state));
  assert(!g.overflow);
@@ -73,11 +83,13 @@ int main(void){
  validate();
  assert(g.missile_brackets==0u);
  assert(g.reticle_quads==4u);
+ assert(have_reticle_left_bar());
  state.camera_base.shoulder_to_chase=1.f;
  state.missile.weapon=B23_MISSILE;
  state.missile.target_x=240;state.missile.target_y=140;
  state.missile.target_health_percent=70;
  validate();
+ assert(have_reticle_left_bar());
  assert(g.missile_brackets==16u);
  state.speed_fx.enabled=1;
  state.speed_fx.strength=1.f;
@@ -88,6 +100,21 @@ int main(void){
  assert(g.pause_glyph_quads>25u);
  assert(g.missile_brackets==0u);
  assert(g.reticle_quads==0u);
+ state.controls.menu=IM2_MENUOPTIONS;
+ state.controls.selected_option=IM2_SETTING_MUSIC;
+ state.controls.settings.music=1;
+ state.controls.settings.sfx=1;
+ state.controls.settings.camera_sensitivity=1.f;
+ validate();
+ assert(g.pause_glyph_quads>50u);
+ unsigned options_on=g.count;
+ state.controls.selected_option=IM2_SETTING_SENSITIVITY;
+ state.controls.settings.camera_sensitivity=1.5f;
+ state.controls.settings.music=0;
+ validate();
+ assert(g.pause_glyph_quads>50u);
+ assert(g.count!=options_on);
+ state.controls.menu=IM2_MENUMAIN;
  uint32_t rng=0xA11CEu;
  for(int i=0;i<20000;i++){
   rng=rng*1664525u+1013904223u;
