@@ -40,6 +40,8 @@ def convert(ipa:Path,out:Path,manifest:Path):
        "source_pvr_sha256":hashlib.sha256(pvr).hexdigest(),
        "c1tx_sha256":hashlib.sha256(data).hexdigest(),
        "original_vehicle_meshes_verified":22,
+       "source_has_mip_chain_bytes":len(pvr)-52-base_bytes,
+       "gpu_uses_only_original_level_zero":True,
        "pixel_swizzle":"BGRA-to-RGBA; original B9 Mark V reference MAE=0.0854",
        "row_flip":False,
        "not_full_city_material_recovery":True,
