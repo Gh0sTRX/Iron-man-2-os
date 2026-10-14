@@ -21,6 +21,7 @@ def run(ipa,out):
     with tempfile.TemporaryDirectory(prefix="b24_wm_2010_socket_source_") as temp:
         b13=load_original_b13(Path(temp))
         nodes=b13.parse_rig(raw)
+        rest_world=b13.worlds(nodes)
     names=[]
     for n in nodes:
         v=n.get("name")
@@ -36,12 +37,53 @@ def run(ipa,out):
               if PATTERN.search(m.group(0).decode("ascii",errors="ignore"))
              ))[:90]]
     meshes=source_meshes(raw)
+    source_rest=[]
+    for node in nodes:
+        name=node.get("name","")
+        if not isinstance(name,str) or not PATTERN.search(name):
+            continue
+        world=rest_world.get(name)
+        if world is None:
+            raise ValueError("original gun scene rig world transform missing: "+name)
+        import numpy as np
+        matrix=np.asarray(world,dtype=np.float64)
+        if matrix.shape!=(4,4) or not np.isfinite(matrix).all():
+            raise ValueError("bad genuine B13 world transform for "+name)
+        translation=[float(matrix[i,3]) for i in range(3)]
+        source_rest.append({
+            "name":name,
+            "original_bres_record_offset":node.get("offset"),
+            "node_data_keys":sorted(node),
+            "original_world_translation_xyz":translation,
+            "original_world_matrix_4x4":matrix.tolist(),
+            "source_parent_relation_proven":False,
+            "verified_particle_emitter":False,
+        })
+    rest_by_name={x["name"]:x for x in source_rest}
+    proposed_pairs=[]
+    for side in ("L","R"):
+        a=rest_by_name.get("Dummy_Gun_"+side+"-node")
+        b=rest_by_name.get("DummyE_Gun_"+side+"-node")
+        if a and b:
+            import math
+            p=a["original_world_translation_xyz"]
+            q=b["original_world_translation_xyz"]
+            distance=math.sqrt(sum((q[i]-p[i])**2 for i in range(3)))
+            proposed_pairs.append({
+                "original_name_side":side,
+                "original_dummy_node":a["name"],
+                "original_dummyE_node":b["name"],
+                "world_distance":distance,
+                "E_label_is_author_verified_emitter":False,
+            })
     summary={
       "owner_2010_source_file":"warmachine.bdae",
       "original_scene_rig_node_count":len(nodes),
       "original_source_meshes":[{"name":m.get("name",""),"vertices":len(m["positions"])}
                                 for m in meshes],
       "named_rig_socket_candidates":candidates,
+      "rest_pose_weapon_node_transforms":source_rest,
+      "source_dummy_to_dummyE_deltas":proposed_pairs,
       "source_ascii_name_candidates":fields,
       "G8_verified_2010_skin_vertex_count":1292,
       "left_rocket_socket_proven":False,
@@ -54,6 +96,8 @@ def run(ipa,out):
     print("WM_2010_BRES_RIG_NODE_COUNT",len(nodes))
     print("WM_2010_MESH_COUNTS",summary["original_source_meshes"])
     print("WM_2010_SHOULDER_NAMED_CANDIDATES",candidates[:30])
+    print("WM_2010_ORIGINAL_REST_WORLD_WEAPON_NODES",[(i["name"],i["original_world_translation_xyz"],i["original_bres_record_offset"]) for i in source_rest])
+    print("WM_2010_ORIGINAL_DUMMY_TO_DUMMYE_DISTANCE",proposed_pairs)
     print("WM_2010_SOURCE_ASCII_WEAPON_NAMES",[(x["name"],x["occurrences"]) for x in fields[:50]])
     print("PASS original model 2010 shoulder mount forensic SOURCE_ONLY; two muzzle transforms UNPROVEN")
 if __name__=="__main__":
