@@ -1,4 +1,4 @@
-name: G8 War Machine original gun L/R DummyE world matrix and mount source NO VPK
+name: G8 War Machine source gun animation bone tracks and shoulder sockets NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
