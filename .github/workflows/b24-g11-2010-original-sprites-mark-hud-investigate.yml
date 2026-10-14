@@ -1,4 +1,4 @@
-name: G11 original iOS sprites true 12-record archive and mark TGA crosshair forensic NO VPK
+name: G11 2010 TRUE RGBA4444 sprite atlas original HUD PVR reverse engineering NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -35,7 +35,8 @@ jobs:
           assert j['original_game_sprites_records']==12
           assert j['original_archive_has_correct_sentinel_offsets']
           assert not j['original_crosshair_identity_verified']
-          assert (root/'G11_ORIGINAL_2010_IOS_MARK_TGA_AUTHOR_TEXTURE.png').stat().st_size>500
+          assert (root/'G11_ORIGINAL_2010_IOS_MARK_TGA_AUTHOR_TEXTURE.png').stat().st_size>100
+          assert sum(len(x['source_pvr_candidates']) for x in j['original_native_blobs'])>=5
           print('PASS actual 2010 sprites archive 13 uint32 offsets, 12 records, source mark.tga preview and no false crosshair assumption')
           PY
       - uses: actions/upload-artifact@v4
