@@ -82,7 +82,7 @@ before='''        if(!b24_unified_paused(&b24_game))
 after='''#ifdef B24_GPU_ENGINE
         /* Original B14/B16 motion, suit cycle, B24 HUD and game input state;
            C1L1 GPU scene + animated original suit + alpha B22 HUD + ONE swap. */
-        if(!b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game)){
+        if(!b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)){
             running=0;break;
         }
         frame++;
