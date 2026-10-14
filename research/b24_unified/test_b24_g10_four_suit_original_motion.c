@@ -18,6 +18,7 @@ int main(void){
   const char *right=b24_g8_motion_route(id,B24M_DRIFT,.8f,0.f);
   assert(right);
   assert(strncmp(idle,armor[i].pref,strlen(armor[i].pref))==0);
+  assert(strstr(idle,"move_float")&&strstr(idle,"_att")==NULL);
   assert(strstr(left,"float_move_l")&&strstr(right,"float_move_r"));
   const char *fire=b24_g8_motion_repulsor_clip(id,B24M_DRIFT,.9f,0.f);
   assert(fire&&strstr(fire,"float_move_r_att"));
