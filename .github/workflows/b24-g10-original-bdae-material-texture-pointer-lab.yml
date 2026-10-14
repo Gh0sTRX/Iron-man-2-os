@@ -1,4 +1,4 @@
-name: G10 2010 Source BDAE Material Texture Pointer Parser Internals NO VPK
+name: G10 original BRES C1L1 per-face source texture pointer graph NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -33,3 +33,14 @@ jobs:
              if any(t in line.casefold() for t in ('texture','material','submesh','tga','pvr')):
                 print('SOURCE',k,line[:200])
           PY
+
+      - name: Trace actual 2010 per-face source material records to authentic BRES texture pointers
+        run: |
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/b24_g10_bres_material_pointer_probe.py \
+            --out /tmp/G10_2010_BRES_TRUE_MATERIAL_POINTER_GRAPH.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_Original_2010_BRES_Per_Face_Material_Atlas_Link_Forensic
+          path: /tmp/G10_2010_BRES_TRUE_MATERIAL_POINTER_GRAPH.json
+          if-no-files-found: error
