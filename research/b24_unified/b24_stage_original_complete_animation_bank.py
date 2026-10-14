@@ -57,7 +57,8 @@ def stage(existing:Path,original:Path,underwater:Path,out:Path):
         if digest(dest)!=info["sha256"]:
             raise ValueError("source clip digest changed during staging")
         info.update({"asset":asset,"source_name":source_name,"tier":kind,
-                     "gameplay_state_connected":playable,
+                     "gameplay_state_connected_individually_verified":False,
+                     "asset_already_shipped_in_G8":kind=="G8_BASELINE_59",
                      "underwater_29_aux_original_parent_proven":False})
         ledger.append(info)
         present.add(asset)
