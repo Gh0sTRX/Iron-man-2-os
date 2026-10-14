@@ -1,0 +1,80 @@
+name: B24 Underwater Original Skeletal Bone Bind Readiness - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-underwater-skin-rig-check.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Reuse true B13 original BDAE rig and skinned animation baker
+        run: python3 -m pip install -q numpy scipy texture2ddecoder
+      - name: Validate actual Underwater rig + joint palette against source model and animation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys,zipfile,struct,os
+          from pathlib import Path
+          from collections import Counter
+          sys.path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              mods=z.read('Payload/IronMan2.app/models')
+              animations=z.read('Payload/IronMan2.app/anims')
+          bres=get_exact(mods,decode(mods,'.bdae'),'LC_MC_UnderWater.bdae')
+          Path('/tmp/underwater.bdae').write_bytes(bres)
+          Path('/tmp/b13-underwater/tools').mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile('animation_b13/B13_Reproducible_Source.zip') as z:
+              for x in ('tools/b13_bake.py','tools/anim_decoder_b6.py'):
+                  (Path('/tmp/b13-underwater')/x).write_bytes(z.read(x))
+          sys.path.insert(0,'/tmp/b13-underwater/tools')
+          from b13_bake import parse_rig,parse_skin,worlds,decode_anim,sample
+          try:
+              rig=parse_rig(bres)
+              print('UNDERWATER_SOURCE_RIG_ROOT',len(rig),'nodes',
+                    [x['name'] for x in rig[:12]])
+          except Exception as e:
+              print('UNDERWATER_RIG_NOT_YET_COMPATIBLE',type(e).__name__,str(e)[:260])
+              rig=None
+          for nv in (840,811,29):
+              try:
+                  desc,bones,inverse,idx,weights=parse_skin(bres,nv)
+                  print('UNDERWATER_BDAE_SKIN',nv,'palette',len(bones),'skin_descriptor',desc,
+                        'influences',int((weights>0).sum()),
+                        'names',bones[:12])
+              except Exception as e:
+                  print('UNDERWATER_SKIN_NOT_FOUND',nv,type(e).__name__,str(e)[:185])
+          clips=['Underwater_Aim_Float_idle.anim','Underwater_Float_idle.anim',
+                 'Underwater_Swim_F.anim','Underwater_Swim_Att_Aim.anim',
+                 'Underwater_Aim_M_Float_idle.anim']
+          records=decode(animations,'.anim')
+          for clip in clips:
+              raw=get_exact(animations,records,clip)
+              a=decode_anim(raw)
+              labels=set(a.names)
+              members={x['name'].removesuffix('-node') for x in rig} if rig else set()
+              print('UNDERWATER_CLIP_RIG_CHANNELS',clip,
+                    'duration',a.duration_ms,'channels',len(a.names),
+                    'rig_matched',len(labels&members),'labels',a.names[:8])
+          print('PASS owner underwater authentic rig source/animation channel audit only, animations not yet integrated in-game')
+          PY
+      - name: Delete ephemeral owner source
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/b13-underwater /tmp/underwater.bdae
