@@ -9,11 +9,13 @@
 int b24_gpu_owner_init(B24GpuOwner *o,int sdl_renderer_exists){
  if(!o||o->initialized||sdl_renderer_exists)return 0;
  (void)b24_gpu_boot_trace_mark("31 VITAGL_INIT_BEGIN");
- if(!vglInit(0x1000000)){
-  (void)b24_gpu_boot_trace_mark("31 VITAGL_INIT_FAILED");
-  return 0;
- }
- (void)b24_gpu_boot_trace_mark("32 VITAGL_INIT_OK");
+ /* vitaGL pinned 2026-10-13: vglInitWithCustomSizes() returns
+    res_fallback, NOT initialization success! A normal 960x544 startup
+    returns GL_FALSE after setting vgl_inited=GL_TRUE. G3 incorrectly
+    treated that normal return value as failure. Never test !vglInit().
+    Actual GL errors must be diagnosed separately from this sentinel. */
+ (void)vglInit(0x1000000);
+ (void)b24_gpu_boot_trace_mark("32 VITAGL_INIT_RETURNED_NOT_HEALTH_PROOF");
  glViewport(0,0,960,544);
  glEnable(GL_DEPTH_TEST);
  glDepthFunc(GL_LESS);
