@@ -57,4 +57,13 @@ void glPopMatrix(void);
 void glMultMatrixf(const float *);
 void glColor4f(float,float,float,float);
 void glTexCoordPointer(int,GLenum,GLsizei,const void *);
+#define GL_BLEND 0x0BE2
+#define GL_SRC_ALPHA 0x0302
+#define GL_ONE_MINUS_SRC_ALPHA 0x0303
+typedef int GLint;
+void glDrawArrays(GLenum,GLint,GLsizei);
+void glLoadIdentity(void);
+void glOrthof(float,float,float,float,float,float);
+void glDepthMask(GLboolean);
+void glBlendFunc(GLenum,GLenum);
 #endif
