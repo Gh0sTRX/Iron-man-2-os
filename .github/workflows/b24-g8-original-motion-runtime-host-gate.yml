@@ -1,4 +1,4 @@
-name: G8 source motion repulsor melee and WM shoulder skill B14 gameplay no VPK
+name: G8 Square melee source HUD plus repulsor WM skill integration final QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
