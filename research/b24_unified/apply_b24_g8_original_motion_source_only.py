@@ -35,6 +35,15 @@ rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_acti
               b24_g8_motion_repulsor_trigger(&b24_original_motion,(uint32_t)now);
 #endif
           }''')
+/* This is source-only in G8. The B24 Square event is consumed by the
+   existing controls in b24_unified_tick; NO synthetic collision actors. */
+rep("        b24_unified_tick(&b24_game,&b24_obs);",
+'''        b24_unified_tick(&b24_game,&b24_obs);
+#ifdef B24_GPU_ENGINE
+        if(!b24_unified_paused(&b24_game) && idx==0 &&
+           !world.flying && b24_unified_should_melee(&b24_game))
+          b24_g8_motion_melee_trigger(&b24_original_motion,(uint32_t)now);
+#endif''')
 rep("        b16_apply_attack(&attack,&model,now);",
 '''#ifdef B24_GPU_ENGINE
         /* B14 has already computed SINGLE authoritative world pose and B13
@@ -60,7 +69,8 @@ rep("        b16_apply_attack(&attack,&model,now);",
 #ifdef B24_GPU_ENGINE
         /* Real full-body 2010 directional _Att must NOT be overdrawn by B16
            upper-arm overlay. If exact source absent B16 remains fallback. */
-        if(b24_g8_motion_whole_body_fire(&b24_original_motion))
+        if(b24_g8_motion_whole_body_fire(&b24_original_motion) ||
+           b24_g8_motion_melee_source_active(&b24_original_motion))
           attack.attack_active=0;
 #endif
         b16_apply_attack(&attack,&model,now);''')
@@ -72,7 +82,8 @@ out=WORK/"b24/b24_unified"
 for name in ("b24_g8_live_original_motion.c",
              "b24_g8_live_original_motion.h",
              "b24_original_im2v_stream.c","b24_original_im2v_stream.h",
-             "b24_hover_pose_blend.c","b24_hover_pose_blend.h"):
+             "b24_hover_pose_blend.c","b24_hover_pose_blend.h",
+             "b24_g8_melee_source_chain.c","b24_g8_melee_source_chain.h"):
  shutil.copyfile(ROOT/"research/b24_unified"/name,out/name)
 CMAKE=WORK/"CMakeLists.txt"
 cm=CMAKE.read_text()
@@ -86,7 +97,8 @@ if(B24_ENABLE_GPU)
  target_sources(im2_beta PRIVATE
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_live_original_motion.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_original_im2v_stream.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_hover_pose_blend.c")
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_hover_pose_blend.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_melee_source_chain.c")
 endif()
 '''
 CMAKE.write_text(cm)
