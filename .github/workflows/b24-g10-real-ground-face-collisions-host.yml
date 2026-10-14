@@ -1,4 +1,4 @@
-name: G10 Original 2010 C1L1 visual floor source mesh sampler and VITA ARM tests NO VPK
+name: G10 original C1L1 370 source mesh scene transform integrity and floor ARM NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -30,6 +30,11 @@ jobs:
               test -s /tmp/g10_original_real_floor.o
               echo "PASS original C1L1 source 3280 face ground support ARM source; no synthetic base floor"
             '
+      - name: Audit all 370 original city GLB source mesh node transformations not fabricated instances
+        run: |
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/b24_g10_c1l1_original_glb_node_transform_audit.py \
+            --out /tmp/G10_C1L1_B11_370_MESH_TRUE_AUTHOR_WORLD_TRANSFORMS.json
       - name: Test original packed 2010 B11 floor triangles vs real center source
         run: |
           python3 -m pip install -q numpy
@@ -60,3 +65,9 @@ jobs:
             research/b24_unified/b24_c1_true_source_floor.c \
             research/b24_unified/b24_c1_gpu_mesh.c -lm -o /tmp/g10_original_ground_real
           /tmp/g10_original_ground_real /tmp/G10_original_geometry.c1g2
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_Source_C1L1_370_BRES_GLTF_Mesh_Node_Transform_Forensic
+          path: /tmp/G10_C1L1_B11_370_MESH_TRUE_AUTHOR_WORLD_TRANSFORMS.json
+          if-no-files-found: error
