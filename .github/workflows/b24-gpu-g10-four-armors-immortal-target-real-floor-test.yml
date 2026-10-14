@@ -607,7 +607,7 @@ jobs:
           p=Path('work/build-vita/IronMan2_GPU_B24_G10_TEST.vpk')
           with zipfile.ZipFile(p) as z:
               n=set(z.namelist())
-              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2v')])==363
+              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2v')])==1107
               assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2k')])==6
           print('PASS G10 truly PACKAGED 1107 animation streams + six original WM IM2K via explicit ZIP append')
           PY
