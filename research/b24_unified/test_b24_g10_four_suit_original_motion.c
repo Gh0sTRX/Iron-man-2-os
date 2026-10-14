@@ -10,9 +10,13 @@ int main(void){
  for(unsigned i=0;i<4;i++){
   const int id=armor[i].suit;
   const char *idle=b24_g8_motion_route(id,B24M_HOVER,0.f,0.f);
-  const char *left=b24_g8_motion_route(id,B24M_DRIFT,-.8f,0.f);
+  const char *left_tmp=b24_g8_motion_route(id,B24M_DRIFT,-.8f,0.f);
+  assert(idle&&left_tmp);
+  char left[128];
+  int len=snprintf(left,sizeof(left),"%s",left_tmp);
+  assert(len>0&&(size_t)len<sizeof(left));
   const char *right=b24_g8_motion_route(id,B24M_DRIFT,.8f,0.f);
-  assert(idle&&left&&right);
+  assert(right);
   assert(strncmp(idle,armor[i].pref,strlen(armor[i].pref))==0);
   assert(strstr(left,"float_move_l")&&strstr(right,"float_move_r"));
   const char *fire=b24_g8_motion_repulsor_clip(id,B24M_DRIFT,.9f,0.f);
