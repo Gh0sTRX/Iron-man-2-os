@@ -1,0 +1,40 @@
+name: G11 Authentic 2010 level C1L1 city objects density vs incorrect B14 spawn NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-original-city-visible-geometry-spawn-probe.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_city_footprints:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Matplotlib original iOS 22919 source triangle data previews
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy matplotlib
+          python3 research/b24_unified/b24_g11_c1l1_true_world_near_spawn_mesh_footprint.py \
+             --out /tmp/G11_2010_C1L1_ORIGINAL_CITY_WORLD_FACE_COVERAGE
+      - name: Verify original B11 world assets and no fabricated source geometry
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('/tmp/G11_2010_C1L1_ORIGINAL_CITY_WORLD_FACE_COVERAGE')
+          d=json.loads((root/'G11_2010_ORIGINAL_C1L1_REAL_WORLD_NEAR_SPAWN_GEOMETRY.json').read_text())
+          assert d['source_triangle_total']==22919
+          assert d['original_2010_scene_meshes']==370
+          assert len(d['generated_static_world_data_overviews'])==4
+          assert d['original_game_spawn_location_proven'] is False
+          for asset in d['generated_static_world_data_overviews'].values():
+             assert (root/asset).stat().st_size>9000
+          print("PASS G11 2010 original city scene 370 meshes / 22919 triangle spatial source evidence, source-only no Vita FPS assertions")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_Original_2010_C1L1_370_Mesh_World_XY_Geometry_and_Prototype_Spawn_Mismatch
+          path: /tmp/G11_2010_C1L1_ORIGINAL_CITY_WORLD_FACE_COVERAGE/
+          if-no-files-found: error
