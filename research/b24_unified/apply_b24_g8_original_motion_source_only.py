@@ -47,6 +47,13 @@ rep("    b24_unified_init(&b24_game);",
     b24_wm_default_config(&b24_wm_cfg);
     if(!b24_wm_init(&b24_wm_shoulder,&b24_wm_cfg))return 1;
 #endif''')
+rep("        b24_obs.melee_anim_active=0; /* no original combo pose linked yet */",
+'''#ifdef B24_GPU_ENGINE
+        b24_obs.melee_anim_active=
+             b24_g8_motion_melee_source_active(&b24_original_motion);
+#else
+        b24_obs.melee_anim_active=0;
+#endif''')
 rep("        b24_unified_tick(&b24_game,&b24_obs);",
 '''        b24_unified_tick(&b24_game,&b24_obs);
 #ifdef B24_GPU_ENGINE
