@@ -1,4 +1,4 @@
-name: G10 original C1L1 ground visual real G9 gameplay source patch and Vita ARM test NO VPK
+name: G10 original C1L1 floor plus L-to-lock unkillable center target source integration NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -38,12 +38,17 @@ jobs:
           python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
           python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
           python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
+          python3 research/b24_unified/apply_b24_g10_practice_target_source_only.py
           python3 - <<'PY'
           from pathlib import Path
           c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
           main=Path('work/src/main.c').read_text()
           cm=Path('work/CMakeLists.txt').read_text()
           assert c.count('b24_g10_foot_visual_source_offset(')==1
+          assert 'b24_g10_practice_target_draw(&r->practice_target)' in c
+          assert 'b24_g10_practice_target.c' in cm
+          assert 'B24_G10_PRACTICE_LOCK=1' in cm
+          assert 'B24_G10_PRACTICE_TARGET_ID' in main
           assert c.count('cam.eye.z+=g10_original_foot_dz;')==1
           assert c.count('cam.target.z+=g10_original_foot_dz;')==1
           assert 'c->player_z+g10_original_foot_dz' in c
@@ -66,6 +71,28 @@ jobs:
             research/b24_unified/test_b24_g10_original_foot_contact.c \
             -lm -o /tmp/g10_source_real_suit_foot_sanitized
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g10_source_real_suit_foot_sanitized
+      - name: G10 physical centered target lock on nonmissile weapon and authored C1L1 height C sanitizer gate
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/test_b24_g10_practice_target.c \
+            -lm -o /tmp/g10_practice_target_host
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g10_practice_target_host
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          target=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
+          lock=Path('work/b24/b23_missile_lock/b23_missile_lock.c').read_text()
+          hud=Path('work/b24/b24_unified/b24_gpu_hud_native.c').read_text()
+          assert main.count('b24_obs.target_id=B24_G10_PRACTICE_TARGET_ID')==1
+          assert 'b24_g10_practice_target_draw(&r->practice_target)' in target
+          assert 'b24_c1_true_floor_at(&r->city,0.f,10.f' in target
+          assert 'B24_G10_PRACTICE_TARGET_ID' in lock
+          assert 'B24_G10_PRACTICE_TARGET_ID' in hud
+          print('PASS G10 actual original scene 3D practice actor connected to real B23 L-held lock on any selected weapon; no HP loss')
+          PY
       - name: Strict Vita ARM objects for both C1L1 original ground/source foot modules only
         run: |
           set -euo pipefail
