@@ -1,0 +1,34 @@
+name: G8 War Machine authentic 2010 shoulder barrel and rocket source evidence NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-original-wm-shoulder-socket-source.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_sockets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch owner IPA only into ephemeral job
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy scipy gdown
+          mkdir -p /tmp/wm-original-source
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/wm-original-source/source.ipa
+          test "$(wc -c </tmp/wm-original-source/source.ipa)" -eq 248613763
+      - name: Extract actual original model weapon node names without fabricating sockets
+        run: |
+          python3 research/b24_unified/b24_wm_original_shoulder_socket_forensics.py \
+            --ipa /tmp/wm-original-source/source.ipa \
+            --report /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Left_Rocket_Right_Gatling_Socket_Forensic_JSON
+          path: /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
+          if-no-files-found: error
+      - name: Clean owner archive
+        if: always()
+        run: rm -rf /tmp/wm-original-source
