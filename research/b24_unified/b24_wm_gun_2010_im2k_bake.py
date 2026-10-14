@@ -5,7 +5,7 @@ These are actual B13.worlds(node hierarchy, original .anim, sampled ms) world
 transforms, not invented gun animations. Intended as SOURCE-ONLY attachment
 timelines. Original nozzle identity + hit/particle assignment still UNKNOWN.
 IM2K header: '<4sIIII' magic, nodes=5, frames, fps=20, duration_ms;
-each frame: five 4x4 LE float32 world matrices in declared manifest order.
+each frame: six 4x4 LE float32 world matrices in declared manifest order.
 """
 from __future__ import annotations
 import argparse,hashlib,json,struct,tempfile,zipfile
@@ -16,7 +16,7 @@ from b24_underwater_source_34_im2v_bake import load_original_b13
 from b24_wm_original_animated_gun_kinematics import ANIMATIONS
 
 ORDER=("Gun01-node","Gun02-node","Gun03-node","Gun04-node",
-       "DummyE_Green_Gun-node")
+       "Dummy_Green_Gun-node","DummyE_Green_Gun-node")
 
 def main(ipa,out):
     with zipfile.ZipFile(ipa) as z:
@@ -73,10 +73,10 @@ def main(ipa,out):
             })
             print("PASS 2010 WM TRUE RIGID GUN STREAM",name,
                   "original BRES 112 scene nodes",len(times),"frames",len(data),"bytes")
-    assert len(summary["clips"])==6
+    assert len(summary["clips"])==6 and len(ORDER)==6
     (out/"G8_WM_2010_ORIGINAL_GUN01_04_IM2K_SOURCE_MANIFEST.json").write_text(
         json.dumps(summary,indent=2)+"\n")
-    print("PASS 6 original War Machine gun rigid attachment matrix streams — no VPK, no proven firing sockets")
+    print("PASS 6 original War Machine gun rigid source clips, 6 named matrix nodes each including Dummy/DummyE marker pair, no VPK or proven muzzle")
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
