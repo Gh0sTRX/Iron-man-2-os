@@ -22,11 +22,15 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
   b24_gpu_c1_free(&r->city);return 0;
  }
  r->initialized=1;
+ r->loaded_suit_index=-1;
  return 1;
 }
-int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *m){
- if(!r||!r->initialized||!m)return 0;
- if(r->stream.source.texture_rgba!=m->texture||
+int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *m,int suit_index){
+ if(!r||!r->initialized||!m||suit_index<0||suit_index>=5)return 0;
+ /* The allocator may reuse the SAME addresses for two different armors!
+    Suit identity is authoritative even if texture pointer/dimensions match. */
+ if(r->loaded_suit_index!=suit_index||
+    r->stream.source.texture_rgba!=m->texture||
     r->stream.source.nv!=m->nv||r->stream.source.nt!=m->nt){
     /* Authentic armor change loads a NEW IM2T atlas+geometry and B14/B16
        reinitializes its animation buffers; keep them in sync with GPU. */
@@ -36,14 +40,15 @@ int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *m){
     if(!b24_gpu_suit_prepare(&r->suit,&r->stream.source)){
        b24_gpu_im2_stream_free(&r->stream);return 0;
     }
+    r->loaded_suit_index=suit_index;
     r->suit_rebinds++;
  }
  return b24_gpu_im2_stream_update(&r->stream,m);
 }
 int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
-                          const IM2Camera *c,B24Unified *g){
+                          const IM2Camera *c,B24Unified *g,int suit_index){
  if(!r||!r->initialized||!m||!c||!g)return 0;
- if(!b24_gpu_runtime_sync_model(r,m))return 0;
+ if(!b24_gpu_runtime_sync_model(r,m,suit_index))return 0;
  /* One authoritative B17 Z-up orbit. Flying stage2/RUSH reduces the
     shoulder offset; free-look recenter remains the existing B24 controller. */
  float a=c->orbit, cp=cosf(c->pitch),sp=sinf(c->pitch);
