@@ -42,6 +42,29 @@ jobs:
           assert Path('/tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png').stat().st_size>10000
           print('PASS original 2010 BRES source hierarchy, 6 Gun track kinematics + diagnostic PNG; no invented muzzle binding')
           PY
+      - name: Bake six source-true original War Machine animated gun rigid matrices IM2K
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_wm_gun_2010_im2k_bake.py \
+            --ipa /tmp/wm-original-source/source.ipa \
+            --out /tmp/WM_2010_Gun01_04_Original_IM2K
+          python3 - <<'PY'
+          import hashlib,json,struct
+          from pathlib import Path
+          root=Path('/tmp/WM_2010_Gun01_04_Original_IM2K')
+          m=json.loads((root/'G8_WM_2010_ORIGINAL_GUN01_04_IM2K_SOURCE_MANIFEST.json').read_text())
+          assert len(m['clips'])==6 and len(list(root.glob('*.im2k')))==6
+          assert len(m['node_order'])==5
+          assert not m['verified_right_gatling_emitter']
+          assert not m['verified_left_rocket_emitter']
+          for item in m['clips']:
+             b=(root/item['output']).read_bytes()
+             magic,n,frames,fps,ms=struct.unpack_from('<4sIIII',b)
+             assert (magic,n,frames,fps,ms)==(b'IM2K',5,item['frames'],20,item['duration_ms'])
+             assert len(b)==20+frames*5*16*4
+             assert hashlib.sha256(b).hexdigest()==item['im2k_sha256']
+          print('PASS 6 true original source War Machine rigid weapon streams, five named nodes, 20Hz, exact SHA, NO VPK')
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
@@ -49,6 +72,7 @@ jobs:
             /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
             /tmp/G8_WM_2010_GUN_ANIMATED_SOURCE_MATRIX.json
             /tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png
+            /tmp/WM_2010_Gun01_04_Original_IM2K/
           if-no-files-found: error
       - name: Clean owner archive
         if: always()
