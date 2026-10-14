@@ -1,0 +1,31 @@
+name: B24 G8 Host Hover L-R Attack Pose Transition Tests - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g8-hover-pose-transition-host.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pure_host_blend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run host C11 strict transition and safety regression
+        run: |
+          set -euo pipefail
+          cd research/b24_unified
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            b24_hover_pose_blend.c test_b24_hover_pose_blend.c \
+            -lm -o /tmp/b24_hover_pose_blend_validate
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
+            /tmp/b24_hover_pose_blend_validate
+      - name: Verify exact 40 original named directional source motion states
+        run: |
+          python3 research/b24_unified/b24_hover_fire_directional_source.py --self-test
+      - name: No new VPK or original private IPA
+        run: |
+          echo "HOST ONLY: no VitaSDK, no gameplay wiring claim, no package"
