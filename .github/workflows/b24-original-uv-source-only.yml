@@ -107,6 +107,19 @@ jobs:
             research/b24_unified/test_b24_gpu_c1_vehicle_texture_mock.c \
             -lm -o /tmp/b24-vehicle-atlas-gpu
           /tmp/b24-vehicle-atlas-gpu
+      - name: Native VitaSDK ARM compile material draw planner object ONLY
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror \
+                -Iresearch/b24_unified \
+                -c research/b24_unified/b24_c1_material_batches.c \
+                -o /tmp/b24_c1_material_batches_vitasdk.o
+              test -s /tmp/b24_c1_material_batches_vitasdk.o
+              echo "PASS REAL VitaSDK material index planner .o only; NO ELF/VPK"
+            '
       - name: Upload METADATA ONLY, never copyrighted atlas, UV, models
         uses: actions/upload-artifact@v4
         with:
