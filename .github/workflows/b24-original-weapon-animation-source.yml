@@ -1,0 +1,44 @@
+name: B24 Original Combat FX and Animation Names - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-weapon-animation-source.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Inventory all original 2010 repulsor missile Unibeam combat source names (no art upload)
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_original_weapon_effect_names.py \
+            --ipa /tmp/ironman-owner-ipa/source_v1.0.0.ipa \
+            --manifest /tmp/2010_original_combat_asset_names.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('/tmp/2010_original_combat_asset_names.json').read_text())
+          assert m['assets']['anims']['total_records']==972
+          assert m['assets']['models']['total_records']==207
+          assert m['assets']['textures']['total_records']==412
+          print('PASS original iOS weapon/FX source inventory; still needs emitter rig and GPU renderer')
+          PY
+      - name: Remove user IPA from ephemeral research runner
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa
