@@ -1,4 +1,4 @@
-name: G8 2010 animated Gun03 emitter marker direction and Gun04 children forensic NO VPK
+name: G8 2010 WM 6-node Gun03 original source barrel marker axis and children NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -58,14 +58,14 @@ jobs:
           root=Path('/tmp/WM_2010_Gun01_04_Original_IM2K')
           m=json.loads((root/'G8_WM_2010_ORIGINAL_GUN01_04_IM2K_SOURCE_MANIFEST.json').read_text())
           assert len(m['clips'])==6 and len(list(root.glob('*.im2k')))==6
-          assert len(m['node_order'])==5
+          assert len(m['node_order'])==6
           assert not m['verified_right_gatling_emitter']
           assert not m['verified_left_rocket_emitter']
           for item in m['clips']:
              b=(root/item['output']).read_bytes()
              magic,n,frames,fps,ms=struct.unpack_from('<4sIIII',b)
-             assert (magic,n,frames,fps,ms)==(b'IM2K',5,item['frames'],20,item['duration_ms'])
-             assert len(b)==20+frames*5*16*4
+             assert (magic,n,frames,fps,ms)==(b'IM2K',6,item['frames'],20,item['duration_ms'])
+             assert len(b)==20+frames*6*16*4
              assert hashlib.sha256(b).hexdigest()==item['im2k_sha256']
           print('PASS 6 true original source War Machine rigid weapon streams, five named nodes, 20Hz, exact SHA, NO VPK')
           PY
