@@ -2,6 +2,7 @@
 #define B24_GPU_RUNTIME_H
 #include "b24_gpu_owner.h"
 #include "b24_gpu_hud_bridge.h"
+#include "b24_gpu_hud_native.h"
 #include "b24_gpu_suit.h"
 #include "b24_gpu_suit_im2_adapter.h"
 #include "renderer.h"
@@ -11,6 +12,7 @@ typedef struct {
  B24GpuSuit suit;
  B24GpuIM2Stream stream;
  B24GpuHudBridge hud;
+ B24NativeHudGeometry native_hud; /* GPU-only shape command buffer */
  B24GpuSuitPose frame_pose;
  B24Unified *frame_game;
  uint32_t suit_rebinds,frames;
