@@ -1,4 +1,4 @@
-name: G8 source true move-fire combo and patched B14-B16 G8 validation NO VPK
+name: G8 source motion repulsor melee and WM shoulder skill B14 gameplay no VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -76,6 +76,11 @@ jobs:
           assert 'b24_g8_motion_whole_body_fire(&b24_original_motion)' in t
           assert t.count('b24_g8_motion_melee_trigger(')==1
           assert 'b24_g8_melee_source_chain.c' in c
+          assert 'b24_g8_wm_shoulder_gameplay.c' in c
+          assert t.count('b24_wm_tick(')==1
+          assert t.count('b24_g8_motion_repulsor_trigger(')==1
+          assert 'b24_wm_in.real_enemies_loaded=b24_obs.real_enemies_loaded;' in t
+          assert 'b24_wm_in.targets=NULL;b24_wm_in.target_count=0;' in t
           assert t.count('b24_gpu_runtime_draw(')==1
           assert t.count('b14_world_tick(')==1
           assert t.count('b14_pose_tick_ex(')==1
