@@ -218,6 +218,10 @@ jobs:
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -Iresearch/b24_unified/mock_gpu -Iresearch/b24_unified \
+            -Iwork/src -Iwork/b24/b22_flight -Iwork/b24/b22_camera \
+            -Iwork/b24/b21_controls -Iwork/b24/b22_hud \
+            -Iwork/b24/b23_missile_lock -Iwork/b24/b22_4_6 \
+            -Iwork/b24/b19/host_gameplay -Iwork/b24/b18_gpu_probe \
             research/b24_unified/b24_gpu_hud_native.c \
             research/b24_unified/b24_gpu_hud_native_vitagl.c \
             research/b24_unified/test_b24_gpu_hud_native_mock.c \
