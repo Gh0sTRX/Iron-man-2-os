@@ -240,6 +240,10 @@ jobs:
                 arm-vita-eabi-gcc -std=gnu11 -O1 -Wall -Wextra \
                   -D__vita__ -DB24_GPU_ENGINE=1 \
                   -Iwork/src -Iwork/b24/b24_unified \
+                  -Iwork/b24/b22_flight -Iwork/b24/b22_camera \
+                  -Iwork/b24/b19/host_gameplay -Iwork/b24/b21_controls \
+                  -Iwork/b24/b22_hud -Iwork/b24/b23_missile_lock \
+                  -Iwork/b24/b22_4_6 -Iwork/b24/b18_gpu_probe \
                   -c "$src" -o "/tmp/$(basename "$src").o"
               done
               echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 9 GPU .o files; NO VPK or executable"
