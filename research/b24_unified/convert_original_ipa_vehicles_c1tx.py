@@ -18,8 +18,11 @@ def convert(ipa:Path,out:Path,manifest:Path):
   if z.testzip():raise ValueError("original IPA CRC failure")
   packed=z.read("Payload/IronMan2.app/textures")
  pvr=get_exact(packed,decode(packed,'.tga'),TEX)
- if len(pvr)!=52+512*512//2:
-  raise ValueError(f"original PVRTC unexpected size {len(pvr)}")
+ # Original 2010 Vehicles PVR contains the 512x512 base image plus its
+ # mip chain (unlike MC_SuitCase.tga). Vita uploads only level zero.
+ base_bytes=512*512//2
+ if len(pvr)<52+base_bytes or len(pvr)>52+base_bytes*2:
+  raise ValueError(f"original PVRTC source total file length unexpected {len(pvr)}")
  size,height,width=struct.unpack_from("<III",pvr)
  if (size,width,height)!=(52,512,512):
   raise ValueError(f"original PVR header drift {(size,width,height)}")
