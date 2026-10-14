@@ -25,6 +25,16 @@ rep("static B24GpuRuntime b24_gpu_rt={0};",
 /* One source animation state/stream for the already-authoritative B14 body.
    G8 renderer remains the SAME real VitaGL owner. */
 static B24G8LiveOriginalMotion b24_original_motion={0};''')
+rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active)
+              b16_attack_begin(&attack,now,world.flying,0,0);''',
+'''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active){
+              b16_attack_begin(&attack,now,world.flying,0,0);
+#ifdef B24_GPU_ENGINE
+              /* Trigger on REAL accepted shot. Source _Att begins NEXT tick.
+                 Existing B16 is fallback when exact IM2V is absent. */
+              b24_g8_motion_repulsor_trigger(&b24_original_motion,(uint32_t)now);
+#endif
+          }''')
 rep("        b16_apply_attack(&attack,&model,now);",
 '''#ifdef B24_GPU_ENGINE
         /* B14 has already computed SINGLE authoritative world pose and B13
@@ -46,6 +56,12 @@ rep("        b16_apply_attack(&attack,&model,now);",
              running=0;break;
           }
         }
+#endif
+#ifdef B24_GPU_ENGINE
+        /* Real full-body 2010 directional _Att must NOT be overdrawn by B16
+           upper-arm overlay. If exact source absent B16 remains fallback. */
+        if(b24_g8_motion_whole_body_fire(&b24_original_motion))
+          attack.attack_active=0;
 #endif
         b16_apply_attack(&attack,&model,now);''')
 rep("    b24_gpu_runtime_close(&b24_gpu_rt);",
