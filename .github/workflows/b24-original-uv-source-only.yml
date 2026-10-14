@@ -44,6 +44,20 @@ jobs:
             research/b24_unified/test_b24_c1_gpu_uv.c \
             -lm -o /tmp/b24-c1uv-test
           /tmp/b24-c1uv-test /tmp/original_C1L1_uv.c1uv
+      - name: Source-verified GPU material gate - original vehicles ONLY
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+            --out /tmp/original_C1L1_gpu.c1g2 \
+            --manifest /tmp/uv_gpu_scene_manifest.json
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iresearch/b24_unified/mock_gpu -Iresearch/b24_unified \
+            research/b24_unified/b24_c1_gpu_mesh.c \
+            research/b24_unified/b24_c1_gpu_uv.c \
+            research/b24_unified/b24_gpu_c1_material_vitagl.c \
+            research/b24_unified/test_b24_gpu_c1_material_mock.c \
+            -lm -o /tmp/b24-mesh-materials
+          /tmp/b24-mesh-materials /tmp/original_C1L1_gpu.c1g2 /tmp/original_C1L1_uv.c1uv
       - name: Upload METADATA ONLY, never copyrighted atlas, UV, models
         uses: actions/upload-artifact@v4
         with:
