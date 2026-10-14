@@ -1,0 +1,25 @@
+#ifndef B24_GPU_RUNTIME_H
+#define B24_GPU_RUNTIME_H
+#include "b24_gpu_owner.h"
+#include "b24_gpu_hud_bridge.h"
+#include "b24_gpu_suit.h"
+#include "b24_gpu_suit_im2_adapter.h"
+#include "renderer.h"
+typedef struct {
+ B24GpuOwner owner;
+ B24GpuC1Mesh city;
+ B24GpuSuit suit;
+ B24GpuIM2Stream stream;
+ B24GpuHudBridge hud;
+ B24GpuSuitPose frame_pose;
+ B24Unified *frame_game;
+ uint32_t suit_rebinds,frames;
+ int initialized;
+} B24GpuRuntime;
+/* GPU owns ONLY renderer; SDL gamepad/timer input can remain active. */
+int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file);
+int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *model);
+int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *model,
+                  const IM2Camera *camera,B24Unified *game);
+void b24_gpu_runtime_close(B24GpuRuntime *r);
+#endif
