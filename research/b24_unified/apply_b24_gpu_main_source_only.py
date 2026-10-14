@@ -119,7 +119,7 @@ rep('''        frame++;
 #ifdef B24_GPU_PROFILE_LOG
         if(frame%120u==0u){
             const B24CpuGpuProfile *p=&b24_gpu_rt.profile;
-            fprintf(stderr,"B24 CPU ms: stream %.2f camera %.2f scene-call %.2f armor-call %.2f HUD-call %.2f swap-wall %.2f | REAL GPU BUSY UNKNOWN\n",
+            fprintf(stderr,"B24 CPU ms: stream %.2f camera %.2f scene-call %.2f armor-call %.2f HUD-call %.2f swap-wall %.2f | REAL GPU BUSY UNKNOWN\\n",
                 p->average_ms[B24P_MODEL_STREAM],
                 p->average_ms[B24P_CAMERA_SETUP],
                 p->average_ms[B24P_SCENE_CALLS],
