@@ -1,0 +1,49 @@
+name: G11 2010 original HUD six sprite atlas rectangle descriptor reverse engineering NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-original-six-hud-sprite-descriptor-uv.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sprite_uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Temporary 2010 original owner backup and exact source native format libraries
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy pillow texture2ddecoder gdown
+          mkdir -p /tmp/owner2010temp
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/owner2010temp/original.ipa
+          test "$(wc -c </tmp/owner2010temp/original.ipa)" -eq 248613763
+      - name: Index original source six atlas rectangle descriptor byte records and RGBA4444 previews
+        run: |
+          python3 research/b24_unified/b24_g11_original_sprite12_2010_offsets_and_mark_preview.py \
+            --ipa /tmp/owner2010temp/original.ipa \
+            --out /tmp/G11_AUTHENTIC_2010_SPRITE_UV_DESCRIPTOR_BANK
+      - name: Validate 2010 sprite cell source record count
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=Path('/tmp/G11_AUTHENTIC_2010_SPRITE_UV_DESCRIPTOR_BANK')
+          j=json.loads((r/'G11_AUTHENTIC_2010_IOS_SPRITE_RECORDS_AND_MARK_PVR.json').read_text())
+          descriptors=[x for x in j['original_native_blobs'] if 'source_sprite_rect_descriptor' in x]
+          assert len(descriptors)==6
+          assert all((r/x['source_sprite_rect_descriptor']).stat().st_size>100 for x in descriptors)
+          assert [x['descriptor_2010_record_count_u16_at_6'] for x in descriptors]==[210,87,7,54,85,3]
+          assert not j['original_crosshair_identity_verified']
+          print("PASS six authentic 2010 UI sprite cell descriptors 210/87/7/54/85/3 from owner original iOS + five real source atlas PNG")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_2010_True_HUD_Sprites_6_Atlas_Descriptor_Binary_And_Original_PNGs
+          path: /tmp/G11_AUTHENTIC_2010_SPRITE_UV_DESCRIPTOR_BANK/
+          if-no-files-found: error
+          compression-level: 6
+      - name: Clean temporary user IPA
+        if: always()
+        run: rm -rf /tmp/owner2010temp
