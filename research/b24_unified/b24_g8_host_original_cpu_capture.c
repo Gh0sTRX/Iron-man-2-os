@@ -76,21 +76,32 @@ static int capture(const char *dir,const char *armor,int suit,
                           sc->x,sc->y,t)){
    fprintf(stderr,"Stream failed at %s\n",sc->tag);good=0;break;
   }
+  /* Test an ACCEPTED repulsor event (original G8 main calls this only
+     when B16 combat fire succeeds). Real _Att should supersede B16 arm. */
+  if(sc->fire)b24_g8_motion_repulsor_trigger(&live,t+1u);
   if(!b24_g8_motion_tick(&live,animation_root,model.vertices,
                           sizeof(IM2Vertex),model.nv,suit,sc->stage,
                           sc->x,sc->y,t+200u)){
    fprintf(stderr,"Pose sampling failed at %s\n",sc->tag);good=0;break;
+  }
+  if(sc->fire&&!b24_g8_motion_whole_body_fire(&live)){
+   fprintf(stderr,"G8 missing original full-body repulsor source animation: %s\n",sc->tag);
+   good=0;break;
   }
   if(live.missing||!live.active){
    fprintf(stderr,"MISSING EXACT REAL 2010 ORIGINAL IM2V for %s: %s\n",
                   sc->tag,live.selected);good=0;break;
   }
   if(sc->fire){
-   /* Source body has already advanced; B16 right-only upper-arm overlay
-      is explicitly AFTER the G8 pose route, as in existing real main.c. */
-   b16_attack_begin(&attack,t+200u,1,0,0);
-   b16_apply_attack(&attack,&model,t+300u);
-   if(!attack.attack_active){fprintf(stderr,"B16 did not play right-arm attack\n");good=0;break;}
+   if(b24_g8_motion_whole_body_fire(&live)){
+    /* Exact source contains arms; avoid applying B16 a second time. */
+    attack.attack_active=0;
+   }else{
+    /* Safe legacy G8 fallback when new _Att resource is missing. */
+    b16_attack_begin(&attack,t+200u,1,0,0);
+    b16_apply_attack(&attack,&model,t+300u);
+    if(!attack.attack_active){fprintf(stderr,"B16 fallback shot unavailable\n");good=0;break;}
+   }
   }
   camera.flying=(sc->stage>=B24M_HOVER);
   im2_render(pixels,depth,&model,&camera,armor,(unsigned)(i+1));
@@ -100,7 +111,7 @@ static int capture(const char *dir,const char *armor,int suit,
    fprintf(stderr,"Host rendered frame not saved\n");good=0;break;
   }
   printf("REAL_G8_HOST_CPU_RENDER %s %s ORIGINAL_SOURCE=%s %s\n",
-         armor,sc->tag,live.selected,sc->fire?"B16_RIGHT_ARM_FIRE":"BASE");
+         armor,sc->tag,live.selected,sc->fire?(b24_g8_motion_whole_body_fire(&live)?"REAL_2010_DIRECTIONAL_FULL_BODY_ATT":"B16_RIGHT_ARM_FALLBACK"):"BASE");
  }
  if(live.successful_frames!=count*2u){
   fprintf(stderr,"Original sample frame count wrong: %u vs %zu\n",
