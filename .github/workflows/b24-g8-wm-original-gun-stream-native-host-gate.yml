@@ -1,4 +1,4 @@
-name: G8 original War Machine 2010 Gun01-04 source stream C host and ARM gate - no VPK
+name: G8 2010 WM six-node Gun03 marker axis source C host and ARM gate - no VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
