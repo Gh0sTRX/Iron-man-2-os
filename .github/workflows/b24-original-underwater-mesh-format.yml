@@ -24,6 +24,8 @@ jobs:
           gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
           test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
           echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Install numpy for original B11 2010 BRES source parser
+        run: python3 -m pip install -q numpy
       - name: Decode real underwater BRES geometry and inspect exact Vita model loader
         run: |
           set -euo pipefail
