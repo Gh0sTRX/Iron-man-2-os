@@ -196,7 +196,7 @@ jobs:
           assert 'return GL_FALSE;' in mock, 'Mock must simulate real 960x544 no fallback'
           print('PASS G5: do not treat vglInit GL_FALSE (no resolution fallback) as init failure')
           PY
-      - name: Verify authentic Vita G5 reverse audit repairs both root causes
+      - name: Verify G6 natural analog and 14m Z-up real projection source regressions
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
