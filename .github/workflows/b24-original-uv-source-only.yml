@@ -101,3 +101,5 @@ jobs:
           if-no-files-found: error
 
 # Rerun corrected original 512 atlas width corruption fixture; source-only, no VPK.
+
+# Re-run strict C11 original C1MA parser and corruption tests after LE32 syntax correction, source-only.
