@@ -1,6 +1,7 @@
 #ifndef B24_GPU_RUNTIME_H
 #define B24_GPU_RUNTIME_H
 #include "b24_gpu_owner.h"
+#include "b24_gpu_c1_vehicle_texture.h"
 #include "b24_gpu_cpu_profile.h"
 #include "b24_gpu_hud_bridge.h"
 #include "b24_gpu_hud_native.h"
