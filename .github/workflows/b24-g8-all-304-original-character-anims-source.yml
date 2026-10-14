@@ -1,0 +1,67 @@
+name: B24 G8 All 304 Original Iron Man War Machine Player Skin Clips - Host Only
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g8-all-304-original-character-anims-source.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_304:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source-catalog count before converting
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0,'research/b24_unified')
+          from b24_all_player_304_original_bake import source_catalog
+          e=source_catalog()
+          print('PASS exact 304 original named player clips; IRON 248 WM 56')
+          assert len(e)==304
+          PY
+      - name: Retrieve original user-provided IPA to ephemeral runner only
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown numpy scipy
+          mkdir -p /tmp/b24_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/b24_owner_original/source.ipa
+          test "$(wc -c </tmp/b24_owner_original/source.ipa)" -eq 248613763
+      - name: Convert 248+56 original character source clips with actual BRES skin weights
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_all_player_304_original_bake.py \
+            --ipa /tmp/b24_owner_original/source.ipa \
+            --armor both \
+            --out /tmp/b24_304_baked
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/b24_304_baked')
+          d=json.loads((p/'B24_ORIGINAL_304_SOURCE_BAKE_COVERAGE.json').read_text())
+          assert d['source_catalog_total']==304
+          assert d['processed']==304
+          assert d['baked']+d['rejected']==304
+          assert d['g8_shipped_baked_clips_unmodified']==59
+          assert len(list(p.glob('*.im2v')))==d['baked']
+          print('PROVED_304_SOURCE_COVERAGE',d['processed'],'converted',d['baked'],
+                'rejected',d['rejected'],'source_bytes',d['baked_bytes'])
+          for bad in (x for x in d['records'] if x['status']!='SOURCE_SKINNED_BAKED'):
+              print('SOURCE_REJECTION',bad['source_animation'],bad['error_type'],
+                    bad['error'])
+          PY
+      - name: Publish complete source coverage evidence + correctly baked derived clip streams ONLY
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: B24_G8_Original_304_Player_Source_Bake_And_Rejections_NO_VPK
+          path: /tmp/b24_304_baked/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Erase original owner IPA from transient runner
+        if: always()
+        run: rm -rf /tmp/b24_owner_original /tmp/b24_304_baked
