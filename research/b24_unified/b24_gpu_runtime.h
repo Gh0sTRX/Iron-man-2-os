@@ -14,12 +14,13 @@ typedef struct {
  B24GpuSuitPose frame_pose;
  B24Unified *frame_game;
  uint32_t suit_rebinds,frames;
+ int loaded_suit_index;
  int initialized;
 } B24GpuRuntime;
 /* GPU owns ONLY renderer; SDL gamepad/timer input can remain active. */
 int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file);
-int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *model);
+int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *model,int suit_index);
 int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *model,
-                  const IM2Camera *camera,B24Unified *game);
+                  const IM2Camera *camera,B24Unified *game,int suit_index);
 void b24_gpu_runtime_close(B24GpuRuntime *r);
 #endif
