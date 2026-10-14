@@ -19,7 +19,7 @@ void b24_gpu_profile_begin(B24CpuGpuProfile *p){
 }
 void b24_gpu_profile_phase(B24CpuGpuProfile *p,B24CpuGpuPhase phase){
  if(!p||!p->enabled||!p->frame_open||
-    (int)phase<0||(int)phase>=B24P_COUNT||(int)phase!=p->next_phase)return;
+    (unsigned)phase>=(unsigned)B24P_COUNT||(int)phase!=p->next_phase)return;
  const uint64_t now=p->ticks(p->userdata);
  double delta=now>=p->previous_tick ?
    (double)(now-p->previous_tick)*1000.0/p->frequency_hz : 0.0;
