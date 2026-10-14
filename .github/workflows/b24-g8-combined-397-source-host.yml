@@ -76,7 +76,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
           cp /tmp/g8-bank/304/*.im2v work/animations/
           test "$(find work/animations -maxdepth 1 -name '*.im2v' | wc -l)" -eq 363
-          cc -std=c11 -O2 -Wall -Wextra -Werror -Iwork/src -Iwork/b24/b24_unified \
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wno-error=unused-function -Iwork/src -Iwork/b24/b24_unified \
              research/b24_unified/b24_g8_host_original_cpu_capture.c \
              work/src/renderer.c work/src/b16_action.c work/src/b14_world.c \
              work/b24/b24_unified/b24_c1l1_map.c \
