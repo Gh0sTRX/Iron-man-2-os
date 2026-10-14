@@ -1,0 +1,82 @@
+name: B24 G6 Original Collision and Animation Source Audit - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-collision-animation-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  introspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Combine known-good viewer and original animation B7
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq flight_b4/flight_b4_overlay.zip -d work
+          unzip -oq performance_b5/b5_optimized_renderer.zip -d work
+          unzip -oq skinning_b7/b7_vita_overlay.zip -d work
+          unzip -oq combat_b8/b8_overlay.zip -d work
+          unzip -oq armor_b9/b9_overlay.zip -d work
+          unzip -oq profile_b10/b10_overlay.zip -d work
+          cat animation_b13/b13-overlay.part?? > /tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done > /tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          # Authentic original C1L1 geometry: 22,919 original triangles (no demo Mark VI).
+          python3 research/b24_unified/build_c1l1_map.py --output work/maps/C1L1_environment.im2map --manifest work/maps/c1l1_map_manifest.json
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 -m pip install -q numpy
+          # Reuse B17/B24 gameplay+animations. Sole scene+armor+HUD GPU owner.
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py --out work/maps/C1L1_environment.c1g2 --manifest /tmp/C1G2_GPU_MANIFEST.json
+          python3 research/b24_unified/recover_c1l1_original_uv.py --out work/maps/C1L1_environment.c1uv --manifest /tmp/C1UV_GPU_MANIFEST.json
+          python3 research/b24_unified/recover_c1l1_triangle_materials.py --out work/maps/C1L1_environment.c1ma --manifest /tmp/C1MA_GPU_MANIFEST.json
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          # Actual G4 physical Vita report: 60FPS, noninteractive pause and drifting sight.
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+      - name: Inspect original B14 animation playback selection and true iOS collision BDAE source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,sys,collections,numpy as np
+          from research.b24_unified.export_b24_c1_gpu_mesh import SOURCE,MEMBER
+          with zipfile.ZipFile('research/B11_C1L1_Source_Parser.zip') as z:
+              code=z.read('bdae_scene_parser.py').decode()
+              ns={'__name__':'original_collision_probe','__file__':'bdae_scene_parser.py'}
+              exec(compile(code,'bdae_scene_parser.py','exec'),ns)
+              for n in ('C1L1_col_01','C1L1_building_col','C1L1_floor_001'):
+                  meshes,meta=ns['parse'](z.read('original_models/'+n+'.bdae'))
+                  triangles=sum(len(m['faces'])//3 for m in meshes)
+                  vertices=sum(len(m['positions']) for m in meshes)
+                  xs=[float(v[0]) for m in meshes for v in m['positions']]
+                  zs=[float(v[2]) for m in meshes for v in m['positions']]
+                  print('AUTHENTIC_COLLISION_SOURCE',n,'mesh',len(meshes),'verts',vertices,'triangles',triangles,
+                      'xrange',(min(xs),max(xs)) if xs else None,
+                      'zrange',(min(zs),max(zs)) if zs else None)
+          for f in ('work/src/b14_pose.c','work/src/b16_action.c','work/src/b14_world.c'):
+              p=Path(f)
+              print('PRESENT',f,p.is_file())
+              if not p.is_file():continue
+              lines=p.read_text().splitlines()
+              for i,line in enumerate(lines):
+                  if any(w in line.lower() for w in ('warmachine','b13_float_move','b14_walk','b14_fly','b13_walk','b13_run','rush','b13_fly','b16_unibeam','repulsor','b16_missile','invert_move','world->x','world->y')):
+                      print('PLAYER_ANIMATION_SOURCE',f,i+1,line.strip()[:210])
+          print('ORIGINAL_BAKED_CLIPS_COUNT',len(list(Path('work/animations').glob('*.im2v'))))
+          PY
