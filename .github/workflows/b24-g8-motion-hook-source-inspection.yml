@@ -84,3 +84,18 @@ jobs:
           for line in cm:
               if any(w in line for w in ("preview","renderer","model","SDL","im2_beta","target_include","add_executable")):print(line[:210])
           PY
+
+      - name: Inspect real G8 CPU raster projection matrices and model camera positioning
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ('renderer.h','renderer.c','b14_world.h','b14_world.c'):
+              p=Path('work/src')/name
+              if p.exists():
+                  lines=p.read_text().splitlines()
+                  print('G8_PROJECTION_SOURCE',name,'TOTAL',len(lines))
+                  if name.startswith('renderer'):
+                      for i,line in enumerate(lines[:300],1):print(f'G8PROJ {name}:{i:03} {line[:180]}')
+                  elif name=='b14_world.h':
+                      for i,line in enumerate(lines[:145],1):print(f'G8B14 {name}:{i:03} {line[:180]}')
+          PY
