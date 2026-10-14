@@ -1,0 +1,46 @@
+name: G11 Actual 2010 iOS original level1 scene spawn and node Position forensic NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-owner-original-level1-spawn-3d-schema.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_first_level_spawn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: User owned original game temporary source
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g11_original_level1
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g11_original_level1/game.ipa
+          test "$(wc -c </tmp/g11_original_level1/game.ipa)" -eq 248613763
+      - name: Reconstruct original first mission SpawnPoint source records and candidate position values
+        run: |
+          python3 research/b24_unified/b24_g11_original_level1_spawn_3d_position_forensic.py \
+            --ipa /tmp/g11_original_level1/game.ipa \
+            --out /tmp/G11_ORIGINAL_C1L1_LEVEL1_SPAWN_BCLARA_FORENSIC.json
+      - name: Validate original level1 file was investigated without invented verified spawn
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          f=Path('/tmp/G11_ORIGINAL_C1L1_LEVEL1_SPAWN_BCLARA_FORENSIC.json')
+          d=json.loads(f.read_text())
+          assert d['original_size']==339733
+          assert d['spawnpoint_count']>=1
+          assert not d['startup_position_confirmed']
+          print('PASS 2010 first level authentic SpawnPoint BCLARA records parsed and original mission spawn remains unclaimed')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_Real_2010_First_Level1_Original_SpawnPoint_Positions_Source_Investigations
+          path: /tmp/G11_ORIGINAL_C1L1_LEVEL1_SPAWN_BCLARA_FORENSIC.json
+          if-no-files-found: error
+      - name: Delete source game backup
+        if: always()
+        run: rm -rf /tmp/g11_original_level1
