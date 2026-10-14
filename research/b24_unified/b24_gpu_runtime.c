@@ -2,6 +2,9 @@
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
+int b24_gpu_runtime_set_clock(B24GpuRuntime *r,B24GpuTicksFn fn,void *ctx,double hz){
+ return r&&b24_gpu_profile_set_clock(&r->profile,fn,ctx,hz);
+}
 static int b24_runtime_armor_draw(void *userdata){
  B24GpuRuntime *r=(B24GpuRuntime *)userdata;
  return b24_gpu_suit_draw(&r->suit,&r->stream.source,
@@ -58,7 +61,9 @@ int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *m,int suit_index
 int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
                           const IM2Camera *c,B24Unified *g,int suit_index){
  if(!r||!r->initialized||!m||!c||!g)return 0;
+ b24_gpu_profile_begin(&r->profile);
  if(!b24_gpu_runtime_sync_model(r,m,suit_index))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_MODEL_STREAM);
  /* One authoritative B17 Z-up orbit. Flying stage2/RUSH reduces the
     shoulder offset; free-look recenter remains the existing B24 controller. */
  float a=c->orbit, cp=cosf(c->pitch),sp=sinf(c->pitch);
@@ -77,14 +82,19 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  };
  B24GpuCameraMatrices matrices={0};
  if(!b24_gpu_camera_matrices(&cam,&matrices))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
  if(!b24_gpu_owner_scene(&r->owner,&r->city))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
  r->frame_pose=(B24GpuSuitPose){c->player_x,c->player_y,c->player_z,
                                 c->player_heading};
  r->frame_game=g;
  if(!b24_gpu_owner_armor(&r->owner,b24_runtime_armor_draw,r))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_SUIT_CALLS);
  if(!b24_gpu_owner_hud(&r->owner,b24_runtime_hud_draw,r))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_HUD_CALLS);
  if(!b24_gpu_owner_present(&r->owner))return 0;
+ b24_gpu_profile_phase(&r->profile,B24P_SWAP_WALL);
  r->frames++;
  return 1;
 }
