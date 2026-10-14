@@ -20,7 +20,7 @@ jobs:
           python3 research/b24_unified/export_b24_authentic_original_collision.py \
             --out /tmp/C1L1_source_real.c1wc \
             --manifest /tmp/C1L1_collision_manifest.json
-      - name: Real original 1908 triangles and corrected synthetic torso plane regression
+      - name: Original collision swept wall tests with physically inside-segment y contact
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
