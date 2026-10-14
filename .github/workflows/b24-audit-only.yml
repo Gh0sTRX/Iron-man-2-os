@@ -281,3 +281,5 @@ jobs:
           if-no-files-found: error
 
 # Re-run exact B16 right-palm-only source patch after audited whitespace correction.
+
+# Rerun pure C11 reticle warning fix + original B24 GPU owner suit rebind and full VitaSDK source-only compile.
