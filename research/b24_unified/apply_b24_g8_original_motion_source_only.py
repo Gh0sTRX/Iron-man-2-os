@@ -19,12 +19,15 @@ def rep(old,new):
  s=s.replace(old,new)
 rep('#include "../b24/b24_unified/b24_gpu_runtime.h"',
 '''#include "../b24/b24_unified/b24_gpu_runtime.h"
-#include "../b24/b24_unified/b24_g8_live_original_motion.h"''')
+#include "../b24/b24_unified/b24_g8_live_original_motion.h"
+#include "../b24/b24_unified/b24_g8_wm_shoulder_gameplay.h"''')
 rep("static B24GpuRuntime b24_gpu_rt={0};",
 '''static B24GpuRuntime b24_gpu_rt={0};
 /* One source animation state/stream for the already-authoritative B14 body.
    G8 renderer remains the SAME real VitaGL owner. */
-static B24G8LiveOriginalMotion b24_original_motion={0};''')
+static B24G8LiveOriginalMotion b24_original_motion={0};
+static B24WMShoulder b24_wm_shoulder={0};
+static B24WMOutput b24_wm_frame_events={0};''')
 rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active)
               b16_attack_begin(&attack,now,world.flying,0,0);''',
 '''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active){
@@ -37,12 +40,40 @@ rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_acti
           }''')
 # This source-only bridge uses the existing B24 Square controller event.
 # Never fabricates collision/hostile actors.
+rep("    b24_unified_init(&b24_game);",
+'''    b24_unified_init(&b24_game);
+#ifdef B24_GPU_ENGINE
+    B24WMConfig b24_wm_cfg;
+    b24_wm_default_config(&b24_wm_cfg);
+    if(!b24_wm_init(&b24_wm_shoulder,&b24_wm_cfg))return 1;
+#endif''')
 rep("        b24_unified_tick(&b24_game,&b24_obs);",
 '''        b24_unified_tick(&b24_game,&b24_obs);
 #ifdef B24_GPU_ENGINE
         if(!b24_unified_paused(&b24_game) && idx==0 &&
            !world.flying && b24_unified_should_melee(&b24_game))
           b24_g8_motion_melee_trigger(&b24_original_motion,(uint32_t)now);
+        /* Right-shoulder autonomous turret skill uses REAL B24 controls and
+           one shared B14 world tick. L+Square is PROTOTYPE skill input.
+           With real_enemies_loaded=0 the weapon NEVER spawns fake targets
+           or pretends to damage invisible enemies. Actual original 2010
+           left/right gun muzzle nodes remain unproven, so there are NO
+           projectile/particle emissions in G8 from these placeholders. */
+        B24WMInput b24_wm_in={0};
+        b24_wm_in.war_machine_selected=(idx==2);
+        b24_wm_in.real_enemies_loaded=b24_obs.real_enemies_loaded;
+        b24_wm_in.trigger_skill_edge=(idx==2 &&
+                (b24_game.controls.held&IM2_BT_L)!=0 &&
+                b24_unified_should_melee(&b24_game));
+        b24_wm_in.dt=dt;
+        b24_wm_in.muzzle_left_rocket=(B24WMVec3){world.x,world.y,world.z};
+        b24_wm_in.muzzle_right_gatling=(B24WMVec3){world.x,world.y,world.z};
+        b24_wm_in.rocket_aim_direction=(B24WMVec3){0.f,1.f,0.f};
+        b24_wm_in.targets=NULL;b24_wm_in.target_count=0;
+        b24_wm_in.trigger_missile_edge=0; /* exact left muzzle unverified */
+        if(!b24_wm_tick(&b24_wm_shoulder,&b24_wm_in,&b24_wm_frame_events)){
+           running=0;break;
+        }
 #endif''')
 rep("        b16_apply_attack(&attack,&model,now);",
 '''#ifdef B24_GPU_ENGINE
@@ -83,7 +114,8 @@ for name in ("b24_g8_live_original_motion.c",
              "b24_g8_live_original_motion.h",
              "b24_original_im2v_stream.c","b24_original_im2v_stream.h",
              "b24_hover_pose_blend.c","b24_hover_pose_blend.h",
-             "b24_g8_melee_source_chain.c","b24_g8_melee_source_chain.h"):
+             "b24_g8_melee_source_chain.c","b24_g8_melee_source_chain.h",
+             "b24_g8_wm_shoulder_gameplay.c","b24_g8_wm_shoulder_gameplay.h"):
  shutil.copyfile(ROOT/"research/b24_unified"/name,out/name)
 CMAKE=WORK/"CMakeLists.txt"
 cm=CMAKE.read_text()
@@ -98,7 +130,8 @@ if(B24_ENABLE_GPU)
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_live_original_motion.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_original_im2v_stream.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_hover_pose_blend.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_melee_source_chain.c")
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_melee_source_chain.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_wm_shoulder_gameplay.c")
 endif()
 '''
 CMAKE.write_text(cm)
