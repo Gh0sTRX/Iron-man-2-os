@@ -48,8 +48,8 @@ static void validate(void){
  assert(g.count%6u==0&&g.quads==g.count/6u);
  for(unsigned i=0;i<g.count;i++){
   assert(isfinite(g.vertices[i].x)&&isfinite(g.vertices[i].y));
-  assert(g.vertices[i].x>=-1.f&&g.vertices[i].x<=481.f);
-  assert(g.vertices[i].y>=-1.f&&g.vertices[i].y<=273.f);
+  assert(g.vertices[i].x>=-128.f&&g.vertices[i].x<=608.f); /* GPU clips offscreen missile brackets */
+  assert(g.vertices[i].y>=-128.f&&g.vertices[i].y<=400.f); /* 2D viewport clip */
   assert((g.vertices[i].rgba&0xff000000u)==0xff000000u);
  }
  assert(b24_native_hud_draw(&g));
