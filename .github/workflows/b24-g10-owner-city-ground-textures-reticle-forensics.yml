@@ -1,4 +1,4 @@
-name: G10 original Lua51 combo input source + real C1L1 NodeMaterials + SpawnPoint decoder NO VPK
+name: G10 original iOS authored PNG crosshair source and Lua51 combo state forensic NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -54,6 +54,11 @@ jobs:
           python3 research/b24_unified/b24_g10_original_lua51_state_and_bclara_record_decode.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/G10_ORIGINAL_2010_LUA51_COMBAT_AND_LEVEL1_NODEMATERIALS.json
+      - name: Probe original iOS PNG Window sprite records for author crosshair family
+        run: |
+          python3 research/b24_unified/b24_g10_original_window_ui_png_archive_probe.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/G10_2010_ORIGINAL_UI_WINDOW_PNG_ARCHIVE_INDEX.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
@@ -65,6 +70,7 @@ jobs:
             /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
             /tmp/G10_2010_LUA_ORIGINAL_COMBO_AND_LEVEL1_SCENE_INDEX.json
             /tmp/G10_ORIGINAL_2010_LUA51_COMBAT_AND_LEVEL1_NODEMATERIALS.json
+            /tmp/G10_2010_ORIGINAL_UI_WINDOW_PNG_ARCHIVE_INDEX.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
