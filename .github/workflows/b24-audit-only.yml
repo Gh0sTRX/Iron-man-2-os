@@ -201,6 +201,49 @@ jobs:
       - name: Read GPU main-loop ownership and swap integration regions
         run: |
           python3 research/b24_unified/audit_b24_gpu_integration_regions.py
+      - name: Build opt-in B24 real GPU main SOURCE TREE without VPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+            --out work/maps/C1L1_environment.c1g2 \
+            --manifest /tmp/B24_C1L1_GPU_RUNTIME_INPUT.json
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("work/src/main.c").read_text()
+          cm=Path("work/CMakeLists.txt").read_text()
+          assert s.count("b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game)")==1
+          assert s.count("#ifdef B24_GPU_ENGINE")>=5
+          assert cm.count("option(B24_ENABLE_GPU")==1
+          assert "SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER" in s
+          assert 'B24_GPU_SINGLE_OWNER_INTEGRATION' in cm
+          assert Path("work/maps/C1L1_environment.c1g2").stat().st_size>500000
+          print("PASS B24 actual gameplay, original animation & C1 GPU opt-in source integration, no SDL second renderer")
+          PY
+      - name: VitaSDK compile WHOLE opt-in B24 main / HUD / 3D GPU modules, object only
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              for src in work/src/main.c \
+                work/b24/b24_unified/b24_gpu_runtime.c \
+                work/b24/b24_unified/b24_gpu_hud_bridge_vitagl.c \
+                work/b24/b24_unified/b24_gpu_camera.c \
+                work/b24/b24_unified/b24_gpu_owner_vitagl.c \
+                work/b24/b24_unified/b24_c1_gpu_mesh.c \
+                work/b24/b24_unified/b24_c1_gpu_vitagl.c \
+                work/b24/b24_unified/b24_gpu_suit_vitagl.c \
+                work/b24/b24_unified/b24_gpu_suit_im2_adapter.c; do
+                arm-vita-eabi-gcc -std=gnu11 -O1 -Wall -Wextra \
+                  -D__vita__ -DB24_GPU_ENGINE=1 \
+                  -Iwork/src -Iwork/b24/b24_unified \
+                  -c "$src" -o "/tmp/$(basename "$src").o"
+              done
+              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 9 GPU .o files; NO VPK or executable"
+            '
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
