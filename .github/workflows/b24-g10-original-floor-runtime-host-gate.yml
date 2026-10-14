@@ -1,4 +1,4 @@
-name: G10 original C1L1 floor plus L-to-lock unkillable center target source integration NO VPK
+name: G10 true C1L1 floor plus practice L-lock plus ALL four authored armor routes NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -39,6 +39,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
           python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
           python3 research/b24_unified/apply_b24_g10_practice_target_source_only.py
+          python3 research/b24_unified/apply_b24_g10_four_suit_original_motion_source_only.py
           python3 - <<'PY'
           from pathlib import Path
           c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
@@ -56,6 +57,9 @@ jobs:
           assert 'b24_g10_original_foot_contact.c' in cm
           assert 'b24_c1_original_collision_resolve(&b24_original_walls' in main
           assert 'b24_g8_motion_tick(' in main
+          source=Path('work/b24/b24_unified/b24_g8_live_original_motion.c').read_text()
+          assert 'g10_alt_iron_source_name' in source
+          assert 'suit==4&&nv!=629u' in source
           assert 'b24_wm_rigid_sync_tick(' in main
           assert main.count('b24_gpu_runtime_draw(')==1
           print('PASS G10 true C1L1 visual face-ground contact in real G9 GPU world/armor transform; original G9 combat unchanged')
@@ -71,6 +75,18 @@ jobs:
             research/b24_unified/test_b24_g10_original_foot_contact.c \
             -lm -o /tmp/g10_source_real_suit_foot_sanitized
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g10_source_real_suit_foot_sanitized
+      - name: G10 original 2010 four suits actual streaming C selection host test (no synthetic source retarget)
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            research/b24_unified/test_b24_g10_four_suit_original_motion.c \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            -lm -o /tmp/g10_four_author_original_armor_route
+          /tmp/g10_four_author_original_armor_route
       - name: G10 physical centered target lock on nonmissile weapon and authored C1L1 height C sanitizer gate
         run: |
           set -euo pipefail
