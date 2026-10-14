@@ -1,4 +1,4 @@
-name: G10 real 2010 Lua character COMBO states and level1.bclara mission scene NO VPK
+name: G10 original Lua51 combo input source + real C1L1 NodeMaterials + SpawnPoint decoder NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -49,6 +49,11 @@ jobs:
           python3 research/b24_unified/b24_g10_original_lua_states_and_level1_inspect.py \
              --ipa /tmp/b24_g10_owner/source.ipa \
              --out /tmp/G10_2010_LUA_ORIGINAL_COMBO_AND_LEVEL1_SCENE_INDEX.json
+      - name: Parse iOS Lua51 author-compiled combat state machine and original level1 material records
+        run: |
+          python3 research/b24_unified/b24_g10_original_lua51_state_and_bclara_record_decode.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/G10_ORIGINAL_2010_LUA51_COMBAT_AND_LEVEL1_NODEMATERIALS.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
@@ -59,6 +64,7 @@ jobs:
             /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
             /tmp/G10_2010_OWNER_HEIGHTMAPS_SCENE_INDEX.json
             /tmp/G10_2010_LUA_ORIGINAL_COMBO_AND_LEVEL1_SCENE_INDEX.json
+            /tmp/G10_ORIGINAL_2010_LUA51_COMBAT_AND_LEVEL1_NODEMATERIALS.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
