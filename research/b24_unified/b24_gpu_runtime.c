@@ -1,4 +1,5 @@
 #include "b24_gpu_runtime.h"
+#include "b24_gpu_boot_trace.h"
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
@@ -25,7 +26,12 @@ static int b24_runtime_hud_draw(void *userdata){
 }
 int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  if(!r||r->initialized||!city_file)return 0;
- if(!b24_gpu_c1_load(&r->city,city_file))return 0;
+ (void)b24_gpu_boot_trace_mark("20 C1G2_LOAD_BEGIN");
+ if(!b24_gpu_c1_load(&r->city,city_file)){
+  (void)b24_gpu_boot_trace_mark("20 C1G2_LOAD_FAILED");
+  return 0;
+ }
+ (void)b24_gpu_boot_trace_mark("21 C1G2_LOAD_OK");
  /* The source-authentic sidecar is optional during the GPU migration.
     If absent, NO fabricated city textures will be assigned. This
     sidecar will be staged alongside C1G2 only after conversion validation. */
@@ -34,6 +40,7 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
     Optional until original 2010 BDAE material->atlas sampler recovery. */
  (void)b24_c1_material_source_load(&r->city_material,
                                     "app0:maps/C1L1_environment.c1ma");
+ (void)b24_gpu_boot_trace_mark("22 C1UV_C1MA_READ_COMPLETED");
  r->verified_vehicle_atlas=0; /* B12 original atlas not packaged yet */
  if(!b24_gpu_owner_init(&r->owner,0)){
   b24_c1_material_source_free(&r->city_material);
@@ -54,6 +61,7 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
   b24_gpu_c1_free(&r->city);return 0;
  }
 #endif
+ (void)b24_gpu_boot_trace_mark("33 GPU_RUNTIME_OPEN_OK");
  r->initialized=1;
  r->loaded_suit_index=-1;
  return 1;
@@ -81,8 +89,11 @@ int b24_gpu_runtime_sync_model(B24GpuRuntime *r,const IM2Model *m,int suit_index
 int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
                           const IM2Camera *c,B24Unified *g,int suit_index){
  if(!r||!r->initialized||!m||!c||!g)return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("40 FIRST_FRAME_ENTER");
  b24_gpu_profile_begin(&r->profile);
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("41 SUIT_GPU_STREAM_BEGIN");
  if(!b24_gpu_runtime_sync_model(r,m,suit_index))return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("42 SUIT_GPU_STREAM_OK");
  b24_gpu_profile_phase(&r->profile,B24P_MODEL_STREAM);
  /* One authoritative B17 Z-up orbit. Flying stage2/RUSH reduces the
     shoulder offset; free-look recenter remains the existing B24 controller. */
@@ -103,10 +114,12 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  B24GpuCameraMatrices matrices={0};
  if(!b24_gpu_camera_matrices(&cam,&matrices))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("43 SCENE_FRAME_BEGIN");
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
  if(!b24_gpu_owner_scene_material(&r->owner,&r->city,
             r->city_uv.loaded?&r->city_uv:NULL,
             r->verified_vehicle_atlas))return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("44 SCENE_DRAW_OK");
  b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
  /* Original B24 CPU flight stage drives the SAME animated armor GPU root.
     Stage1 retains grounded upright pose; Stage2/RUSH get genuine 3D pitch
@@ -116,10 +129,13 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
                  g->visual_root.visual_roll_rad};
  r->frame_game=g;
  if(!b24_gpu_owner_armor(&r->owner,b24_runtime_armor_draw,r))return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("45 ARMOR_DRAW_OK");
  b24_gpu_profile_phase(&r->profile,B24P_SUIT_CALLS);
  if(!b24_gpu_owner_hud(&r->owner,b24_runtime_hud_draw,r))return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("46 HUD_DRAW_OK");
  b24_gpu_profile_phase(&r->profile,B24P_HUD_CALLS);
  if(!b24_gpu_owner_present(&r->owner))return 0;
+ if(!r->frames)(void)b24_gpu_boot_trace_mark("47 FIRST_SWAP_OK");
  b24_gpu_profile_phase(&r->profile,B24P_SWAP_WALL);
  r->frames++;
  return 1;
