@@ -1,4 +1,4 @@
-name: G8 War Machine source gun animation bone tracks and shoulder sockets NO VPK
+name: G8 2010 animated Gun03 emitter marker direction and Gun04 children forensic NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -38,6 +38,10 @@ jobs:
           d=json.loads(Path('/tmp/G8_WM_2010_GUN_ANIMATED_SOURCE_MATRIX.json').read_text())
           assert d['rig_count']==112 and len(d['animations'])==6
           assert len(d['nodes'])==10
+          for clip,details in d['animations'].items():
+              assert len(details['gun03_source_marker_direction_candidate'])==5
+              assert not details['candidate_markers_are_proven_muzzle']
+          assert isinstance(d['nodes']['Gun04-node']['authentic_child_nodes'],list)
           assert d['parent_graph_verified'] and not d['muzzle_side_or_particle_emitter_proven']
           assert Path('/tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png').stat().st_size>10000
           print('PASS original 2010 BRES source hierarchy, 6 Gun track kinematics + diagnostic PNG; no invented muzzle binding')
