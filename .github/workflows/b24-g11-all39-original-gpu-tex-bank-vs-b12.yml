@@ -1,0 +1,65 @@
+name: G11 39 genuine 2010 C1L1 GPU C1TX textures original B12 vehicles exact proof NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-all39-original-gpu-tex-bank-vs-b12.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_texture_bank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install genuine owner PVR / source texture decoders and temporary 2010 IPA
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy pillow texture2ddecoder gdown
+          mkdir -p /tmp/owner_real_2010
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/owner_real_2010/game.ipa
+          test "$(wc -c </tmp/owner_real_2010/game.ipa)" -eq 248613763
+      - name: Build 39 ORIGINAL source C1L1 RGBA texture streams in GPU-native C1TX format
+        run: |
+          python3 research/b24_unified/b24_g11_all_39_original_c1l1_gpu_texture_assets.py \
+            --ipa /tmp/owner_real_2010/game.ipa \
+            --out /tmp/G11_39_TRUE_SOURCE_C1L1_GPU_ATLASES
+      - name: Compare converted vehicles EXACTLY against independently verified original G9 B12 vehicle converter
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/convert_original_ipa_vehicles_c1tx.py \
+             --ipa /tmp/owner_real_2010/game.ipa \
+             --out /tmp/G11_B12_INDEPENDENT_ORIGINAL_VEHICLE.c1tx \
+             --manifest /tmp/G11_B12_INDEPENDENT_ORIGINAL_VEHICLE.json
+          cmp /tmp/G11_B12_INDEPENDENT_ORIGINAL_VEHICLE.c1tx /tmp/G11_39_TRUE_SOURCE_C1L1_GPU_ATLASES/c1l1_vehicles.c1tx
+          python3 - <<'PY'
+          import json,hashlib,struct
+          from pathlib import Path
+          root=Path('/tmp/G11_39_TRUE_SOURCE_C1L1_GPU_ATLASES')
+          d=json.loads((root/'G11_ORIGINAL_2010_C1L1_39_GPU_TEXTURES_MANIFEST.json').read_text())
+          assert d['genuine_2010_C1L1_TGA']==39
+          assert len(d['entries'])==39
+          assert len(list(root.glob('*.c1tx')))==39
+          assert not d['atlas_to_original_material_bindings_verified']
+          for x in d['entries']:
+             file=root/x['output_exact_c1tx']
+             b=file.read_bytes()
+             magic,version,w,h,_=struct.unpack_from('<4sIIII',b)
+             assert (magic,version,w,h)==(b'C1TX',1,x['actual_rgba_source_width'],
+                                           x['actual_rgba_source_height'])
+             assert len(b)==x['output_bytes']==20+w*h*4
+             assert hashlib.sha256(b).hexdigest()==x['output_c1tx_sha256']
+          print('PASS 39 exact genuine owner first-level C1L1 source GPU C1TX streams')
+          print('PASS exact byte-for-byte B12 original vehicle GPU texture vs independently encoded G11 source city stream')
+          print('No fake material assignment; do not claim full textured Vita city. No VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_All_39_2010_Original_C1L1_GPU_Ready_Diffuse_Atlases_Vehicles_B12_BitExact
+          path: /tmp/G11_39_TRUE_SOURCE_C1L1_GPU_ATLASES/
+          retention-days: 14
+          compression-level: 6
+          if-no-files-found: error
+      - name: Clear private source archive
+        if: always()
+        run: rm -rf /tmp/owner_real_2010
