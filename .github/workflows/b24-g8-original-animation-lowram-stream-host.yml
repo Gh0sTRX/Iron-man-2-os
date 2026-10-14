@@ -1,0 +1,27 @@
+name: B24 G8 Original 304 Animation Low RAM Stream Host Tests - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g8-original-animation-lowram-stream-host.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_304_stream_host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict host C11 original motion stream buffer safety test
+        run: |
+          set -euo pipefail
+          cd research/b24_unified
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            b24_original_im2v_stream.c test_b24_original_im2v_stream.c \
+            -lm -o /tmp/b24_orig_im2v_stream_host
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
+            /tmp/b24_orig_im2v_stream_host
+      - name: Do not build or modify any VPK
+        run: echo "SOURCE ONLY - original 304+59 runtime bank interface is not yet connected to G8"
