@@ -1,4 +1,4 @@
-name: G10 ORIGINAL C1L1 Ground plus 37 actual atlas metadata pointer forensic and HUD reticle NO VPK
+name: G10 2010 Original sprites crosshair archive plus true C1L1 atlases NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -28,12 +28,18 @@ jobs:
           python3 research/b24_unified/b24_g10_city_material_pointer_and_cross_source.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
+      - name: Decode genuine original iOS 2010 Sprite crosshair atlas index
+        run: |
+          python3 research/b24_unified/b24_g10_original_sprite_crosshair_inventory.py \
+            --ipa /tmp/b24_g10_owner/source.ipa \
+            --out /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
       - uses: actions/upload-artifact@v4
         with:
           name: G10_Genuine_C1L1_Ground_Coverage_And_Original_Reticle_Texture_Names
           path: |
             /tmp/B24_G10_ORIGINAL_C1L1_GROUND_AND_RETICLE_SOURCE_REPORT.json
             /tmp/B24_G10_ORIGINAL_BDAE_MATERIAL_TGA_AND_UI_REPORT.json
+            /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
           if-no-files-found: error
       - name: Clean owner backup
         if: always()
