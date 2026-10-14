@@ -24,14 +24,27 @@ int b24_gpu_suit_validate(const B24GpuSuitSource *s){
 }
 int b24_gpu_suit_matrix(float m[16],const B24GpuSuitPose *p,float center_z){
  if(!m||!p||!isfinite(p->x)||!isfinite(p->y)||!isfinite(p->z)||
-    !isfinite(p->heading)||!isfinite(center_z))return 0;
- /* Matches B17 b16_model_palm exactly: world X=originX-c*x-s*y,
-    world Y=originY+s*x-c*y, world Z=originZ+z-center_z. */
+    !isfinite(p->heading)||!isfinite(p->pitch)||!isfinite(p->roll)||
+    !isfinite(center_z)||fabsf(p->pitch)>1.05f||fabsf(p->roll)>1.05f)return 0;
+ /* Authoritative B17 original Z-up model basis B, then B * Rx(pitch) *
+    Ry(bank): heading remains the physical collision/world heading. The
+    bank is about original model forward (-Y), NOT world vertical Z.
+    This affects visible armor ONLY; B14 physics remains CPU-authoritative.
+    Do not claim pitch-based flight acceleration or muzzle sockets fixed. */
  float c=cosf(p->heading),s=sinf(p->heading);
+ float cp=cosf(p->pitch),sp=sinf(p->pitch);
+ float cr=cosf(p->roll),sr=sinf(p->roll);
  memset(m,0,16*sizeof(float));
- m[0]=-c;m[1]=s;
- m[4]=-s;m[5]=-c;
- m[10]=1.f;m[15]=1.f;
+ m[0]=-c*cr+s*sp*sr;
+ m[1]= s*cr+c*sp*sr;
+ m[2]=-cp*sr;
+ m[4]=-s*cp;
+ m[5]=-c*cp;
+ m[6]=sp;
+ m[8]=-c*sr+s*sp*cr;
+ m[9]= s*sr+c*sp*cr;
+ m[10]=cp*cr;
+ m[15]=1.f;
  m[12]=p->x;m[13]=p->y;m[14]=p->z-center_z;
  return 1;
 }
