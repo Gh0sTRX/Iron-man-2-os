@@ -20,21 +20,22 @@ int b24_c1_material_batches_build(B24C1MaterialBatchPlan *dst,
     must agree with all four C1G2 group draws before any reordering. */
  uint32_t counts[B24_C1_MAX_MATERIAL_BUCKETS]={0};
  uint32_t cursors[B24_C1_MAX_MATERIAL_BUCKETS]={0};
- uint32_t group_tri[4]={0},group_vert[4]={0};
- uint32_t next_vert=0,next_tri=0;
+ uint32_t group_tri[4]={0};
+ uint32_t next_vert=0,next_tri=0,batch_first=0;
  for(uint32_t g=0;g<4;g++){
   const B24GpuC1Batch *batch=&scene->batches[g];
-  if(batch->kind!=g||batch->first_index!=next_tri*3u||
+  if(batch->kind!=g||batch->first_index!=batch_first||
      batch->index_count%3u||batch->source_meshes==0)return 0;
   group_tri[g]=batch->index_count/3u;
+  batch_first+=batch->index_count;
  }
+ if(batch_first!=B24_GPU_C1_INDICES)return 0;
  for(uint32_t k=0;k<B24_C1_MAT_NMESH;k++){
   const B24C1MatMesh *m=&src->meshes[k];
   if(m->group>=4||!m->triangle_count||!m->vertex_count||
      m->first_vertex!=next_vert||m->first_triangle!=next_tri||
      m->vertex_count>B24_C1_MAT_NVERT-next_vert||
      m->triangle_count>B24_C1_MAT_NTRI-next_tri)return 0;
-  group_vert[m->group]+=m->vertex_count;
   for(uint32_t t=0;t<m->triangle_count;t++){
    uint32_t ti=next_tri+t;
    uint16_t mat=src->triangle_material[ti];
@@ -107,6 +108,5 @@ int b24_c1_material_batches_build(B24C1MaterialBatchPlan *dst,
  tmp.ready=1;
  b24_c1_material_batches_free(dst);
  *dst=tmp;
- (void)group_vert;
  return 1;
 }
