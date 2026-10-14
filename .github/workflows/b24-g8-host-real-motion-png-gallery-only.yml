@@ -1,4 +1,4 @@
-name: G8 verified CPU original motion 15 screenshot PNG gallery only - no VPK
+name: G8 real 2010 left-right repulsor fullbody moving 15 CPU screenshots no VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: G8_397_Sourced_Player_Motion_Files_Not_VPK
-          run-id: 38601913616
+          run-id: 38606270546
           github-token: ${{ github.token }}
           path: /tmp/previous_verified_source
       - name: Extract independently verified actual original G8 CPU screenshots only
