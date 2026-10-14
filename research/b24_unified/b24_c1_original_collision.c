@@ -69,7 +69,6 @@ int b24_c1_original_collision_load(B24C1OriginalCollision *c,const char *path){
  *c=tmp;return 1;
 }
 typedef struct {float x,y;} Vec2;
-static float cross2(Vec2 a,Vec2 b){return a.x*b.y-a.y*b.x;}
 static float dot2(Vec2 a,Vec2 b){return a.x*b.x+a.y*b.y;}
 static Vec2 sub(Vec2 a,Vec2 b){Vec2 r={a.x-b.x,a.y-b.y};return r;}
 static Vec2 add(Vec2 a,Vec2 b){Vec2 r={a.x+b.x,a.y+b.y};return r;}
