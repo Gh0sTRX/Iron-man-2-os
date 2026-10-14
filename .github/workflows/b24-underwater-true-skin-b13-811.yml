@@ -52,7 +52,14 @@ jobs:
           old="target=raw.find(b'Bip01-node\\0');assert target>0"
           new="hits=[i for i in range(0,len(raw)-11) if raw[i:i+11]==b'Bip01-node\\0']\n    refs=[i for i in hits if sum(raw[k:k+4]==struct.pack('<I',i)\n                        for k in range(32,len(raw)-72,4))==1]\n    assert len(refs)==1,refs\n    target=refs[0]"
           assert src.count(old)==1
-          (b/'tools/b13_bake.py').write_text(src.replace(old,new))
+          src=src.replace(old,new)
+          # Original Underwater source descriptor: 26 bone palette, 192 unique
+          # positive weights, 811 vertex influence lists. The B13 archive
+          # hardcoded nw<=128 for early Mark VI/WM shapes. Broaden the *count*
+          # only; B13 still rejects invalid arrays and nonunit weight sums.
+          assert src.count('1<=nw<=128')==1
+          src=src.replace('1<=nw<=128','1<=nw<=512')
+          (b/'tools/b13_bake.py').write_text(src)
           sys.path.insert(0,str(b/'tools'))
           import b13_bake as original
           nodes=original.parse_rig(raw)
