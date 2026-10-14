@@ -125,7 +125,7 @@ int b24_c1_original_collision_resolve(const B24C1OriginalCollision *c,
    const B24C1OriginalCollisionFace *f=&c->faces[i];
    if(!f->wall||torso_z<f->minz||torso_z>f->maxz||
       f->maxx<minx||f->minx>maxx||f->maxy<miny||f->miny>maxy)continue;
-   Vec2 a,b;
+   Vec2 a={0.f,0.f},b={0.f,0.f};
    if(!slice(f,torso_z,&a,&b))continue;
    Vec2 seg=sub(b,a);
    float len=sqrtf(dot2(seg,seg));
