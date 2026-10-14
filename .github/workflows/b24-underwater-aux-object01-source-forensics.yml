@@ -1,0 +1,55 @@
+name: B24 G8 Underwater Object01 Source Attachment Forensics - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-underwater-aux-object01-source-forensics.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_object01_attachment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout feature source
+        uses: actions/checkout@v4
+      - name: Lightweight independent synthetic pointer regression
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy scipy
+          python3 research/b24_unified/b24_underwater_aux_original_binding_probe.py --self-test
+      - name: Download owner-provided original iOS IPA into ephemeral runner only
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/ironman-owner-ipa/source.ipa
+          test "$(wc -c < /tmp/ironman-owner-ipa/source.ipa)" -eq 248613763
+          echo "PASS original-owner archive length; no archive uploads"
+      - name: Inspect genuine 29v Object01 geometry and original node pointer references
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_underwater_aux_original_binding_probe.py \
+            --ipa /tmp/ironman-owner-ipa/source.ipa \
+            --report /tmp/underwater_object01_pointer_evidence.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/underwater_object01_pointer_evidence.json').read_text())
+          assert d['verified_original_main_skinned_vertices']==811
+          assert d['verified_original_auxiliary_vertices']==29
+          assert d['verified_original_rig_nodes']==97
+          assert d['auxiliary_source_parent_proven'] is False
+          assert d['g8_vita_runtime_modified'] is False
+          print('PASS original Underwater 29v source investigation; no invented rig binding')
+          PY
+      - name: Upload forensic metadata only (no original model or IPA)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Underwater_Object01_Source_Pointer_Evidence_Only
+          path: /tmp/underwater_object01_pointer_evidence.json
+          if-no-files-found: error
+      - name: Delete private original binary from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/underwater_object01_pointer_evidence.json
