@@ -151,6 +151,10 @@ jobs:
                 -c research/b24_unified/b24_gpu_cpu_profile.c -o /tmp/b24_gpu_cpu_profile.o
               echo "PASS real VitaSDK GPU CPU-side profiler + native HUD objects: GPU busy not invented, no VPK"
             '
+      - name: Inspect authentic original B11 mesh vertex UV and material records
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/audit_b11_uv_source.py
       - name: Publish diagnostics only - no original 2010 game data exported
         uses: actions/upload-artifact@v4
         with:
