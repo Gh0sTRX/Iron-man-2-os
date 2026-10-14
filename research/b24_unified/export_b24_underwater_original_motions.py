@@ -48,8 +48,9 @@ def convert(ipa:Path,destination:Path,manifest:Path):
   # by numeric track index would be a serious animation skinning defect.
   # Preserve native order per-clip. Do not invent a single rigid track order.
   unique_names=set(clip.names)
-  if not all(name.startswith("Bip01") for name in unique_names):
-   raise ValueError("Unexpected source 38-joint non-Bip01 track: "+r.name)
+  # Some original Gameloft clips encode a long original authoring path
+  # among name records. Do not replace it with a guessed Bip01 bone.
+  # Preserve that exact source label; flag compatibility for later rig QA.
   matching_names=(unique_names==set(palette))
   data=encode_clip(clip)
   header=struct.unpack_from("<4sHHi",data)
@@ -65,7 +66,8 @@ def convert(ipa:Path,destination:Path,manifest:Path):
                  "palette_same_bone_set_as_first_clip":matching_names,
                  "palette_order_same_as_first_clip":tuple(clip.names)==palette,
                  "bone_names_in_original_order":list(clip.names),
-                 "new_or_missing_bones":sorted(unique_names ^ set(palette))})
+                 "new_or_missing_bones":sorted(unique_names ^ set(palette)),
+                 "bip01_named_tracks":sum(n.startswith("Bip01") for n in clip.names)})
  if len(result)!=34:raise AssertionError("unreachable")
  out={"provenance":"User-provided real Gameloft Iron Man 2 iOS v1.0.0 IPA 2010 Underwater 38-bone .anim",
       "clips":result,"original_underwater_name_matches":43,
