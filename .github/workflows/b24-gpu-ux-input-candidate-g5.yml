@@ -213,7 +213,7 @@ jobs:
           assert 'heading,pitch,roll' in h
           print('PASS actual B24 animated original suit ROOT gets stage2/rush pitch+roll; CPU B14 world stays single authority')
           PY
-      - name: B24 G5 camera independent fixed HUD, actual menu settings, event-latched actions regression
+      - name: B24 G5 centered reticle, 20k HUD and interactive pause event regression
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
