@@ -112,6 +112,7 @@ sources=[
  "b24_c1_gpu_vitagl.c","b24_gpu_suit_vitagl.c",
  "b24_gpu_suit_im2_adapter.c","b24_gpu_hud_bridge_vitagl.c",
  "b24_gpu_reticle.c",
+ "b24_gpu_hud_native.c","b24_gpu_hud_native_vitagl.c",
  "b24_gpu_runtime.c"
 ]
 cmroot="$"+"{CMAKE_CURRENT_SOURCE_DIR}"
@@ -128,6 +129,10 @@ if(B24_ENABLE_GPU)
     message(FATAL_ERROR "B24_GPU_ENGINE requires VitaSDK")
   endif()
   target_compile_definitions(im2_beta PRIVATE B24_GPU_ENGINE=1)
+  option(B24_ENABLE_NATIVE_HUD "GPU-native shapes/text; no HUD bitmap transfer" ON)
+  if(B24_ENABLE_NATIVE_HUD)
+    target_compile_definitions(im2_beta PRIVATE B24_GPU_NATIVE_HUD=1)
+  endif()
   target_sources(im2_beta PRIVATE
 '''+''.join("    "+base+f+"\n" for f in sources)+'''  )
   target_include_directories(im2_beta PRIVATE '''+cmroot+'''/src)
