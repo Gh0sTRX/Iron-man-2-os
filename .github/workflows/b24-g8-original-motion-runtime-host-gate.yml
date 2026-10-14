@@ -1,4 +1,4 @@
-name: G8 original runtime motion bridge host and Vita ARM strict gate NO VPK
+name: G8 true directional repulsor source fullbody clip and Vita ARM gate NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -67,6 +67,8 @@ jobs:
           a=Path('work/animations')
           assert len(list(a.glob('*.im2v')))==59
           assert t.count('b24_g8_motion_tick(')==1
+          assert t.count('b24_g8_motion_repulsor_trigger(')==1
+          assert 'b24_g8_motion_whole_body_fire(&b24_original_motion)' in t
           assert t.count('b24_gpu_runtime_draw(')==1
           assert t.count('b14_world_tick(')==1
           assert t.count('b14_pose_tick_ex(')==1
