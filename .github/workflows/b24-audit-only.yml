@@ -198,6 +198,9 @@ jobs:
                 -c research/b24_unified/b24_gpu_suit_im2_adapter.c -o /tmp/b24-im2-stream-vita.o
               echo "PASS REAL VitaSDK authentic B14/B16 animated IM2Model GPU adapter object, no executable, no VPK"
             '
+      - name: Read GPU main-loop ownership and swap integration regions
+        run: |
+          python3 research/b24_unified/audit_b24_gpu_integration_regions.py
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
         with:
