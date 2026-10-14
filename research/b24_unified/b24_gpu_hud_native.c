@@ -137,6 +137,24 @@ static void core_hud(B24NativeHudGeometry *g,const B22UI *ui,
   line(g,126,7,161,7,1,main);line(g,319,7,354,7,1,main);
  }
 }
+/* Always visible: the actual combat mode is passed by the unified owner through
+   B23Lock.weapon. Weapon LABEL does not imply a real projectile or a hit. */
+static void weapon_ui(B24NativeHudGeometry *g,const B23Lock *state,uint32_t color){
+ const char *name="REPULSOR";
+ const char *help="R FIRE";
+ if(state){
+  switch(state->weapon){
+   case B23_UNIBEAM:name="UNIBEAM";help="R FIRE";break;
+   case B23_MISSILE:name="MISSILE";help="L LOCK";break;
+   case B23_MELEE:name="MELEE";help="SQUARE";break;
+   case B23_REPULSOR:default:break;
+  }
+ }
+ rect(g,357.f,14.f,115.f,23.f,0x15232du);
+ line(g,357.f,14.f,472.f,14.f,1.f,color);
+ label(g,361.f,18.f,name,color,1.f);
+ label(g,418.f,18.f,help,0x9ac2d5u,.75f);
+}
 static void missile_ui(B24NativeHudGeometry *g,const B23Lock *s,
                        const B22UI *ui,uint32_t accent){
  if(ui->page!=B22_GAME||!s||s->weapon!=B23_MISSILE||
@@ -180,8 +198,9 @@ int b24_native_hud_build(B24NativeHudGeometry *g,const B24Unified *game){
       line(g,x,y,x+(x<240.f?-7.f:7.f),y+15.f,1.2f,soft);
     }
   }
-  float t=bound(game->camera_base.shoulder_to_chase,0.f,1.f);
-  float cx=278.f-38.f*t,cy=110.f+26.f*t;
+  /* Screen-space aiming center is fixed across WALK, HOVER, CRUISE, RUSH.
+     Camera interpolation must not slide the weapon sight around the display. */
+  const float cx=240.f,cy=136.f;
   uint32_t reticle=game->missile.phase==B23_LOCKED?accent:main;
   line(g,cx-12,cy,cx-5,cy,1.3f,reticle);
   line(g,cx+5,cy,cx+12,cy,1.3f,reticle);
@@ -189,6 +208,7 @@ int b24_native_hud_build(B24NativeHudGeometry *g,const B24Unified *game){
   line(g,cx,cy+5,cx,cy+12,1.3f,reticle);
   g->reticle_quads=4;
   missile_ui(g,&game->missile,ui,accent);
+  weapon_ui(g,&game->missile,accent);
  }else{
   /* Match readable B24-C2 menu, GPU-native quads: no bitmap upload. */
   rect(g,103,59,274,151,0x101b27u);
@@ -196,12 +216,40 @@ int b24_native_hud_build(B24NativeHudGeometry *g,const B24Unified *game){
   line(g,103,210,377,210,1.5f,main);
   line(g,103,59,103,210,1.5f,main);
   line(g,377,59,377,210,1.5f,main);
-  label(g,169,69,"PAUSED",0x55dff8u,2.f);
-  label(g,141,111,"START RESUME",0xe8bb5du,1.f);
-  label(g,141,139,"CIRCLE RESUME",0xc8e5eeu,1.f);
-  label(g,141,164,"CROSS OPTIONS",0xc8e5eeu,1.f);
-  label(g,141,187,"BETA MENU",0x7cb2c5u,1.f);
-  line(g,133,118,347,118,1,accent);
+  /* The original C2 panel was a frozen list of strings even while
+     B21 options changed. Draw actual menu state and selected setting. */
+  if(game->controls.menu==IM2_MENUOPTIONS){
+   static const char *const option_name[IM2_SETTING_COUNT]={
+     "MUSIC","SFX","INVERT X","INVERT Y","SENSITIVITY"
+   };
+   const Im2Settings *cfg=&game->controls.settings;
+   const int selected=game->controls.selected_option;
+   const int flags[4]={cfg->music,cfg->sfx,cfg->invert_x,cfg->invert_y};
+   label(g,163,69,"OPTIONS",main,2.f);
+   for(int i=0;i<IM2_SETTING_COUNT;i++){
+    float y=100.f+17.f*(float)i;
+    uint32_t ink=selected==i?accent:0xc8e5eeu;
+    if(selected==i){
+      rect(g,129,y-3,217,15,0x263945u);
+      rect(g,131,y+1,3,6,accent);
+    }
+    label(g,143,y,option_name[i],ink,1.f);
+    const char *val=i==4?(cfg->camera_sensitivity<.9f?"LOW":
+                         cfg->camera_sensitivity<1.3f?"MID":"HIGH"):
+                         (flags[i]?"ON":"OFF");
+    label(g,298,y,val,ink,1.f);
+   }
+   label(g,137,189,"UP DOWN SELECT",0x94b9cbu,.8f);
+   label(g,250,189,"CROSS CHANGE",0x94b9cbu,.8f);
+   label(g,153,200,"CIRCLE BACK",main,.8f);
+  }else{
+   label(g,169,69,"PAUSED",main,2.f);
+   label(g,141,108,"START RESUME",accent,1.f);
+   label(g,141,137,"CIRCLE RESUME",0xc8e5eeu,1.f);
+   label(g,141,165,"CROSS OPTIONS",0xc8e5eeu,1.f);
+   label(g,141,190,"DPAD LR WEAPON",0x7cb2c5u,.8f);
+   line(g,133,126,347,126,1,accent);
+  }
  }
  return !g->overflow && g->count>0u && g->count<=B24_NATIVE_HUD_VERTICES;
 }
