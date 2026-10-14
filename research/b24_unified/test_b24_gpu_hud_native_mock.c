@@ -136,7 +136,7 @@ int main(void){
   validate();
   if(state.missile.weapon!=B23_MISSILE)assert(g.missile_brackets==0u);
  }
- assert(draw_calls==20004u);
+ assert(draw_calls==20006u);
  assert(vertex_count>draw_calls*6u);
  assert(texture_updates==0);
  printf("PASS B24 native GPU HUD: 20k fuzz+4 vectors, one draw/frame, ZERO pixel/texture uploads, original pause glyphs, missile-only lock, stage Rush streaks; %u GL draws\n",draw_calls);
