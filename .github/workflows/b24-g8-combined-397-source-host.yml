@@ -117,6 +117,40 @@ jobs:
           (folder/'G8_HOST_REAL_SOURCE_CPU_SCREENSHOTS.json').write_text(
               json.dumps({'original_model_and_animation_source':True,'not_vita_gpu':True,'frames':rows},indent=2))
           PY
+      - name: Capture 3 authentic Mark VI textured melee combo frames in REAL G8 CPU renderer
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -Wno-error=unused-function \
+             -Iwork/src -Iwork/b24/b24_unified \
+             research/b24_unified/b24_g8_host_original_melee_3shot_capture.c \
+             work/src/renderer.c work/b24/b24_unified/b24_c1l1_map.c \
+             work/b24/b24_unified/b24_g8_live_original_motion.c \
+             work/b24/b24_unified/b24_g8_melee_source_chain.c \
+             work/b24/b24_unified/b24_original_im2v_stream.c \
+             work/b24/b24_unified/b24_hover_pose_blend.c \
+             -lm -o /tmp/g8-real-source-original-melee-preview
+          (cd work && /tmp/g8-real-source-original-melee-preview \
+             models/mark6.im2t animations /tmp/g8-bank/staged/host-screenshots)
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image,ImageDraw
+          root=Path('/tmp/g8-bank/staged/host-screenshots')
+          shots=sorted(root.glob('mark6_2010_original_melee_combo_*.ppm'))
+          assert len(shots)==3
+          board=Image.new('RGB',(3*480,308+60),(12,21,38))
+          d=ImageDraw.Draw(board)
+          d.text((15,12),'2010 ORIGINAL MARK VI | G8 REAL CPU RENDER | COMBO 1 - 2 - 3',fill='white')
+          for index,p in enumerate(shots):
+             im=Image.open(p).convert('RGB')
+             assert im.size==(480,272)
+             assert len(set(im.resize((40,30)).getdata()))>12
+             board.paste(im,(index*480,60))
+             d.text((index*480+10,60+277),f'ORIGINAL COMBO {index+1}',fill='white')
+             im.save(p.with_suffix('.png'));p.unlink()
+          dest=root/'HOST_G8_MARKVI_2010_SOURCE_REAL_MELEE_COMBO_1_2_3.png'
+          board.save(dest)
+          print('PASS 3 real authored combo pose CPU frames + original model textured melee contact sheet')
+          PY
       - name: Upload source motion bank (never an executable)
         uses: actions/upload-artifact@v4
         with:
