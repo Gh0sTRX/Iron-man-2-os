@@ -1,0 +1,62 @@
+name: G10 Original 2010 C1L1 visual floor source mesh sampler and VITA ARM tests NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g10-real-ground-face-collisions-host.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_ground:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: C11 original source-face 3D floor query guard with ASan and UBSan
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            research/b24_unified/b24_c1_true_source_floor.c \
+            research/b24_unified/test_b24_c1_true_source_floor.c \
+            -lm -o /tmp/g10_original_floor_source_test
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g10_original_floor_source_test
+      - name: Compile native VitaSDK ARM source floor sampler only, no VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                -c research/b24_unified/b24_c1_true_source_floor.c -o /tmp/g10_original_real_floor.o
+              test -s /tmp/g10_original_real_floor.o
+              echo "PASS original C1L1 source 3280 face ground support ARM source; no synthetic base floor"
+            '
+      - name: Test original packed 2010 B11 floor triangles vs real center source
+        run: |
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+            --out /tmp/G10_original_geometry.c1g2 \
+            --manifest /tmp/G10_original_geometry.json
+          cat > /tmp/g10_floor_real.c <<'C'
+          #include "b24_c1_gpu_mesh.h"
+          #include "b24_c1_true_source_floor.h"
+          #include <assert.h>
+          #include <stdio.h>
+          int main(int argc,char **argv){
+           if(argc!=2)return 2;
+           B24GpuC1Mesh city={0};
+           assert(b24_gpu_c1_load(&city,argv[1]));
+           float h=0;
+           for(int i=-1;i<=1;i++)for(int j=-1;j<=1;j++){
+            assert(b24_c1_true_floor_at(&city,(float)i*10,(float)j*10,0.f,3.f,&h));
+            assert(h>-.36f&&h<-.15f);
+           }
+           printf("PASS original 2010 source C1L1 nine player-area ground heights include test Z %.6f\n",h);
+           b24_gpu_c1_free(&city);
+           return 0;
+          }
+          C
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iresearch/b24_unified /tmp/g10_floor_real.c \
+            research/b24_unified/b24_c1_true_source_floor.c \
+            research/b24_unified/b24_c1_gpu_mesh.c -lm -o /tmp/g10_original_ground_real
+          /tmp/g10_original_ground_real /tmp/G10_original_geometry.c1g2
