@@ -55,6 +55,16 @@ jobs:
               print('SOURCE_REJECTION',bad['source_animation'],bad['error_type'],
                     bad['error'])
           PY
+      - name: Generate source-authentic flight combat repulsor melee screenshots (host only)
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q matplotlib
+          python3 research/b24_unified/b24_304_player_host_contact_sheet.py \
+            --ipa /tmp/b24_owner_original/source.ipa \
+            --assets /tmp/b24_304_baked \
+            --out /tmp/b24_304_baked
+          test -s /tmp/b24_304_baked/B24_G8_HOST_ORIGINAL_ironman_8_flight_combat_pose_comparison.png
+          test -s /tmp/b24_304_baked/B24_G8_HOST_ORIGINAL_warmachine_8_flight_combat_pose_comparison.png
       - name: Publish complete source coverage evidence + correctly baked derived clip streams ONLY
         if: always()
         uses: actions/upload-artifact@v4
