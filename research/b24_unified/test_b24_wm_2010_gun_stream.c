@@ -51,3 +51,24 @@ int main(void){
       " filename guard, seek and loop tests, no VPK or guessed emitter");
  return 0;
 }
+
+int b24_wm_gun_original_marker_axis(const float m[6][16],
+                                   float tip[3],float dir[3]){
+ if(!m||!tip||!dir)return 0;
+ /* The two source markers are distinct Gun03 children in original BRES.
+    Matrix layout is row-major and position is column 3. */
+ float delta[3];
+ float sq=0.f;
+ for(int k=0;k<3;k++){
+   const float a=m[4][k*4+3],b=m[5][k*4+3];
+   if(!isfinite(a)||!isfinite(b))return 0;
+   delta[k]=b-a;sq+=delta[k]*delta[k];
+ }
+ if(!isfinite(sq)||sq<1e-12f||sq>1e8f)return 0;
+ const float inv=1.f/sqrtf(sq);
+ for(int k=0;k<3;k++){
+   tip[k]=m[5][k*4+3];
+   dir[k]=delta[k]*inv;
+ }
+ return 1;
+}
