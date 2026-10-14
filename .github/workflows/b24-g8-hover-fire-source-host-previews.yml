@@ -1,0 +1,45 @@
+name: B24 G8 Original Hover Strafe Fire Skinning Host Previews - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g8-hover-fire-source-host-previews.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host_original_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original animation name and state-transition verification
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_hover_fire_directional_source.py --self-test \
+            --report /tmp/b24_g8_hover_direction_matrix.json
+      - name: Retrieve exact owner IPA into private ephemeral CI runner (no upload)
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown numpy scipy matplotlib
+          mkdir -p /tmp/ironman-owner-ipa
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/ironman-owner-ipa/source.ipa
+          test "$(wc -c < /tmp/ironman-owner-ipa/source.ipa)" -eq 248613763
+      - name: Genuine B13 source skin transforms and annotated HOST screenshots
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_hover_fire_authentic_pose_preview.py \
+            --ipa /tmp/ironman-owner-ipa/source.ipa \
+            --out /tmp/b24_g8_hover_poses
+          cp /tmp/b24_g8_hover_direction_matrix.json /tmp/b24_g8_hover_poses/
+          test -s /tmp/b24_g8_hover_poses/HOST_2010_ironman_hover_LR_attack.png
+          test -s /tmp/b24_g8_hover_poses/HOST_2010_warmachine_hover_LR_attack.png
+      - name: Upload source-proven screenshots and metadata only (no IPA/no VPK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: B24_G8_2010_Original_Hover_LR_Attack_HOST_Previews_Only
+          path: /tmp/b24_g8_hover_poses/
+          if-no-files-found: error
+      - name: Clear original IPA and temporary decoded geometry
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/b24_g8_hover_poses /tmp/b24_g8_hover_direction_matrix.json
