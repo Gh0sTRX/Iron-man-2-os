@@ -21,11 +21,18 @@ typedef struct {
  size_t nv;
  int suit_index,missing;
  char selected[128];
- uint32_t started_ms,previous_ms;
- int active;
+ uint32_t started_ms,previous_ms,repulsor_started_ms;
+ int active,repulsor_pending,whole_body_repulsor_active;
  unsigned transitions,misses,successful_frames;
 } B24G8LiveOriginalMotion;
 void b24_g8_motion_release(B24G8LiveOriginalMotion *a);
+/* Call ONCE on an accepted B16_REPULSOR fire event (never during missiles/
+   unibeam), AFTER pose computation. The original source clip begins NEXT
+   frame; if missing, B16 old right-palm blend still works as fallback. */
+void b24_g8_motion_repulsor_trigger(B24G8LiveOriginalMotion *a,uint32_t now_ms);
+int b24_g8_motion_whole_body_fire(const B24G8LiveOriginalMotion *a);
+const char *b24_g8_motion_repulsor_clip(int suit_index,B24MotionStage stage,
+                                        float left_x,float forward);
 const char *b24_g8_motion_route(int suit_index,B24MotionStage stage,
                                 float left_x,float forward);
 int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *animation_dir,
