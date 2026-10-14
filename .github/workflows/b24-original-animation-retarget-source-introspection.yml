@@ -1,0 +1,33 @@
+name: B24 Original Underwater And Combat Rig Bake Internals - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-animation-retarget-source-introspection.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read exact author-reconstructed B13 joint skin bake implementation
+        run: |
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          for p,names in [
+            ('animation_b13/B13_Reproducible_Source.zip',['tools/b13_bake.py']),
+            ('research/B7_Skinning_Tools.zip',['skin_parser.py','bake_original_motion.py']),
+          ]:
+              with ZipFile(p) as z:
+                  for name in names:
+                      if name not in z.namelist():
+                          print('SOURCE_NOT_PRESENT',name);continue
+                      lines=z.read(name).decode().splitlines()
+                      print('START_AUTHOR_SOURCE',p,name)
+                      for i,line in enumerate(lines[:190],1):
+                          print(f'SRC:{i:03} {line[:250]}')
+                      print('END_AUTHOR_SOURCE',p,name)
+          PY
