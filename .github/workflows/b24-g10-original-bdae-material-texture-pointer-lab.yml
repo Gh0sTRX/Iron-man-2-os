@@ -1,4 +1,4 @@
-name: G10 original BRES C1L1 per-face source texture pointer graph NO VPK
+name: G10 2010 C1L1 BRES original TGA offset pointers and exact face materials NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -43,4 +43,14 @@ jobs:
         with:
           name: G10_Original_2010_BRES_Per_Face_Material_Atlas_Link_Forensic
           path: /tmp/G10_2010_BRES_TRUE_MATERIAL_POINTER_GRAPH.json
+          if-no-files-found: error
+
+      - name: Trace exact internal BRES pointers to C1L1 image strings without guessed material assignment
+        run: |
+          python3 research/b24_unified/b24_g10_bres_author_material_texture_refs.py \
+            --out /tmp/G10_BRES_C1L1_NATIVE_TGA_POINTERS.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_C1L1_Exact_Source_TGA_Pointer_Offsets_Original_BRES
+          path: /tmp/G10_BRES_C1L1_NATIVE_TGA_POINTERS.json
           if-no-files-found: error
