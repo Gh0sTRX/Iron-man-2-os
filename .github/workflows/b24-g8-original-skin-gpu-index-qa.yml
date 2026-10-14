@@ -1,0 +1,49 @@
+name: G8 original 2010 weighted vertex to real IM2T topology proof NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-original-skin-gpu-index-qa.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_indices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract unchanged G8 model assets from known original B9/B13 archives
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          unzip -oq source/IronMan2_Vita_GitHub_Ready_CI_R2.zip -d work
+          unzip -oq armor_b9/b9_overlay.zip -d work
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          test -s work/models/mark6.im2t
+          test -s work/models/warmachine.im2t
+      - name: Retrieve exact owner original IPA ephemerally
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy scipy gdown
+          mkdir -p /tmp/g8owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g8owner/original.ipa
+          test "$(wc -c < /tmp/g8owner/original.ipa)" -eq 248613763
+      - name: Compare source geometry position and faces INDEX BY INDEX
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_verify_g8_source_to_gpu_vertex_order.py \
+            --ipa /tmp/g8owner/original.ipa \
+            --models work/models \
+            --out /tmp/g8_model_original_source_order_proof.json
+      - name: Upload only geometric compatibility JSON source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G8_Original_Weighted_Skin_vs_GPU_IM2T_Vertex_Order_Audit
+          path: /tmp/g8_model_original_source_order_proof.json
+          if-no-files-found: warn
+      - name: Erase owner archive
+        if: always()
+        run: rm -rf /tmp/g8owner /tmp/b13-overlay.zip
