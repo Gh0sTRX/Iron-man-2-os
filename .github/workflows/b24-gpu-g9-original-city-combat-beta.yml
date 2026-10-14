@@ -683,9 +683,9 @@ jobs:
               values={}
               for i in range(n):
                   keyoff,fmt,length,maxlen,off=struct.unpack_from('<HHIII',sf,20+i*16)
-                  key=sf[keybase+keyoff:].split(b'\\x00',1)[0].decode('ascii')
+                  key=sf[keybase+keyoff:].split(b'\x00',1)[0].decode('ascii')
                   val=sf[datbase+off:datbase+off+length]
-                  values[key]=val.split(b'\\x00',1)[0].decode('ascii','replace') if fmt==0x204 else val
+                  values[key]=val.split(b'\x00',1)[0].decode('ascii','replace') if fmt==0x204 else val
               assert values['TITLE_ID']=='IM2G00034',values
               print('PASS G9 independent title',values['TITLE_ID'],'genuine 22919 original map GPU, 1908 original CPU wall triangles, five armor models, 363 IM2V, 6 IM2K',len(p.read_bytes()),'bytes')
               print('G9_BETA_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
