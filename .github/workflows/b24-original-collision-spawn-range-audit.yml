@@ -1,0 +1,45 @@
+name: B24 Actual C1L1 Collision Spawn Space Check - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-original-collision-spawn-range-audit.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  spawn_geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Derive actual source triangle coverage inside active B14 plus/minus 20m movement range
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/export_b24_authentic_original_collision.py \
+            --out /tmp/c1wc_real.c1wc --manifest /tmp/c1wc_real.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import numpy as np,struct
+          b=Path('/tmp/c1wc_real.c1wc').read_bytes()
+          assert struct.unpack_from('<4sIIII',b)==(b'C1WC',1,1908,2,40)
+          rows=np.frombuffer(b,offset=20,dtype=np.dtype([('xyz','<f4',(9,)),('group','<u4')]))
+          tri=rows['xyz'].reshape(-1,3,3)
+          mins=tri.min(axis=1)
+          maxs=tri.max(axis=1)
+          centers=tri.mean(axis=1)
+          normals=np.cross(tri[:,1]-tri[:,0],tri[:,2]-tri[:,0])
+          lens=np.linalg.norm(normals,axis=1)
+          steep=(np.abs(normals[:,2])<.58*lens)&((maxs[:,2]-mins[:,2])>.1)
+          for extent in (3,10,20,40,120):
+              xy=(mins[:,0]<=extent)&(maxs[:,0]>=-extent)&(mins[:,1]<=extent)&(maxs[:,1]>=-extent)
+              for zlo,zhi in ((.7,4),(.7,8),(-1000,1000)):
+                  mask=xy&steep&(mins[:,2]<=zhi)&(maxs[:,2]>=zlo)
+                  print('SOURCE_C1_B14_RANGE_REAL_WALLS',extent,'z',zlo,zhi,'faces',int(mask.sum()))
+          print('TRUE_BDAE_C1WC_EXTENTS',[(float(mins[:,i].min()),float(maxs[:,i].max())) for i in range(3)])
+          print('B14_SPAWN_NEAREST_WALL_CENTER_DIST_XY',
+                float(np.linalg.norm(centers[steep,:2],axis=1).min()))
+          print('TRUE_BDAE_C1WC_COLLIDER_WITHIN_20_OF_ORIGIN',
+                bool(np.any(steep&(mins[:,0]<=20)&(maxs[:,0]>=-20)&(mins[:,1]<=20)&(maxs[:,1]>=-20))))
+          print('PASS SOURCE-VERIFIED collision coordinate-space coverage; real physics still requires Vita device contact')
+          PY
