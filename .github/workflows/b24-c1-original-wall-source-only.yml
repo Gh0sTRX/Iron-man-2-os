@@ -1,0 +1,49 @@
+name: B24 C1L1 Authentic Wall Broadphase - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-c1-original-wall-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_wall_index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout original scene recovery and source-only CPU geometry
+        uses: actions/checkout@v4
+      - name: Export original C1L1 geometry (actual 2010 BDAE-derived, no fabricated shapes)
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+            --out /tmp/C1L1_original_gpu.c1g2 --manifest /tmp/C1L1_wall_source_manifest.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/C1L1_wall_source_manifest.json').read_text())
+          assert data['vertices']==37946 and data['triangles']==22919 and data['indices']==68757
+          print('PASS ORIGINAL C1L1 authentic original world mesh, not a fake building collision cube')
+          PY
+      - name: Native GCC strict C11 wall broadphase, synthetic contacts and ACTUAL source scene
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_gpu_mesh.c \
+            research/b24_unified/b24_c1_wall_index.c \
+            research/b24_unified/test_b24_c1_wall_index.c \
+            -lm -o /tmp/b24-c1-authentic-wall-collider
+          /tmp/b24-c1-authentic-wall-collider /tmp/C1L1_original_gpu.c1g2
+      - name: Native VitaSDK ARM object compilation only, NO real-device rollout yet
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror \
+              -Iresearch/b24_unified \
+              -c research/b24_unified/b24_c1_wall_index.c \
+              -o /tmp/b24_c1_wall_index.o
+            test -s /tmp/b24_c1_wall_index.o
+            echo "PASS REAL VitaSDK C1L1 CPU wall candidate index .o only: NO VPK, NO collisions claimed in-game"
+          '
