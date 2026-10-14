@@ -169,3 +169,5 @@ jobs:
 # Native one-batch GPU HUD replaces full 480x272 upload: fuzz includes offscreen GPU clipping.
 
 # Recheck strict signed enum profile phase and valid waveform test, source-only no VPK.
+
+# Re-run real VitaSDK strict-Werror CPU profile after unsigned enum bounds fix; no package.
