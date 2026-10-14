@@ -1,0 +1,42 @@
+name: G8 verified CPU original motion 15 screenshot PNG gallery only - no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g8-host-real-motion-png-gallery-only.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_cpu_pngs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38601913616
+          github-token: ${{ github.token }}
+          path: /tmp/previous_verified_source
+      - name: Extract independently verified actual original G8 CPU screenshots only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/G8_REAL_HOST_MOTION_SHOTS
+          cp /tmp/previous_verified_source/host-screenshots/*.png /tmp/G8_REAL_HOST_MOTION_SHOTS/
+          cp /tmp/previous_verified_source/host-screenshots/G8_HOST_REAL_SOURCE_CPU_SCREENSHOTS.json /tmp/G8_REAL_HOST_MOTION_SHOTS/
+          test "$(find /tmp/G8_REAL_HOST_MOTION_SHOTS -name '*.png' | wc -l)" -eq 17
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('/tmp/G8_REAL_HOST_MOTION_SHOTS')
+          records=json.loads((base/'G8_HOST_REAL_SOURCE_CPU_SCREENSHOTS.json').read_text())
+          assert len(records['frames'])==15
+          assert not records['not_vita_gpu'] is False
+          print('PASS 15 REAL G8 SOURCE CPU gameplay frames plus TWO contact sheets; NO IPA, NO VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G8_15_Real_2010_Motion_Repulsor_Host_PNG_Screenshots_Only
+          path: /tmp/G8_REAL_HOST_MOTION_SHOTS/
+          if-no-files-found: error
+          retention-days: 14
