@@ -14,7 +14,10 @@ from b24_owner_pack_extract import decode,get_exact
 MODEL_NAME="LC_MC_UnderWater.bdae"
 ATLAS_NAME="MC_UnderWater.tga"
 EXPECTED_VERTS=840
-EXPECTED_TRIS=359
+# B11 parser faces are Nx3 rows; old source audit incorrectly did
+# len(faces)//3. Actual owner Underwater IM2T produced 6468 16-bit bytes
+# = 3234 indices = 1078 triangles, from TWO genuine submeshes.
+EXPECTED_TRIS=1078
 def source(ipa:Path):
  with zipfile.ZipFile(ipa) as z:
   path='Payload/IronMan2.app/'
@@ -32,7 +35,7 @@ def decode_bres(data:bytes,parser_archive:Path):
  meshes,stats=namespace['parse'](data)
  if len(meshes)!=2:raise ValueError(f"Underwater original mesh count {len(meshes)} != 2")
  vertices=sum(len(m['positions']) for m in meshes)
- triangles=sum(len(m['faces'])//3 for m in meshes)
+ triangles=sum(len(np.asarray(m['faces']).reshape(-1))//3 for m in meshes)
  if (vertices,triangles)!=(EXPECTED_VERTS,EXPECTED_TRIS):
   raise ValueError(f"Underwater source topology drift {(vertices,triangles)}")
  packed=bytearray()
