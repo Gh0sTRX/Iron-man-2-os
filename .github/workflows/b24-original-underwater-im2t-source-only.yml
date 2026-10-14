@@ -26,7 +26,7 @@ jobs:
           echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
       - name: Install original B11 BRES and independent PVRTC decoder dependencies
         run: python3 -m pip install -q numpy texture2ddecoder
-      - name: Validate original BRES -> IM2T and original texture codec, no released armor
+      - name: Measure original BRES skin and IM2T topology before atlas-channel calibration
         run: |
           set -euo pipefail
           python3 research/b24_unified/b24_original_underwater_armor.py \
