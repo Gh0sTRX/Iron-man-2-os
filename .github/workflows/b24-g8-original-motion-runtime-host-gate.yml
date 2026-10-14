@@ -1,4 +1,4 @@
-name: G8 real original animation runtime bridge host and Vita C object gate NO VPK
+name: G8 original runtime motion bridge host and Vita ARM strict gate NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
