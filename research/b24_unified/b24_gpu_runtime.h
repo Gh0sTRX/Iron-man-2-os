@@ -3,6 +3,7 @@
 #include "b24_gpu_owner.h"
 #include "b24_gpu_c1_vehicle_texture.h"
 #include "b24_gpu_cpu_profile.h"
+#include "b24_c1_material_source.h"
 #include "b24_gpu_hud_bridge.h"
 #include "b24_gpu_hud_native.h"
 #include "b24_gpu_suit.h"
@@ -13,6 +14,7 @@ typedef struct {
  B24CpuGpuProfile profile; /* CPU thread wall only; not GPU busy */
  B24GpuC1Mesh city;
  B24C1UV city_uv;
+ B24C1MaterialSource city_material; /* original material LABELS, NOT atlases */
  uint32_t verified_vehicle_atlas; /* 0 until B12 original atlas loaded, never guessed */
  B24GpuSuit suit;
  B24GpuIM2Stream stream;
