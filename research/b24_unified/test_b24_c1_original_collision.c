@@ -13,8 +13,14 @@ static void synthetic(const char *path){
  for(unsigned i=0;i<1908;i++){
   /* Synthetic triangle for test ONLY, never exported to the game.
      Original source collision file instead tested by separate arg path. */
-  float x=i==0?0.f:1000.f+(float)i*6.f;
-  float xyz[9]={x,-2.f,0.f,x,2.f,0.f,x,2.f,3.f};
+  /* Two real 3D triangles comprise the TEST wall square. First triangle
+     alone intersects a horizontal torso slice in only half the wall. */
+  float x=i<2u?0.f:1000.f+(float)i*6.f;
+  float xyz[9]={x,-2.f,0.f,x,2.f,0.f,x,-2.f,3.f};
+  if(i==1u){
+   const float other[9]={x,2.f,0.f,x,2.f,3.f,x,-2.f,3.f};
+   memcpy(xyz,other,sizeof(other));
+  }
   unsigned group=0;
   assert(fwrite(xyz,sizeof(float),9,f)==9);
   assert(fwrite(&group,sizeof(group),1,f)==1);
