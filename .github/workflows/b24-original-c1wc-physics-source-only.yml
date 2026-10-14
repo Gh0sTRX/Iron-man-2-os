@@ -20,7 +20,7 @@ jobs:
           python3 research/b24_unified/export_b24_authentic_original_collision.py \
             --out /tmp/C1L1_source_real.c1wc \
             --manifest /tmp/C1L1_collision_manifest.json
-      - name: Strict C11 authentic wall sweep and 4096 spatial contact samples
+      - name: Strict C11 fixed initialized contact slices and 4096 original spatial checks
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
