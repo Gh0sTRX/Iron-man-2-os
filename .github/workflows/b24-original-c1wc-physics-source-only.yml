@@ -1,0 +1,40 @@
+name: B24 C1WC Genuine CPU Wall Contact Regression - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-c1wc-physics-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_collision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Export ONLY the two genuine 2010 source collision BDAE meshes
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/export_b24_authentic_original_collision.py \
+            --out /tmp/C1L1_source_real.c1wc \
+            --manifest /tmp/C1L1_collision_manifest.json
+      - name: Strict C11 authentic wall sweep and 4096 spatial contact samples
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/test_b24_c1_original_collision.c \
+            -lm -o /tmp/c1wc_native
+          /tmp/c1wc_native /tmp/C1L1_source_real.c1wc
+      - name: Vita ARM strict original collision C object only no VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=gnu11 -O2 -Wall -Wextra -Werror \
+              -c research/b24_unified/b24_c1_original_collision.c \
+              -o /tmp/b24_original_collision.o
+            test -s /tmp/b24_original_collision.o
+            echo "PASS original BDAE CPU collision ARM strict object only; no Vita FPS or game contact implied"
+          '
