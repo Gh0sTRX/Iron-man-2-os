@@ -208,6 +208,10 @@ jobs:
           python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
             --out work/maps/C1L1_environment.c1g2 \
             --manifest /tmp/B24_C1L1_GPU_RUNTIME_INPUT.json
+          python3 -m pip install -q numpy
+          python3 research/b24_unified/recover_c1l1_original_uv.py \
+            --out work/maps/C1L1_environment.c1uv \
+            --manifest /tmp/B24_C1L1_SOURCE_UV.json
           python3 research/b24_unified/apply_b24_gpu_main_source_only.py
           python3 - <<'PY'
           from pathlib import Path
@@ -223,6 +227,8 @@ jobs:
           assert "SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER" in s
           assert 'B24_GPU_SINGLE_OWNER_INTEGRATION' in cm
           assert Path("work/maps/C1L1_environment.c1g2").stat().st_size>500000
+          assert Path("work/maps/C1L1_environment.c1uv").stat().st_size==303954
+          assert 'b24_gpu_c1_material_vitagl.c' in cm
           print("PASS B24 actual gameplay, original animation & C1 GPU opt-in source integration, no SDL second renderer")
           PY
       - name: B24 shoulder to center target crosshair host regression
@@ -264,6 +270,9 @@ jobs:
                 work/b24/b24_unified/b24_gpu_camera.c \
                 work/b24/b24_unified/b24_gpu_owner_vitagl.c \
                 work/b24/b24_unified/b24_c1_gpu_mesh.c \
+                work/b24/b24_unified/b24_c1_gpu_uv.c \
+                work/b24/b24_unified/b24_gpu_c1_material_vitagl.c \
+                work/b24/b24_unified/b24_gpu_owner_c1_material.c \
                 work/b24/b24_unified/b24_c1_gpu_vitagl.c \
                 work/b24/b24_unified/b24_gpu_suit_vitagl.c \
                 work/b24/b24_unified/b24_gpu_suit_im2_adapter.c; do
@@ -276,7 +285,7 @@ jobs:
                   -Iwork/b24/b22_4_6 -Iwork/b24/b18_gpu_probe \
                   -c "$src" -o "/tmp/$(basename "$src").o"
               done
-              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 13 GPU .o files; NO VPK or executable"
+              echo "PASS REAL VitaSDK B24 original main + original dynamic suits + C1L1 + HUD: 16 GPU .o files; NO VPK or executable"
             '
       - name: Publish source-only animation-coverage report
         uses: actions/upload-artifact@v4
