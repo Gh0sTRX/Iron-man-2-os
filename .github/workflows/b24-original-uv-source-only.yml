@@ -1,0 +1,44 @@
+name: B24 Original C1L1 UV Source Audit - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-uv-source-only.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  restore_original_uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout private original 2010 BDAE source (never upload assets)
+        uses: actions/checkout@v4
+      - name: Install B11 parser dependency
+        run: python3 -m pip install -q numpy
+      - name: Decode and independently verify 370 original meshes UV
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/recover_c1l1_original_uv.py \
+            --out /tmp/original_C1L1_uv.c1uv \
+            --manifest /tmp/original_C1L1_uv_manifest.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,struct
+          path=Path('/tmp/original_C1L1_uv.c1uv')
+          magic,ver,verts,meshes=struct.unpack_from('<4sIII',path.read_bytes())
+          assert (magic,ver,verts,meshes)==(b'C1UV',1,37946,370)
+          assert path.stat().st_size==16+370+37946*8
+          d=json.loads(Path('/tmp/original_C1L1_uv_manifest.json').read_text())
+          assert d['counts']['vehicle_meshes']==22
+          assert d['counts']['mesh_count']==370
+          assert d['exact_world_face_alignment']
+          assert not d['fully_textured_C1L1']
+          print('PASS 2010 C1L1 original UV recovery: 370 meshes in exact B24 C1G2 draw ordering')
+          PY
+      - name: Upload METADATA ONLY, never copyrighted atlas, UV, models
+        uses: actions/upload-artifact@v4
+        with:
+          name: B24_Original_C1L1_UV_Metadata_No_Game_Data
+          path: /tmp/original_C1L1_uv_manifest.json
+          if-no-files-found: error
