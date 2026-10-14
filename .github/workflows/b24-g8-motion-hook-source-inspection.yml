@@ -99,3 +99,23 @@ jobs:
                   elif name=='b14_world.h':
                       for i,line in enumerate(lines[:145],1):print(f'G8B14 {name}:{i:03} {line[:180]}')
           PY
+
+      - name: Locate exact G8 foot-to-ground B14 pose root and L-lock observation assignment
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ("b14_world.c","b14_pose.c","main.c"):
+              p=Path("work/src")/name
+              if not p.is_file():continue
+              lines=p.read_text().splitlines()
+              if name=="b14_world.c":
+                  for i,line in enumerate(lines): print(f"G10B14:{i+1:03} {line[:195]}")
+              else:
+                  terms=("b14_world_tick","b14_pose_tick_ex","b24_obs.target_",
+                         "b24_unified_tick(","b24_obs.weapon_index",
+                         "b24_obs.target_visible","world.z","camera.hover_bob",
+                         "b24_gpu_runtime_draw")
+                  indices={j for i,line in enumerate(lines) if any(t in line for t in terms)
+                           for j in range(max(0,i-6),min(len(lines),i+7))}
+                  for i in sorted(indices):print(f"G10FLOW:{name}:{i+1:03} {lines[i][:195]}")
+          PY
