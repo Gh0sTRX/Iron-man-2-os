@@ -25,8 +25,14 @@ static int b24_runtime_hud_draw(void *userdata){
 int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  if(!r||r->initialized||!city_file)return 0;
  if(!b24_gpu_c1_load(&r->city,city_file))return 0;
+ /* The source-authentic sidecar is optional during the GPU migration.
+    If absent, NO fabricated city textures will be assigned. This
+    sidecar will be staged alongside C1G2 only after conversion validation. */
+ (void)b24_c1_uv_load(&r->city_uv,"app0:maps/C1L1_environment.c1uv");
+ r->verified_vehicle_atlas=0; /* B12 original atlas not packaged yet */
  if(!b24_gpu_owner_init(&r->owner,0)){
-  b24_gpu_c1_free(&r->city);return 0;
+  b24_c1_uv_free(&r->city_uv);
+ b24_gpu_c1_free(&r->city);return 0;
  }
 #ifndef B24_GPU_NATIVE_HUD
  /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
@@ -84,7 +90,9 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  if(!b24_gpu_camera_matrices(&cam,&matrices))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
- if(!b24_gpu_owner_scene(&r->owner,&r->city))return 0;
+ if(!b24_gpu_owner_scene_material(&r->owner,&r->city,
+            r->city_uv.loaded?&r->city_uv:NULL,
+            r->verified_vehicle_atlas))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
  r->frame_pose=(B24GpuSuitPose){c->player_x,c->player_y,c->player_z,
                                 c->player_heading};
