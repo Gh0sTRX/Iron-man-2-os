@@ -1,0 +1,58 @@
+name: B24 Original Owner IPA Assets Discovery - Ephemeral Only
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-original-user-drive-asset-availability.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown --fuzzy 'https://drive.google.com/file/d/1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I/view?usp=drivesdk' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Audit original underwater suit and game-original weapon / city assets by NAME ONLY
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,re,zipfile,struct
+          p='/tmp/ironman-owner-ipa/source_v1.0.0.ipa'
+          with zipfile.ZipFile(p) as z:
+              entries=z.namelist()
+              for entry in entries:
+                  if re.search('underwater|diving|scuba|under.sea',entry,re.I):
+                      print('SOURCE_IPA_PATH_CANDIDATE',entry)
+              for kind in ('models','textures','anims','states','clev'):
+                  matches=[n for n in entries if n.endswith('/'+kind)]
+                  print('ORIGINAL_ARCHIVE_KIND',kind,'files',len(matches))
+                  if not matches:continue
+                  raw=z.read(matches[0])
+                  # Exact proprietary game packed-bundle name table is inside
+                  # the archive; scan printable ASCII metadata only.
+                  for term in (b'underwater',b'Underwater',b'UNDERWATER',
+                     b'Missile',b'Unibeam',b'Repulsor',b'C1L1_',b'IronMan_Ground_Combo'):
+                      at=raw.find(term)
+                      if at>=0:
+                          print('ORIGINAL_BINARY_NAME',kind,term.decode(),at)
+                  if kind=='models':
+                      names=re.findall(rb'[\x20-\x7e]{8,120}\.bdae',raw[:250000])
+                      unique=list(dict.fromkeys(n.decode('ascii','replace') for n in names))
+                      print('SOURCE_MODEL_FILE_NAME_SAMPLES',unique[:22])
+              print('PASS owner archive inspected, no raw model/texture bytes emitted')
+          PY
+      - name: Secure ephemeral source cleanup
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa
