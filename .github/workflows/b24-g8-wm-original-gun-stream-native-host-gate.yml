@@ -1,4 +1,4 @@
-name: G8 2010 WM six-node Gun03 marker axis source C host and ARM gate - no VPK
+name: G8 original WM six-node gun marker vector C11 host and Vita ARM regression NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
