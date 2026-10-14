@@ -62,6 +62,58 @@ const char *b24_g8_motion_route(int suit,B24MotionStage mode,float x,float y){
  }
  return NULL;
 }
+/* The exact 2010 owner-source filenames for full-body movement+attack.
+   In this prototype they are played ONLY after a successful REPULSOR event.
+   Their name _Att alone does not prove original iOS weapon-event semantics. */
+static const char *const mk6_hover_fire[]={
+ "ironman_ironman_aim_float_idle_att",
+ "ironman_ironman_aim_float_move_f_att",
+ "ironman_ironman_aim_float_move_b_att",
+ "ironman_ironman_aim_float_move_l_att",
+ "ironman_ironman_aim_float_move_r_att"
+};
+static const char *const wm_hover_fire[]={
+ "warmachine_warmachine_aim_float_idle_att",
+ "warmachine_warmachine_aim_float_move_f_att",
+ "warmachine_warmachine_aim_float_move_b_att",
+ "warmachine_warmachine_aim_float_move_l_att",
+ "warmachine_warmachine_aim_float_move_r_att"
+};
+static const char *const mk6_ground_fire[]={
+ "ironman_ironman_aim_ground_idle_att",
+ "ironman_ironman_aim_ground_move_f_att",
+ "ironman_ironman_aim_ground_move_b_att",
+ "ironman_ironman_aim_ground_move_l_att",
+ "ironman_ironman_aim_ground_move_r_att"
+};
+static const char *const wm_ground_fire[]={
+ "warmachine_warmachine_aim_ground_idle_att",
+ "warmachine_warmachine_aim_ground_move_f_att",
+ "warmachine_warmachine_aim_ground_move_b_att",
+ "warmachine_warmachine_aim_ground_move_l_att",
+ "warmachine_warmachine_aim_ground_move_r_att"
+};
+const char *b24_g8_motion_repulsor_clip(int suit,B24MotionStage stage,float x,float y){
+ int d=stage_direction(x,y);
+ if(d<0)return NULL;
+ if(suit==0){
+  if(stage==B24M_HOVER||stage==B24M_DRIFT)return mk6_hover_fire[d];
+  if(stage==B24M_WALK||stage==B24M_IDLE)return mk6_ground_fire[d];
+ }else if(suit==2){
+  if(stage==B24M_HOVER||stage==B24M_DRIFT)return wm_hover_fire[d];
+  if(stage==B24M_WALK||stage==B24M_IDLE)return wm_ground_fire[d];
+ }
+ return NULL;
+}
+void b24_g8_motion_repulsor_trigger(B24G8LiveOriginalMotion *a,uint32_t now){
+ if(!a||!a->nv)return;
+ if(!a->repulsor_pending || (uint32_t)(now-a->repulsor_started_ms)>1600u){
+  a->repulsor_started_ms=now;a->repulsor_pending=1;
+ }
+}
+int b24_g8_motion_whole_body_fire(const B24G8LiveOriginalMotion *a){
+ return a&&a->whole_body_repulsor_active&&a->active&&!a->missing;
+}
 void b24_g8_motion_release(B24G8LiveOriginalMotion *a){
  if(!a)return;
  b24_original_im2v_close(&a->stream);
@@ -89,6 +141,17 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
                        uint32_t now){
  if(!a||!dir||!vertices||stride<3*sizeof(float))return 0;
  const char *desired=b24_g8_motion_route(suit,mode,left_x,forward);
+ /* Only an ACCEPTED B16 repulsor shot can request an original _Att clip.
+    The source IM2V duration is authoritative; never auto-fire a projectile. */
+ const char *shot=b24_g8_motion_repulsor_clip(suit,mode,left_x,forward);
+ if(a->repulsor_pending&&a->stream.file&&a->whole_body_repulsor_active&&
+    (uint32_t)(now-a->repulsor_started_ms)>=a->stream.duration_ms){
+    a->repulsor_pending=0;a->whole_body_repulsor_active=0;
+ }
+ if(a->repulsor_pending&&shot)desired=shot;
+ else if(a->repulsor_pending&&!shot){
+    a->repulsor_pending=0;a->whole_body_repulsor_active=0;
+ }
  if(!desired|| (suit==0&&nv!=802u) || (suit==2&&nv!=1292u)){
   /* Unsupported suit or mode explicitly leaves the proven G8 pose intact. */
   if(a->active||a->missing)b24_g8_motion_release(a);
@@ -121,6 +184,12 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
   strcpy(a->selected,desired);
   a->started_ms=now;a->previous_ms=now;
   a->active=!a->missing;
+  a->whole_body_repulsor_active=(a->active&&a->repulsor_pending&&shot&&
+                                 desired==shot);
+  if(a->missing&&a->repulsor_pending){
+    /* Preserve B16 single right-palm attack if source file missing. */
+    a->repulsor_pending=0;a->whole_body_repulsor_active=0;
+  }
   if(a->active){
    /* Capture PREVIOUS *rendered* pose, including interruptions. */
    if(!b24_hover_pose_blend_begin(&a->blend,a->snapshot_xyz,.15f))return 0;
