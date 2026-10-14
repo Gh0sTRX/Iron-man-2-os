@@ -1,4 +1,4 @@
-name: G8 true directional repulsor source fullbody clip and Vita ARM gate NO VPK
+name: G8 source moving repulsor and authentic 2010 3-hit combo ARM host NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -17,21 +17,26 @@ jobs:
           set -euo pipefail
           cd research/b24_unified
           cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -fno-omit-frame-pointer \
-            b24_original_im2v_stream.c b24_hover_pose_blend.c b24_g8_live_original_motion.c \
+            b24_original_im2v_stream.c b24_hover_pose_blend.c b24_g8_melee_source_chain.c b24_g8_live_original_motion.c \
             test_b24_g8_live_original_motion.c -lm -o /tmp/b24_g8_live_original_test
           ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/b24_g8_live_original_test
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            b24_g8_melee_source_chain.c test_b24_g8_melee_source_chain.c \
+            -o /tmp/b24_g8_melee_source_test
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/b24_g8_melee_source_test
       - name: VitaSDK ARMv7 strict C objects only no link and no VPK
         run: |
           set -euo pipefail
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
             vitasdk/vitasdk:2026.08 sh -lc '
               set -eu
-              for n in b24_original_im2v_stream b24_hover_pose_blend b24_g8_live_original_motion; do
+              for n in b24_original_im2v_stream b24_hover_pose_blend b24_g8_melee_source_chain b24_g8_live_original_motion; do
                 arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -c \
                   "research/b24_unified/$n.c" -o "/tmp/$n.o"
                 test -s "/tmp/$n.o"
               done
-              echo "PASS 3 ARM VitaSDK code objects; no eboot, no link, no VPK"
+              echo "PASS 4 ARM VitaSDK code objects; no eboot, no link, no VPK"
             '
       - name: Reconstruct G8 current real CPU and GPU gameplay source only
         run: |
@@ -69,6 +74,8 @@ jobs:
           assert t.count('b24_g8_motion_tick(')==1
           assert t.count('b24_g8_motion_repulsor_trigger(')==1
           assert 'b24_g8_motion_whole_body_fire(&b24_original_motion)' in t
+          assert t.count('b24_g8_motion_melee_trigger(')==1
+          assert 'b24_g8_melee_source_chain.c' in c
           assert t.count('b24_gpu_runtime_draw(')==1
           assert t.count('b14_world_tick(')==1
           assert t.count('b14_pose_tick_ex(')==1
