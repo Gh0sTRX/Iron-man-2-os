@@ -167,3 +167,5 @@ jobs:
 # Re-run after completing GL_TRUE in the source-only vitaGL mock.
 
 # Native one-batch GPU HUD replaces full 480x272 upload: fuzz includes offscreen GPU clipping.
+
+# Recheck strict signed enum profile phase and valid waveform test, source-only no VPK.
