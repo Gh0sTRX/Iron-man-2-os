@@ -2,6 +2,7 @@
 #define B24_G8_LIVE_ORIGINAL_MOTION_H
 #include "b24_original_im2v_stream.h"
 #include "b24_hover_pose_blend.h"
+#include "b24_g8_melee_source_chain.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -17,6 +18,7 @@ typedef enum {
 typedef struct {
  B24OriginalIM2VStream stream;
  B24HoverPoseBlend blend;
+ B24G8MeleeChain melee;
  float *source_xyz,*result_xyz,*snapshot_xyz;
  size_t nv;
  int suit_index,missing;
@@ -30,6 +32,10 @@ void b24_g8_motion_release(B24G8LiveOriginalMotion *a);
    unibeam), AFTER pose computation. The original source clip begins NEXT
    frame; if missing, B16 old right-palm blend still works as fallback. */
 void b24_g8_motion_repulsor_trigger(B24G8LiveOriginalMotion *a,uint32_t now_ms);
+/* Accepted Square melee edge: 2010 source Mark VI combo_1->2->3
+   with 2010 authored durations; NO simulated enemy-hit frame. */
+void b24_g8_motion_melee_trigger(B24G8LiveOriginalMotion *a,uint32_t now_ms);
+int b24_g8_motion_melee_source_active(const B24G8LiveOriginalMotion *a);
 int b24_g8_motion_whole_body_fire(const B24G8LiveOriginalMotion *a);
 const char *b24_g8_motion_repulsor_clip(int suit_index,B24MotionStage stage,
                                         float left_x,float forward);
