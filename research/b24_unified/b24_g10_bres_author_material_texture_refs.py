@@ -22,11 +22,11 @@ def forensic():
     tgas[m.group(0)[:-1].decode("latin1")].add(m.start())
    # Enumerate pointer positions that point exactly to 2010 TGA filename strings
    refs=collections.defaultdict(list)
+   target_to_name={offset:name for name,positions in tgas.items() for offset in positions}
    for off in range(0,len(raw)-3,4):
     pointer=struct.unpack_from("<I",raw,off)[0]
-    for label,targets in tgas.items():
-     if pointer in targets:
-      refs[label].append(off)
+    name=target_to_name.get(pointer)
+    if name is not None:refs[name].append(off)
    records.append({"original_bres":bres_name,
       "literal_tga_string_offsets":{x:sorted(v)[:7] for x,v in tgas.items()},
       "direct_native_pointer_references":{x:v[:25] for x,v in refs.items()},
