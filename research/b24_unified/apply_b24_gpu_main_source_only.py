@@ -111,6 +111,7 @@ sources=[
  "b24_gpu_camera.c","b24_gpu_owner_vitagl.c","b24_c1_gpu_mesh.c",
  "b24_c1_gpu_vitagl.c","b24_gpu_suit_vitagl.c",
  "b24_gpu_suit_im2_adapter.c","b24_gpu_hud_bridge_vitagl.c",
+ "b24_gpu_reticle.c",
  "b24_gpu_runtime.c"
 ]
 cmroot="$"+"{CMAKE_CURRENT_SOURCE_DIR}"
