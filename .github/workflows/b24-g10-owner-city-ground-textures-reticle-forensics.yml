@@ -1,4 +1,4 @@
-name: G10 other 3 suits bone retarget original city sprites and textures NO VPK
+name: G10 prove Mark IV Stealth Suitcase authored 2010 BRES animation retargeting NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -35,6 +35,7 @@ jobs:
             --out /tmp/B24_G10_ORIGINAL_IOS_SPRITE_CROSSHAIR_INDEX.json
       - name: Test actual Mark IV Stealth Suitcase 2010 BRES rig skin retargets with Mark VI authored clips
         run: |
+          python3 -m pip install -q scipy
           python3 research/b24_unified/b24_g10_ironman_other_suit_rig_retarget_probe.py \
             --ipa /tmp/b24_g10_owner/source.ipa \
             --out /tmp/B24_G10_ORIGINAL_OTHER_SUITS_RETARGET_SOURCE.json
