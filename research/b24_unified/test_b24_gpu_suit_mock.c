@@ -51,10 +51,18 @@ int main(void){
  assert(b24_gpu_suit_prepare(&cache,&src));
  assert(newtex==1&&uploads==1);
  assert(!b24_gpu_suit_prepare(&cache,&src));
- B24GpuSuitPose pose={5,6,2,0};
+ B24GpuSuitPose pose={5,6,2,0,0,0};
  float mat[16];
  assert(b24_gpu_suit_matrix(mat,&pose,.5f));
  assert(fabsf(mat[0]+1.f)<.001f&&fabsf(mat[5]+1.f)<.001f);
+ assert(fabsf(mat[12]-5.f)<.001f&&fabsf(mat[14]-1.5f)<.001f);
+
+ /* B17 yaw remains original; cruise/rush applies actual GPU root Rx/Ry.
+    Local model forward is -Y; negative pitch raises the nose in Z-up. */
+ pose.pitch=-.3f;pose.roll=.2f;
+ assert(b24_gpu_suit_matrix(mat,&pose,.5f));
+ assert(fabsf(mat[6]-sinf(-.3f))<.001f);
+ assert(fabsf(mat[2]+cosf(-.3f)*sinf(.2f))<.001f);
  assert(fabsf(mat[12]-5.f)<.001f&&fabsf(mat[14]-1.5f)<.001f);
  assert(b24_gpu_suit_draw(&cache,&src,&pose));
  v[1].z=2.f; /* live B14 original animation output in RAM */
