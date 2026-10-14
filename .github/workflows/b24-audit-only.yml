@@ -213,7 +213,7 @@ jobs:
           from pathlib import Path
           s=Path("work/src/main.c").read_text()
           cm=Path("work/CMakeLists.txt").read_text()
-          assert s.count("b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game)")==1
+          assert s.count("b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)")==1
           assert s.count("#ifdef B24_GPU_ENGINE")>=5
           assert cm.count("option(B24_ENABLE_GPU")==1
           assert "SDL_INIT_GAMECONTROLLER|SDL_INIT_TIMER" in s
@@ -221,6 +221,17 @@ jobs:
           assert Path("work/maps/C1L1_environment.c1g2").stat().st_size>500000
           print("PASS B24 actual gameplay, original animation & C1 GPU opt-in source integration, no SDL second renderer")
           PY
+      - name: B24 real five-armored GPU cache invalidation and animation rebind regression
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -ffunction-sections -fdata-sections \
+            -Iwork/src -Iresearch/b24_unified \
+            research/b24_unified/b24_gpu_suit_im2_adapter.c \
+            research/b24_unified/b24_gpu_runtime.c \
+            research/b24_unified/test_b24_gpu_runtime_suit_rebind.c \
+            -Wl,--gc-sections -lm -o /tmp/b24-gpu-suit-rebind
+          /tmp/b24-gpu-suit-rebind
       - name: VitaSDK compile WHOLE opt-in B24 main / HUD / 3D GPU modules, object only
         shell: bash
         run: |
