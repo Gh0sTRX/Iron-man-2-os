@@ -17,11 +17,30 @@ PATTERN=re.compile(r"shoulder|rocket|missile|muzzle|gatl|gun|barrel|weapon|turre
 def run(ipa,out):
     with zipfile.ZipFile(ipa) as z:
         models=z.read("Payload/IronMan2.app/models")
+        animations=z.read("Payload/IronMan2.app/anims")
     raw=get_exact(models,decode(models,".bdae"),"warmachine.bdae")
     with tempfile.TemporaryDirectory(prefix="b24_wm_2010_socket_source_") as temp:
         b13=load_original_b13(Path(temp))
         nodes=b13.parse_rig(raw)
         rest_world=b13.worlds(nodes)
+        original_anim_index=decode(animations,".anim")
+        original_animation_gun_tracks=[]
+        for source_anim in ("Warmachine_Aim_Float_idle.anim",
+                            "Warmachine_Aim_Float_move_R_Att.anim",
+                            "Warmachine_Aim_M_Float_move_L_Att.anim",
+                            "Warmachine_Aim_Fly_M.anim"):
+            track=b13.decode_anim(get_exact(animations,original_anim_index,source_anim))
+            matched=[str(label) for label in track.names if PATTERN.search(str(label))]
+            original_animation_gun_tracks.append({
+                "original_2010_animation":source_anim,
+                "authored_duration_ms":track.duration_ms,
+                "total_bone_tracks":len(track.names),
+                "candidate_weapon_animation_track_labels":matched,
+                "gun_tracking_motion_proven":False,
+            })
+    gun_palette_candidates=[]
+    _,palette,_,_,_=b13.parse_skin(raw,1292)
+    gun_palette_candidates=[name for name in palette if PATTERN.search(name)]
     names=[]
     for n in nodes:
         v=n.get("name")
@@ -83,6 +102,8 @@ def run(ipa,out):
                                 for m in meshes],
       "named_rig_socket_candidates":candidates,
       "rest_pose_weapon_node_transforms":source_rest,
+      "source_gun_related_skinned_palette_labels":gun_palette_candidates,
+      "original_source_animation_weapon_track_audit":original_animation_gun_tracks,
       "source_dummy_to_dummyE_deltas":proposed_pairs,
       "source_ascii_name_candidates":fields,
       "G8_verified_2010_skin_vertex_count":1292,
@@ -98,6 +119,8 @@ def run(ipa,out):
     print("WM_2010_SHOULDER_NAMED_CANDIDATES",candidates[:30])
     print("WM_2010_ORIGINAL_REST_WORLD_WEAPON_NODES",[(i["name"],i["original_world_translation_xyz"],i["original_bres_record_offset"]) for i in source_rest])
     print("WM_2010_ORIGINAL_DUMMY_TO_DUMMYE_DISTANCE",proposed_pairs)
+    print("WM_2010_ANIMATION_GUN_TRACKS",original_animation_gun_tracks)
+    print("WM_2010_SKIN_GUN_PALETTE",gun_palette_candidates)
     print("WM_2010_SOURCE_ASCII_WEAPON_NAMES",[(x["name"],x["occurrences"]) for x in fields[:50]])
     print("PASS original model 2010 shoulder mount forensic SOURCE_ONLY; two muzzle transforms UNPROVEN")
 if __name__=="__main__":
