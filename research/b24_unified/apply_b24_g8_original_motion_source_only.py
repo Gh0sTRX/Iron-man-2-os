@@ -20,14 +20,18 @@ def rep(old,new):
 rep('#include "../b24/b24_unified/b24_gpu_runtime.h"',
 '''#include "../b24/b24_unified/b24_gpu_runtime.h"
 #include "../b24/b24_unified/b24_g8_live_original_motion.h"
-#include "../b24/b24_unified/b24_g8_wm_shoulder_gameplay.h"''')
+#include "../b24/b24_unified/b24_g8_wm_shoulder_gameplay.h"
+#include "../b24/b24_unified/b24_wm_original_rigid_sync.h"''')
 rep("static B24GpuRuntime b24_gpu_rt={0};",
 '''static B24GpuRuntime b24_gpu_rt={0};
 /* One source animation state/stream for the already-authoritative B14 body.
    G8 renderer remains the SAME real VitaGL owner. */
 static B24G8LiveOriginalMotion b24_original_motion={0};
 static B24WMShoulder b24_wm_shoulder={0};
-static B24WMOutput b24_wm_frame_events={0};''')
+static B24WMOutput b24_wm_frame_events={0};
+/* Diagnostic ONLY: owner-authentic War Machine rigid Gun03 markers are not
+   player weapon muzzle/FX sources until exact original binding is proven. */
+static B24WMRigidSync b24_wm_original_rigid={0};''')
 rep('''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active)
               b16_attack_begin(&attack,now,world.flying,0,0);''',
 '''          if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active){
@@ -102,6 +106,26 @@ rep("        b16_apply_attack(&attack,&model,now);",
                 original_stage,move_x,move_y,(uint32_t)now)){
              running=0;break;
           }
+          /* Original 2010 WM Gun01-04 and Gun03 author marker stream is
+             synchronized with EXACT selected original body clip + B14 age.
+             No extra physics tick, no second model, no projectile emission.
+             Missing IM2K files silently preserve G8's old 59 fallback. */
+          const B24WMG8ActorPose wm_actor={
+               world.x,world.y,world.z,world.heading,
+               model.center_z,camera.hover_bob};
+          if(!b24_wm_rigid_sync_tick(&b24_wm_original_rigid,
+             "app0:animations",
+             b24_original_motion.selected,
+             b24_original_motion.stream.frames,
+             b24_original_motion.stream.duration_ms,
+             b24_original_motion.started_ms,(uint32_t)now,
+             idx==2 && b24_original_motion.active &&
+                    !b24_original_motion.missing,
+             &wm_actor)){
+              /* Only an optional unproven diagnostic failed; DO NOT
+                 interrupt combat/flying or replace the known-good suit. */
+              b24_wm_rigid_sync_release(&b24_wm_original_rigid);
+          }
         }
 #endif
 #ifdef B24_GPU_ENGINE
@@ -113,7 +137,8 @@ rep("        b16_apply_attack(&attack,&model,now);",
 #endif
         b16_apply_attack(&attack,&model,now);''')
 rep("    b24_gpu_runtime_close(&b24_gpu_rt);",
-'''    b24_g8_motion_release(&b24_original_motion);
+'''    b24_wm_rigid_sync_release(&b24_wm_original_rigid);
+    b24_g8_motion_release(&b24_original_motion);
     b24_gpu_runtime_close(&b24_gpu_rt);''')
 P.write_text(s)
 out=WORK/"b24/b24_unified"
@@ -122,7 +147,10 @@ for name in ("b24_g8_live_original_motion.c",
              "b24_original_im2v_stream.c","b24_original_im2v_stream.h",
              "b24_hover_pose_blend.c","b24_hover_pose_blend.h",
              "b24_g8_melee_source_chain.c","b24_g8_melee_source_chain.h",
-             "b24_g8_wm_shoulder_gameplay.c","b24_g8_wm_shoulder_gameplay.h"):
+             "b24_g8_wm_shoulder_gameplay.c","b24_g8_wm_shoulder_gameplay.h",
+             "b24_wm_2010_gun_stream.c","b24_wm_2010_gun_stream.h",
+             "b24_wm_original_marker_g8_world.c","b24_wm_original_marker_g8_world.h",
+             "b24_wm_original_rigid_sync.c","b24_wm_original_rigid_sync.h"):
  shutil.copyfile(ROOT/"research/b24_unified"/name,out/name)
 CMAKE=WORK/"CMakeLists.txt"
 cm=CMAKE.read_text()
@@ -138,7 +166,10 @@ if(B24_ENABLE_GPU)
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_original_im2v_stream.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_hover_pose_blend.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_melee_source_chain.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_wm_shoulder_gameplay.c")
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_g8_wm_shoulder_gameplay.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_wm_2010_gun_stream.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_wm_original_marker_g8_world.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_wm_original_rigid_sync.c")
 endif()
 '''
 CMAKE.write_text(cm)
