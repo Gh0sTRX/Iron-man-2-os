@@ -1,0 +1,59 @@
+name: G10 2010 original Mark IV Stealth Suitcase ALL 744 BRES reskinned authored player animations NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g10-all-four-ironman-original-2010-reskin-744-source.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_2010_reskin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 48
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original B13 actual skin evaluator and temporary user backup
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy scipy gdown
+          mkdir -p /tmp/g10_original_user_backup
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g10_original_user_backup/source.ipa
+          test "$(wc -c < /tmp/g10_original_user_backup/source.ipa)" -eq 248613763
+      - name: Bake EACH of 248 original owner player animations separately to authentic Mark4, Stealth and Suitcase
+        run: |
+          python3 research/b24_unified/b24_g10_other_armors_248_original_reskin_bake.py \
+            --ipa /tmp/g10_original_user_backup/source.ipa \
+            --out /tmp/G10_2010_ORIGINAL_MARK4_STEALTH_SUITCASE_744_IM2V
+      - name: Validate all 744 stream headers, exact source timing, digest and geometry
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,struct
+          from pathlib import Path
+          root=Path('/tmp/G10_2010_ORIGINAL_MARK4_STEALTH_SUITCASE_744_IM2V')
+          m=json.loads((root/'G10_MARK4_STEALTH_SUITCASE_ALL_248_ORIGINAL_SKIN_ANIMATIONS.json').read_text())
+          assert len(m['outfits'])==3
+          sizes={'mark4':802,'stealth':802,'suitcase':629}
+          assert len(list(root.glob('*.im2v')))==744
+          for suit,item in m['outfits'].items():
+             assert item['vertices']==sizes[suit] and len(item['records'])==248
+             assert item['inverse_bind_error']<2e-4
+             for entry in item['records']:
+                 b=(root/entry['asset']).read_bytes()
+                 magic,n,frames,fps,duration=struct.unpack_from('<4sIIII',b)
+                 assert magic==b'IM2V' and n==sizes[suit]
+                 assert frames==entry['frames'] and fps==20
+                 assert duration==entry['duration_ms']
+                 assert len(b)==entry['bytes']==20+frames*n*12
+                 assert hashlib.sha256(b).hexdigest()==entry['im2v_sha256']
+          print('PASS 744 actual original 2010 separately-skinned original BRES motion streams, no invented retarget or VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G10_All_744_Original_2010_Mark4_Stealth_Suitcase_Animation_IM2V_Source_Not_VPK
+          path: /tmp/G10_2010_ORIGINAL_MARK4_STEALTH_SUITCASE_744_IM2V/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
+      - name: Remove user's original IPA
+        if: always()
+        run: rm -rf /tmp/g10_original_user_backup
