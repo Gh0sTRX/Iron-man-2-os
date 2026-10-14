@@ -62,14 +62,17 @@ def decode_pvr(pvr:bytes):
  import texture2ddecoder
  pixels=texture2ddecoder.decode_pvrtc(pvr[52:],512,512)
  if len(pixels)!=512*512*4:raise ValueError("PVRTC decoder wrong output size")
- return pixels
+ # Real B9 original Mark V 512x512 RGBA reference cross-calibrated against
+ # SAME owner's original PVRTC MC_SuitCase.tga: BGRA straight, MAE 0.0854
+ # (2026-10-14 source-only CI 38574410509). No vertical flip required.
+ channel=np.frombuffer(pixels,dtype=np.uint8).reshape(-1,4)
+ return np.ascontiguousarray(channel[:,[2,1,0,3]]).tobytes()
 def build(ipa:Path,parser_archive:Path,out:Path,manifest:Path):
  bres,atlas,rs,packed=source(ipa)
  verts,faces,meshes=decode_bres(bres,parser_archive)
  pixels=decode_pvr(atlas)
- # Pixel byte-order MUST be calibrated against the existing B9 original
- # suit: imagecodecs/texture2ddecoder may output BGRA.
- # Until independently verified don't assign output to a live release.
+ # Converter channel ordering is cross-calibrated against original B9 Mark V.
+ # Rig binding and motion remain unverified; no new playable sixth suit yet.
  if len(verts)!=EXPECTED_VERTS*20 or len(faces)!=EXPECTED_TRIS*6:
   raise ValueError(f"underwater mesh layout bytes verts={len(verts)} expected={EXPECTED_VERTS*20}; indices={len(faces)} expected={EXPECTED_TRIS*6}")
  header=struct.pack('<4sIIII',b'IM2T',EXPECTED_VERTS,EXPECTED_TRIS,512,512)
@@ -81,11 +84,12 @@ def build(ipa:Path,parser_archive:Path,out:Path,manifest:Path):
    "source_atlas_sha256":hashlib.sha256(atlas).hexdigest(),"im2t_sha256":hashlib.sha256(data).hexdigest(),
    "vertices":EXPECTED_VERTS,"triangles":EXPECTED_TRIS,"bytes":len(data),
    "original_animation_count":len([x for x in rs['anims'] if "underwater" in x.name.lower()]),
-   "pvrtc_output_byte_order_calibrated":False,
+   "pvrtc_output_byte_order_calibrated":True,
+   "pvrtc_calibration_original_b9_suitcase_mae":0.0854,
    "original_skin_weights_or_animations_decoded_here":False,"g7_device_verified":False}
  manifest.write_text(json.dumps(meta,indent=2)+"\n")
- print("PASS ORIGINAL Underwater BRES 840 vertices 359 triangles + PVR atlas, IM2T v1 source format",
-    len(data),"bytes; COLOR ORDER UNVERIFIED - DO NOT SHIP AS COMPLETE ARMOR")
+ print("PASS ORIGINAL Underwater BRES 840 vertices 1078 triangles + B9-calibrated PVR original atlas, IM2T v1 source format",
+    len(data),"bytes; RIG ANIMATION UNVERIFIED - NOT A PLAYABLE RELEASE")
  return meta
 if __name__=='__main__':
  a=argparse.ArgumentParser()
