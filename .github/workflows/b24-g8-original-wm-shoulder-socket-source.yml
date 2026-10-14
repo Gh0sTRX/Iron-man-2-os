@@ -24,10 +24,31 @@ jobs:
           python3 research/b24_unified/b24_wm_original_shoulder_socket_forensics.py \
             --ipa /tmp/wm-original-source/source.ipa \
             --report /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
+      - name: Sample six genuine 2010 animated gun hierarchies and render source kinematics
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q matplotlib
+          python3 research/b24_unified/b24_wm_original_animated_gun_kinematics.py \
+            --ipa /tmp/wm-original-source/source.ipa \
+            --report /tmp/G8_WM_2010_GUN_ANIMATED_SOURCE_MATRIX.json \
+            --image /tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/G8_WM_2010_GUN_ANIMATED_SOURCE_MATRIX.json').read_text())
+          assert d['rig_count']==112 and len(d['animations'])==6
+          assert len(d['nodes'])==10
+          assert d['parent_graph_verified'] and not d['muzzle_side_or_particle_emitter_proven']
+          assert Path('/tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png').stat().st_size>10000
+          print('PASS original 2010 BRES source hierarchy, 6 Gun track kinematics + diagnostic PNG; no invented muzzle binding')
+          PY
       - uses: actions/upload-artifact@v4
         with:
-          name: G8_WM_2010_Source_Left_Rocket_Right_Gatling_Socket_Forensic_JSON
-          path: /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          path: |
+            /tmp/G8_WM_2010_SHOULDER_SOURCE_NODE_FORENSICS.json
+            /tmp/G8_WM_2010_GUN_ANIMATED_SOURCE_MATRIX.json
+            /tmp/G8_WM_2010_Gun01_04_6_Original_Motion_Preview.png
           if-no-files-found: error
       - name: Clean owner archive
         if: always()
