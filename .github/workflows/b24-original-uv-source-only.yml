@@ -58,6 +58,15 @@ jobs:
             research/b24_unified/test_b24_gpu_c1_material_mock.c \
             -lm -o /tmp/b24-mesh-materials
           /tmp/b24-mesh-materials /tmp/original_C1L1_gpu.c1g2 /tmp/original_C1L1_uv.c1uv
+      - name: Validate 512x512 vehicle atlas one-time GPU upload and corrupt input guards
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iresearch/b24_unified/mock_gpu -Iresearch/b24_unified \
+            research/b24_unified/b24_gpu_c1_vehicle_texture_vitagl.c \
+            research/b24_unified/test_b24_gpu_c1_vehicle_texture_mock.c \
+            -lm -o /tmp/b24-vehicle-atlas-gpu
+          /tmp/b24-vehicle-atlas-gpu
       - name: Upload METADATA ONLY, never copyrighted atlas, UV, models
         uses: actions/upload-artifact@v4
         with:
