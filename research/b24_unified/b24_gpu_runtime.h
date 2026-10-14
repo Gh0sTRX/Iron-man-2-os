@@ -11,6 +11,8 @@ typedef struct {
  B24GpuOwner owner;
  B24CpuGpuProfile profile; /* CPU thread wall only; not GPU busy */
  B24GpuC1Mesh city;
+ B24C1UV city_uv;
+ uint32_t verified_vehicle_atlas; /* 0 until B12 original atlas loaded, never guessed */
  B24GpuSuit suit;
  B24GpuIM2Stream stream;
  B24GpuHudBridge hud;
