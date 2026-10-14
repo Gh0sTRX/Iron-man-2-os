@@ -1,0 +1,77 @@
+name: B24 Underwater Texture Codec Calibration - No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-underwater-texture-calibration.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout vetted inventory tools
+        uses: actions/checkout@v4
+      - name: Retrieve exactly owner-provided original IPA via share URL into ephemeral runner
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/ironman-owner-ipa
+          cd /tmp/ironman-owner-ipa
+          # Only explicit owner-supplied 2026-10-14 exact Drive file ID.
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O source_v1.0.0.ipa
+          test "$(wc -c < source_v1.0.0.ipa)" -eq 248613763
+          echo "PASS exact owner-supplied original archive length; original archive NEVER uploaded as artifact"
+      - name: Original 2010 BRES and PVRTC codec dependencies
+        run: python3 -m pip install -q numpy texture2ddecoder
+      - name: Strict original Underwater IM2T build and B9 Suitcase texture calibration
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_original_underwater_armor.py \
+            --ipa /tmp/ironman-owner-ipa/source_v1.0.0.ipa \
+            --out /tmp/underwater.im2t \
+            --manifest /tmp/underwater_check.json
+          python3 - <<'PY'
+          import sys,zipfile,struct,numpy as np,hashlib,json
+          sys.path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          import texture2ddecoder
+          with zipfile.ZipFile('/tmp/ironman-owner-ipa/source_v1.0.0.ipa') as z:
+              raw=z.read('Payload/IronMan2.app/textures')
+          pvr=get_exact(raw,decode(raw,'.tga'),'MC_Suitcase.tga') if 'MC_Suitcase.tga' in {r.name for r in decode(raw,'.tga')} else get_exact(raw,decode(raw,'.tga'),'MC_SuitCase.tga')
+          with zipfile.ZipFile('armor_b9/b9_overlay.zip') as z:
+              b=z.read('models/suitcase.im2t')
+          magic,nv,nt,tw,th=struct.unpack_from('<4sIIII',b)
+          assert magic==b'IM2T' and (nv,nt,tw,th)==(629,902,512,512)
+          offset=20+nv*20+nt*6
+          old=np.frombuffer(b[offset:],dtype=np.uint8).reshape(th,tw,4).astype(np.int16)
+          assert len(b[offset:])==512*512*4
+          h,hh,ww=struct.unpack_from('<III',pvr)
+          print('B9_REFERENCE_PVR_HEADER',h,hh,ww,'file_bytes',len(pvr))
+          decoded=np.frombuffer(texture2ddecoder.decode_pvrtc(pvr[52:],512,512),dtype=np.uint8).reshape(512,512,4).astype(np.int16)
+          candidates={
+             'rgba':decoded,'bgra':decoded[:,:,[2,1,0,3]],
+             'abgr':decoded[:,:,[3,2,1,0]],
+             'argb':decoded[:,:,[1,2,3,0]]
+          }
+          results={}
+          for name,arr in candidates.items():
+              for flip in ('straight','flip_y'):
+                  candidate=arr if flip=='straight' else arr[::-1]
+                  err=np.abs(old-candidate)
+                  results[name+'_'+flip]={
+                      'mae':round(float(err.mean()),4),
+                      'mismatch_ratio':round(float((err>3).mean()),5),
+                      'ref_rgba_means':[round(float(x),2) for x in old.mean(axis=(0,1))],
+                      'new_rgba_means':[round(float(x),2) for x in candidate.mean(axis=(0,1))]
+                  }
+          best=min(results,key=lambda k:results[k]['mae'])
+          print('B9_AUTHENTIC_SUITCASE_PIXEL_CALIBRATION',json.dumps({'best':best,'scores':results},sort_keys=True))
+          assert results[best]['mae']<18, 'PVRTC output not confidently calibrated against original B9'
+          print('PASS ORIGINAL UNDERWATER v1 IM2T STRUCTURE + B9 COLOR-CHANNEL calibration (does NOT prove rig animations)')
+          PY
+      - name: Source-owned binary cleanup
+        if: always()
+        run: rm -rf /tmp/ironman-owner-ipa /tmp/underwater.im2t
