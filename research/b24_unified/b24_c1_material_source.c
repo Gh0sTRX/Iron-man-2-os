@@ -4,7 +4,7 @@
 #include <string.h>
 _Static_assert(sizeof(B24C1MatMesh)==20,"C1MA 5x uint32 mesh ABI drift");
 static uint32_t rd32(const unsigned char *p){
- return (uint32_t)p[0]|(uint32_t)p[1]<<8|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24;
+ return (uint32_t)p[0]|(uint32_t)p[1]<<8|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24);
 }
 static uint16_t rd16(const unsigned char *p){
  return (uint16_t)((unsigned)p[0]|((unsigned)p[1]<<8));
