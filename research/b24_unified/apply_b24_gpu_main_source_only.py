@@ -136,6 +136,8 @@ body=cmake.read_text()
 if "B24_GPU_SINGLE_OWNER_INTEGRATION" in body:raise RuntimeError("duplicate GPU CMake")
 sources=[
  "b24_gpu_camera.c","b24_gpu_owner_vitagl.c","b24_c1_gpu_mesh.c",
+ "b24_c1_gpu_uv.c","b24_gpu_c1_material_vitagl.c",
+ "b24_gpu_owner_c1_material.c",
  "b24_c1_gpu_vitagl.c","b24_gpu_suit_vitagl.c",
  "b24_gpu_suit_im2_adapter.c","b24_gpu_hud_bridge_vitagl.c",
  "b24_gpu_reticle.c",
