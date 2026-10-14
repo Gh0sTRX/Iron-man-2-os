@@ -1,11 +1,7 @@
 name: Build Iron Man 2 Vita B24 C1L1 Recovery Candidate
+# Historical C2 failed on real hardware; preserve for forensic reproduction only.
+# Disable automatic rebuild on B24 source edits while native GPU G1 supersedes it.
 on:
-  push:
-    branches: [feature/b24-unified-gameplay]
-    paths:
-      - ".github/workflows/unified-b24.yml"
-      - "research/b24_unified/**"
-      - "research/B11_C1L1_Scene_GLBS.zip"
   workflow_dispatch:
 permissions:
   contents: read
