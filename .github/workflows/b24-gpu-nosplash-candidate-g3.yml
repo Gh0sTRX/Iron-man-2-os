@@ -157,7 +157,7 @@ jobs:
           PY
           grep -q IM2G00028 work/CMakeLists.txt
           test -s work/models/suitcase.im2t
-      - name: Preflight: G1 source-matched crash fix and precise G3 diagnostics
+      - name: G1 source-matched crash fix and precise G3 diagnostics
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
