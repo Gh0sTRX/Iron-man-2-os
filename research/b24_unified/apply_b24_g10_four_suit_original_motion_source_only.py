@@ -13,6 +13,12 @@ def change(old,new):
  if s.count(old)!=1:raise RuntimeError("G10 four armor source drift "+str(s.count(old))+" "+old[:115])
  s=s.replace(old,new)
 change('#include <string.h>', '#include <string.h>\n#include <stdio.h>')
+# Source IronMan_Move_Float is the non-repulsor hover body variant.
+# G9 used IronMan_Aim_Float_idle even when no attack was accepted, causing
+# a permanently raised repulsor while floating. Source Move_Float must be
+# visually confirmed on Vita; never disable B16 actual repulsor attack.
+change('"ironman_ironman_aim_float_idle",',
+       '"ironman_ironman_move_float",')
 entry='''const char *b24_g8_motion_route(int suit,B24MotionStage mode,float x,float y){'''
 intro='''/* Original source BRES clips are independently re-skinned for each armor.
    Local buffer only: single original animation/gameplay B14 tick, no threads.
