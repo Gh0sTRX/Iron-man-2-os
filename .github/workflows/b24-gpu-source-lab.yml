@@ -95,7 +95,7 @@ jobs:
             research/b24_unified/test_b24_gpu_hud_native_mock.c \
             -lm -o /tmp/b24-gpu-native-hud
           /tmp/b24-gpu-native-hud
-      - name: CPU-vs-GPU submission timing: monotonic six-phase source-only regression
+      - name: CPU vs GPU submission timing - six phase source regression
         run: |
           set -euo pipefail
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
