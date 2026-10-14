@@ -29,8 +29,13 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
     If absent, NO fabricated city textures will be assigned. This
     sidecar will be staged alongside C1G2 only after conversion validation. */
  (void)b24_c1_uv_load(&r->city_uv,"app0:maps/C1L1_environment.c1uv");
+ /* Source-validated IDs for ALL 22919 triangles, not diffuse textures.
+    Optional until original 2010 BDAE material->atlas sampler recovery. */
+ (void)b24_c1_material_source_load(&r->city_material,
+                                    "app0:maps/C1L1_environment.c1ma");
  r->verified_vehicle_atlas=0; /* B12 original atlas not packaged yet */
  if(!b24_gpu_owner_init(&r->owner,0)){
+  b24_c1_material_source_free(&r->city_material);
   b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
@@ -43,6 +48,7 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
  if(!b24_gpu_hud_bridge_prepare(&r->hud)){
   b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
+  b24_c1_material_source_free(&r->city_material);
   b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
@@ -119,6 +125,7 @@ void b24_gpu_runtime_close(B24GpuRuntime *r){
  b24_gpu_suit_release(&r->suit);
  b24_gpu_im2_stream_free(&r->stream);
  b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
+ b24_c1_material_source_free(&r->city_material);
  b24_c1_uv_free(&r->city_uv);
  b24_gpu_c1_free(&r->city);
  /* vitaGL has no stable public vglEnd in current upstream header.
