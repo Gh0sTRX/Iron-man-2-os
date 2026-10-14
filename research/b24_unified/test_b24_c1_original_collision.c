@@ -35,6 +35,7 @@ int main(int argc,char **argv){
  assert(c.ready&&c.count==1908u&&c.wall_count==1908u);
  float x=1.f,y=.3f;
  assert(b24_c1_original_collision_resolve(&c,-1.f,.3f,1.f,1.f,.35f,&x,&y));
+ fprintf(stderr,"DEBUG_FIRST_OR_RUSH_CONTACT x=%.9f y=%.9f\\n",x,y);
  assert(x<-.345f&&x>-.365f);
  assert(y>.19f&&y<.32f); /* retain tangential sliding */
  x=40.f;y=.5f;
