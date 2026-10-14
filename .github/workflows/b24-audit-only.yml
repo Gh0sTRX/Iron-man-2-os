@@ -215,7 +215,7 @@ jobs:
           cm=Path("work/CMakeLists.txt").read_text()
           assert s.count("b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)")==1
           assert s.count("#ifdef B24_GPU_ENGINE")>=5
-          assert cm.count("option(B24_ENABLE_GPU")==1
+          assert cm.count('option(B24_ENABLE_GPU "')==1
           assert 'option(B24_ENABLE_NATIVE_HUD' in cm
           assert 'b24_gpu_hud_native_vitagl.c' in cm
           assert 'b24_gpu_cpu_profile.c' in cm
