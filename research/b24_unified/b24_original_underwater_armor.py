@@ -68,7 +68,7 @@ def build(ipa:Path,parser_archive:Path,out:Path,manifest:Path):
  # suit: imagecodecs/texture2ddecoder may output BGRA.
  # Until independently verified don't assign output to a live release.
  if len(verts)!=EXPECTED_VERTS*20 or len(faces)!=EXPECTED_TRIS*6:
-  raise ValueError("underwater mesh layout")
+  raise ValueError(f"underwater mesh layout bytes verts={len(verts)} expected={EXPECTED_VERTS*20}; indices={len(faces)} expected={EXPECTED_TRIS*6}")
  header=struct.pack('<4sIIII',b'IM2T',EXPECTED_VERTS,EXPECTED_TRIS,512,512)
  data=header+verts+faces+pixels
  assert len(data)==20+EXPECTED_VERTS*20+EXPECTED_TRIS*6+512*512*4
