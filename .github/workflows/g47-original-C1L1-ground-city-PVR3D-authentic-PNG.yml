@@ -42,7 +42,7 @@ jobs:
           assert r['source_native_ground_triangles']==3280
           assert r['source_authentic_original_PVRs']==24
           assert r['source_native_PD_negative_Z_count']==5
-          assert r['source_original_vertices_relocated'] is False
+          assert r['original_source_vertices_relocated'] is False
           assert r['original_runtime_visibility_claimed'] is False
           assert r['no_VPK_and_no_performance_changes']
           assert (p/'G47_C1L1_2010_ORIGINAL_BRES_PVR_3D_GROUND_ON_OFF.png').stat().st_size>120000
