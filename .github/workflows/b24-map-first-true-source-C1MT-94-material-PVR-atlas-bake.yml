@@ -1,4 +1,4 @@
-name: MAP FIRST G12 94 authentic shader PVR material atlas defensive Vita C11 signedness patched NO VPK
+name: MAP FIRST G12 authentic 2010 C1L1 atlas + host genuine textured triangle visual QA and Vita ARM NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -27,6 +27,10 @@ jobs:
             --ipa /tmp/g12_owner/owner.ipa \
             --out /tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt \
             --manifest /tmp/G12_C1L1_2010_SOURCE_AUTHORED_SHADER_DIFFUSE_INDEX_REPORT.json
+      - name: Visual map source 2010 C1L1 geometry and actual material preview validation
+        run: |
+          python3 -m pip install -q pillow texture2ddecoder
+          python3 research/b24_unified/b24_g12_true_2010_textured_C1L1_host_scene_preview.py --ipa /tmp/g12_owner/owner.ipa --out /tmp/g12_owner/previews
       - name: Assert authentic car atlas and all source BRES 94 labels plus two Building4 proof, no VPK
         run: |
           python3 - <<'PY'
@@ -70,6 +74,8 @@ jobs:
           path: |
             /tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt
             /tmp/G12_C1L1_2010_SOURCE_AUTHORED_SHADER_DIFFUSE_INDEX_REPORT.json
+            /tmp/g12_owner/previews/*.png
+            /tmp/g12_owner/previews/*.json
           if-no-files-found: error
       - name: Remove ephemeral original user-owned 2010 IPA from CI
         if: always()
