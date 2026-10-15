@@ -1,0 +1,42 @@
+name: MAP FIRST 2010 C1L1 native ground building road 22919 face UV availability NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-c1l1-real-source-uv-face-coverage.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_original_uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install B11 original iOS geometry/UV parser
+        run: python3 -m pip install -q numpy
+      - name: Audit every true source UV-carrying face by city category
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_map_first_2010_c1l1_true_uv_material_visibility.py \
+            --out /tmp/MAP_FIRST_C1L1_REAL_BRES_UV_FACE_COVERAGE.json
+      - name: Assert ALL 22919 original triangles preserved and no invented textures
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/MAP_FIRST_C1L1_REAL_BRES_UV_FACE_COVERAGE.json').read_text())
+          g=d['groups']
+          assert d['original_C1L1_triangle_total']==22919
+          assert d['original_source_meshes']==370
+          assert sum(a['all_faces'] for a in g.values())==22919
+          assert sum(a['all_meshes'] for a in g.values())==370
+          assert sum(a['texturable_meshes'] for a in g.values())==169
+          assert all(a['texturable_faces']+a['missing_uv_faces']==a['all_faces'] for a in g.values())
+          assert d['UV_zero_BRES_faces_must_not_get_false_solid_texture']
+          print('PASS original 2010 C1L1 all 22919 road/urban/light/car face UV audit, no guessed 39 atlas-to-material pair and no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MAP_FIRST_2010_C1L1_True_22919_Ground_Urban_Vehicle_Light_Face_UV_Coverage
+          path: /tmp/MAP_FIRST_C1L1_REAL_BRES_UV_FACE_COVERAGE.json
+          if-no-files-found: error
