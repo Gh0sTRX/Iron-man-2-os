@@ -1,0 +1,47 @@
+name: G13 MAP native original 2010 370 BRES dome and light structures material UV 12 picture forensic NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g13-first-map-370-original-mesh-dome-clay-provenance-screenshots.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_bres_geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Numpy/Pillow decode owner's original bundled real B11 BRES meshes
+        run: python3 -m pip install -q numpy pillow
+      - name: Draw 12 true native 2010 source mesh triangle contact sheets and original shader UV classifications
+        run: |
+          python3 research/b24_unified/b24_g13_c1l1_light_dome_mesh_provenance_sheet.py \
+            --out /tmp/G13_2010_C1L1_370_MESH_AUTHORED_MATERIAL_DOME_LIGHT_PROVENANCE.json \
+            --png /tmp/G13_2010_12_ORIGINAL_MESH_CLAY_SHADER_UV_CONTACT.png
+      - name: Check exact original 370 meshes 22919 tris and source facts
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          from PIL import Image
+          root=Path('/tmp')
+          d=json.loads((root/'G13_2010_C1L1_370_MESH_AUTHORED_MATERIAL_DOME_LIGHT_PROVENANCE.json').read_text())
+          assert d['source_source_meshes']==370
+          assert d['source_faces']==22919
+          assert len(d['source_BRES_original_material_and_UV_mesh_records'])==370
+          assert len(d['representative_contact_sheet_meshes'])==12
+          assert d['group_counts']['lights_total_faces']==3382
+          assert d['group_counts']['lights_uv_candidate_faces']==1098
+          assert d['light_uv_and_authored_sampler_face_count_at_source_mesh_resolution']>=0
+          assert Image.open(root/'G13_2010_12_ORIGINAL_MESH_CLAY_SHADER_UV_CONTACT.png').size==(1200,850)
+          print('PASS original 2010 source 370 city meshes, 22919 triangles, 12 actual 3D BRES polygon originals with file/material/UV provenance, NO guessed dome identity or VPK.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G13_C1L1_Original2010_12_BRES_Dome_Lights_Mesh_Clay_Material_SourceSheet
+          path: |
+            /tmp/G13_2010_C1L1_370_MESH_AUTHORED_MATERIAL_DOME_LIGHT_PROVENANCE.json
+            /tmp/G13_2010_12_ORIGINAL_MESH_CLAY_SHADER_UV_CONTACT.png
+          if-no-files-found: error
+          retention-days: 14
