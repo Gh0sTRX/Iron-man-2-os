@@ -1,0 +1,59 @@
+name: G11 inspect actual Vita G10 body FIRE stage race WarMachine repulsor and B14 CAMERA
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-combat-b14-fire-camera-source-inspect.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild exact B14 B16 G9 native CPU/GPU render source without owner IPA or Vita package
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          for zip in source/IronMan2_Vita_GitHub_Ready_CI_R2.zip flight_b4/flight_b4_overlay.zip performance_b5/b5_optimized_renderer.zip skinning_b7/b7_vita_overlay.zip combat_b8/b8_overlay.zip armor_b9/b9_overlay.zip profile_b10/b10_overlay.zip; do unzip -oq "$zip" -d work; done
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done >/tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+          python3 research/b24_unified/apply_b24_g6_controls_source_only.py
+          python3 research/b24_unified/apply_b24_g7_original_collisions_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
+          python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
+          python3 research/b24_unified/apply_b24_g10_practice_target_source_only.py
+          python3 research/b24_unified/apply_b24_g10_four_suit_original_motion_source_only.py
+      - name: Inspect exact G10 VITA body fire / stages / camera / lock ownership - NO VPK
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          needles=('fired>=','fire','ground_run','flight_stage','world.flying','b24_unified_tick(','b24_obs.target','camera','b14_pose_tick_ex(','b16_attack_begin(','b24_g8_motion_tick(','b24_gpu_runtime_draw(','land','melee','b24_obs.weapon_index','IM2_BT_L','im2_camera_step(')
+          for path in ('work/src/main.c','work/src/b14_world.c','work/b24/b24_unified/b24_g8_live_original_motion.c','work/b24/b24_unified/b24_unified.c'):
+            p=Path(path)
+            if not p.is_file():continue
+            lines=p.read_text().splitlines()
+            points=[i for i,line in enumerate(lines) if any(n in line for n in needles)]
+            nearby=sorted({j for i in points for j in range(max(0,i-5),min(len(lines),i+6))})
+            for j in nearby:
+              if path.endswith('main.c'):
+                print('G11COMBAT_MAIN',j+1,lines[j][:210])
+              elif any(n in lines[j] for n in ('world.flying','fly','fire','target','camera','speed')):
+                print('G11COMBAT_ENGINE',path,j+1,lines[j][:210])
+          PY
