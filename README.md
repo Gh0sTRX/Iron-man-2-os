@@ -2,7 +2,7 @@
 
 **Projenin hedefi:** Gameloft'un özgün **Iron Man 2 iOS (2010, sürüm 1.0.0)** oyununu, kaynak oyun geometrisi, materyalleri, animasyonları ve görevleri korunarak PS Vita'da çalıştırmak. Mevcut çalışma **özel araştırma/deneysel homebrew** aşamasındadır; henüz tamamlanmış bir oyun portu **değildir**.
 
-> **Güncel durum — 16 Ekim 2026 (G55 özgün node→pivot yerleşimi doğrulandı; runtime haritası hâlâ tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
+> **Güncel durum — 16 Ekim 2026 (G56 özel light geometri sınıflandırması doğrulandı; özgün runtime haritası hâlâ tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
 
 ## Hızlı durum özeti
 
@@ -25,6 +25,8 @@
 **296** özgün aynı isimli `-node → -node_PIVOT → -mesh` kaydı, kaynak pointer'ıyla eşleşiyor: 16/16 zemin, 121/121 şehir, 22/22 araç, 137 özel light. **22.441/22.919 üçgen ve 37.089/37.946 vertex** için özgün parent/pivot TRS bileşik dönüşümleri kaynak temelli üstten harita PNG'si ve 3B GLB şeklinde üretildi. 74 küçük/özel mesh (478 üçgen) ve runtime root, özgün görünürlük, materyal/alpha ve kamera davranışı henüz tamamlanmadı.
 
 Bu çıktı **özgün iOS uygulamasının gerçek çizimi, touchHLE'den alınmış oyun ekranı veya PS Vita testi değildir**; source-authentic host geometri önizlemesidir. Yeni VPK yok, eski sürümler etkilenmedi. Kod: [G55 native BRES map source parser](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g55_2010_C1L1_true_native_BRES_parent_pivot_scene_reconstruction.py). Öncelik: gerçek iOS ilk görev referans görüntüsüyle doğrulama, root/visibility, kalan ışık/özel mesh ve materyaller.
+
+**G56 kaynak ayrımı:** [CI SUCCESS — 74 özel mesh](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38812301376). `_PIVOT` bulunmayan **74/74** özel light mesh'inin özgün `-node` kaydı var. Bunlardan **49'u kaynak bounding-box olarak orijin merkezli**, **25'i kaynakta önceden farklı konuma yerleşmiş (baked-offset)** durumda; toplam **478** orijinal üçgen. **Bu iki sınıfın gerçek iOS world dönüşümü kesinleşmedi**, dolayısıyla tümüne tek tip ebeveyn konumu eklenmeyecek. Kaynak kodu [`b24_g56_C1L1_special_light_missing_pivot_raw_source_geometry_audit.py`](research/b24_unified/b24_g56_C1L1_special_light_missing_pivot_raw_source_geometry_audit.py) (`feature/b24-unified-gameplay` dalında).
 
 ## Haritanın neden hâlâ tamamlanmadığı
 
