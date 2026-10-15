@@ -1,4 +1,4 @@
-name: G11 actual G10 user G11 WM MELEE root corrected and combat QA NO VPK
+name: G11 physical G10 War Machine weapon reset and L-combo gold hit QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
