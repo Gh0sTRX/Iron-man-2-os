@@ -1,0 +1,57 @@
+name: MAP FIRST 2010 authentic 60byte original shader sampler 94 C1MA to 39 PVR C1TX exact C1MT map NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-true-source-C1MT-94-material-PVR-atlas-bake.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_C1L1_source_material_bank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python 2010 original C1MA triangle mapping numpy and private source IPA
+        run: python3 -m pip install -q numpy gdown
+      - name: Download ephemeral user-owned source for original 39 PVR names only (not artifact)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g12_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g12_owner/owner.ipa
+          test "$(wc -c </tmp/g12_owner/owner.ipa)" -eq 248613763
+      - name: Bake actual source BRES 88->60->20 sampler and 370-mesh 94 material dictionary into native Vita C1MT
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_map_first_original_2010_C1MT_source_verified_material_bank.py \
+            --ipa /tmp/g12_owner/owner.ipa \
+            --out /tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt \
+            --manifest /tmp/G12_C1L1_2010_SOURCE_AUTHORED_SHADER_DIFFUSE_INDEX_REPORT.json
+      - name: Assert authentic car atlas and all source BRES 94 labels plus two Building4 proof, no VPK
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          p=Path('/tmp/G12_C1L1_2010_SOURCE_AUTHORED_SHADER_DIFFUSE_INDEX_REPORT.json')
+          d=json.loads(p.read_text())
+          assert d['true_material_count']==94
+          assert d['true_2010_atlas_count']==39
+          assert d['B12_original_verified_vehicles_still_match']
+          assert d['Material47_independently_verified_Building4_in_obj2_and_obj4']
+          assert d['material_indices_are_exact_real_C1MA_ID_not_index_guesses']
+          assert d['total_original_triangles']==22919
+          assert d['materials_authentically_textured_from_original_2010']>30
+          c=Path('/tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt').read_bytes()
+          assert struct.unpack_from('<4sIIII',c)==(b'C1MT',1,94,39,len(c)-20-94*2)
+          print('PASS G12 original 2010 source-material exact C1MT native binary with authenticated PVR bank links and 22919 original triangles, no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G12_MAP_FIRST_94_REAL_2010_C1L1_PER_MATERIAL_39_PVR_AUTHENTIC_C1MT
+          path: |
+            /tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt
+            /tmp/G12_C1L1_2010_SOURCE_AUTHORED_SHADER_DIFFUSE_INDEX_REPORT.json
+          if-no-files-found: error
+      - name: Remove ephemeral original user-owned 2010 IPA from CI
+        if: always()
+        run: rm -rf /tmp/g12_owner
