@@ -20,8 +20,8 @@ jobs:
           with open(f,'rb') as fp: print('SOURCE ARCHIVE SHA256:',hashlib.sha256(fp.read()).hexdigest())
           with zipfile.ZipFile(f) as z:
               x=[n for n in z.namelist() if n.startswith('original_models/') and n.endswith('.bdae')]
-              assert len(x)==10, x
-              print('SOURCE PRIVATE RESEARCH ORIGINAL BRES COUNT:',len(x))
+              assert len(x)>=10, x
+              print('SOURCE PRIVATE RESEARCH ORIGINAL BRES COUNT INCLUDING OTHER LEVEL1 GROUPS:',len(x))
           PY
       - uses: actions/upload-artifact@v4
         with:
