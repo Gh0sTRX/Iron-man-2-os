@@ -1,0 +1,51 @@
+name: G40 original 2010 25 first-level Deco BRES source native material TGA PVR atlas audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g40-first-level-original-Deco-BRES-PVR-atlas.yaml"
+      - "research/b24_unified/b24_g40_source_2010_first_level_Deco_authentic_BRES_PVR_shader_material_atlas_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_Deco_native_atlas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original 2010 PVR decoding prerequisites
+        run: python3 -m pip install -q numpy pillow texture2ddecoder gdown
+      - name: Stage private original owner game temporarily
+        run: |
+          mkdir -p /tmp/g40
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g40/original.ipa
+          test "$(wc -c </tmp/g40/original.ipa)" -eq 248613763
+      - name: Inspect exact shader sampler to original PVR packed archive and make authentic atlas preview
+        run: |
+          python3 research/b24_unified/b24_g40_source_2010_first_level_Deco_authentic_BRES_PVR_shader_material_atlas_audit.py --ipa /tmp/g40/original.ipa --out /tmp/g40/G40_ORIGINAL_2010_25_DECO_MATERIAL_ATLAS_PROVENANCE.json --png /tmp/g40/G40_REAL_DECO_NATIVE_2010_PVR_ATLAS_PREVIEW.png
+      - name: Require original 25 types and explicit non-native shader warnings
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g40/G40_ORIGINAL_2010_25_DECO_MATERIAL_ATLAS_PROVENANCE.json').read_text())
+          assert x['original_models_named_archive_entry_count']==207
+          assert x['original_level1_Deco_native_instances']==53
+          assert x['source_distinct_decoded_Deco_BRES_model_resources']==25
+          assert not x['original_real_alpha_blend_emissive_light_shader_reconstructed']
+          assert x['no_guessed_textures'] and x['NO_VPK']
+          assert Path('/tmp/g40/G40_REAL_DECO_NATIVE_2010_PVR_ATLAS_PREVIEW.png').stat().st_size>1500
+          print('PASS source-only exact original BRES and TGA material atlas forensic; no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G40_2010_ORIGINAL_25_DECO_MODEL_NATIVE_SHADER_PVR_TGA_SOURCE_ATLAS_PNG_NO_VPK
+          path: |
+            /tmp/g40/G40_ORIGINAL_2010_25_DECO_MATERIAL_ATLAS_PROVENANCE.json
+            /tmp/g40/G40_REAL_DECO_NATIVE_2010_PVR_ATLAS_PREVIEW.png
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remove original owner's source IPA after test
+        if: always()
+        run: rm -rf /tmp/g40/original.ipa
