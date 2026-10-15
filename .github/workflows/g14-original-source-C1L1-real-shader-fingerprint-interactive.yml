@@ -1,0 +1,49 @@
+name: G14 MAP FIRST authentic 2010 C1L1 shader88 material color-unknown fingerprints interactive HTML NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g14-original-source-C1L1-real-shader-fingerprint-interactive.yml"
+      - "research/b24_unified/b24_g14_original_2010_c1l1_shader_material_fingerprints.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_shader_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent native original BRES extraction dependencies
+        run: python3 -m pip install -q numpy pillow
+      - name: Forensically inspect original material64 shader88 property60 across all ten 2010 C1L1 sources
+        run: |
+          python3 research/b24_unified/b24_g14_original_2010_c1l1_shader_material_fingerprints.py \
+            --out /tmp/G14_2010_C1L1_ORIGINAL_MATERIAL_SHADER_10_BRES_SOURCE_FINGERPRINTS.json \
+            --html /tmp/G14_2010_C1L1_MESH_MATERIAL_UV_ETKILESIMLI_INCELEME.html
+      - name: Assert authentic invariants and protect against false color/shader claims
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('/tmp')
+          d=json.loads((root/'G14_2010_C1L1_ORIGINAL_MATERIAL_SHADER_10_BRES_SOURCE_FINGERPRINTS.json').read_text())
+          assert d['mesh_count']==370 and d['face_count']==22919
+          assert len(d['source_BRES_files'])==10
+          assert d['g13_light_true_source_UV_AND_proven_diffuse_faces']==0
+          assert d['forbid_guessed_shader_colors_or_clay_fix']
+          assert not d['original_source_shader_semantic_lighting_decoded']
+          assert not d['original_source_vertex_colors_decoded']
+          assert not d['original_source_real_game_spawn_decoded']
+          assert d['no_VPK']
+          assert (root/'G14_2010_C1L1_MESH_MATERIAL_UV_ETKILESIMLI_INCELEME.html').stat().st_size>20000
+          print('PASS: original native material fingerprint/source provenance only; no guessed color/light or Vita screenshot.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G14_Original2010_BRES_Material_Shader88_Fingerprints_Mesh370_UV_Interactive_HTML_NO_VPK
+          path: |
+            /tmp/G14_2010_C1L1_ORIGINAL_MATERIAL_SHADER_10_BRES_SOURCE_FINGERPRINTS.json
+            /tmp/G14_2010_C1L1_MESH_MATERIAL_UV_ETKILESIMLI_INCELEME.html
+          if-no-files-found: error
+          retention-days: 14
