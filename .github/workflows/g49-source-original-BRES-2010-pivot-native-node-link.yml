@@ -1,0 +1,40 @@
+name: G49 original Iron Man 2 2010 BRES source PIVOT labels to native 32bit node TRS pointer evidence NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g49-source-original-BRES-2010-pivot-native-node-link.yml"
+      - "research/b24_unified/b24_g49_native_2010_BRES_PIVOT_node_string_pointer_TRS_structure.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_pivot_reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source original native 32bit BRES node TRS numeric evidence requirements
+        run: python3 -m pip install -q numpy
+      - name: Scan actual owner's original 10 BRES models for native 2010 PIVOT names and source raw direct/relative pointer refs
+        run: |
+          python3 research/b24_unified/b24_g49_native_2010_BRES_PIVOT_node_string_pointer_TRS_structure.py             --zip research/B11_C1L1_Source_Parser.zip             --out /tmp/g49/G49_ORIGINAL_2010_BRES_PIVOT_NODE_POINTER_TRS_STRUCTURAL_EVIDENCE.json
+      - name: Assert native 2010 source findings with non-fabricated mapping
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g49/G49_ORIGINAL_2010_BRES_PIVOT_NODE_POINTER_TRS_STRUCTURAL_EVIDENCE.json').read_text())
+          assert d['source_original_BRES_tested']==10
+          assert d['original_2010_all_BRES_strings_with_PIVOT']>0
+          assert not d['older_original_2010_0_0_0_133_layout_assumed_equal_to_new_0_0_0_779']
+          assert not d['original_native_mesh_name_to_node_name_mapping_verified']
+          assert not d['original_native_mesh_vertex_matrix_applied']
+          assert d['NO_VPK']
+          print('PASS native 2010 original _PIVOT node label/pointer forensic, no auto-transforms or VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G49_2010_ORIGINAL_BRES_PIVOT_NATIVE_NODE_TRS_POINTER_AUDIT_NO_VPK
+          path: /tmp/g49/G49_ORIGINAL_2010_BRES_PIVOT_NODE_POINTER_TRS_STRUCTURAL_EVIDENCE.json
+          retention-days: 14
