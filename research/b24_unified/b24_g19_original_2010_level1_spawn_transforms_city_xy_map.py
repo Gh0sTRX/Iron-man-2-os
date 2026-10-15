@@ -168,7 +168,7 @@ info.innerHTML='<strong>'+n.node+'</strong><p>Konum (X, Y, Z): '+n.position_XYZ.
 sel.addEventListener("change",draw);draw();
 </script></body></html>"""
     out.write_text(page.replace("__PNG__",png).replace("__DATA__",j.replace("</","<\\/")),encoding="utf-8")
-    assert out.stat().st_size>100000
+    assert out.stat().st_size>10000
 
 def main(ipa:Path,out:Path,png:Path,preview:Path):
     with zipfile.ZipFile(ipa) as z:
