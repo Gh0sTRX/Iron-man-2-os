@@ -1,0 +1,38 @@
+name: G11 MAP FIRST — Original 2010 BRES C1L1 Exact Triangle Material To PVR Pointer Investigation
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-map-first-real-c1l1-bres-material-tga-links.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_first_level:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install only exact original source B11 geometry parser runtime
+        run: python3 -m pip install -q numpy
+      - name: Recover exact native original material -> TGA pointer links without filename guesses
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_map_first_c1l1_material_link_graph_probe.py \
+            --out /tmp/G11_ORIGINAL_MATERIAL_TO_ATLAS_AUTHENTIC_BRES_POINTER_GRAPH.json
+      - name: Guard source triangle authenticity and 10 authored BDAE scene chunks
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/G11_ORIGINAL_MATERIAL_TO_ATLAS_AUTHENTIC_BRES_POINTER_GRAPH.json').read_text())
+          assert len(d['sources'])==10
+          assert sum(q['source_meshes'] for q in d['sources'])==370
+          assert all(len(x['BRES_material_graph_records'])==x['submeshes'] for x in d['sources'])
+          assert d['false_surface_texture_associations_not_silently_accepted']
+          print("PASS real 2010 C1L1 370 source geometry meshes and all material pointer records investigated — NO VPK")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G11_MapFirst_Real_2010_C1L1_Original_Submesh_To_TGA_Pointer_Proof
+          path: /tmp/G11_ORIGINAL_MATERIAL_TO_ATLAS_AUTHENTIC_BRES_POINTER_GRAPH.json
+          if-no-files-found: error
