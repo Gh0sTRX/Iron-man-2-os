@@ -1,4 +1,4 @@
-name: G11 live G10 original Beam, WM, camera and immortal melee dummy source QA NO VPK
+name: G11 actual G10 user G11 WM MELEE root corrected and combat QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -45,6 +45,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g11_authentic_unibeam_and_hover_idle_source_only.py
           python3 research/b24_unified/apply_b24_g11_practice_hit_feedback_source_only.py
           python3 research/b24_unified/apply_b24_g11_training_dummy_hit_source_only.py
+          python3 research/b24_unified/apply_b24_g11_wm_reset_weapon_on_suit_source_only.py
           python3 - <<'PY'
           from pathlib import Path
           c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
@@ -151,6 +152,7 @@ jobs:
           grep -q 'b24_g11_practice_melee_hit(' work/src/main.c
           grep -q 'b24_g11_practice_hit_flash(' work/src/main.c
           grep -q 'b24_g11_practice_melee_feedback.c' work/CMakeLists.txt
+          test "$(grep -c 'combat.mode=B16_REPULSOR;combat.combo_step=0;' work/src/main.c)" -eq 2
           echo "PASS authentic C1L1 real 3D permanent practice dummy melee hit reaction, no VPK"
       - name: G11 actual immortal 3D target C11 valid near swing and temporary GPU hit flash
         run: |
