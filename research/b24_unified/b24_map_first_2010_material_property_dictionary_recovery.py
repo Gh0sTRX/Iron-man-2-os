@@ -15,7 +15,10 @@ DO NOT assign any texture until source exact native ID/pointer linking proven.
 from __future__ import annotations
 import argparse,collections,json,re,struct,zipfile
 from pathlib import Path
-from recover_c1l1_original_uv import BDAEZIP,SOURCES
+BDAEZIP=Path(__file__).resolve().parents[2]/'research/B11_C1L1_Source_Parser.zip'
+SOURCES=('C1L1_ground_001','C1L1_obj_001','C1L1_obj_002',
+         'C1L1_obj_003','C1L1_obj_004','C1L1_car_01','C1L1_car_02',
+         'C1L1_light_001','C1L1_light_002','C1L1_light_003')
 
 def u(b,p):
  return struct.unpack_from('<I',b,p)[0] if 0<=p<=len(b)-4 else None
