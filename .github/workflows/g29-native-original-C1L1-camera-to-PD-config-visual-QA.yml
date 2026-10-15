@@ -1,0 +1,59 @@
+name: G29 original 2010 CameraPreset PD CameraConfig native source map HTML NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g29-native-original-C1L1-camera-to-PD-config-visual-QA.yml"
+      - "research/b24_unified/b24_g29_original_CameraPreset_PD_CameraConfig_source_map.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_camera_PD_links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install native original scene renderer prerequisites
+        run: python3 -m pip install -q gdown numpy pillow
+      - name: Retrieve private owner original archival input temporarily
+        run: |
+          mkdir -p /tmp/g29
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g29/owner.ipa
+          test "$(wc -c </tmp/g29/owner.ipa)" -eq 248613763
+      - name: Resolve genuine CameraPreset references and original city top-down debug HTML
+        run: |
+          python3 research/b24_unified/b24_g29_original_CameraPreset_PD_CameraConfig_source_map.py --ipa /tmp/g29/owner.ipa --out /tmp/g29/G29_original_native_camera_links.json --png /tmp/g29/G29_original_city_camera_debug.png --html /tmp/g29/G29_C1L1_KAMERA_SAHNE_INCELEYICISI.html
+      - name: Source strict invariants with explicit false camera pose guard
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g29/G29_original_native_camera_links.json').read_text())
+          assert d['source_original_CameraPreset_count']==57
+          assert d['source_original_CameraConfig_count']==2
+          assert d['source_original_PD_mapped_camera_count']==51
+          assert d['source_explicit_NULL_camera_position_target_count']==6
+          assert d['source_original_camera_PD_transform_subrecords']==153
+          assert d['camera_native_config_fields_18_vec3_per_config']==36
+          assert d['source_original_config_18_vec3_exact_equal_across_both']
+          assert d['source_original_world_BRES_meshes']==370
+          assert d['source_original_world_BRES_faces']==22919
+          assert not d['source_camera_position_transform_role_or_look_at_PROVEN']
+          assert not d['source_camera_runtime_execution_or_footage_PROVEN']
+          assert not d['new_VPK']
+          assert Path('/tmp/g29/G29_C1L1_KAMERA_SAHNE_INCELEYICISI.html').stat().st_size>60000
+          print('PASS original 2010 source exact 57 camera 51 positioned PD and source city debug no fake camera pose')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G29_2010_ORIGINAL_57_CameraPreset_51_PD_TARGETS_CC_FollowMC_CITY_SOURCE_HTML_PNG_NO_VPK
+          path: |
+            /tmp/g29/G29_original_native_camera_links.json
+            /tmp/g29/G29_original_city_camera_debug.png
+            /tmp/g29/G29_C1L1_KAMERA_SAHNE_INCELEYICISI.html
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove original owner source game
+        if: always()
+        run: rm -rf /tmp/g29/owner.ipa
