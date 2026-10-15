@@ -53,7 +53,8 @@ def run(html,report,out):
  center=np.array([-65.,-47.,-17.])
  xyz=pos.astype(np.float64)-center
  projected=np.stack((xyz@right,xyz@up),axis=1)
- screen=np.rint(np.stack((635+projected[faces,:,0]*2.14,570-projected[faces,:,1]*2.14),axis=-1)).astype(np.int32)
+ tri_xy=projected[faces]
+ screen=np.rint(np.stack((635+tri_xy[:,:,0]*2.14,570-tri_xy[:,:,1]*2.14),axis=-1)).astype(np.int32)
  distances=(xyz@front)[faces].mean(axis=1)
  order=np.argsort(distances)
  pts3=pos[faces].astype(np.float64)
