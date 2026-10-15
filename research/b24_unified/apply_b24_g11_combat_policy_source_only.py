@@ -44,6 +44,11 @@ rep('''        b24_buttons|=b24_input_latched;
 rep('''        const int ground_run=b24_gate.is_ground_running;''',
     '''        const int ground_run=b24_gate.is_ground_running &&
                              !g11_shot.force_walk;''')
+rep('''        const B13Clip *chosen=b16_idle_override(&attack,mode,idx);''',
+'''        /* Stage2/RUSH MUST NOT retain a last-frame repulsor arm overlay.
+           This also protects WM shoulder/original full-body fly stream. */
+        if(world.flying && world.flight_stage>=2)attack.attack_active=0;
+        const B13Clip *chosen=b16_idle_override(&attack,mode,idx);''')
 rep('''        if(trigger){
           const unsigned palm=attack.palm_r;''',
     '''        if(trigger && !b24_unified_paused(&b24_game) &&
