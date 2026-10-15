@@ -107,7 +107,7 @@ def main(g32_html,sourcezip,g55glb,out):
     payload["G57_native_triangles"]=22441
     payload["G57_true_PVR_uv_faces"]=18774
     payload["G57_unresolved_74_hidden"]=True
-    native=np.vstack([v for v,_ in groups.values()])
+    native=np.concatenate([q for v,_ in groups.values() for q in v],axis=0)
     payload["map_center"]=((native.min(axis=0)+native.max(axis=0))/2).tolist()
     html=replace_once(html,raw,json.dumps(payload,ensure_ascii=False,separators=(",",":")))
     html=replace_once(html,tag(html,"rawpositions"),base64.b64encode(source_xyz.astype("<f4").tobytes()).decode())
