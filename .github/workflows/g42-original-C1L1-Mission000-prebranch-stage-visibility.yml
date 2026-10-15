@@ -33,6 +33,9 @@ jobs:
           assert d['source_pre_branch_exact_Deco_enable_disable_instruction_count']==12
           assert d['source_unique_Deco_names_with_visibility_action_CALL']==35
           assert d['source_2010_script_secondary_model_406_405_same_authored_pose_proven']
+          assert d['source_original_11_static_C1L1_affected_by_any_71_Lua_visibility_op']==0
+          assert len(d['source_original_11_static_C1L1_filename_nodes_without_Lua_visibility_op'])==11
+          assert d['source_original_total_Deco_nodes_without_any_Lua_visibility_op']==18
           assert not d['source_2010_actor_runtime_default_visibility_OR_preexisting_state_PROVEN']
           assert not d['source_2010_actor_root_world_transform_proven']
           assert not d['source_2010_sprite_special_light_emissive_alpha_shader_proven']
