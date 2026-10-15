@@ -9,7 +9,11 @@ int main(void){
  };
  for(unsigned i=0;i<4;i++){
   const int id=armor[i].suit;
-  const char *idle=b24_g8_motion_route(id,B24M_HOVER,0.f,0.f);
+  const char *idle_tmp=b24_g8_motion_route(id,B24M_HOVER,0.f,0.f);
+  assert(idle_tmp);
+  char idle[128];
+  int idle_len=snprintf(idle,sizeof(idle),"%s",idle_tmp);
+  assert(idle_len>0&&(size_t)idle_len<sizeof(idle));
   const char *left_tmp=b24_g8_motion_route(id,B24M_DRIFT,-.8f,0.f);
   assert(idle&&left_tmp);
   char left[128];
