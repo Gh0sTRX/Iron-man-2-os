@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Gameloft Iron Man 2 2010 BRES v0.0.0.778 material property records.
+"""Gameloft Iron Man 2 2010 BRES original C1L1 material table record structure.
 
-Real authored world file main-version field 778 one revision prior to
+The value 778 at 0x10 of C1L1_ground_001 is the RELOCATION COUNT,\nnot a version number. Historic version is not assumed equal to
 public 010 BDAE v779 template. Prove independent MATERIAL table (64-byte
 entries), follow actual material property pointers and locate source
 textured diffuse slot, without assigning guessed C1L1 texture samplers.
@@ -45,7 +45,7 @@ def parse(blob,srcname):
   run=[t['offset']]
   while run[-1]+64 in offsets:run.append(run[-1]+64)
   if len(run)>len(longest):longest=run
- if len(longest)<3:raise ValueError('material template stride unsupported '+srcname)
+ if len(longest)<1:raise ValueError('no authentic material records '+srcname)
  active=[t for t in material_candidates if t['offset'] in longest]
  for t in active:
   for tag,base in (('absolute',t['candidate_props_point_abs']),
@@ -65,11 +65,11 @@ def parse(blob,srcname):
     'offset',t['offset'],'name',t['name'],
     'record_16_u32',t['record_16_u32'],
     'property_records',t['candidate_shader_property_names'],flush=True)
- summary={'bres_name':srcname,'native_2010_version_u32_16':u(blob,16),
+ summary={'bres_name':srcname,'native_2010_relocation_count_u32_16':u(blob,16),
      '64byte_table_run_start':longest[0],'64byte_material_definitions':len(active),
      'source_material_definitions':active}
  print('G11_AUTHORED_MATERIAL_HEADER',srcname,
-    '2010_version',u(blob,16),'true64_definitions',len(active),
+    '2010_pointer_count',u(blob,16),'true64_definitions',len(active),
     'range',longest[0],longest[-1]+64,flush=True)
  return summary
 
