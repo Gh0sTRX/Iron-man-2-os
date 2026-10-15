@@ -1,0 +1,58 @@
+name: G58A original C1L1 BRES PVR source host sun light HTML NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g58a-original-bres-pvr-host-lighting.yml"
+      - "research/b24_unified/b24_g58a_authentic_BRES_PVR_host_lighting_preview.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_source_lighting:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore authentic G57 original source PVR+UV offline WebGL2 HTML
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/g58/in /tmp/g58/out
+          gh run download 38814440599 --repo "${{ github.repository }}" -n G57_ORIGINAL_2010_BRES_296_SOURCE_NODE_PVR_UV_MATERIALS_WEBGL2_HTML_GLB_NO_VPK -D /tmp/g58/in
+          test -s /tmp/g58/in/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html
+      - name: Host-only parser deps
+        run: python3 -m pip install -q numpy pillow
+      - name: Add interactive source-preserving host lighting controls and shader
+        run: |
+          python3 research/b24_unified/b24_g58a_authentic_BRES_PVR_host_lighting_preview.py --g57html /tmp/g58/in/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html --html /tmp/g58/out/G58A_ORIGINAL_C1L1_BRES_PVR_DAY_EVENING_HTML.html --json /tmp/g58/out/G58A_SOURCE_LIGHT_EVIDENCE.json
+      - name: Verify exact original mesh and material coverage and JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import re,json,pathlib
+          base=pathlib.Path('/tmp/g58/out')
+          d=json.loads((base/'G58A_SOURCE_LIGHT_EVIDENCE.json').read_text())
+          assert d['original_2010_source_BRES_meshes']==296
+          assert d['original_2010_source_triangles']==22441
+          assert d['original_PVR_UV_triangles']==18774
+          assert d['authentic_original_atlases']==24
+          assert d['original_CLARA_Sun_entities']==4
+          assert d['only_original_alpha_atlas']==['c1l1_earth.tga']
+          assert d['host_shadow_map_or_real_iOS_shader_validated'] is False
+          assert d['VPK_produced'] is False
+          html=(base/'G58A_ORIGINAL_C1L1_BRES_PVR_DAY_EVENING_HTML.html').read_text()
+          match=re.search(r'<script>\s*"use strict";(.*?)</script>',html,re.S)
+          assert match and len(html)>4500000
+          (base/'g58_static_shader_check.js').write_text('"use strict";'+match.group(1))
+          print('G58A static original scene continuity successful; no native gameplay claims')
+          PY
+          node --check /tmp/g58/out/g58_static_shader_check.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G58A_2010_NATIVE_C1L1_G55_PVR_UV_HOST_DAY_EVENING_LIGHTING_NO_VPK
+          path: |
+            /tmp/g58/out/G58A_ORIGINAL_C1L1_BRES_PVR_DAY_EVENING_HTML.html
+            /tmp/g58/out/G58A_SOURCE_LIGHT_EVIDENCE.json
+          retention-days: 14
+          if-no-files-found: error
