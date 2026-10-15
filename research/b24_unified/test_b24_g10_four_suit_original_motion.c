@@ -15,7 +15,7 @@ int main(void){
   int idle_len=snprintf(idle,sizeof(idle),"%s",idle_tmp);
   assert(idle_len>0&&(size_t)idle_len<sizeof(idle));
   const char *left_tmp=b24_g8_motion_route(id,B24M_DRIFT,-.8f,0.f);
-  assert(idle&&left_tmp);
+  assert(left_tmp);
   char left[128];
   int len=snprintf(left,sizeof(left),"%s",left_tmp);
   assert(len>0&&(size_t)len<sizeof(left));
