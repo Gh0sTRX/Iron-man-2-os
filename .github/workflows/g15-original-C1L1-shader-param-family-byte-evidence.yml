@@ -1,0 +1,39 @@
+name: G15 MAP FIRST actual 2010 original untextured BRES shader parameter family bytes NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g15-original-C1L1-shader-param-family-byte-evidence.yml"
+      - "research/b24_unified/b24_g15_original_shader_parameter_family_native_bytes.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shader_native_params:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe real BRES shader88 native parameter pointers, without guessed rendering
+        run: |
+          python3 research/b24_unified/b24_g15_original_shader_parameter_family_native_bytes.py \
+            --out /tmp/G15_ORIGINAL_2010_C1L1_SHADER_PARAM_BYTES_UNTEXTURED_FAMILIES.json
+      - name: Verify source 10 files and ambiguity flags
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/G15_ORIGINAL_2010_C1L1_SHADER_PARAM_BYTES_UNTEXTURED_FAMILIES.json').read_text())
+          assert j['source_original_10_files']==10
+          assert j['source_material_instances']>=190
+          assert len(j['native_shader_flag_signatures'])>=5
+          assert not j['source_color_semantics_proven'] and not j['source_emissive_transparency_semantics_proven']
+          assert j['no_mesh_texture_overrides'] and j['no_VPK']
+          print('PASS exact original shader-family raw native bytes source-only no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G15_2010_BRES_Original_Shader_Parameter_Raw_Families_No_Speculative_Color_NO_VPK
+          path: /tmp/G15_ORIGINAL_2010_C1L1_SHADER_PARAM_BYTES_UNTEXTURED_FAMILIES.json
+          if-no-files-found: error
+          retention-days: 14
