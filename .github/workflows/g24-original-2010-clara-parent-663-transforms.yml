@@ -1,0 +1,49 @@
+name: G24 2010 original C1L1 601 native scene IDs all 663 typed child parent links NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g24-original-2010-clara-parent-663-transforms.yml"
+      - "research/b24_unified/b24_g24_original_clara_source_601_nodes_663_parent_links.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_scene_graph_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original owner game only during private source analysis
+        run: |
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g24
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g24/original.ipa
+          test "$(wc -c </tmp/g24/original.ipa)" -eq 248613763
+      - name: Parse original 2010 BCLARA typed node ID and source transform parent ID record link
+        run: |
+          python3 research/b24_unified/b24_g24_original_clara_source_601_nodes_663_parent_links.py --ipa /tmp/g24/original.ipa --out /tmp/g24/native_scene_source_2010.json
+      - name: Assert source provenance and do not call runtime map complete
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g24/native_scene_source_2010.json'))
+          assert j['source_native_2plus_character_name_id_records']==601
+          assert j['source_native_typed_child_parent_record_count']==1604
+          assert j['source_native_0x005C_transform_child_parent_prefix_count']==684
+          assert j['native_source_verified_12_16_12_transform_parent_links']==663
+          assert j['named_parents_with_valid_transforms']==389
+          assert not j['original_2010_live_render_world_parent_matrices_verified']
+          assert not j['original_player_start_or_mission_trigger_execution_verified']
+          assert not j['VPK_built']
+          print('PASS original 2010 source native named parent/child graph, no Vita test')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G24_REAL_2010_C1L1_601_NODE_IDS_663_NATIVE_PARENT_CHILD_SOURCE_GRAPH_NO_VPK
+          path: /tmp/g24/native_scene_source_2010.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Delete temporary owner IPA after test
+        if: always()
+        run: rm -rf /tmp/g24/original.ipa
