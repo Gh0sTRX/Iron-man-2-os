@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Source mesh parser + GLB and diagnostic preview dependencies
-        run: python3 -m pip install -q numpy trimesh matplotlib
+        run: python3 -m pip install -q numpy trimesh matplotlib scipy
       - name: Validate exact real 2010 native record offsets and compose source-only mesh chains
         run: |
           python3 -m py_compile research/b24_unified/b24_g55_2010_C1L1_true_native_BRES_parent_pivot_scene_reconstruction.py
