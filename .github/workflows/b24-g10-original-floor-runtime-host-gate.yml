@@ -1,4 +1,4 @@
-name: G11 live G10 source fire stage WM repulsor and L target camera QA NO VPK
+name: G11 real Vita G10 L-focus camera corrected Python source and WM repulsor host QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
