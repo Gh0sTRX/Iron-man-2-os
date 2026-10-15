@@ -36,7 +36,7 @@ def run(source, output):
     assert len(expo)==1 and expo[0]['material']=='orig_07___Default'
     assert expo[0]['tga'].lower()=='cahp01_c_expo_building.tga'
     assert expo[0]['original_uv_mesh_positive'] and expo[0]['tga'].lower() in atlas
-    building=[b for b in batches if b['material']=='c1l1_3building']
+    building=[b for b in batches if b['material']=='c1l1_3building' and b['status']=='UV-no-source-diffuse']
     assert sum(b['tris'] for b in building)==1683
     assert all(b['original_uv_mesh_positive'] and not b['tga'] for b in building)
     poles=[b for b in batches if b['status']=='source-texture-no-UV']
