@@ -1,0 +1,49 @@
+name: G27 ORIGINAL 2010 CLARA 1035 Lua GETGLOBAL CALL native source and MC camera class bindings NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g27-original-level1-lua-native-call-sites.yml"
+      - "research/b24_unified/b24_g27_original_source_lua51_native_global_call_sites.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_mission_static_calls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Temporarily retrieve owner's archival original 2010 game
+        run: |
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g27
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g27/original.ipa
+          test "$(wc -c </tmp/g27/original.ipa)" -eq 248613763
+      - name: Forensically inspect genuine native Lua CALL instructions and classed camera actor ID arguments
+        run: |
+          python3 research/b24_unified/b24_g27_original_source_lua51_native_global_call_sites.py --ipa /tmp/g27/original.ipa --out /tmp/g27/original_lua_calls.json
+      - name: Source invariants, no false runtime/camera/audio claims
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g27/original_lua_calls.json'))
+          assert j['original_2010_lua_callback_count']==71
+          assert j['original_native_Lua_GLOBAL_CALL_candidates']==1035
+          assert j['source_statically_crosslinked_MC_and_CameraPreset_calls']
+          assert j['source_no_guessed_node_ID_for_music_sfx_wait_duration']
+          assert not j['source_original_gameplay_execution_or_mission_flow_PROVEN']
+          assert not j['source_camera_runtime_camera_transforms_PROVEN']
+          assert not j['source_original_audio_anim_ID_to_file_binding_PROVEN']
+          assert not j['new_VPK']
+          print('PASS original 2010 typed 71 original Lua callbacks and native 1035 static GLOBAL CALL bytecode sites.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          path: /tmp/g27/original_lua_calls.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Delete original owner IPA temporary bytes
+        if: always()
+        run: rm -rf /tmp/g27/original.ipa
