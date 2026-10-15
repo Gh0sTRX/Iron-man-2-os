@@ -67,6 +67,16 @@ def inspect(ipa):
   **{f"Deco_man{k}":"Enable" for k in range(1,9)},
   "Deco004":"Enable","Deco005":"Disable",
   "Deco_fence3":"Disable","Deco_fence4":"Disable"}
+ # Important falsifiable boundary: all 11 original fixed C1L1 map packages
+ # have NO Enable/Disable/Show/Hide targets in ANY of the 71 source callbacks.
+ # Therefore intro-script actor toggles alone CANNOT explain the outlying city.
+ native_target_ids={x["original_CLARA_Deco_ID"] for x in all_actions}
+ static_map=[x for x in deco if table[x["native_raw_resource_type_uint32"]-1].name.startswith("C1L1_")]
+ assert len(static_map)==11
+ assert not any(x["original_source_entity_ID"] in native_target_ids for x in static_map)
+ static_map_names=[x["source_Deco_name"] for x in static_map]
+ other_unscripted=[x["source_Deco_name"] for x in deco if x["original_source_entity_ID"] not in native_target_ids]
+ assert len(other_unscripted)==18
  d4=next(x for x in pre if x["original_CLARA_Deco_name"]=="Deco004")
  d5=next(x for x in pre if x["original_CLARA_Deco_name"]=="Deco005")
  assert d4["original_one_based_model_archive_slot"]==137==d5["original_one_based_model_archive_slot"]
@@ -78,6 +88,10 @@ def inspect(ipa):
    "source_original_Mission000_OnStart_native_code_instruction_count":len(code),
    "source_pre_branch_exact_Deco_enable_disable_instruction_count":len(pre),
    "source_pre_branch_decoded_Deco_actions":pre,
+   "source_original_11_static_C1L1_affected_by_any_71_Lua_visibility_op":0,
+   "source_original_11_static_C1L1_filename_nodes_without_Lua_visibility_op":static_map_names,
+   "source_original_total_Deco_nodes_without_any_Lua_visibility_op":len(other_unscripted),
+   "source_original_other_Decco_nodes_without_script_visibility_op":other_unscripted,
    "source_all_level1_deco_visibility_action_CALL_instruction_count":len(all_actions),
    "source_unique_Deco_names_with_visibility_action_CALL":len({x["original_CLARA_Deco_name"] for x in all_actions}),
    "source_all_source_callback_actions":all_actions,
@@ -101,6 +115,7 @@ def main(ipa,out):
  print("PASS G42 original C1L1 2010 level1 Mission000_OnStart first branch PC",d["source_original_Mission000_OnStart_first_Lua_branch_PC"])
  print("G42 script native Deco prebranch exact",[(x["original_lua_global_call"],x["original_CLARA_Deco_name"]) for x in d["source_pre_branch_decoded_Deco_actions"]])
  print("G42 script all native Deco-call count",d["source_all_level1_deco_visibility_action_CALL_instruction_count"],"different source Deco objects",d["source_unique_Deco_names_with_visibility_action_CALL"])
+ print("G42 original 11 static C1L1 environment model nodes have ZERO source Lua visibility toggles; 18 total Deco nodes unaddressed by these 71 callbacks.")
  print("G42 original same-stage expo_crash double instance secondary tags are 406 vs 405; no assumed runtime visibility or final world matrices.")
  print("PASS original source Lua instructions analyzed no execution, no Vita VPK.")
 if __name__=="__main__":
