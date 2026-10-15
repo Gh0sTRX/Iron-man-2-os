@@ -200,10 +200,10 @@ def main(ipa,out):
  out.mkdir(parents=True,exist_ok=True)
  d=original_data(ipa)
  result={'source_geometry':d[-1],'previews':{}}
- result['G10_synthetic_spawn']=preview(d,np.array([0.,0.,0.]),
+ result['previews']['G10_synthetic_spawn']=preview(d,np.array([0.,0.,0.]),
    'G10 current synthetic player spawn world center (0,0)',
    out/'G12_PER_PIXEL_REAL_2010_G10_WORLD_ORIGIN.png')
- result['original_urban_dense_center']=preview(d,d[-2],
+ result['previews']['original_urban_dense_center']=preview(d,d[-2],
    'Source 2010 urban area dense geometry sample',
    out/'G12_PER_PIXEL_REAL_2010_C1L1_DENSE_URBAN.png')
  result['screenshot_method']='per-pixel perspective corrected atlas original PVR RGBA; host CPU renderer, not VitaGL'
