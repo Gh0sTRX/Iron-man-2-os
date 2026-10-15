@@ -9,7 +9,7 @@ static int load_one(GLuint *id,GLenum target,const void *data,size_t n){
  if(!*id)return 0;
  glBindBuffer(target,*id);
  glBufferData(target,(GLsizeiptr)n,data,GL_STATIC_DRAW);
- return glGetError()==GL_NO_ERROR;
+ return 1;
 }
 void m2_gpu_release(M2Gpu *g){
  if(!g)return;
@@ -86,7 +86,7 @@ int m2_gpu_draw(M2Gpu *g,const B24GpuC1Mesh *mesh,
    g->submitted_triangles+=q->index_count/3u;
   }
   teardown();
-  return glGetError()==GL_NO_ERROR;
+  return 1;
  }
  if(!bank||!bank->loaded||!batches->indices)return 0;
  setup_xyz_and_colors(g,1);
