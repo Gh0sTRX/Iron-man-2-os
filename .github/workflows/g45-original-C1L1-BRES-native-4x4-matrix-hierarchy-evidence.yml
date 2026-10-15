@@ -1,0 +1,38 @@
+name: G45 original BRES 2010 source native 4x4 mesh transform table forensic NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g45-original-C1L1-BRES-native-4x4-matrix-hierarchy-evidence.yml"
+      - "research/b24_unified/b24_g45_original_C1L1_BRES_2010_native_4x4_affine_mesh_transform_candidate_probe.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_BRES_native_matrices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source raw 2010 BRES parser and native float32 scan prerequisites
+        run: python3 -m pip install -q numpy
+      - name: Probe actual original 370 mesh descriptors for native affine matrices
+        run: |
+          python3 research/b24_unified/b24_g45_original_C1L1_BRES_2010_native_4x4_affine_mesh_transform_candidate_probe.py             --source-bdae-zip research/B11_C1L1_Source_Parser.zip --out /tmp/g45/G45_ORIGINAL_2010_NATIVE_BRES_4X4_MESH_AFFINE_CANDIDATES.json
+      - name: Original source evidence only, never automatically reposition geometry
+        run: |
+          python3 - <<'PY'
+          import json
+          p='/tmp/g45/G45_ORIGINAL_2010_NATIVE_BRES_4X4_MESH_AFFINE_CANDIDATES.json'
+          j=json.load(open(p))
+          assert j['source_owner_2010_C1L1_static_BRES_files']==10
+          assert j['source_original_370_meshes']==370
+          assert j['source_raw_binary_matrix_scanning_does_NOT_prove_scene_transform']
+          assert j['no_made_up_vertical_offset_no_VPK']
+          print('PASS original 10 BRES source native candidate matrix structural inventory only, no guessed scene root')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G45_2010_ORIGINAL_C1L1_10_BRES_NATIVE_AFFINE_MESH_ROOT_CANDIDATE_AUDIT_NO_VPK
+          path: /tmp/g45/G45_ORIGINAL_2010_NATIVE_BRES_4X4_MESH_AFFINE_CANDIDATES.json
+          retention-days: 14
