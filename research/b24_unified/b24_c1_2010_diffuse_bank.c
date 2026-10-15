@@ -27,24 +27,26 @@ int b24_c1_2010_diffuse_bank_load(B24C1OriginalDiffuseBank *b,const char *path){
  unsigned len=0;
  if(ok){
   len=u32(header+16);
+  tmp.atlas_count=u32(header+12);
   if(memcmp(header,"C1MT",4)!=0||u32(header+4)!=1u||
      u32(header+8)!=B24_C1_2010_MATERIALS||
-     u32(header+12)!=B24_C1_2010_ATLASES||
-     len< B24_C1_2010_ATLASES*3u||
-     len>B24_C1_2010_ATLASES*B24_C1_2010_NAME_MAX)ok=0;
+     (tmp.atlas_count!=B24_C1_2010_LEGACY_ATLASES&&
+      tmp.atlas_count!=B24_C1_2010_ATLASES)||
+     len<tmp.atlas_count*3u||
+     len>tmp.atlas_count*B24_C1_2010_NAME_MAX)ok=0;
  }
  if(ok){
   for(unsigned i=0;i<B24_C1_2010_MATERIALS;i++){
    unsigned char bb[2];
    if(fread(bb,1,2,f)!=2){ok=0;break;}
    unsigned v=u16(bb);
-   if(v!=B24_C1_2010_NO_TEXTURE&&v>=B24_C1_2010_ATLASES){ok=0;break;}
+   if(v!=B24_C1_2010_NO_TEXTURE&&v>=tmp.atlas_count){ok=0;break;}
    tmp.texture_for_material[i]=(uint16_t)v;
    if(v!=B24_C1_2010_NO_TEXTURE)tmp.source_verified_count++;
   }
  }
  unsigned used=0;
- for(unsigned i=0;i<B24_C1_2010_ATLASES&&ok;i++){
+ for(unsigned i=0;i<tmp.atlas_count&&ok;i++){
   int n=fgetc(f);
   if(n<8||(unsigned)n>=B24_C1_2010_NAME_MAX||(unsigned)n>len-used-1u){ok=0;break;}
   used++;
