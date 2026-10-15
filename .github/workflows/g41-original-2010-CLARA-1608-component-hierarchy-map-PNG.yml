@@ -1,0 +1,65 @@
+name: G41 original 2010 C1L1 native scene 1608 typed components and real BRES geometry PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g41-original-2010-CLARA-1608-component-hierarchy-map-PNG.yml"
+      - "research/b24_unified/b24_g41_original_C1L1_native_scene_1608_component_hierarchy_and_png.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_G41_scene_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install private original 2010 source parser dependencies
+        run: python3 -m pip install -q numpy pillow texture2ddecoder gdown
+      - name: Temporary original 2010 user-owned IPA
+        run: |
+          mkdir -p /tmp/g41
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g41/owner.ipa
+          test "$(wc -c </tmp/g41/owner.ipa)" -eq 248613763
+      - name: Decode 1608 CLARA native components and exactly linked Deco BRES geometry plus atlas source preview
+        run: |
+          python3 research/b24_unified/b24_g41_original_C1L1_native_scene_1608_component_hierarchy_and_png.py --ipa /tmp/g41/owner.ipa --out /tmp/g41/report
+      - name: Strict original source hierarchy and not invented world matrices checks
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g41/report/G41_original_2010_component_hierarchy.json').read_text())
+          assert d['source_actual_named_classed_scene_nodes']==587
+          assert d['source_name_record_candidates']==601
+          assert d['source_name_candidate_distinct_IDs']==594
+          assert d['source_original_native_typed_child_component_edges']==1608
+          assert d['original_parent_named_node_IDs_owning_any_component']==494
+          assert d['source_original_0x005C_component_prefixes']==685
+          assert d['source_original_verified_0x005C_XYZ_quaternion_scale']==663
+          assert d['native_0x005C_other_records_with_unproven_rigid_pose']==22
+          assert d['native_component_child_IDs_are_unique_and_do_not_overlap_named_scene_actors']
+          assert d['source_classed_PositionDummy_three_native_transforms']==137
+          assert d['source_original_CameraPreset_count']==57
+          assert d['source_camera_to_PD_exact_native_references']==51
+          assert d['original_C1L1_Deco_model_archive_index_links']==53
+          assert d['original_2010_Deco_source_locally_transformed_mesh_instances']==41
+          assert d['original_source_Deco_local_instance_model_triangles']==10379
+          assert d['original_first_level_source_static_BRES_geometry_triangles']==22919
+          assert d['source_authentic_2010_PVR_atlases_identified_in_active_Deco_materials']==25
+          assert d['source_original_native_parent_world_matrices_NOT_PROVEN']
+          assert d['source_original_runtime_cutscene_visibility_NOT_PROVEN']
+          assert d['source_original_2010_renderer_shader_alpha_NOT_PROVEN']
+          assert d['source_no_performance_or_VPK_changes']
+          assert Path('/tmp/g41/report/G41_2010_C1L1_REAL_SOURCE_HIERARCHY_MAP_PREVIEW.png').stat().st_size>40000
+          print('PASS G41 actual CLARA source graph/native original source BRES/PVR PNG, no false actor world matrix or VPK.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G41_C1L1_2010_1608_NATIVE_TYPED_COMPONENTS_53_MODEL_57_CAMERA_REAL_BRES_PNG_NO_VPK
+          path: /tmp/g41/report/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove private owner IPA after proof
+        if: always()
+        run: rm -rf /tmp/g41/owner.ipa
