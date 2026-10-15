@@ -1,0 +1,46 @@
+name: G25 ORIGINAL CLARA native 193 types 587 real instances and MC MainCharacter source class ID 112 NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g25-real-original-c1l1-clara-class-dictionary-MC.yml"
+      - "research/b24_unified/b24_g25_original_clara_class_schema_and_actual_MC_maincharacter.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_schema_and_actor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Temporarily retrieve original owner iOS 2010 asset data for source-only CI
+        run: |
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g25
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g25/original.ipa
+          test "$(wc -c </tmp/g25/original.ipa)" -eq 248613763
+      - name: Resolve exact authored BCLARA class prototypes and MC native typed MainCharacter source data
+        run: |
+          python3 research/b24_unified/b24_g25_original_clara_class_schema_and_actual_MC_maincharacter.py --ipa /tmp/g25/original.ipa --out /tmp/g25/original_source_class_map.json
+      - name: Reject contradictory class IDs and unverified gameplay assertions
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g25/original_source_class_map.json'))
+          assert j['source_class_definitions']==193 and j['source_real_named_instances_with_proven_class_ID']==587
+          assert j['source_2010_MC_instance_class112_MainCharacter_PROVEN']
+          assert j['source_exact_MC_native_parent_child_transform']['original_child_node_ID']==1064
+          assert not j['source_player_first_runtime_spawn_trigger_PROVEN']
+          assert not j['NO_VPK']==False
+          print('PASS authentic 2010 original 193 class prototypes, 587 classed scene entities, MC MainCharacter class112 native source owner')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G25_Original_2010_C1L1_193_Class_Prototypes_587_Entities_MC_MainCharacter_Source_No_VPK
+          path: /tmp/g25/original_source_class_map.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove original user IPA after check
+        if: always()
+        run: rm -rf /tmp/g25/original.ipa
