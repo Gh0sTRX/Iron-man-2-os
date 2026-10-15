@@ -1,0 +1,55 @@
+name: G17 REAL 2010 original level1 BCLARA native SpawnPoint pointer xrefs map-first NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g17-2010-original-level1-clara-spawn-noninvented-xrefs.yml"
+      - "research/b24_unified/b24_g17_owner_original_level1_clara_spawn_pointer_crossrefs.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_clara_xrefs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Owner original private archival IPA, temporary
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g17_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g17_owner_original/source.ipa
+          test "$(wc -c </tmp/g17_owner_original/source.ipa)" -eq 248613763
+      - name: Locate original CLARA source named spawn and native reference patterns with no coordinate guessing
+        run: |
+          python3 research/b24_unified/b24_g17_owner_original_level1_clara_spawn_pointer_crossrefs.py \
+            --ipa /tmp/g17_owner_original/source.ipa \
+            --out /tmp/G17_ORIGINAL_C1L1_BCLARA_SPAWN_NATIVE_POINTER_XREFS.json \
+            --html /tmp/G17_C1L1_SPAWN_ORIGINAL_2010_ISIM_VE_ADRES_ETKILESIMLI.html
+      - name: Check historical exact owner first level and proven-vs-unknown
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/G17_ORIGINAL_C1L1_BCLARA_SPAWN_NATIVE_POINTER_XREFS.json').read_text())
+          assert j['original_level1_file_size']==339733
+          assert len(j['unique_real_SpawnPoint_literal_names'])>=1
+          assert j['never_use_triplet_near_string_as_actual_spawn']
+          assert not j['source_genuine_player_spawn_xyz_confirmed']
+          assert not j['source_structure_SpawnPoint_to_typed_Position_link_confirmed']
+          assert j['no_map_gameplay_or_VPK_modifications']
+          assert Path('/tmp/G17_C1L1_SPAWN_ORIGINAL_2010_ISIM_VE_ADRES_ETKILESIMLI.html').stat().st_size>3000
+          print('PASS actual original 2010 BCLARA exact file, typed spawn unclaimed and HTML/JSON generated')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G17_ORIGINAL_2010_LEVEL1_BCLARA_NATIVE_SPAWN_POINTER_XREFS_OFFLINE_HTML_NO_VPK
+          path: |
+            /tmp/G17_ORIGINAL_C1L1_BCLARA_SPAWN_NATIVE_POINTER_XREFS.json
+            /tmp/G17_C1L1_SPAWN_ORIGINAL_2010_ISIM_VE_ADRES_ETKILESIMLI.html
+          if-no-files-found: error
+          retention-days: 14
+      - name: Delete original IPA archive after test
+        if: always()
+        run: rm -rf /tmp/g17_owner_original
