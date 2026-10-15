@@ -1,4 +1,4 @@
-name: G12 true original 2010 C1L1 64 material per PVR bank GPU world direct VitaARM source NO VPK
+name: G12 original 2010 C1L1 source atlas vitaGL 94 material shader strict ARM regression QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
