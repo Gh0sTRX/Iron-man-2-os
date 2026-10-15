@@ -1,0 +1,48 @@
+name: G53 source BRES full reverse native node pointer index NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g53-original-BRES-all-node-references.yml"
+      - "research/b24_unified/b24_g53_original_BRES_all_node_inbound_reference_graph.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  census_native_BRES_inbound_references:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source-only Python dependency
+        run: python3 -m pip install -q numpy
+      - name: Validate syntactic and synthetic pointer classification
+        run: |
+          python3 -m py_compile research/b24_unified/b24_g53_original_BRES_all_node_inbound_reference_graph.py
+          python3 research/b24_unified/b24_g53_original_BRES_all_node_inbound_reference_graph.py --self-test
+      - name: Index every exact pointer to known native node inside ten original C1L1 model BRES
+        run: |
+          python3 research/b24_unified/b24_g53_original_BRES_all_node_inbound_reference_graph.py \
+            --zip research/B11_C1L1_Source_Parser.zip \
+            --out /tmp/g53/G53_ALL_ORIGINAL_2010_BRES_NATIVE_NODE_INBOUND_REFERENCES.json
+      - name: Verify same original 370 meshes and no invented scene parent matrix
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g53/G53_ALL_ORIGINAL_2010_BRES_NATIVE_NODE_INBOUND_REFERENCES.json'))
+          assert d['totals']['native_BRES_models']==10
+          assert d['totals']['original_meshes']==370
+          assert d['totals']['G51_nodes']>=370
+          assert d['raw_exact_offsets_not_semantics']
+          assert d['all_original_mesh_vertices_unchanged']
+          assert d['cumulative_world_matrices_reconstructed'] is False
+          assert d['confirmed_parent_sibling_edges_from_external_refs']==0
+          assert d['no_vpk_no_performance_work']
+          print('PASS G53 original raw BRES exact reference graph, no scene transform assumptions')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G53_ORIGINAL_BRES_NODE_INBOUND_EXACT_REFERENCE_GRAPH_NO_VPK
+          path: /tmp/g53/G53_ALL_ORIGINAL_2010_BRES_NATIVE_NODE_INBOUND_REFERENCES.json
+          retention-days: 14
+          if-no-files-found: error
