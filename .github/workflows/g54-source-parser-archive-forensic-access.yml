@@ -1,0 +1,31 @@
+name: G54 private original BRES local structure forensic source archive NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g54-source-parser-archive-forensic-access.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preserve_original_reader_test_archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate and inventory existing private B11 original source parser archive
+        run: |
+          python3 - <<'PY'
+          import zipfile,hashlib
+          f='research/B11_C1L1_Source_Parser.zip'
+          with open(f,'rb') as fp: print('SOURCE ARCHIVE SHA256:',hashlib.sha256(fp.read()).hexdigest())
+          with zipfile.ZipFile(f) as z:
+              x=[n for n in z.namelist() if n.startswith('original_models/') and n.endswith('.bdae')]
+              assert len(x)==10, x
+              print('SOURCE PRIVATE RESEARCH ORIGINAL BRES COUNT:',len(x))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G54_PRIVATE_ORIGINAL_B11_C1L1_BRES_SOURCE_FORENSIC_READ_ONLY
+          path: research/B11_C1L1_Source_Parser.zip
+          retention-days: 1
+          if-no-files-found: error
