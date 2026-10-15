@@ -1,4 +1,4 @@
-name: G11 original Unibeam and WM first shot G10 native pose plus camera stage QA NO VPK
+name: G11 real G10 four suit true original Beam source linked host QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -88,6 +88,7 @@ jobs:
             work/b24/b24_unified/b24_g8_melee_source_chain.c \
             work/b24/b24_unified/b24_original_im2v_stream.c \
             work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g11_original_unibeam_sequence.c \
             -lm -o /tmp/g10_four_author_original_armor_route
           /tmp/g10_four_author_original_armor_route
       - name: G10 physical centered target lock on nonmissile weapon and authored C1L1 height C sanitizer gate
