@@ -94,7 +94,7 @@ def unit(x):
  n=np.linalg.norm(x)
  return x/n if n>0.00001 else x
 
-def original_data(ipa):
+def original_data(ipa, include_expo=False):
  # True auth source: model mesh positions & per-vertex UV live in the
  # user's original BRES, face identity in exact independently exported GLB.
  originals={}; shader={}
@@ -115,11 +115,11 @@ def original_data(ipa):
   packed=z.read('Payload/IronMan2.app/textures')
  atlas={};atlas_names=[]
  for tex in owner_decode(packed,'.tga'):
-  if tex.name.casefold().startswith('c1l1_'):
+  if tex.name.casefold().startswith('c1l1_') or (include_expo and tex.name.casefold()=='cahp01_c_expo_building.tga'):
    pic,_=pvr_pixels(packed[tex.start:tex.end],tex.name)
    atlas[tex.name.casefold()]=np.array(pic.convert('RGBA'),dtype=np.uint8)
    atlas_names.append(tex.name.casefold())
- assert len(atlas)==len(atlas_names)==39
+ assert len(atlas)==len(atlas_names)==39+(1 if include_expo else 0)
  names=sorted(atlas);index={name:i for i,name in enumerate(names)}
  rgba_parts=[];offsets=[];width=[];height=[];size=0
  for name in names:
@@ -168,7 +168,7 @@ def original_data(ipa):
  return (p,t,g,ids,rgba,np.asarray(offsets,np.int64),
    np.asarray(width,np.int32),np.asarray(height,np.int32),center,
    {'source_2010_urban_crowded_55m_geometry_cell':int(hist[a,b]),
-    'source_texture_atlas_count':39,'source_original_triangles':22919,
+    'source_texture_atlas_count':len(names),'source_original_triangles':22919,
     'original_UV_materials_shader_prop60_not_guessed':True})
 
 def preview(data,center,title,out):
