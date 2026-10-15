@@ -1,4 +1,4 @@
-name: MAP FIRST 2010 real 60B property original TGA atlas exact links with default material bypass NO VPK
+name: MAP FIRST 2010 true shader material per-record sampler cross-model B12 vehicle atlas QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
