@@ -109,7 +109,8 @@ def draw(polys,center,out,desc):
   projected[:,1]=(H-44)/2-focal*(p@up)/z+35
   if (projected[:,0].max()<0 or projected[:,0].min()>W or
       projected[:,1].max()<45 or projected[:,1].min()>H):continue
-  if float(np.abs(np.cross(projected[1]-projected[0],projected[2]-projected[0])))<.05:continue
+  a=projected[1]-projected[0];b=projected[2]-projected[0]
+  if abs(float(a[0]*b[1]-a[1]*b[0]))<.05:continue
   n=np.cross(pos[1]-pos[0],pos[2]-pos[0])
   n=vunit(n)
   shade=.70+.30*abs(float(n@vunit([.35,.25,.9])))
