@@ -26,7 +26,9 @@ int b24_g10_practice_target_draw(const B24G10PracticeTarget *t){
  };
  glDisable(GL_TEXTURE_2D);
  glEnable(GL_DEPTH_TEST);
- glColor4f(.2f,1.f,.9f,1.f);
+ if(t->hit_flash>0.f)
+  glColor4f(1.f,.84f,.12f,1.f); /* feedback only, persistent invulnerable target */
+ else glColor4f(.2f,1.f,.9f,1.f);
  glEnableClientState(GL_VERTEX_ARRAY);
  glVertexPointer(3,GL_FLOAT,0,lines);
  glDrawArrays(GL_LINES,0,(GLsizei)(sizeof(lines)/sizeof(lines[0])));
