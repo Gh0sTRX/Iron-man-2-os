@@ -1,0 +1,48 @@
+name: G52 original 2010 BRES native child table stride audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g52-original-2010-BRES-child-layout-probe.yml"
+      - "research/b24_unified/b24_g52_2010_BRES_child_layout_stride_pointer_table_validation.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify_g52_source_node_layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source parser dependencies
+        run: python3 -m pip install -q numpy
+      - name: Syntax and controlled synthetic source-pointer classifications
+        run: |
+          python3 -m py_compile research/b24_unified/b24_g52_2010_BRES_child_layout_stride_pointer_table_validation.py
+          python3 research/b24_unified/b24_g52_2010_BRES_child_layout_stride_pointer_table_validation.py --self-test
+      - name: Analyze authentic 2010 source binary child layouts and inspect competing interpretations
+        run: |
+          python3 research/b24_unified/b24_g52_2010_BRES_child_layout_stride_pointer_table_validation.py \
+            --zip research/B11_C1L1_Source_Parser.zip \
+            --out /tmp/g52/G52_ORIGINAL_2010_BRES_CHILD_LAYOUT_SOURCE_EVIDENCE.json
+      - name: Validate provenance and forbid invented Vita gameplay/scene transform success
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g52/G52_ORIGINAL_2010_BRES_CHILD_LAYOUT_SOURCE_EVIDENCE.json'))
+          assert d['source_BRES_v133_files']==10
+          assert d['totals']['meshes']==370
+          assert d['totals']['G51_nodes']>=370
+          assert d['totals']['direct_first_child_struct_valid']>=4
+          assert d['source_only_no_vpk_no_geometry_shift']
+          assert d['interpretation']['world_matrix_proven'] is False
+          assert d['interpretation']['shader_visibility_proven'] is False
+          assert d['interpretation']['native_scene_modified'] is False
+          print('PASS G52 original native child layout source audit; actual full map remains unresolved')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G52_ORIGINAL_2010_BRES_CHILD_LAYOUT_POINTER_TABLE_STRIDE_EVIDENCE_NO_VPK
+          path: /tmp/g52/G52_ORIGINAL_2010_BRES_CHILD_LAYOUT_SOURCE_EVIDENCE.json
+          retention-days: 14
+          if-no-files-found: error
