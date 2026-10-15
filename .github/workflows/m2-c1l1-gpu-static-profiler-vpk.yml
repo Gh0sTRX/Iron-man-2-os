@@ -1,0 +1,91 @@
+name: M2 C1L1 PS Vita static GPU buffer scene diagnosis FPS and per-group native user QA
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/m2-c1l1-gpu-static-profiler-vpk.yml"
+      - "research/b24_unified/mapviewer_m1/mapviewer_m2*"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build_native_mapviewer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare original 2010 map-only BRES geometry and source PVR textures
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy pillow texture2ddecoder gdown
+          mkdir -p /tmp/im2_m1_owner research/b24_unified/mapviewer_m2/maps
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/im2_m1_owner/original.ipa
+          test "$(wc -c </tmp/im2_m1_owner/original.ipa)" -eq 248613763
+          python3 research/b24_unified/export_b24_c1_gpu_mesh.py \
+             --out research/b24_unified/mapviewer_m2/maps/C1L1_environment.c1g2 \
+             --manifest /tmp/im2_m1_owner/mesh.json
+          python3 research/b24_unified/recover_c1l1_original_uv.py \
+             --out research/b24_unified/mapviewer_m2/maps/C1L1_environment.c1uv \
+             --manifest /tmp/im2_m1_owner/uv.json
+          python3 research/b24_unified/recover_c1l1_triangle_materials.py \
+             --out research/b24_unified/mapviewer_m2/maps/C1L1_environment.c1ma \
+             --manifest /tmp/im2_m1_owner/material.json
+          python3 research/b24_unified/b24_g12_pack_only_source_used_original_C1L1_map_textures.py \
+             --ipa /tmp/im2_m1_owner/original.ipa \
+             --archive /tmp/im2_m1_owner/authentic_c1l1_used_pvr.zip \
+             --qa /tmp/im2_m1_owner/texture.json
+          unzip -oq /tmp/im2_m1_owner/authentic_c1l1_used_pvr.zip -d research/b24_unified/mapviewer_m2
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          m=Path('research/b24_unified/mapviewer_m2/maps')
+          a,b,c,d=[m/('C1L1_environment'+ext) for ext in ('.c1g2','.c1uv','.c1ma','.c1mt')]
+          assert all(p.is_file() for p in (a,b,c,d))
+          assert struct.unpack_from('<4sIIIIII',a.read_bytes())[:6]==(b'C1G2',2,16,37946,68757,4)
+          assert struct.unpack_from('<4sIII',b.read_bytes())==(b'C1UV',1,37946,370)
+          assert struct.unpack_from('<4sIIIIII',c.read_bytes())[:6]==(b'C1MA',1,37946,22919,370,94)
+          assert struct.unpack_from('<4sIIII',d.read_bytes())[:4]==(b'C1MT',1,94,39)
+          q=json.loads(Path('/tmp/im2_m1_owner/texture.json').read_text())
+          assert q['actual_used_atlases_staged']>=12
+          print('PASS original 370 source meshes and native city UV/material PVR sidecars; selected atlas count',q['actual_used_atlases_staged'])
+          PY
+      - name: Build stand-alone minimal map viewer in official VitaSDK container
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace/research/b24_unified/mapviewer_m1 vitasdk/vitasdk:2026.08 sh -lc \
+            'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Verify actual bootable installer VPK has eboot and ONLY original first map assets
+        run: |
+          set -euo pipefail
+          VPK=research/b24_unified/mapviewer_m2/build-vita/IronMan2_C1L1_MapViewer_GPU_M2.vpk
+          test -s "$VPK"
+          unzip -t "$VPK" | tail -n 2
+          unzip -Z1 "$VPK" | grep -Fx 'eboot.bin'
+          unzip -Z1 "$VPK" | grep -Fx 'sce_sys/param.sfo'
+          for suffix in c1g2 c1uv c1ma c1mt; do
+            unzip -Z1 "$VPK" | grep -Fx "maps/C1L1_environment.$suffix"
+          done
+          unzip -Z1 "$VPK" | grep -E '^maps/.*\.c1tx$' | head -20
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,struct
+          f=Path('research/b24_unified/mapviewer_m2/build-vita/IronMan2_C1L1_MapViewer_GPU_M2.vpk')
+          with zipfile.ZipFile(f) as z:
+           n=set(z.namelist())
+           assert len([p for p in n if p.startswith('maps/') and p.endswith('.c1tx')])>=12
+           assert set(['eboot.bin','sce_sys/param.sfo','maps/C1L1_environment.c1g2','maps/C1L1_environment.c1uv',
+             'maps/C1L1_environment.c1ma','maps/C1L1_environment.c1mt'])<=n
+           assert z.read('eboot.bin')[:4] == b'\x7fELF' or len(z.read('eboot.bin'))>10000
+           assert not any(p.endswith(('.ipa','.bdae','.bclara')) for p in n)
+           print('VPK REAL NATIVE INSTALLER PASS',f.stat().st_size, 'bytes;',len(n),'files')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_C1L1_M2_STATIC_GPU_DIAGNOSTIC_PERFORMANCE_VPK
+          path: research/b24_unified/mapviewer_m2/build-vita/IronMan2_C1L1_MapViewer_GPU_M2.vpk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Erase temporary original IPA but keep VPK
+        if: always()
+        run: rm -rf /tmp/im2_m1_owner
