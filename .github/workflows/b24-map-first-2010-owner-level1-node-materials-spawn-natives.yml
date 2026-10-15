@@ -1,0 +1,45 @@
+name: MAP FIRST original 2010 level1 BCLARA NodeMaterials and genuine SpawnPoint coordinates research NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-2010-owner-level1-node-materials-spawn-natives.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  first_level_original_clara:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Temporary private 2010 source game and no output of original game IPA
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/owner2010_firstmap
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/owner2010_firstmap/source.ipa
+          test "$(wc -c </tmp/owner2010_firstmap/source.ipa)" -eq 248613763
+      - name: Inspect authored C1L1 level scene material and texture property semantics
+        run: |
+          python3 research/b24_unified/b24_map_first_original_level1_bclara_scene_material_and_spawn_decode.py \
+            --ipa /tmp/owner2010_firstmap/source.ipa \
+            --out /tmp/MAP_FIRST_2010_ORIGINAL_LEVEL1_NODEMATERIALS_AND_SPAWN_REPORT.json
+      - name: Check exact user level1 and honest unknown source mapping
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/MAP_FIRST_2010_ORIGINAL_LEVEL1_NODEMATERIALS_AND_SPAWN_REPORT.json').read_text())
+          assert d['original_bytes']==339733
+          assert not d['original_material_to_TGA_verified']
+          assert not d['original_player_spawn_xyz_verified']
+          print('PASS owner 2010 authentic original Level1 scene investigated: no guessed spawn or diffuse maps')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MAP_FIRST_Original_Gameloft2010_Level1_BCLARA_Native_NodeMaterials_Spawn_Fields
+          path: /tmp/MAP_FIRST_2010_ORIGINAL_LEVEL1_NODEMATERIALS_AND_SPAWN_REPORT.json
+          if-no-files-found: error
+      - name: Remove user-owned original IPA
+        if: always()
+        run: rm -rf /tmp/owner2010_firstmap
