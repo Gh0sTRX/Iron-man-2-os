@@ -1,4 +1,4 @@
-name: G11 physical G10 War Machine weapon reset and L-combo gold hit QA NO VPK
+name: G11 physical Vita ARM all four new combat modules and G10 regression NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -180,11 +180,11 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
             vitasdk/vitasdk:2026.08 sh -lc '
               set -eu
-              for n in b24_c1_true_source_floor b24_g10_original_foot_contact; do
+              for n in b24_c1_true_source_floor b24_g10_original_foot_contact b24_g11_combat_stage_policy b24_g11_target_camera_follow b24_g11_original_unibeam_sequence b24_g11_practice_melee_feedback; do
                 arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
                   -Iwork/src -Iwork/b24/b24_unified \
                   -c "research/b24_unified/$n.c" -o "/tmp/$n.o"
                 test -s "/tmp/$n.o"
               done
-              echo "PASS G10 two C1L1 original triangle to source suit foot placement Vita ARM object files, NO VPK"
+              echo "PASS G11 six exact Vita ARM modules: original C1L1 ground, feet, shot-stage, lock-camera, unibeam, immortal combat feedback. NO VPK"
             '
