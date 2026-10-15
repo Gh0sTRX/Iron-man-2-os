@@ -65,20 +65,17 @@ def run(zpath,out):
    records={}
    # candidate starts from string ptr fields, avoiding scanning ~MB of
    # all random payload and accidentally inventing many native node records.
+   words=np.frombuffer(raw[:len(raw)//4*4],dtype="<u4")
    for mo in re.finditer(rb"[A-Za-z0-9_]+(?:-node(?:_PIVOT)?|_PIVOT)",raw):
     loc=mo.start()
-    for word in (loc,loc+4):
-     if word<4 or word>=len(raw):continue
-     pat=struct.pack("<I",word)
-     for hit in range(0,len(raw)-3,4):
-      if raw[hit:hit+4]!=pat:continue
-      for slot in (0,1,2):
-       base=hit-slot*4
-       if base<0 or base%4:continue
-       if base in records:continue
-       rec=parse_record(raw,base)
-       if rec is not None:
-        records[base]=rec
+    if loc<4 or loc>=len(raw):continue
+    for hit in np.flatnonzero((words==loc)|(words==loc+4)):
+     for slot in (0,1,2):
+      base=int(hit)*4-slot*4
+      if base<0 or base%4 or base in records:continue
+      rec=parse_record(raw,base)
+      if rec is not None:
+       records[base]=rec
    # exact field child pointer -> validated actual child record start
    exact=[]
    for r in records.values():
