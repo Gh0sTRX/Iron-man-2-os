@@ -15,7 +15,7 @@ Do not invent camera movement or reconstructed iOS visuals. NO VPK.
 from __future__ import annotations
 import argparse,base64,collections,hashlib,json,math,struct,zipfile
 from pathlib import Path
-from b24_owner_pack_extract import decode,get_exact
+from b24_owner_pack_extract import decode as owner_decode,get_exact
 from b24_g25_original_clara_class_schema_and_actual_MC_maincharacter import summarize
 from b24_g24_original_clara_source_601_nodes_663_parent_links import audit
 from b24_g19_original_2010_level1_spawn_transforms_city_xy_map import exact_spawns,render
@@ -188,7 +188,7 @@ selector.addEventListener('change',()=>change(selector.value));search.addEventLi
 def main(ipa,report_path,image_path,html_path):
     with zipfile.ZipFile(ipa) as z:
         packed=z.read("Payload/IronMan2.app/clev")
-        original=get_exact(packed,decode(packed,".bclara"),"level1.bclara")
+        original=get_exact(packed,owner_decode(packed,".bclara"),"level1.bclara")
     result=decode(original)
     meshrows,_=source()
     nodes=exact_spawns(original)
