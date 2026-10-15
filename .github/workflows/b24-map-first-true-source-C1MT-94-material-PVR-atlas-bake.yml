@@ -1,4 +1,4 @@
-name: MAP FIRST 2010 authentic 60byte original shader sampler 94 C1MA to 39 PVR C1TX exact C1MT map NO VPK
+name: MAP FIRST G12 original 2010 C1MT 64 source shaders 39 C1TX link actual Vita ARM loader NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -45,6 +45,25 @@ jobs:
           assert struct.unpack_from('<4sIIII',c)==(b'C1MT',1,94,39,len(c)-20-94*2)
           print('PASS G12 original 2010 source-material exact C1MT native binary with authenticated PVR bank links and 22919 original triangles, no VPK')
           PY
+      - name: Compile and verify strict C11 G12 real original C1MT 94x39 bank against actually generated owner 2010 material atlas
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_2010_diffuse_bank.c \
+            research/b24_unified/test_b24_c1_2010_diffuse_bank.c \
+            -o /tmp/G12_C1MT_real_authored_sampler_bank_host
+          /tmp/G12_C1MT_real_authored_sampler_bank_host \
+            /tmp/G12_C1L1_ORIGINAL_2010_C1MA_94_MATERIAL_TO_39_ATLAS.c1mt
+      - name: Compile actual strict ARM PS Vita source image bank loader without making VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                -c research/b24_unified/b24_c1_2010_diffuse_bank.c \
+                -o /tmp/G12_C1MT_VITA_ARM.o
+              test -s /tmp/G12_C1MT_VITA_ARM.o
+              echo "PASS true 2010 BRES 94 material 39 PVR image bank native Vita ARM C11 object NO VPK"
+            '
       - uses: actions/upload-artifact@v4
         with:
           name: G12_MAP_FIRST_94_REAL_2010_C1L1_PER_MATERIAL_39_PVR_AUTHENTIC_C1MT
