@@ -1,0 +1,52 @@
+name: G55 real 2010 BRES C1L1 296 node-parent-pivot map source GLB and PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g55-real-2010-BRES-native-parent-pivot-296-map.yml"
+      - "research/b24_unified/b24_g55_2010_C1L1_true_native_BRES_parent_pivot_scene_reconstruction.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify_source_authentic_level1_map_node_chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source mesh parser + GLB and diagnostic preview dependencies
+        run: python3 -m pip install -q numpy trimesh matplotlib
+      - name: Validate exact real 2010 native record offsets and compose source-only mesh chains
+        run: |
+          python3 -m py_compile research/b24_unified/b24_g55_2010_C1L1_true_native_BRES_parent_pivot_scene_reconstruction.py
+          python3 research/b24_unified/b24_g55_2010_C1L1_true_native_BRES_parent_pivot_scene_reconstruction.py \
+            --zip research/B11_C1L1_Source_Parser.zip \
+            --out /tmp/g55/G55_C1L1_REAL_SOURCE_PARENT_PIVOT_MESH_SCENE.json \
+            --glb /tmp/g55/G55_C1L1_296_SOURCE_MESH_NODE_CHAIN_DIAGNOSTIC.glb \
+            --png /tmp/g55/G55_C1L1_ORIGINAL_2010_NATIVE_MAP_TOPDOWN_DIAGNOSTIC.png
+      - name: Source-only identity validation; no completed actual native runtime map claim
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          d=json.loads(pathlib.Path('/tmp/g55/G55_C1L1_REAL_SOURCE_PARENT_PIVOT_MESH_SCENE.json').read_text())
+          c=d['totals']
+          assert c['source_meshes']==370
+          assert c['source_triangles']==22919
+          assert c['native_source_nodes']>=670
+          assert c['exact_linked_meshes']==296
+          assert c['exact_linked_triangles']==22441
+          assert c['unresolved_meshes']==74
+          assert d['exact_native_node_record_format']['child_count']==52
+          assert d['exact_native_node_record_format']['first_child_record_pointer']==56
+          assert d['source_geom_world_candidate_not_runtime_verified']
+          assert d['NO_VPK_AND_NO_NATIVE_DEVICE_TEST']
+          for n in ('G55_C1L1_296_SOURCE_MESH_NODE_CHAIN_DIAGNOSTIC.glb','G55_C1L1_ORIGINAL_2010_NATIVE_MAP_TOPDOWN_DIAGNOSTIC.png'):
+              assert (pathlib.Path('/tmp/g55')/n).stat().st_size>10000
+          print('G55 PASS: 296 source parent-pivot chains; 159/159 ground+urban+vehicles linked; Vita runtime and full remaining 74 lights still open')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G55_SOURCE_REAL_2010_296_MESH_NATIVE_MAP_WORLD_CANDIDATE_JSON_GLB_PNG_NO_VPK
+          path: /tmp/g55/*
+          retention-days: 14
+          if-no-files-found: error
