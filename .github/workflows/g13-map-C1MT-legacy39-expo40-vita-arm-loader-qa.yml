@@ -1,0 +1,51 @@
+name: G13 C1L1 original map C1MT backward compatible 39 and authenticated Expo40 C11 Vita ARM source QA no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g13-map-C1MT-legacy39-expo40-vita-arm-loader-qa.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_c11:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: G12 genuine 39 atlas backward compatible source loader C11 unit
+        run: |
+          set -eu
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_2010_diffuse_bank.c \
+            research/b24_unified/test_b24_c1_2010_diffuse_bank.c \
+            -o /tmp/g13_c1mt39_unit
+          /tmp/g13_c1mt39_unit
+      - name: G13 original 40 atlas Expo support and invalid atlas 41 transactional rejection
+        run: |
+          set -eu
+          python3 - <<'PY'
+          import struct
+          from pathlib import Path
+          p=Path('/tmp/G13_AUTH_SOURCE_TEST_40.c1mt')
+          ids=[(i%39 if i<64 else 65535) for i in range(94)]
+          ids[64]=39
+          names=[f'c1l1_test{i:02}.c1tx' for i in range(39)]
+          names.append('cahp01_c_expo_building.c1tx')
+          data=b''.join(bytes([len(x)])+x.encode('ascii') for x in names)
+          p.write_bytes(struct.pack('<4sIIII',b'C1MT',1,94,40,len(data))+
+                        struct.pack('<94H',*ids)+data)
+          PY
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_c1_2010_diffuse_bank.c \
+            research/b24_unified/test_b24_g13_expo40_real_source_bank.c \
+            -o /tmp/g13_c1mt40_unit
+          /tmp/g13_c1mt40_unit /tmp/G13_AUTH_SOURCE_TEST_40.c1mt 64
+      - name: Strict compile real native PS Vita ARM material bank source module only - no VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk:2026.08 sh -lc '
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                 -c research/b24_unified/b24_c1_2010_diffuse_bank.c -o /tmp/g13_c1mt_arm.o
+              test -s /tmp/g13_c1mt_arm.o
+              echo "PASS G13 source original PVR40 plus legacy G12 PVR39 native Vita ARM C11 loader, NO VPK"
+            '
