@@ -1,0 +1,81 @@
+name: G11 G10 actual Vita B14 fire policy and War Machine repulsor guard host tests NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g11-physical-20261015-shoot-stage-guard.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild exact B14 B16 G9 native CPU/GPU render source without owner IPA or Vita package
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          for zip in source/IronMan2_Vita_GitHub_Ready_CI_R2.zip flight_b4/flight_b4_overlay.zip performance_b5/b5_optimized_renderer.zip skinning_b7/b7_vita_overlay.zip combat_b8/b8_overlay.zip armor_b9/b9_overlay.zip profile_b10/b10_overlay.zip; do unzip -oq "$zip" -d work; done
+          cat animation_b13/b13-overlay.part?? >/tmp/b13-overlay.zip
+          echo 'ec9b66b9b48ecf223fddd0b33e8c3889027de36be789516e721c9e1cc1fb0c13  /tmp/b13-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b13-overlay.zip -d work
+          unzip -oq third_person_b14/b14_overlay.zip -d work
+          unzip -oq mechanics_b15/b15_overlay.zip -d work
+          for i in 00 01 02 03 04 05; do cat "combat_b16/b16-overlay.part${i}"; done >/tmp/b16-overlay.zip
+          echo 'c6d8393fd0cf5e93302fffe0351319bb9b9a2bc41ff185d021e32163ad39993b  /tmp/b16-overlay.zip' | sha256sum -c -
+          unzip -oq /tmp/b16-overlay.zip -d work
+          python3 research/b17/apply_b17.py
+          python3 research/b24_unified/assemble_b24_modules.py
+          python3 research/b24_unified/apply_b24.py
+          python3 research/b24_unified/apply_b24_c1.py
+          python3 research/b24_unified/apply_b24_c2_fix.py
+          python3 research/b24_unified/apply_b24_right_arm_source_only.py
+          python3 research/b24_unified/apply_b24_gpu_main_source_only.py
+          python3 research/b24_unified/apply_b24_g5_gameplay_source_only.py
+          python3 research/b24_unified/apply_b24_g6_controls_source_only.py
+          python3 research/b24_unified/apply_b24_g7_original_collisions_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_world_bounds_source_only.py
+          python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py
+          python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
+          python3 research/b24_unified/apply_b24_g10_practice_target_source_only.py
+          python3 research/b24_unified/apply_b24_g10_four_suit_original_motion_source_only.py
+          python3 research/b24_unified/apply_b24_g11_combat_policy_source_only.py
+      - name: G11 strict sanitized movement-fire policy: walk, stage1, stage2/rush no fire
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O1 -g -Wall -Wextra -Werror -pedantic \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            research/b24_unified/b24_g11_combat_stage_policy.c \
+            research/b24_unified/test_b24_g11_combat_stage_policy.c -lm -o /tmp/g11_shoot_motion_policy
+          ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 /tmp/g11_shoot_motion_policy
+      - name: Assert G11 real B14 B16 source ordering and no 2nd physics engine or VPK
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          policy=Path('work/b24/b24_unified/b24_g11_combat_stage_policy.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert 'b24_g11_combat_stage_policy.c' in cm
+          assert main.count('b24_g11_combat_stage_policy(&g11_in')==1
+          assert main.count('b24_g11_stage_allows_hand_attack(')==1
+          assert main.count('b16_combat_fire(&combat')==1
+          assert main.count('b14_world_tick(&world')==1
+          assert main.index('b24_g11_combat_stage_policy(&g11_in')<main.index('b14_world_tick(&world')
+          assert main.index('b24_g11_stage_allows_hand_attack(')<main.index('b16_combat_fire(&combat')
+          assert main.index('b16_combat_fire(&combat')<main.index('b24_g8_motion_tick(')
+          assert 'ground_run=b24_gate.is_ground_running &&' in main
+          assert 'if(world.flying && world.flight_stage>=2)attack.attack_active=0;' in main
+          assert main.count('b24_gpu_runtime_draw(')==1
+          assert 'if(fired>=0 && combat.mode==B16_REPULSOR){' in main
+          print('PASS G11 original B14 single CPU world, B16 actual accepted WM shooting event, real 2010 IM2V source clip, one VitaGL draw')
+          PY
+      - name: Native Vita ARM C11 strict compile of single-frame policy (no link or VPK)
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+             vitasdk/vitasdk:2026.08 sh -lc '
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                -c research/b24_unified/b24_g11_combat_stage_policy.c -o /tmp/g11_policy_arm.o
+              test -s /tmp/g11_policy_arm.o
+              echo "PASS G11 stage guard Vita ARM object no VPK"
+             '
