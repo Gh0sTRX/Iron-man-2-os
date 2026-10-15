@@ -1,0 +1,51 @@
+name: G46 first level original 2010 negative Z PD authored nodes versus BRES city original source PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g46-native-original-C1L1-negative-Z-PD-nearest-BRES.yml"
+      - "research/b24_unified/b24_g46_original_C1L1_negative_Z_PositionDummy_native_urban_BRES_proximity.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_author_negative_Z_PD:
+    runs-on: ubuntu-latest
+    timeout-minutes: 21
+    steps:
+      - uses: actions/checkout@v4
+      - name: Private original asset decoder dependencies
+        run: python3 -m pip install -q numpy pillow gdown
+      - name: Original owner iOS source IPA temporary
+        run: |
+          mkdir -p /tmp/g46
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g46/owner.ipa
+          test "$(wc -c </tmp/g46/owner.ipa)" -eq 248613763
+      - name: Compare real 2010 CLARA authored low Z PositionDummies with real 2010 BRES original source city triangles
+        run: |
+          python3 research/b24_unified/b24_g46_original_C1L1_negative_Z_PositionDummy_native_urban_BRES_proximity.py             --ipa /tmp/g46/owner.ipa --out /tmp/g46/report
+      - name: Prevent false conclusion negative Z original polygons need blanket +36
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g46/report')
+          d=json.loads((p/'G46_original_2010_low_Z_PD_vs_BRES_city.json').read_text())
+          assert d['source_original_low_Z_PositionDummy_count']==5
+          assert d['source_negative_2010_PD_near_original_city_within_10_world_coordinate_units']==4
+          assert d['source_all_five_PD_near_original_city_within_20_world_coordinate_units']
+          assert d['source_G44_city_negative_Z_does_not_alone_prove_bad_game_scene_root']
+          assert not d['source_BRES_original_scene_root_world_matrix_resolved']
+          assert not d['source_PD_three_transform_semantics_and_runtime_position_resolved']
+          assert d['no_original_mesh_moved_and_NO_VPK']
+          assert (p/'G46_ORIGINAL_2010_ALT_SEVIYE_SAHNE_PD_HARITASI_16_9.png').stat().st_size>25000
+          print('PASS exact original source native 5 negative-Z PD within 20 units of original city, do not move models')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G46_2010_C1L1_5_NATIVE_NEGATIVE_Z_PD_NEAR_REAL_CITY_BRES_MAP_PNG_NO_VPK
+          path: /tmp/g46/report/
+          retention-days: 14
+          if-no-files-found: error
+      - if: always()
+        run: rm -rf /tmp/g46/owner.ipa
