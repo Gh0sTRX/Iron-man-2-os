@@ -1,0 +1,34 @@
+name: MAP FIRST 2010 original BRES 88-byte shader material property actual diffuse sampler record archaeology
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-real-2010-88byte-shader-material-tex-pointer-diagnosis.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_88byte:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect real 2010 shader/material property records downstream exact TGA bank 20-byte table
+        run: |
+          python3 research/b24_unified/b24_map_first_real_2010_88byte_shader_table_and_props.py \
+            --out /tmp/C1L1_ORIGINAL_SOURCE_2010_88_BYTE_MATERIAL_SHADER_POINTER_GRAPH.json
+      - name: Count original author C1L1 scene source materials
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/C1L1_ORIGINAL_SOURCE_2010_88_BYTE_MATERIAL_SHADER_POINTER_GRAPH.json').read_text())
+          assert len(d['source_original_2010_BRES_88byte_shader_property_tables'])==10
+          assert sum(x['source_shader88_records_count'] for x in d['source_original_2010_BRES_88byte_shader_property_tables'])>100
+          assert not d['material_shader_texture_sampler_proven']
+          print("PASS independently authenticated 2010 BRES shader record 88byte TGA association investigation, no guessed map/VPK")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: C1L1_REAL2010_MapOriginal_88byte_ShaderProps_Texture_Index_Forensics
+          path: /tmp/C1L1_ORIGINAL_SOURCE_2010_88_BYTE_MATERIAL_SHADER_POINTER_GRAPH.json
+          if-no-files-found: error
