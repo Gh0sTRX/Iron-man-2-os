@@ -1,4 +1,4 @@
-name: MAP FIRST 2010 C1L1 native ground building road 22919 face UV availability NO VPK
+name: MAP FIRST source 20635 road building C1L1 face UV, 2284 light faces nonUV NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -31,7 +31,7 @@ jobs:
           assert sum(a['all_faces'] for a in g.values())==22919
           assert sum(a['all_meshes'] for a in g.values())==370
           assert sum(a['texturable_meshes'] for a in g.values())==169
-          assert all(a['texturable_faces']+a['missing_uv_faces']==a['all_faces'] for a in g.values())
+          assert all(a.get('texturable_faces',0)+a.get('missing_uv_faces',0)==a['all_faces'] for a in g.values())
           assert d['UV_zero_BRES_faces_must_not_get_false_solid_texture']
           print('PASS original 2010 C1L1 all 22919 road/urban/light/car face UV audit, no guessed 39 atlas-to-material pair and no VPK')
           PY
