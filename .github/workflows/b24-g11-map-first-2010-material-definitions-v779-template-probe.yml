@@ -1,4 +1,4 @@
-name: C1L1 MAP FIRST original 2010 Gameloft BDAE material declaration and texture property v779 template validation
+name: C1L1 MAP FIRST original author material structs offset dictionary v779 local CI no external dependencies
 on:
   push:
     branches: [feature/b24-unified-gameplay]
