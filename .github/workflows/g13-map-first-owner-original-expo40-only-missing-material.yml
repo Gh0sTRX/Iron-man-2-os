@@ -1,0 +1,61 @@
+name: G13 MAP FIRST ORIGINAL EXPO PVR missing prefix 206 city faces 40 C1MT source-only NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g13-map-first-owner-original-expo40-only-missing-material.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_original_expo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare real iOS 2010 BRES and original source PVR decoders
+        run: python3 -m pip install -q numpy pillow texture2ddecoder gdown
+      - name: Temporarily fetch actual user 2010 IronMan2 IPA, never publish whole game
+        run: |
+          mkdir -p /tmp/g13_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g13_owner/owner.ipa
+          test "$(wc -c </tmp/g13_owner/owner.ipa)" -eq 248613763
+      - name: Extend G12 true BRES per material source bank by exactly one omitted Expo atlas with original PVR pixels
+        run: |
+          python3 research/b24_unified/b24_g13_original_expo40_source_material_fix.py \
+            --ipa /tmp/g13_owner/owner.ipa \
+            --output /tmp/G13_OWNER_2010_EXPO40_TRUE_SOURCE_MAP_ONLY_NOT_VPK.zip \
+            --report /tmp/G13_OWNER_2010_EXPO40_VERIFIED_BRES_MATERIAL.json
+      - name: Validate original source model link 206 newly mapped faces and all previous original 93 material identities unchanged
+        run: |
+          python3 - <<'PY'
+          import json,zipfile,struct,hashlib
+          from pathlib import Path
+          p=Path('/tmp/G13_OWNER_2010_EXPO40_TRUE_SOURCE_MAP_ONLY_NOT_VPK.zip')
+          d=json.loads(Path('/tmp/G13_OWNER_2010_EXPO40_VERIFIED_BRES_MATERIAL.json').read_text())
+          assert d['source_original_triangles_newly_textured']==206
+          assert d['output_G13_C1MT_original_material_count']==94
+          assert d['output_G13_C1MT_original_atlas_count']==40
+          assert d['all_other_material_indices_identical_to_proven_G12']
+          assert d['actual_authored_source_C1TX_textures_packed']==24
+          with zipfile.ZipFile(p) as z:
+            files=z.namelist()
+            assert len(files)==25 and all(s.startswith('maps/') for s in files)
+            c=z.read('maps/C1L1_environment.c1mt')
+            assert struct.unpack_from('<4sIIII',c)[:4]==(b'C1MT',1,94,40)
+            expo=z.read('maps/cahp01_c_expo_building.c1tx')
+            m,v,w,h,_=struct.unpack_from('<4sIIII',expo)
+            assert (m,v)==(b'C1TX',1) and len(expo)==20+4*w*h
+            assert hashlib.sha256(expo).hexdigest()==d['source_expo_native_C1TX_sha256']
+          print('PASS original C1L1 2010 94 source material 40 PVR; newly textured 206 Expo faces; 93 source material entries unchanged. Map files only, no VPK.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G13_Original2010_Authentic_40_PVR_ExpoPlusC1L1_24UsedMapOnly
+          path: |
+            /tmp/G13_OWNER_2010_EXPO40_TRUE_SOURCE_MAP_ONLY_NOT_VPK.zip
+            /tmp/G13_OWNER_2010_EXPO40_VERIFIED_BRES_MATERIAL.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Clean temporary original full game
+        if: always()
+        run: rm -rf /tmp/g13_owner
