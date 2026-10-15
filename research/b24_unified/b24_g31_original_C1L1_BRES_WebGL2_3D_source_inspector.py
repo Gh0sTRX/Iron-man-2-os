@@ -146,12 +146,12 @@ const sourceColors={"source-texture-and-UV":[.36,.78,.63],"expo":[.96,.75,.35],"
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function b64(id){let s=document.getElementById(id).textContent.trim(),decoded=atob(s),b=new Uint8Array(decoded.length);for(let i=0;i<decoded.length;i++)b[i]=decoded.charCodeAt(i);return b.buffer}
 function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s}
-function program(){const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,\`#version 300 es
+function program(){const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,`#version 300 es
 layout(location=0) in vec3 position;uniform mat4 projection,view;out vec3 worldP;
-void main(){worldP=position;gl_Position=projection*view*vec4(position,1.);}\`));
-gl.attachShader(p,shader(gl.FRAGMENT_SHADER,\`#version 300 es
+void main(){worldP=position;gl_Position=projection*view*vec4(position,1.);}`));
+gl.attachShader(p,shader(gl.FRAGMENT_SHADER,`#version 300 es
 precision highp float;in vec3 worldP;uniform vec3 baseColor;uniform float diagShade;out vec4 outColor;
-void main(){float s=1.;if(diagShade>0.5){vec3 n=normalize(cross(dFdx(worldP),dFdy(worldP)));s=0.48+0.52*abs(dot(n,normalize(vec3(0.35,0.55,0.78))));}outColor=vec4(baseColor*s,1.);}\`));
+void main(){float s=1.;if(diagShade>0.5){vec3 n=normalize(cross(dFdx(worldP),dFdy(worldP)));s=0.48+0.52*abs(dot(n,normalize(vec3(0.35,0.55,0.78))));}outColor=vec4(baseColor*s,1.);}`));
 gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));return p}
 let pr=null,projU=null,viewU=null,colorU=null,shadeU=null,indexTotal=0;
 if(gl)try{pr=program();gl.useProgram(pr);projU=gl.getUniformLocation(pr,"projection");viewU=gl.getUniformLocation(pr,"view");colorU=gl.getUniformLocation(pr,"baseColor");shadeU=gl.getUniformLocation(pr,"diagShade");
