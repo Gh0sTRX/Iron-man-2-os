@@ -1,0 +1,56 @@
+name: G12 MAP-FIRST actual original dome clay root cause per source material no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g12-original-city-dome-clay-material-source-causality.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_light_shader_truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source original 2010 texture and geometry dependencies
+        run: python3 -m pip install -q numpy gdown
+      - name: Obtain ephemeral owner 2010 game data to verify source TGA exceptions
+        run: |
+          mkdir -p /tmp/g12_source_clay
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g12_source_clay/original.ipa
+          test "$(wc -c </tmp/g12_source_clay/original.ipa)" -eq 248613763
+      - name: Derive exact original 94 material shader BRES 60-byte sampled manifest
+        run: |
+          python3 research/b24_unified/b24_map_first_original_2010_C1MT_source_verified_material_bank.py \
+            --ipa /tmp/g12_source_clay/original.ipa \
+            --out /tmp/g12_source_clay/exact.c1mt \
+            --manifest /tmp/g12_source_clay/source.json
+      - name: Isolate real source material vs our own disabled light shader category for all C1L1 domes
+        run: |
+          python3 research/b24_unified/b24_g12_map_clay_legacy_material_source_audit.py \
+            --ipa /tmp/g12_source_clay/original.ipa \
+            --c1mt-source-manifest /tmp/g12_source_clay/source.json \
+            --out /tmp/C1L1_2010_ORIGINAL_MATERIAL_CLAY_DOME_SOURCE_CAUSE_REPORT.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/C1L1_2010_ORIGINAL_MATERIAL_CLAY_DOME_SOURCE_CAUSE_REPORT.json').read_text())
+          g=d['per_source_C1MA_triangle_group_counts']
+          assert g['ground']['triangles']==3280
+          assert g['urban']['triangles']==11141
+          assert g['cars']['triangles']==5116
+          assert g['lights']['triangles']==3382
+          assert g['urban']['no_matched_C1L1_diffuse_triangles']==969
+          assert g['lights']['no_matched_C1L1_diffuse_triangles']==3250
+          assert d['documented_preview_light_category_disabled_even_if_UV_exists']
+          assert d['documented_live_vitaGL_light_category_disabled_even_if_UV_exists']
+          print('PASS 2010 BRES original authored shaders from owner archive and actual forced light-clay renderer root cause, no new VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G12_Original_IronMan2_C1L1_DomeClay_Actual_Shader_And_UV_Reason
+          path: /tmp/C1L1_2010_ORIGINAL_MATERIAL_CLAY_DOME_SOURCE_CAUSE_REPORT.json
+          if-no-files-found: error
+      - name: Remove temporary owner IPA
+        if: always()
+        run: rm -rf /tmp/g12_source_clay
