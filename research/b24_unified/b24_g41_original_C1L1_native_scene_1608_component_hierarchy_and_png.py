@@ -127,6 +127,15 @@ def analyze(raw,modelpack,g39_json,g40_json,report_dir):
       "source_local_scale_xyz":links[0]["native_vec3_scale"],
       "actual_runtime_world_matrix_recovered":False})
  assert len(modelrows)==53
+ # Static ORIGINAL 2010 visible C1L1 source families are ALL identity-local
+ # CLARA Deco source transforms. Never "fix" disjoint M1 meshes with a guessed
+ # translation just because isolated world polygons appear off the grass slab.
+ static_c1l1=[r for r in modelrows if r["actual_original_2010_model_filename"].startswith("C1L1_")]
+ assert len(static_c1l1)==11
+ for r in static_c1l1:
+  assert r["source_local_XYZ"]==[0.0,0.0,0.0]
+  assert r["source_local_quaternion_xyzw"]==[0.0,0.0,0.0,1.0]
+  assert r["source_local_scale_xyz"]==[1.0,1.0,1.0]
  camrows=[]
  for c in cameras["source_original_CameraPreset_to_PositionDummy_and_CameraConfig_links"]:
   target=c["source_native_camera_target_id"]
@@ -160,6 +169,9 @@ def analyze(raw,modelpack,g39_json,g40_json,report_dir):
    "source_camera_to_PD_exact_native_references":sum(x["has_original_PD_reference"] for x in camrows),
    "source_camera_explicit_NULL_refs":sum(not x["has_original_PD_reference"] for x in camrows),
    "original_C1L1_Deco_model_archive_index_links":len(modelrows),
+   "source_original_environment_C1L1_Deco_local_identity_transform_model_count":len(static_c1l1),
+   "source_original_environment_C1L1_Deco_all_local_transforms_identity":True,
+   "original_C1L1_static_mesh_disjoint_placement_cannot_be_fixed_by_GUESSED_Deco_translation":True,
    "original_2010_Deco_source_locally_transformed_mesh_instances":41,
    "original_source_Deco_local_instance_model_triangles":10379,
    "original_first_level_source_static_BRES_geometry_meshes":370,
