@@ -1,0 +1,47 @@
+name: G12 original 2010 per-pixel map UV visual verified preview two locations
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g12-original-perpixel-2010-map-uv-source-qa-rerun.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host_uv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install authentic BRES geometry and PVR per-pixel renderer
+        run: python3 -m pip install -q 'numpy<2.4' numba pillow texture2ddecoder gdown
+      - name: Temporary original-owner IPA source for private raster validation
+        run: |
+          mkdir -p /tmp/city_2010
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/city_2010/owner.ipa
+          test "$(wc -c </tmp/city_2010/owner.ipa)" -eq 248613763
+      - name: Render and verify original 22919-face road building PVR textures with real perspective-correct UV pixels
+        run: |
+          python3 research/b24_unified/b24_g12_original_C1L1_true_uv_pixel_raster.py \
+            --ipa /tmp/city_2010/owner.ipa --out /tmp/city_2010/previews
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path=Path('/tmp/city_2010/previews')
+          j=json.loads((path/'G12_ORIGINAL_2010_PER_PIXEL_UV_HOST_DIAGNOSTIC.json').read_text())
+          assert j['source_geometry']['source_original_triangles']==22919
+          assert j['source_geometry']['source_texture_atlas_count']==39
+          assert len(list(path.glob('*.png')))==2
+          for k in ('G10_synthetic_spawn','original_urban_dense_center'):
+            r=j['previews'][k]
+            assert r['visible_source_triangle_count']>8000
+            assert r['final_visible_source_PVR_texture_pixels']>10000
+          print('PASS two 1280x760 true source PVR per-pixel UV host previews at G10 and 2010 denser urban, not VitaGL screenshot. NO VPK.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G12_2010_True_Original_UV_Pixel_Host_2_Images
+          path: /tmp/city_2010/previews/
+          if-no-files-found: error
+      - name: Remove temporary original game source
+        if: always()
+        run: rm -rf /tmp/city_2010/owner.ipa
