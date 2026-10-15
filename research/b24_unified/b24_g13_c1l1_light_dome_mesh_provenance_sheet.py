@@ -114,15 +114,27 @@ def panel(draw,r,pos,face,x0,y0,w=288,h=250):
  draw.text((x0+7,y0+h-19),'source materials: '+str(len(material)),fill='#1C2630')
 
 def render(rows,out):
- light_both=sorted((r for r in rows if r[0]['original_scene_group']=='lights' and
-    r[0]['can_draw_original_diffuse_safely']),key=lambda r:-r[0]['source_faces'])[:4]
+ # Real original light mesh provenance may NOT have four meshes with BOTH
+ # source diffuse sampler AND true UV; do not invent source-confirmed combos.
+ # Select 4 largest original positive UV light meshes, four true no-UV light
+ # meshes and four original unresolved urban/material meshes.
+ light_uv=sorted((r for r in rows if r[0]['original_scene_group']=='lights' and
+    r[0]['genuine_original_uv_candidate']),key=lambda r:-r[0]['source_faces'])[:4]
  light_no_uv=sorted((r for r in rows if r[0]['original_scene_group']=='lights' and
     not r[0]['genuine_original_uv_candidate']),key=lambda r:-r[0]['source_faces'])[:4]
  urban_missing=sorted((r for r in rows if r[0]['original_scene_group']=='urban' and
     any(not x['authored_named_PVR'] for x in r[0]['original_BRES_authored_submesh_materials'])),
     key=lambda r:-r[0]['source_faces'])[:4]
- group_list=light_both+light_no_uv+urban_missing
- if len(group_list)!=12:raise ValueError('insufficient authentic mesh provenance sample')
+ group_list=light_uv+light_no_uv+urban_missing
+ if len(group_list)!=12:
+  # Genuine source may have fewer unresolved urban meshes than four.
+  # Pick only distinct authentic mesh records, never synthesize models.
+  used={r[0]['source_mesh_name'] for r in group_list}
+  for r in sorted(rows,key=lambda r:-r[0]['source_faces']):
+   if len(group_list)==12:break
+   if r[0]['source_mesh_name'] not in used:
+    group_list.append(r);used.add(r[0]['source_mesh_name'])
+ if len(group_list)!=12:raise ValueError('insufficient ORIGINAL source meshes')
  image=Image.new('RGB',(1200,850),'#EEF3F4')
  draw=ImageDraw.Draw(image)
  draw.rectangle((0,0,1200,60),fill='#142632')
