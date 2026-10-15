@@ -1,4 +1,4 @@
-name: G11 inspect actual Vita G10 body FIRE stage race WarMachine repulsor and B14 CAMERA
+name: G11 full B14 flight stage original threshold and B16 trigger fire diagnose NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -44,6 +44,11 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          for engine in ('work/src/b14_world.c','work/src/b16_combat.c'):
+            p=Path(engine)
+            if p.exists():
+              for n,line in enumerate(p.read_text().splitlines(),1):
+                if n<=180:print('G11B14FULL',engine,n,line[:180])
           needles=('fired>=','fire','ground_run','flight_stage','world.flying','b24_unified_tick(','b24_obs.target','camera','b14_pose_tick_ex(','b16_attack_begin(','b24_g8_motion_tick(','b24_gpu_runtime_draw(','land','melee','b24_obs.weapon_index','IM2_BT_L','im2_camera_step(')
           for path in ('work/src/main.c','work/src/b14_world.c','work/b24/b24_unified/b24_g8_live_original_motion.c','work/b24/b24_unified/b24_unified.c'):
             p=Path(path)
