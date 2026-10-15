@@ -62,7 +62,7 @@ if(B24_ENABLE_GPU)
 endif()
 '''
 cm.write_text(body)
-assert s.index('b24_g11_target_camera_follow(&camera_focus_in')<
-       s.index('camera.orbit=world.orbit;')
+assert (s.index('b24_g11_target_camera_follow(&camera_focus_in') <
+        s.index('camera.orbit=world.orbit;'))
 assert s.count('b14_world_tick(&world')==1
 print('PASS G11 L-locked permanent target, follow world orbit, close melee camera and all 4 genuine IronMan suit melee inputs linked to actual G10 source, NO VPK')
