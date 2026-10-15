@@ -1,0 +1,40 @@
+name: G50 2010 BRES authentic mesh names mapped to original node PIVOT TRS and local centers NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g50-original-C1L1-370-BRES-mesh-node-pivot-centered.yml"
+      - "research/b24_unified/b24_g50_original_2010_C1L1_BRES_mesh_name_node_PIVOT_inverse_center_hierarchy.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_mesh_node_reconstruction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native 2010 source BDAE mesh and node names numeric dependencies
+        run: python3 -m pip install -q numpy
+      - name: Original 370 real BRES names to exact source named PIVOT nodes and candidate hierarchy
+        run: |
+          python3 research/b24_unified/b24_g50_original_2010_C1L1_BRES_mesh_name_node_PIVOT_inverse_center_hierarchy.py             --zip research/B11_C1L1_Source_Parser.zip             --out /tmp/g50/G50_ORIGINAL_2010_370_BRES_MESH_TO_NODE_PIVOT_STRUCTURAL_LINKS.json
+      - name: No false automatic mesh position corrections
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g50/G50_ORIGINAL_2010_370_BRES_MESH_TO_NODE_PIVOT_STRUCTURAL_LINKS.json'))
+          assert d['original_source_BRES_file_count']==10
+          assert d['original_2010_C1L1_source_mesh_count']==370
+          assert d['source_exact_mesh_name_to_pivot_TRS_binary_link_count']>=130
+          assert not d['original_recursive_root_parent_visibility_cumulative_matrices_PROVEN']
+          assert not d['original_BRES_vertex_positions_applied_or_shifted']
+          assert not d['original_2010_render_world_space_fixed']
+          assert d['NO_VPK_NO_PERFORMANCE']
+          print('PASS exact original native BRES per-mesh linked PIVOT and source bbox inverse-center check, no mesh relocation')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G50_2010_C1L1_370_ORIGINAL_BRES_MESH_NODE_PIVOT_NATIVE_TRS_AND_PARENT_PROOF_NO_VPK
+          path: /tmp/g50/G50_ORIGINAL_2010_370_BRES_MESH_TO_NODE_PIVOT_STRUCTURAL_LINKS.json
+          retention-days: 14
