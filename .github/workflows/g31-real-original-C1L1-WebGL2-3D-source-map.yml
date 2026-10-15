@@ -1,0 +1,53 @@
+name: G31 first-level original BRES 370 meshes real WebGL2 interactive 3D source inspector NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g31-real-original-C1L1-WebGL2-3D-source-map.yml"
+      - "research/b24_unified/b24_g31_original_C1L1_BRES_WebGL2_3D_source_inspector.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_source_3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -q numpy pillow gdown
+      - name: Owner original iOS 2010 source staging only
+        run: |
+          mkdir -p /tmp/g31
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g31/original.ipa
+          test "$(wc -c </tmp/g31/original.ipa)" -eq 248613763
+      - name: Original BRES 370 source meshes into host HTML WebGL2 debug renderer
+        run: |
+          python3 research/b24_unified/b24_g31_original_C1L1_BRES_WebGL2_3D_source_inspector.py --ipa /tmp/g31/original.ipa --html /tmp/g31/G31_GERCEK_2010_3D_HARITA_WEBGL2.html --manifest /tmp/g31/G31_3D_SAHNE_KAYNAK_MATERYAL_IZLEME.json
+      - name: Assert original BRES geometry source and no guessed colored shader state
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/g31/G31_3D_SAHNE_KAYNAK_MATERYAL_IZLEME.json').read_text())
+          assert r['source_meshes']==370 and r['vertices']==37946 and r['triangles']==22919
+          assert sum(r['source_material_triangle_status_summary'].values())==22919
+          assert r['source_geometry_is_original_BRES']
+          assert not r['original_material_diffuse_PVR_pixels_actually_rendered']
+          assert not r['original_WorldMatrix_Parenting_rendered']
+          assert not r['actual_iOS_2010_camera_or_shading_recreated']
+          assert r['browser_WebGL2_diagnostic_only'] and r['NO_VPK']
+          html=Path('/tmp/g31/G31_GERCEK_2010_3D_HARITA_WEBGL2.html').read_text()
+          assert '#version 300 es' in html and 'webgl2' in html
+          assert 'rawpositions' in html and 'rawindices' in html
+          print('PASS G31 all real native source 3D meshes original geometry only, no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G31_2010_ORIGINAL_370_BRES_MESH_22919_TRIANGLES_3D_WEBGL2_MATERIAL_SOURCE_QA_NO_VPK
+          path: |
+            /tmp/g31/G31_GERCEK_2010_3D_HARITA_WEBGL2.html
+            /tmp/g31/G31_3D_SAHNE_KAYNAK_MATERYAL_IZLEME.json
+          if-no-files-found: error
+          retention-days: 14
+      - if: always()
+        run: rm -rf /tmp/g31/original.ipa
