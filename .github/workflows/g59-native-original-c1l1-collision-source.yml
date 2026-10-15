@@ -1,0 +1,51 @@
+name: G59 original 2010 C1L1 real collision mesh source audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g59-native-original-c1l1-collision-source.yml"
+      - "research/b24_unified/b24_g59_native_2010_C1L1_collision_original_source_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify_authentic_owner_collision_meshes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source parsing requirements
+        run: python3 -m pip install -q numpy trimesh scipy
+      - name: Recover only original 2010 collision BRES triangle sources for future playable collision
+        run: |
+          mkdir -p /tmp/g59
+          python3 research/b24_unified/b24_g59_native_2010_C1L1_collision_original_source_audit.py \
+            --zip research/B11_C1L1_Source_Parser.zip \
+            --json /tmp/g59/G59_ORIGINAL_C1L1_NATIVE_COLLISION_BRES_SOURCE.json \
+            --glb /tmp/g59/G59_ORIGINAL_C1L1_NATIVE_COLLISION_SOURCE_ONLY.glb
+      - name: Validate original source topology and prohibit physics/gameplay overclaim
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('/tmp/g59/G59_ORIGINAL_C1L1_NATIVE_COLLISION_BRES_SOURCE.json')
+          d=json.loads(p.read_text())
+          assert d['source_original_collision_meshes']==19
+          assert d['source_original_collision_triangles']==1910
+          assert d['source_native_collision_BRES_file_count']==3
+          assert d['source_original_collision_vertices']==2146
+          assert d['host_diagnostic_abs_face_normal_up_ge_0_8']==188
+          assert d['host_diagnostic_sloping_face_count']==32
+          assert d['host_diagnostic_wall_face_count']==1690
+          assert d['source_native_walkable_logic_proven'] is False
+          assert d['source_native_gameplay_collision_engine_recovered'] is False
+          assert d['Vita_C1L1_demo_playable_or_tested'] is False
+          assert d['NO_VPK'] is True
+          assert pathlib.Path('/tmp/g59/G59_ORIGINAL_C1L1_NATIVE_COLLISION_SOURCE_ONLY.glb').stat().st_size>20000
+          print('PASS G59 original Level1 collision geometry: 1910 authentic triangles, no physics invention')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G59_ORIGINAL_C1L1_19_COLLISION_BRES_MESHES_SOURCE_GLB_JSON_NO_VPK
+          path: /tmp/g59/*
+          retention-days: 14
+          if-no-files-found: error
