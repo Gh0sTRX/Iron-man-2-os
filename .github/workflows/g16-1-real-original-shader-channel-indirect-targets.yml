@@ -1,0 +1,37 @@
+name: G16.1 2010 original BRES genuine indirect shader pointer CHANNEL1 data probe NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g16-1-real-original-shader-channel-indirect-targets.yml"
+      - "research/b24_unified/b24_g16_1_original_shader_indirect_channel_payload_source_probe.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_shader_channel_relocations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve authentic native BRES shader relocated pointer destinations
+        run: |
+          python3 research/b24_unified/b24_g16_1_original_shader_indirect_channel_payload_source_probe.py \
+            --out /tmp/G16_1_ORIGINAL_2010_MATERIAL_CHANNEL_SOURCE_RELOC_PAYLOAD.json
+      - name: Assert source pointer evidence and forbid false shader emulation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          j=json.loads(Path('/tmp/G16_1_ORIGINAL_2010_MATERIAL_CHANNEL_SOURCE_RELOC_PAYLOAD.json').read_text())
+          assert j['source_original_BRES_files']==10
+          assert j['CHANNEL1_original_address_literal_if_present']
+          assert not j['source_gpu_shading_semantics_verified'] and j['no_render_color_claims'] and j['no_VPK']
+          print('PASS source BRES CHANNEL1 native link and indirect pointer payload byte evidence')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G16_1_ORIGINAL_2010_BRES_SHADER_CHANNEL1_INDIRECT_POINTER_NATIVE_BYTES_NO_VPK
+          path: /tmp/G16_1_ORIGINAL_2010_MATERIAL_CHANNEL_SOURCE_RELOC_PAYLOAD.json
+          if-no-files-found: error
+          retention-days: 14
