@@ -85,8 +85,8 @@ def build(ipa:Path,out:Path,manifest:Path):
  for basename in ('C1L1_obj_002.bdae','C1L1_obj_004.bdae'):
   key=basename+':Material__47'
   mat=next((x for x in records if x['material']==key),None)
-  if mat is None or mat['2010_verified_20byte_named_diffuse'] is None or
-     mat['2010_verified_20byte_named_diffuse'].casefold()!='c1l1_building4.tga':
+  if (mat is None or mat['2010_verified_20byte_named_diffuse'] is None or
+      mat['2010_verified_20byte_named_diffuse'].casefold()!='c1l1_building4.tga'):
    raise ValueError('cross-original building4 material47 sampler regression '+key)
  # Binary string bank remains ONLY 39 original source C1TX; missing links -> 0xffff
  names_bytes=bytearray()
