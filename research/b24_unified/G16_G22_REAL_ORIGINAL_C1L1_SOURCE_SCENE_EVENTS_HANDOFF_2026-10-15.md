@@ -41,4 +41,4 @@ Code and workflows:
 - research/b24_unified/b24_g21_original_C1L1_clara_OnDestroy_action_real_node_id_links.py
 - research/b24_unified/b24_g22_original_C1L1_event_target_fence_source_world_render.py
 
-All seven corresponding original-source CI jobs verified SUCCESS, and their source must remain PRIVATE because the owner's assets are proprietary. No new game VPK produced.
+All eight corresponding original-source CI jobs verified SUCCESS, and their source must remain PRIVATE because the owner's assets are proprietary. No new game VPK produced.
