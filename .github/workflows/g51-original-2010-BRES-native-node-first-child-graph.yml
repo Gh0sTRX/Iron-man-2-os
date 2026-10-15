@@ -1,0 +1,42 @@
+name: G51 original 2010 BRES source node parent child TRS graph reconstruction NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g51-original-2010-BRES-native-node-first-child-graph.yml"
+      - "research/b24_unified/b24_g51_original_2010_BRES_named_node_child_pointer_graph.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  decode_native_2010_BRES_scene_nodes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source-original Gameloft v0.0.0.133 node graph parser requirements
+        run: python3 -m pip install -q numpy
+      - name: Reconstruct original 10 Level1 BRES file named node TRS records with child-pointer references
+        run: |
+          python3 research/b24_unified/b24_g51_original_2010_BRES_named_node_child_pointer_graph.py --zip research/B11_C1L1_Source_Parser.zip --out /tmp/g51/G51_ORIGINAL_2010_NATIVE_BRES_MESH_NODE_CHILD_POINTER_GRAPH.json
+      - name: Prove source actual 370 meshes and node graph without claiming world transforms
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g51/G51_ORIGINAL_2010_NATIVE_BRES_MESH_NODE_CHILD_POINTER_GRAPH.json'))
+          assert d['original_Gameloft_BRES_v133_source_models']==10
+          assert d['source_authentic_original_source_meshes']==370
+          assert d['source_original_explicit_named_native_TRS_nodes']>=370
+          assert d['original_source_first_child_exact_node_pointer_edges']>0
+          assert not d['native_parent_child_strides_or_all_2010_nodes_completely_proven']
+          assert not d['original_2010_game_render_modelview_shader_visibility_proven']
+          assert not d['native_2010_source_meshes_world_moved']
+          assert d['NO_VPK_AND_NO_FPS_WORK']
+          print('PASS G51 actual 2010 BRES typed node hierarchy first-child exact binary graph, not guessed source model placement')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G51_ORIGINAL_2010_C1L1_BRES_BINARY_NODE_PARENT_CHILD_HIERARCHY_SOURCE_ONLY
+          path: /tmp/g51/G51_ORIGINAL_2010_NATIVE_BRES_MESH_NODE_CHILD_POINTER_GRAPH.json
+          retention-days: 14
+          if-no-files-found: error
