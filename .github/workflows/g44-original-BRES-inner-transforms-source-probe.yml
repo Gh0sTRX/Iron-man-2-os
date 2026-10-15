@@ -1,0 +1,39 @@
+name: G44 original 2010 C1L1 BDAE native per-mesh transform metadata root audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g44-original-BRES-inner-transforms-source-probe.yml"
+      - "research/b24_unified/b24_g44_original_BDAE_per_mesh_native_transform_parser_omission_probe.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_source_BRES_decoder_roots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original C1L1 BRES numpy parser dependency
+        run: python3 -m pip install -q numpy
+      - name: Read actual owner original source BDAE parser and native meshes without any IPA download
+        run: |
+          python3 research/b24_unified/b24_g44_original_BDAE_per_mesh_native_transform_parser_omission_probe.py --parser-bdae-zip research/B11_C1L1_Source_Parser.zip --out /tmp/G44_NATIVE_BRES_SOURCE_MESH_SCENE_TRANSFORM_META.json
+      - name: Validate 10 actual original static source BRES models and no guessed world positions
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/G44_NATIVE_BRES_SOURCE_MESH_SCENE_TRANSFORM_META.json'))
+          assert d['native_2010_static_environment_BRES_model_count']==10
+          assert len(d['native_source_parsed_BRES_models'])==10
+          assert not any(r['meshes']<=0 for r in d['native_source_parsed_BRES_models'])
+          assert d['source_parser_interpretation_and_original_game_runtime_world_mat_NOT_YET_PROVEN']
+          assert d['no_original_game_shader_or_source_poly_movement_assumed'] and d['no_VPK']
+          print('PASS G44 original source ten environment BRES models parser metadata matrix evidence')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G44_ORIGINAL_2010_BRES_10_MODEL_SOURCE_NATIVE_MESH_MATRIX_META_NO_VPK
+          path: /tmp/G44_NATIVE_BRES_SOURCE_MESH_SCENE_TRANSFORM_META.json
+          retention-days: 14
+          if-no-files-found: error
