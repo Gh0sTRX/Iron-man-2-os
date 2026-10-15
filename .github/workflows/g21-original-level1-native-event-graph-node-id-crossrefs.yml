@@ -1,0 +1,47 @@
+name: G21 2010 authentic original CLARA OnDestroy Enable Disable exact destination node IDs NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g21-original-level1-native-event-graph-node-id-crossrefs.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_source_event_graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -q numpy pillow gdown
+      - name: Temporary private source, owner original iOS 2010
+        run: |
+          mkdir -p /tmp/g21
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g21/owner.ipa
+          test "$(wc -c </tmp/g21/owner.ipa)" -eq 248613763
+      - name: Match typed native source event number targets to actual CLARA named node record IDs
+        run: |
+          python3 research/b24_unified/b24_g21_original_C1L1_clara_OnDestroy_action_real_node_id_links.py --ipa /tmp/g21/owner.ipa --out /tmp/g21/native_event_edges.json
+      - name: Validate exact source graph without claiming real executed mission
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g21/native_event_edges.json').read_text())
+          assert j['source_size']==339733
+          assert j['native_name_id_records']>=500
+          assert j['event_graph_edge_count']==3
+          assert j['source_static_graph_recovered']
+          assert not j['source_runtime_event_execution_verified']
+          assert not j['original_player_start_location_proven']
+          assert j['no_gameplay_or_VPK_changes']
+          print('PASS C1L1 authentic typed source node-ID event graph 3 original exact links')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G21_GENUINE_2010_C1L1_MISSION_EVENT_SOURCE_TARGET_NODE_ID_GRAPH_NO_VPK
+          path: /tmp/g21/native_event_edges.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Remove user IPA from CI
+        if: always()
+        run: rm -rf /tmp/g21/owner.ipa
