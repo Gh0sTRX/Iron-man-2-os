@@ -1,0 +1,53 @@
+name: G43 2010 source first mission BRES 9 actor native Enable 3 Disable map PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g43-native-level1-first-mission-enabled-actor-geometry-map.yml"
+      - "research/b24_unified/b24_g43_source_original_Mission000_only_9_explicit_enabled_real_BRES_actors_over_static_world.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_first_scene_layer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source BRES real mesh and map PNG environment
+        run: python3 -m pip install -q gdown numpy pillow
+      - name: Download temporary owner original iOS 2010 assets
+        run: |
+          mkdir -p /tmp/g43
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g43/owner.ipa
+          test "$(wc -c </tmp/g43/owner.ipa)" -eq 248613763
+      - name: Render genuine original mission prologue actor source triangles over BRES map
+        run: |
+          python3 research/b24_unified/b24_g43_source_original_Mission000_only_9_explicit_enabled_real_BRES_actors_over_static_world.py --ipa /tmp/g43/owner.ipa --out /tmp/g43/result
+      - name: Insist static map+genuine actor polygons; runtime untouched
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g43/result')
+          d=json.loads((p/'G43_2010_LEVEL1_NATIVE_STAGE_9_MODEL_GEOMETRY_PROOF.json').read_text())
+          assert d['original_source_true_static_C1L1_BRES_meshes']==370
+          assert d['original_source_true_static_C1L1_BRES_triangles']==22919
+          assert d['original_stage_Mission000_first_branch_PC']==73
+          assert d['original_stage_first_unconditional_explicit_Enable_Deco_count']==9
+          assert d['original_stage_first_unconditional_explicit_Disable_Deco_count']==3
+          assert d['original_native_genuine_placed_actor_triangles']>1000
+          assert d['stage_preview_other_41_Deco_visibility_default_not_assumed']
+          assert d['game_original_static_geometry_parent_root_matrix_not_proven']
+          assert d['no_native_Vita_VPK_or_performance_changes']
+          assert (p/'G43_ILK_GOREV_ORIGINAL_KAYNAK_GEOMETRI_9_ENABLE_3_DISABLE_HARITA.png').stat().st_size>30000
+          print('PASS G43 original 9 actor BRES native 2010 model geometry plus Lua source prebranch exact, no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G43_ORIGINAL_2010_C1L1_MISSION000_9_ENABLED_BRES_MODEL_GEOMETRY_PNG_SOURCE_ONLY
+          path: /tmp/g43/result/
+          retention-days: 14
+          if-no-files-found: error
+      - if: always()
+        run: rm -rf /tmp/g43/owner.ipa
