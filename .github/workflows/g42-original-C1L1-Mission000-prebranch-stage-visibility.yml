@@ -1,0 +1,51 @@
+name: G42 original Level1 Mission000 branch gated Deco scene activation source audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g42-original-C1L1-Mission000-prebranch-stage-visibility.yml"
+      - "research/b24_unified/b24_g42_original_2010_C1L1_Mission000_prebranch_Deco_stage_visibility.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_level1_initial_scene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve original user-owned IPA privately and temporarily
+        run: |
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g42
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g42/owner.ipa
+          test "$(wc -c </tmp/g42/owner.ipa)" -eq 248613763
+      - name: Audit original binary Lua branch structure and 53 Deco source model ID refs
+        run: |
+          python3 research/b24_unified/b24_g42_original_2010_C1L1_Mission000_prebranch_Deco_stage_visibility.py             --ipa /tmp/g42/owner.ipa --out /tmp/g42/report
+      - name: Check native mission stage graph invariants — don't claim runtime
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g42/report/G42_SOURCE_MISSION_SCRIPT_STAGE_VISIBILITY_EVIDENCE.json'))
+          assert d['source_original_2010_Lua_5_1_callbacks']==71
+          assert d['source_original_Mission000_OnStart_first_Lua_branch_PC']==73
+          assert d['source_pre_branch_exact_Deco_enable_disable_instruction_count']==12
+          assert d['source_unique_Deco_names_with_visibility_action_CALL']==35
+          assert d['source_2010_script_secondary_model_406_405_same_authored_pose_proven']
+          assert not d['source_2010_actor_runtime_default_visibility_OR_preexisting_state_PROVEN']
+          assert not d['source_2010_actor_root_world_transform_proven']
+          assert not d['source_2010_sprite_special_light_emissive_alpha_shader_proven']
+          assert not d['original_2010_Lua_simulated_or_executed']
+          assert d['NO_VPK_AND_NO_PERFORMANCE_WORK']
+          print('PASS 2010 source-stage Lua5.1 PC 73 boundary and native model IDs; runtime unknown; no VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G42_ORIGINAL_2010_C1L1_Mission000_12_PREBRANCH_35_DECO_STAGE_GRAPH_NO_VPK
+          path: /tmp/g42/report
+          retention-days: 14
+          if-no-files-found: error
+      - name: Erase original user-owned IPA after source audit
+        if: always()
+        run: rm -rf /tmp/g42/owner.ipa
