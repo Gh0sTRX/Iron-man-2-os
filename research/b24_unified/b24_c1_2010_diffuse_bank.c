@@ -46,7 +46,7 @@ int b24_c1_2010_diffuse_bank_load(B24C1OriginalDiffuseBank *b,const char *path){
  unsigned used=0;
  for(unsigned i=0;i<B24_C1_2010_ATLASES&&ok;i++){
   int n=fgetc(f);
-  if(n<8||n>=B24_C1_2010_NAME_MAX||(unsigned)n>len-used-1u){ok=0;break;}
+  if(n<8||(unsigned)n>=B24_C1_2010_NAME_MAX||(unsigned)n>len-used-1u){ok=0;break;}
   used++;
   if(fread(tmp.names[i],1,(size_t)n,f)!=(size_t)n){ok=0;break;}
   tmp.names[i][n]=0;used+=(unsigned)n;
