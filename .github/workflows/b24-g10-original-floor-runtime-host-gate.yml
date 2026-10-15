@@ -44,7 +44,6 @@ jobs:
           python3 research/b24_unified/apply_b24_g11_camera_combat_focus_source_only.py
           python3 research/b24_unified/apply_b24_g11_authentic_unibeam_and_hover_idle_source_only.py
           python3 research/b24_unified/apply_b24_g11_practice_hit_feedback_source_only.py
-          python3 research/b24_unified/apply_b24_g11_training_dummy_hit_source_only.py
           python3 research/b24_unified/apply_b24_g11_wm_reset_weapon_on_suit_source_only.py
           python3 - <<'PY'
           from pathlib import Path
