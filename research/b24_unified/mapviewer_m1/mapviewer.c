@@ -41,7 +41,6 @@ static const float focus_points[3][3]={{-1.319f,-6.747f,25.054f},
  {-402.2025f,-279.047f,0.f},{0.f,0.f,10.f}};
 static const float focus_dist[3]={115.f,2200.f,270.f};
 
-static unsigned char pix[20000*2];
 static float hudverts[20000*2];
 static unsigned npix;
 static const unsigned char *glyph(char c) {
@@ -88,11 +87,11 @@ static const unsigned char *glyph(char c) {
  {0,0,0,0,0,0,0}  /* space */
  };
  if(c>='a'&&c<='z')c-=32;
- if(c>='A'&&c<='Z')return data+(c-'A')*7;
- if(c>='0'&&c<='9')return data+(26+c-'0')*7;
- if(c==':')return data+36*7;
- if(c=='-')return data+37*7;
- return data+38*7;
+ if(c>='A'&&c<='Z')return data[c-'A'];
+ if(c>='0'&&c<='9')return data[26+c-'0'];
+ if(c==':')return data[36];
+ if(c=='-')return data[37];
+ return data[38];
 }
 static void add_text(int x,int y,const char *str){
  for(int n=0;str[n]&&n<140;n++,x+=14){
