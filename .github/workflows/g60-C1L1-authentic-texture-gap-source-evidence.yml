@@ -1,0 +1,38 @@
+name: G60 native original 2010 C1L1 texture gaps forensic NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g60-C1L1-authentic-texture-gap-source-evidence.yml"
+      - "research/b24_unified/b24_g60_2010_C1L1_material_gaps_source_provenance.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify_2010_texture_gap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download reproducible G57 authentic original material source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/g60/source /tmp/g60/out
+          gh run download 38814440599 --repo "${{ github.repository }}" \
+            -n G57_ORIGINAL_2010_BRES_296_SOURCE_NODE_PVR_UV_MATERIALS_WEBGL2_HTML_GLB_NO_VPK \
+            -D /tmp/g60/source
+          test -s /tmp/g60/source/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html
+      - name: Verify actual native source UV and material provenance
+        run: |
+          python3 -m py_compile research/b24_unified/b24_g60_2010_C1L1_material_gaps_source_provenance.py
+          python3 research/b24_unified/b24_g60_2010_C1L1_material_gaps_source_provenance.py \
+            --g57html /tmp/g60/source/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html \
+            --out /tmp/g60/out/G60_REAL_C1L1_MATERIAL_GAP_PROVENANCE.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G60_C1L1_NATIVE_MATERIAL_GAPS_EXPO_ALREADY_TEXTURED_ROAD_ZERO_UV_PROOF
+          path: /tmp/g60/out/*.json
+          retention-days: 14
+          if-no-files-found: error
