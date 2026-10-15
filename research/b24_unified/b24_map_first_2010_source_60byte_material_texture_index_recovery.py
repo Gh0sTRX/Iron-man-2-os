@@ -22,9 +22,24 @@ from b24_map_first_source_BRES_real_relocation_materials import load,BDAEZIP,SOU
 def decode(name,raw):
  core=load(name,raw);tex=core['textures'];materials=core['materials']
  # Begin shader array immediately at end of exact native TGA index array.
- first=tex[0]['offset']+len(tex)*20
- if string(raw,u(raw,first))!=materials[0]['original_BRES_material_name']+'-fx':
-  raise ValueError('no 2010 exact shader table at native postTGA boundary '+name)
+ expected_tga_end=tex[0]['offset']+len(tex)*20
+ # Some BRES chunks preserve an extra 20B resource entry/alias between
+ # TGA and shader arrays; select exact native first authored material
+ # name and verify continuity, never use ordinal of shader array as TGA.
+ real_first_shader=materials[0]['original_BRES_material_name']+'-fx'
+ first=None
+ for p in range(max(32,expected_tga_end-200),
+                min(len(raw)-88,expected_tga_end+600),4):
+  if string(raw,u(raw,p))!=real_first_shader:continue
+  if string(raw,u(raw,p+4))!=materials[0]['original_BRES_material_name']:continue
+  if all(string(raw,u(raw,p+88*k+4))==m['original_BRES_material_name']
+         for k,m in enumerate(materials)):
+   first=p
+   break
+ if first is None:raise ValueError('true 2010 source shader array not found '+name)
+ print('G11_MAP_SOURCE_TRUE_FIRST_MATERIAL_OFFSET',name,
+       'last_exact_TGA_plus20_records',expected_tga_end,
+       'first_authenticated_material_shader88',first,flush=True)
  propbase=first+len(materials)*88
  end=min(m['source_record_offset'] for m in materials)
  entries=[]
