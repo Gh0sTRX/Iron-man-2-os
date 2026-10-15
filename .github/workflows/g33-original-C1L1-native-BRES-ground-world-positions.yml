@@ -1,0 +1,44 @@
+name: G33 REAL 2010 C1L1 source map mesh vs original ground XYZ spatial QA M1 native screenshots
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g33-original-C1L1-native-BRES-ground-world-positions.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_geometry_world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source model native BRES mesh position dependencies
+        run: python3 -m pip install -q numpy pillow gdown
+      - name: Stage temporary original owner 2010 IPA
+        run: |
+          mkdir -p /tmp/g33
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g33/owner.ipa
+          test "$(wc -c </tmp/g33/owner.ipa)" -eq 248613763
+      - name: Prove source raw ground XY coverage and actual original mesh outliers
+        run: |
+          python3 research/b24_unified/b24_g33_mapviewer_m1_real_vita_source_mesh_ground_spatial_drift.py \
+            --ipa /tmp/g33/owner.ipa --out /tmp/g33/G33_source_BRES_ground_mesh_coordinate_evidence.json
+      - name: Require all original source geometries and no invented world placement
+        run: |
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g33/G33_source_BRES_ground_mesh_coordinate_evidence.json'))
+          assert d['owner_original_BRES_source_meshes']==370
+          assert d['owner_original_BRES_source_triangles']==22919
+          assert d['original_source_parent_world_matrix_and_level_actor_mesh_binds_NOT_derived']
+          assert d['M1_vita_3D_source_mesh_is_raw_coordinates_without_authored_CLARA_world_placement']
+          assert d['scene_IS_NOT_COMPLETE'] and d['NO_VPK']
+          print('PASS original game source raw city source-ground provenance no guessed placement')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G33_2010_BRES_SOURCE_370_GROUND_SPATIAL_DIAGNOSTIC_NO_VPK
+          path: /tmp/g33/G33_source_BRES_ground_mesh_coordinate_evidence.json
+          retention-days: 14
+      - if: always()
+        run: rm -rf /tmp/g33/owner.ipa
