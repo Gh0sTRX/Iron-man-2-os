@@ -36,6 +36,15 @@ def run(source, output):
     assert len(expo)==1 and expo[0]['material']=='orig_07___Default'
     assert expo[0]['tga'].lower()=='cahp01_c_expo_building.tga'
     assert expo[0]['original_uv_mesh_positive'] and expo[0]['tga'].lower() in atlas
+    # Independently bound sibling instances prove this *material label* can
+    # refer to c1l1_building.tga in C1L1_obj_003, but same-name cross-BRES
+    # propagation is still an inference, not a proven target sampler.
+    sibling=[b for b in batches if b['material']=='c1l1_3building'
+             and b['status']=='source-texture-and-UV']
+    assert sum(b['tris'] for b in sibling)==108
+    assert len(sibling)==3
+    assert all(b['mesh'].startswith('C1L1_obj_003_')
+               and b['tga'].lower()=='c1l1_building.tga' for b in sibling)
     building=[b for b in batches if b['material']=='c1l1_3building' and b['status']=='UV-no-source-diffuse']
     assert sum(b['tris'] for b in building)==1683
     assert all(b['original_uv_mesh_positive'] and not b['tga'] for b in building)
@@ -63,6 +72,10 @@ def run(source, output):
         'original_PVR_and_original_UV_verified_triangles':verified_original,
         'expo_206_faces_ALREADY_original_texture_not_missing':True,
         'c1l1_3building_faces_with_UV_but_no_proven_atlas':1683,
+        'source_authentic_sibling_same_material_108_triangles_with_confirmed_c1l1_building_atlas':True,
+        'source_sibling_known_meshes':[b['mesh'] for b in sibling],
+        'cross_file_same_material_atlas_transfer_candidate':'c1l1_building.tga',
+        'cross_file_material_link_confirmed_for_unresolved_1683':False,
         'building_same_game_PVR_test_candidates':['c1l1_building.tga','c1l1_build2.tga','c1l1_building4.tga'],
         'any_building_candidate_proven_native_binding':False,
         'road_132_source_triangle_UVs_exactly_zero':True,
@@ -76,7 +89,7 @@ def run(source, output):
     assert all(x in atlas for x in result['building_same_game_PVR_test_candidates'])
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-    print('PASS G60: original expo actually textured; missing 1683 3building atlas unresolved;',
+    print('PASS G60: original expo already textured; 108 SAME-material genuine atlas supports 1683 cross-BRES material candidate;',
           '132 road native zero UV; no fake iOS asset binding')
 
 if __name__=='__main__':
