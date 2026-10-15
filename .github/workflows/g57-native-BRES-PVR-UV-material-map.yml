@@ -1,0 +1,59 @@
+name: G57 genuine native BRES + original PVR UV textured WebGL2 map NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g57-native-BRES-PVR-UV-material-map.yml"
+      - "research/b24_unified/b24_g57_g55_native_TRS_plus_g32_source_PVR_UV_offline_preview.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify_true_source_textured_map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore verified original owner G32 PVR and G55 mesh artifacts from past CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/G57/G32 /tmp/G57/G55 /tmp/G57/out
+          gh run download 38759136193 --repo "${{ github.repository }}" -n G32_2010_ORIGINAL_BRES_40_PVR_BANK_TRUE_UV_18774_FACES_WEBGL2_3D_HTML_NO_VPK -D /tmp/G57/G32
+          gh run download 38811387146 --repo "${{ github.repository }}" -n G55_SOURCE_REAL_2010_296_MESH_NATIVE_MAP_WORLD_CANDIDATE_JSON_GLB_PNG_NO_VPK -D /tmp/G57/G55
+          test -s /tmp/G57/G32/G32_IOS2010_ORIJINAL_PVR_UV_3B_HARITA.html
+          test -s /tmp/G57/G55/G55_C1L1_296_SOURCE_MESH_NODE_CHAIN_DIAGNOSTIC.glb
+      - name: Host source-only original 2010 PVR/GLB reconstruction requirements
+        run: python3 -m pip install -q numpy pillow trimesh scipy
+      - name: Recompose real G55 296 BRES mesh transforms with G32 original PVR diffuse per-pixel UV
+        run: |
+          python3 research/b24_unified/b24_g57_g55_native_TRS_plus_g32_source_PVR_UV_offline_preview.py \
+            --g32html /tmp/G57/G32/G32_IOS2010_ORIJINAL_PVR_UV_3B_HARITA.html \
+            --b11zip research/B11_C1L1_Source_Parser.zip \
+            --g55glb /tmp/G57/G55/G55_C1L1_296_SOURCE_MESH_NODE_CHAIN_DIAGNOSTIC.glb \
+            --out /tmp/G57/out
+      - name: Fail closed on source topology/UV/material mismatch, no Vita claims
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          d=json.load(open('/tmp/G57/out/G57_C1L1_SOURCE_EVIDENCE.json'))
+          assert d['source_meshes_exact_G55_G32']==296
+          assert d['native_node_chain_triangles']==22441
+          assert d['matched_vertices']==37089
+          assert d['PVR_atlas_count']==24
+          assert d['authentic_per_pixel_UV_PVR_triangles']==18774
+          assert d['untextured_material_triangle_count']==3667
+          assert d['unlinked_meshes_hidden']==74
+          assert d['new_VPK'] is False and d['real_Vita_fps_test'] is False
+          for ext in ('html','glb'):
+              fs=list(pathlib.Path('/tmp/G57/out').glob('*.'+ext))
+              assert len(fs)==1 and fs[0].stat().st_size>10000,(ext,fs)
+          print('PASS G57: actual source 2010 UV+PVR + node-pivot 3D; no game runtime or Vita fps claims')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G57_ORIGINAL_2010_BRES_296_SOURCE_NODE_PVR_UV_MATERIALS_WEBGL2_HTML_GLB_NO_VPK
+          path: /tmp/G57/out/*
+          retention-days: 14
+          if-no-files-found: error
