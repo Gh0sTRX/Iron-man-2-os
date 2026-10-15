@@ -1,0 +1,42 @@
+name: G20 2010 source C1L1 SpawnPoint OnDestroy native Enable Disable proof NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g20-original-source-level1-ondestroy-actions.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_clara_events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -q numpy pillow gdown
+      - name: Temporary original owner game source, private workflow
+        run: |
+          mkdir -p /tmp/g20
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g20/original.ipa
+          test "$(wc -c </tmp/g20/original.ipa)" -eq 248613763
+      - name: Validate original 2010 C1L1 CLARA binary event strings and typed target fields
+        run: |
+          python3 research/b24_unified/b24_g20_original_C1L1_SpawnPoint_OnDestroy_native_event_probe.py --ipa /tmp/g20/original.ipa --out /tmp/g20/original_events.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g20/original_events.json'))
+          assert j['source_level1_bytes']==339733
+          assert j['callbacks']==4 and j['typed_Enable_Disable_actions']==3
+          assert j['original_player_spawn_not_yet_identified']
+          assert j['original_target_numeric_semantics_not_yet_proven']
+          assert j['no_gameplay_or_VPK_changes']
+          print('PASS native original 2010 first level OnDestroy/Enable/Disable source-only')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G20_2010_CLARA_NATIVE_LEVEL1_ONDESTROY_ACTION_SOURCE_PROOF_NO_VPK
+          path: /tmp/g20/original_events.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Delete original game bytes
+        if: always()
+        run: rm -rf /tmp/g20/original.ipa
