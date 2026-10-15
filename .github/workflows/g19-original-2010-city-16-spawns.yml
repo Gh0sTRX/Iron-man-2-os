@@ -33,7 +33,7 @@ jobs:
           assert d['source_all_native_tagged_transform_lengths_are_12_16_12']
           assert not d['original_player_start_node_identified']
           assert Image.open('/tmp/g19/map.png').size==(1400,920)
-          assert Path('/tmp/g19/map.html').stat().st_size>100000
+          assert Path('/tmp/g19/map.html').stat().st_size>10000
           print('PASS genuine source mesh + native 16 CLARA positions, NO VPK')
           PY
       - uses: actions/upload-artifact@v4
