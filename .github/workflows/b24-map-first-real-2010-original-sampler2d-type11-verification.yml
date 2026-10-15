@@ -1,0 +1,33 @@
+name: MAP FIRST 2010 authored C1L1 material property SAMPLER2D 11 structural check NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-real-2010-original-sampler2d-type11-verification.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_map_source_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find actual original material texture sampler property type11 using original 2010 BRES relocation table
+        run: |
+          python3 research/b24_unified/b24_map_first_2010_true_sampler2d_material_property_probe.py \
+            --out /tmp/MAP_FIRST_REAL_ORIGINAL_2010_SAMPLER2D_PROPERTY_TEST.json
+      - name: Validate same ten owner level1 mesh files; no guessed sampler
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/MAP_FIRST_REAL_ORIGINAL_2010_SAMPLER2D_PROPERTY_TEST.json').read_text())
+          assert len(j['real_2010_material_properties'])==10
+          assert j['NO_GUESSED_C1L1_MATERIAL_TGA']
+          print('PASS independent Gameloft 2011 SAMPLER2D field hypothesis checked against authentic original C1L1 2010 BRES - no fabricated material map')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MAP_FIRST_Source_2010_C1L1_SAMPLER2D_Type11_Authenticity_Test
+          path: /tmp/MAP_FIRST_REAL_ORIGINAL_2010_SAMPLER2D_PROPERTY_TEST.json
+          if-no-files-found: error
