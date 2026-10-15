@@ -7,6 +7,7 @@
 typedef struct {
  float x,y,z,radius;
  int invulnerable;
+ float hit_flash; /* transient cyan->gold 3D visual hit feedback, NOT HP */
 } B24G10PracticeTarget;
 B24G10PracticeTarget b24_g10_practice_target_at_floor(float genuine_ground_z);
 int b24_g10_practice_target_valid(const B24G10PracticeTarget *t);
