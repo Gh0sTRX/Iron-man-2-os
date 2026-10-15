@@ -1,4 +1,4 @@
-name: G10 source B14 real floor + permanent L target + 744 BRES true armor clips QA NO VPK
+name: G11 verified G10 B14 shooting stage restriction and native WM original arm fire source NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -40,6 +40,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g10_ground_visual_source_only.py
           python3 research/b24_unified/apply_b24_g10_practice_target_source_only.py
           python3 research/b24_unified/apply_b24_g10_four_suit_original_motion_source_only.py
+          python3 research/b24_unified/apply_b24_g11_combat_policy_source_only.py
           python3 - <<'PY'
           from pathlib import Path
           c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
@@ -109,6 +110,15 @@ jobs:
           assert 'B24_G10_PRACTICE_TARGET_ID' in hud
           print('PASS G10 actual original scene 3D practice actor connected to real B23 L-held lock on any selected weapon; no HP loss')
           PY
+      - name: Check fixed sprint and repulsor state policy with real G10 B14 B16 source
+        run: |
+          set -eu
+          cc -std=c11 -O1 -Wall -Wextra -Werror -pedantic research/b24_unified/b24_g11_combat_stage_policy.c research/b24_unified/test_b24_g11_combat_stage_policy.c -lm -o /tmp/g11_fire_stage_host
+          /tmp/g11_fire_stage_host
+          grep -q 'b24_g11_stage_allows_hand_attack(world.flying,world.flight_stage)' work/src/main.c
+          grep -q 'ground_run=b24_gate.is_ground_running' work/src/main.c
+          grep -q 'b24_g11_combat_stage_policy.c' work/CMakeLists.txt
+          echo "PASS patched G10 B14/B16 real source and stage R rules no VPK"
       - name: Strict Vita ARM objects for both C1L1 original ground/source foot modules only
         run: |
           set -euo pipefail
