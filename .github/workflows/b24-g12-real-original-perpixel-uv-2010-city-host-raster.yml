@@ -1,0 +1,55 @@
+name: MAP FIRST G12 owner iOS original 2010 C1L1 per-pixel PVR atlas correct UV raster & zbuffer SOURCE screenshots NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g12-real-original-perpixel-uv-2010-city-host-raster.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_city_perpixel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source original 2010 BRES GLB PVR and host CPU raster deps
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q 'numpy<2.4' numba pillow texture2ddecoder gdown
+      - name: Temporarily fetch original user 2010 iOS source archive for source-only diagnostics
+        run: |
+          mkdir -p /tmp/c1l1_truepixel
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/c1l1_truepixel/original.ipa
+          test "$(wc -c </tmp/c1l1_truepixel/original.ipa)" -eq 248613763
+      - name: Render real original BRES coordinates and 39 authored textures per-pixel with perspective-correct UV and z-buffer
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_g12_original_C1L1_true_uv_pixel_raster.py \
+            --ipa /tmp/c1l1_truepixel/original.ipa \
+            --out /tmp/c1l1_truepixel/screens
+      - name: Validate actual 2010 source geometry camera pixels and correct per-pixel depth, no fake surfaces
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          s=Path('/tmp/c1l1_truepixel/screens')
+          j=json.loads((s/'G12_ORIGINAL_2010_PER_PIXEL_UV_HOST_DIAGNOSTIC.json').read_text())
+          assert j['source_geometry']['source_original_triangles']==22919
+          assert j['source_geometry']['source_texture_atlas_count']==39
+          for k in ('G10_synthetic_spawn','original_urban_dense_center'):
+            x=j['previews'][k]
+            assert x['visible_source_triangle_count']>8000
+            assert x['final_visible_source_PVR_texture_pixels']>10000
+            assert x['not_real_vita_screenshot']
+          assert len(list(s.glob('*.png')))==2
+          print('PASS 2010 C1L1 BRES real PVR atlases fully per-pixel UV/winding and Z CPU preview diagnostics, no modified source textures or VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G12_Original2010_C1L1_True_PerPixel_UV_PVR_Texture_2_Host_Views
+          path: /tmp/c1l1_truepixel/screens/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remove temporary original user 2010 IPA
+        if: always()
+        run: rm -rf /tmp/c1l1_truepixel/original.ipa
