@@ -18,6 +18,12 @@
 
 **Önemli:** Çözümlenmiş model/texture sayısı, ilk haritanın oynanabilir veya özgün oyunla aynı görünümde olduğu anlamına gelmez. G55 ile özgün kaynak zemin/şehir/araç mesh'lerinin yerel node zinciri ve host 3B önizleme oluşturuldu, fakat üst runtime sahne kökü, görünürlük ve özel efektlerin özgün çizim davranışı henüz tamamlanmadı. Bu nedenle “harita tamamlandı” iddiasında bulunmuyoruz.
 
+## G57 — Özgün C1L1 haritasının 2010 PVR/UV dokularıyla ilk gerçek giydirilmesi (16 Ekim 2026)
+
+**G57 kaynak kodu GitHub'da, GitHub Actions testi başarılı:** [G57 CI 38814440599](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38814440599) • [yeniden üretilebilir Python betiği](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g57_g55_native_TRS_plus_g32_source_PVR_UV_offline_preview.py). G55'in 2010 BRES native parent→pivot dönüşümünü, G32'nin **gerçek iOS BRES mesh sırası, özgün UV ve 24 özgün PVR diffuse atlasıyla** aynı geometri üzerinde birleştirir. **296 mesh (37.089 vertex / 22.441 triangle)** için orijinal model ve yüz sırası tekrar kaynak B11 ile eşleştirilip doğrulandı. **18.774 üçgen özgün PVR+UV diffuse dokulu**, **3.667** üçgen bilinmeyen materyal tanısal renkli, **74** henüz ana zincire bağlanmamış özel mesh gizli. Üretim: çevrimdışı WebGL2 **etkileşimli HTML**, kaynaktan dokulu **3B GLB**, JSON. Ayrı yerel CPU orijinal-PVR/UV rasterlayıcı, şehir detay ve tüm haritanın **gerçek veri PNG** görüntülerini üretti. AI ile çizilmiş fotoğraf kullanılmadı.
+
+**Doğrulanmayanlar:** kaynağın gerçek orijinal iOS uygulamasında touchHLE ile açıldığı **henüz bu projede doğrulanmadı**; G57'nin host görüntüsü gerçek Gameloft shader/render-state/camera/alpha blending değildir. Hâlâ üst sahne kökü, özel 74 mesh, görünürlük, FX shader, oyuncunun harita üstündeki özgün başlangıcı ve Vita FPS'i açık. **Yeni VPK oluşturulmadı.** Bir sonraki hedef: özgün touchHLE ilk C1L1 gameplay görüntüsüyle G57 kaynak modellerinin sahne ve ışık/alpha doğruluğunu karşılaştırmak.
+
 ## G55 (16 Ekim 2026) — Haritada gerçek kaynak hiyerarşisi
 
 **Bağımsız G55 GitHub Actions SUCCESS:** [G55 CI ve 2010 kaynak geometri GLB/PNG/JSON](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38811387146). BRES v0.0.0.133 formatının doğrulanan çocuk sayısı alanı `+52`, ilk çocuk kaydı işaretçisi `+56` bayt ofsetindedir. G51/G52 bunları `+56/+60` olarak okuduğundan eski `382 node/4 child` teşhisi superseded: doğru ayrıştırıcı **670** native node kaydı tespit ediyor.
@@ -69,7 +75,7 @@ Diğer ilgili projeler: [Shadow Guardian Vita](https://github.com/MetalSyntax/Sh
 
 Mevcut **`main`** dalında eski **Asset Beta** denemesi (`source/IronMan2_Vita_GitHub_Ready_CI.zip`) ve ilgili `Build Iron Man 2 Vita Asset Beta` GitHub Actions iş akışı bulunur. Bu, dört zırh modelini gösteren ayrı bir deneysel görüntüleyicidir; **bugünkü C1L1 harita analiziyle veya tamamlanmış portla karıştırılmamalıdır**.
 
-Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`feature/b24-unified-gameplay`** dalındadır. G48–G55 testleri yeni cihaz VPK'sı oluşturmaz. Sonraki gerçek Vita sürümünün FPS'i veya sahne doğruluğu cihazda yeniden test edilmedikçe kesin kabul edilmez.
+Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`feature/b24-unified-gameplay`** dalındadır. G48–G57 testleri yeni cihaz VPK'sı oluşturmaz. Sonraki gerçek Vita sürümünün FPS'i veya sahne doğruluğu cihazda yeniden test edilmedikçe kesin kabul edilmez.
 
 ## Lisans / içerik notu
 
