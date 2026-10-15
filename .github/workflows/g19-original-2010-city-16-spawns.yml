@@ -1,0 +1,50 @@
+name: G19 original 2010 city and 16 CLARA transforms source proof
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: ['.github/workflows/g19-original-2010-city-16-spawns.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -q numpy pillow gdown
+      - name: Test owner original source file locally in CI
+        run: |
+          mkdir -p /tmp/g19
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g19/owner.ipa
+          test "$(wc -c </tmp/g19/owner.ipa)" -eq 248613763
+      - name: Build source-only original city / 16 CLARA position HTML
+        run: |
+          python3 research/b24_unified/b24_g19_original_2010_level1_spawn_transforms_city_xy_map.py --ipa /tmp/g19/owner.ipa --out /tmp/g19/coords.json --png /tmp/g19/map.png --html /tmp/g19/map.html
+      - name: Assert authentic geometry source and unknown player start
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          d=json.loads(Path('/tmp/g19/coords.json').read_text())
+          assert d['source_original_spawn_nodes_valid']==16
+          assert d['actual_authored_BRES_meshes']==370 and d['actual_authored_BRES_triangles']==22919
+          assert d['source_all_native_tagged_transform_lengths_are_12_16_12']
+          assert not d['original_player_start_node_identified']
+          assert Image.open('/tmp/g19/map.png').size==(1400,920)
+          assert Path('/tmp/g19/map.html').stat().st_size>100000
+          print('PASS genuine source mesh + native 16 CLARA positions, NO VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G19_2010_SPAWN_CITY_REAL_BRES_HTML_PNG_NO_VPK
+          path: |
+            /tmp/g19/coords.json
+            /tmp/g19/map.png
+            /tmp/g19/map.html
+          retention-days: 7
+          if-no-files-found: error
+      - name: Clean original game
+        if: always()
+        run: rm -rf /tmp/g19/owner.ipa
