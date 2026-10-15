@@ -29,5 +29,5 @@ rep('''                    idx=(idx+1)%5;
                     world.head_height=b15_suit_head(&model);''')
 p.write_text(s)
 assert s.count('combat.mode=B16_REPULSOR;combat.combo_step=0;')==2
-assert s.count('b16_combat_mode(&combat,')==2
+assert s.count('b16_combat_mode(&combat,')>=2  # G10 input retains keyboard AND controller weapon cycles
 print('PASS G11 WM MELEE HUD root fix: suit selectors reset REPULSOR; Dpad cycles weapons normally. NO VPK')
