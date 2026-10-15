@@ -36,12 +36,16 @@ def decode(name,raw):
   p=words[3]
   # Authentic shader property pointers are known from 88 record. In the
   # true source they point to its own 60byte payload and repeat every 60.
-  if p!=propbase+60*idx:raise ValueError('source per-material 60byte pointer drift '+name+' '+pname)
-  if not p+60<=end:raise ValueError('source per-material 60byte bounds drift '+name)
-  values=[u(raw,p+4*i) for i in range(15)]
-  possible=values[14]
-  last_ptr=(p+4*14,possible)
-  tex_match=tex[possible]['name'] if 0<=possible<len(tex) else None
+  if p!=propbase+60*idx:
+   print('G11_MAP_SOURCE_SPECIAL_MATERIAL_PROP_RECORD',name,pname,
+      'expected',propbase+60*idx,'found',p,'property_first_word',u(raw,p),flush=True)
+  # Original mesh BRES sometimes has last 40B placeholder material,
+  # e.g. orig_07___Default; only 60B authored source contains TGA index.
+  real_index_present=(p>=propbase and p+60<=end and
+                      words[2]==1 and u(raw,p)==1)
+  values=[u(raw,p+4*i) for i in range(15)] if real_index_present else []
+  possible=values[14] if real_index_present else None
+  tex_match=tex[possible]['name'] if possible is not None and 0<=possible<len(tex) else None
   entries.append({'source_BRES':name,'original_material_name':pname,
      'shader_88_offset':rec,'property_60_offset':p,
      'property_60_original_15_u32':values,
