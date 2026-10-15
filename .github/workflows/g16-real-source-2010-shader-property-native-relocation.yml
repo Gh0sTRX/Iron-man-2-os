@@ -1,0 +1,38 @@
+name: G16 SOURCE ORIGINAL 2010 BRES shader 40 60-byte relocated pointer semantics NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g16-real-source-2010-shader-property-native-relocation.yml"
+      - "research/b24_unified/b24_g16_bres_original_shader_property_relocation_semantics.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_bres_relocation_shader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan original 2010 BRES relocated shader native field strings
+        run: |
+          python3 research/b24_unified/b24_g16_bres_original_shader_property_relocation_semantics.py \
+            --out /tmp/G16_Original2010_BRES_40_60B_Shader_Real_Reloc_Fields.json
+      - name: Assert 194 records and no invented shader semantic
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          j=json.loads(Path('/tmp/G16_Original2010_BRES_40_60B_Shader_Real_Reloc_Fields.json').read_text())
+          assert j['source_files']==10 and j['original_material_records']==194
+          assert not j['original_RGBA_semantics_verified']
+          assert not j['original_alpha_blend_semantics_verified']
+          assert not j['VPK_built']
+          print('PASS 2010 source native BRES relocated shader property ptrs and names')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G16_REAL_2010_BRES_SHADER_PROPERTY_RELOCATION_EVIDENCE_NO_VPK
+          path: /tmp/G16_Original2010_BRES_40_60B_Shader_Real_Reloc_Fields.json
+          if-no-files-found: error
+          retention-days: 14
