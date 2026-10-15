@@ -1,0 +1,35 @@
+name: MAP FIRST real original Gameloft BRES relocation pointer tables material and TGA actual 10 sources
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-map-first-authored-2010-BRES-relocation-verified-10-world-sources.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_2010_city_texture_link_graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actual 2010 BRES 10 owned C1L1 geometry files true relocation fields and material table
+        run: |
+          python3 research/b24_unified/b24_map_first_source_BRES_real_relocation_materials.py \
+            --out /tmp/C1L1_TRUE_ORIGINAL_2010_BRES_RELOC_MATERIAL_ATLAS_LINKS.json
+      - name: Original source no invented texture mapping check
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/C1L1_TRUE_ORIGINAL_2010_BRES_RELOC_MATERIAL_ATLAS_LINKS.json').read_text())
+          assert len(d['real_2010_BRES_files'])==10
+          assert all(x['source_relocations_end_equals_strings_start'] for x in d['real_2010_BRES_files'])
+          assert sum(len(x['materials']) for x in d['real_2010_BRES_files'])>40
+          assert not d['material_texture_sampler_assignment_proven']
+          print('PASS game-authored relocation pointer types distinguish BRES material shader from C1L1 TGA texture table, NO VPK')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: C1L1_Source_2010_BRES_Exact_Material_And_Texture_Relocations_10_Models
+          path: /tmp/C1L1_TRUE_ORIGINAL_2010_BRES_RELOC_MATERIAL_ATLAS_LINKS.json
+          if-no-files-found: error
