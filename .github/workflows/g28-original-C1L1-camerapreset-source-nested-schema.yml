@@ -1,0 +1,48 @@
+name: G28 original 2010 level1 57 CameraPreset source nested children 1026 tagged zero vec3 NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g28-original-C1L1-camerapreset-source-nested-schema.yml"
+      - "research/b24_unified/b24_g28_original_level1_57_CameraPreset_nested_camera_structure.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  camera_source_schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original owner IPA only as temporary source
+        run: |
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g28
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g28/original.ipa
+          test "$(wc -c </tmp/g28/original.ipa)" -eq 248613763
+      - name: Inspect all actual native 2010 camera preset nested class original records
+        run: |
+          python3 research/b24_unified/b24_g28_original_level1_57_CameraPreset_nested_camera_structure.py --ipa /tmp/g28/original.ipa --out /tmp/g28/camera_native_structure.json
+      - name: Verify no fake original camera pose and exact original camera IDs
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g28/camera_native_structure.json'))
+          assert j['source_original_named_CameraPreset_instances']==57
+          assert j['source_nested_CameraPreset_3_child_parent_links_proven']==171
+          assert j['source_camera_native_0x000C_vec3_records_proven']==1026
+          assert j['source_camera_native_nonzero_candidate_vec3_count']==0
+          assert j['source_original_main_Mission000_SetCamera_IDs_1864_1868_present']
+          assert not j['source_actual_camera_world_positions_and_look_at_matrices_PROVEN']
+          assert j['NO_VPK']
+          print('PASS camera source schema 57/57, NO real camera pose invented or GPU.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G28_ORIGINAL_2010_C1L1_57_CameraPreset_NATIVE_SUBNODES_SOURCE_NOT_CAMERA_POSE_NO_VPK
+          path: /tmp/g28/camera_native_structure.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove archival owner game
+        if: always()
+        run: rm -rf /tmp/g28/original.ipa
