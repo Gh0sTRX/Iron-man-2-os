@@ -1,4 +1,4 @@
-name: G11 physical Vita ARM all four new combat modules and G10 regression NO VPK
+name: MAP FIRST G10 real C1L1 native per-material 22919 face sorting plus prior baseline QA NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -45,6 +45,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g11_authentic_unibeam_and_hover_idle_source_only.py
           python3 research/b24_unified/apply_b24_g11_practice_hit_feedback_source_only.py
           python3 research/b24_unified/apply_b24_g11_wm_reset_weapon_on_suit_source_only.py
+          python3 research/b24_unified/apply_b24_map_first_original_material_batch_runtime_source_only.py
           python3 - <<'PY'
           from pathlib import Path
           c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
@@ -174,13 +175,33 @@ jobs:
           assert main.index('b24_g11_practice_melee_hit(&b24_practice_hits')<main.index('b24_gpu_runtime_draw(')
           print("PASS G11 one real B14 native actor hitbox, 190ms GOLD impact visual on immortal test dummy, true BRES combo preserved, NO VPK")
           PY
+      - name: Validate authentic C1L1 per-material CPU-once Vita GPU runtime source and 22919 triangle index buckets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          h=Path('work/b24/b24_unified/b24_gpu_runtime.h').read_text()
+          c=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert 'B24C1MaterialBatchPlan city_draw_material_plan;' in h
+          assert 'b24_c1_material_batches_build(&r->city_draw_material_plan' in c
+          assert c.count('b24_c1_material_batches_free(&r->city_draw_material_plan)')==3
+          assert 'b24_c1_material_batches.c' in cm
+          assert 'b24_gpu_owner_scene_material(&r->owner,&r->city' in c
+          assert '39' not in c
+          print('PASS exact G10 VitaGL runtime 22919 2010 owner source triangles prepared CPU-once by C1MA original material; no fake original atlas or extra render passes')
+          PY
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            -c work/b24/b24_unified/b24_c1_material_batches.c \
+            -o /tmp/2010_source_true_city_material_plan.o
+          test -s /tmp/2010_source_true_city_material_plan.o
       - name: Strict Vita ARM objects for both C1L1 original ground/source foot modules only
         run: |
           set -euo pipefail
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
             vitasdk/vitasdk:2026.08 sh -lc '
               set -eu
-              for n in b24_c1_true_source_floor b24_g10_original_foot_contact b24_g11_combat_stage_policy b24_g11_target_camera_follow b24_g11_original_unibeam_sequence b24_g11_practice_melee_feedback; do
+              for n in b24_c1_true_source_floor b24_g10_original_foot_contact b24_g11_combat_stage_policy b24_g11_target_camera_follow b24_g11_original_unibeam_sequence b24_g11_practice_melee_feedback b24_c1_material_batches; do
                 arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
                   -Iwork/src -Iwork/b24/b24_unified \
                   -c "research/b24_unified/$n.c" -o "/tmp/$n.o"
