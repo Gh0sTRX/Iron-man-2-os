@@ -38,7 +38,7 @@ jobs:
           assert not d['actual_original_2010_runtime_OpenGL_drawing_captured']
           assert not d['original_BRES_polygons_moved_or_shader_guess_applied']
           assert d['NO_VPK']
-          print('PASS original owner's actual Info.plist verified; external BDAE 779 node format adaptation still HYPOTHESIS for BRES 133')
+          print('PASS original IPA Info.plist verified; BDAE 779 node layout is still only a hypothesis for BRES 133')
           PY
       - uses: actions/upload-artifact@v4
         with:
