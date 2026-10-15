@@ -1,0 +1,56 @@
+name: G12 MAP FIRST original 2010 only USED authored C1L1 PVR images plus exact C1MT staged app0 maps NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g12-original-2010-c1l1-used-pvr-optimized-app0-map-assets-no-vpk.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_owner_source_city_only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install original source PVR and BRES material mapping dependencies
+        run: python3 -m pip install -q numpy pillow texture2ddecoder gdown
+      - name: Fetch ephemeral original user 2010 C1L1 source
+        run: |
+          mkdir -p /tmp/g12_city
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g12_city/owner.ipa
+          test "$(wc -c </tmp/g12_city/owner.ipa)" -eq 248613763
+      - name: Prepare only true 2010 BRES referenced city PVR images with exact native source shader 94-mat C1MT for future map build
+        run: |
+          python3 research/b24_unified/b24_g12_pack_only_source_used_original_C1L1_map_textures.py \
+            --ipa /tmp/g12_city/owner.ipa \
+            --archive /tmp/G12_C1L1_2010_TRUE_SOURCE_MAP_ONLY_ASSETS_NOT_VPK.zip \
+            --qa /tmp/G12_C1L1_2010_ACTUAL_USED_ATLAS_MANIFEST.json
+      - name: Verify no unrelated original game media and all source map C1TX bytes valid
+        run: |
+          python3 - <<'PY'
+          import json,zipfile,struct
+          from pathlib import Path
+          d=json.loads(Path('/tmp/G12_C1L1_2010_ACTUAL_USED_ATLAS_MANIFEST.json').read_text())
+          with zipfile.ZipFile('/tmp/G12_C1L1_2010_TRUE_SOURCE_MAP_ONLY_ASSETS_NOT_VPK.zip') as z:
+            ns=z.namelist()
+            assert len(ns)==1+d['actual_used_atlases_staged']
+            assert all(x.startswith('maps/') and x.endswith(('.c1tx','.c1mt')) for x in ns)
+            assert 'maps/C1L1_environment.c1mt' in ns
+            c=z.read('maps/C1L1_environment.c1mt')
+            assert struct.unpack_from('<4sIIII',c)[:4]==(b'C1MT',1,94,39)
+          assert d['actual_used_atlases_staged']>=12
+          assert d['num_source_C1TX_unreferenced_banks_omitted_for_install_optimization']>=1
+          assert not d['VPK_generated']
+          assert not d['original_owner_IPA_in_bundle']
+          print('PASS genuine 2010 map-only optimized PVR data ZIP (not VPK), original per shader material exact C1MT and no unreferenced media')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G12_2010_Original_C1L1_UsedOnly_Authentic_Map_Assets_Not_VPK
+          path: |
+            /tmp/G12_C1L1_2010_TRUE_SOURCE_MAP_ONLY_ASSETS_NOT_VPK.zip
+            /tmp/G12_C1L1_2010_ACTUAL_USED_ATLAS_MANIFEST.json
+          if-no-files-found: error
+      - name: Remove private original IPA
+        if: always()
+        run: rm -rf /tmp/g12_city/owner.ipa
