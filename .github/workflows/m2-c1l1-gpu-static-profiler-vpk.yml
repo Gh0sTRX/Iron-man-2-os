@@ -53,7 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace" \
-            -w /workspace/research/b24_unified/mapviewer_m1 vitasdk/vitasdk:2026.08 sh -lc \
+            -w /workspace/research/b24_unified/mapviewer_m2 vitasdk/vitasdk:2026.08 sh -lc \
             'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
       - name: Verify actual bootable installer VPK has eboot and ONLY original first map assets
         run: |
