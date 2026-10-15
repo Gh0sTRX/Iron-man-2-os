@@ -29,8 +29,8 @@ jobs:
           import json
           j=json.load(open('/tmp/g24/native_scene_source_2010.json'))
           assert j['source_native_2plus_character_name_id_records']==601
-          assert j['source_native_typed_child_parent_record_count']==1604
-          assert j['source_native_0x005C_transform_child_parent_prefix_count']==684
+          assert j['source_native_typed_child_parent_record_count']==1608
+          assert j['source_native_0x005C_transform_child_parent_prefix_count']==685
           assert j['native_source_verified_12_16_12_transform_parent_links']==663
           assert j['named_parents_with_valid_transforms']==389
           assert not j['original_2010_live_render_world_parent_matrices_verified']
