@@ -1,0 +1,51 @@
+name: G37 2010 C1L1 genuine 53 Deco native source resource ID and 41 XYZ scene points NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g37-original-C1L1-53-deco-native-source-type-links.yml"
+      - "research/b24_unified/b24_g37_original_C1L1_Deco_resource_type_scene_instances.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_deco_native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage owner original 2010 source only in private CI
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g37_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g37_private/owner.ipa
+          test "$(wc -c </tmp/g37_private/owner.ipa)" -eq 248613763
+      - name: Recover authentic Deco 0x4D resource slots and 0x5C original scene XYZ
+        run: |
+          python3 research/b24_unified/b24_g37_original_C1L1_Deco_resource_type_scene_instances.py --ipa /tmp/g37_private/owner.ipa --out /tmp/g37_private/G37_NATIVE_SOURCE_DECO_RECORDS.json
+      - name: Audit native resource 44 134 136 reuse and no world transform claim
+        run: |
+          python3 - <<'PY'
+          import json
+          j=json.load(open('/tmp/g37_private/G37_NATIVE_SOURCE_DECO_RECORDS.json'))
+          assert j['source_2010_original_Deco_instances']==53
+          assert j['distinct_source_type_field_values']==25
+          assert j['native_nonzero_local_positions']==41 and j['native_local_origin_positions']==12
+          assert j['source_type_field_histogram']['44']==7
+          assert j['source_type_field_histogram']['134']==11
+          assert j['source_type_field_histogram']['136']==10
+          assert not j['native_resource_index_to_actual_BRES_file_proven']
+          assert not j['source_scene_parent_to_final_world_matrix_proven']
+          assert j['no_VPK_or_performance_changes']
+          print('PASS original 2010 C1L1 Deco typed binary resource field and local scene XYZ, source only.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G37_ORIGINAL_2010_C1L1_53_DECO_25_SOURCE_TYPES_41_REAL_LOCAL_XYZ_NO_VPK
+          path: /tmp/g37_private/G37_NATIVE_SOURCE_DECO_RECORDS.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Erase temporary original owner IPA
+        if: always()
+        run: rm -rf /tmp/g37_private/owner.ipa
