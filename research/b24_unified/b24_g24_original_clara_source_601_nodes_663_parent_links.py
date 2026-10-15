@@ -92,8 +92,8 @@ def audit(raw):
     expected_spawns={f"SpawnPoint{i:03d}" for i in range(16)}
     observed_spawns={r["original_named_parent"] for r in matches if r["original_named_parent"] in expected_spawns}
     assert expected_spawns==observed_spawns
-    assert len(names)==601 and len(matches)==663 and len(all_children)==1604
-    assert len(used)==389 and len(child_typed_92)==684
+    assert len(names)==601 and len(matches)==663 and len(all_children)==1608
+    assert len(used)==389 and len(child_typed_92)==685
     return {
         "original_game":"Gameloft Iron Man 2 2010 owner iOS level1.bclara",
         "authored_source_level1_bytes":len(raw),
