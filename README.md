@@ -77,6 +77,13 @@ Mevcut **`main`** dalında eski **Asset Beta** denemesi (`source/IronMan2_Vita_G
 
 Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`feature/b24-unified-gameplay`** dalındadır. G48–G57 testleri yeni cihaz VPK'sı oluşturmaz. Sonraki gerçek Vita sürümünün FPS'i veya sahne doğruluğu cihazda yeniden test edilmedikçe kesin kabul edilmez.
 
+
+## G58–G59 (16 Ekim 2026) — Gerçek dokulu harita ışığı ve ilk oynanabilir için collision
+
+- **G58A CI SUCCESS:** [GitHub Actions](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38816435046). Tam olarak G55/G57 kaynak geometri ve 24 PVR atlasına ait 296 mesh/22.441 üçgen/18.774 kaynak UV+PVR üçgen korunarak host WebGL2 güneş/yön/ortam/pozlama/akşam ve atmosfer shader kontrolleri üretildi. Özgün CLARA Sun001–Sun004 yerel konum ve quaternion kayıtları korunuyor, fakat oyundaki gerçek kaynak ışık ve renk/yoğunluk/shader semantiği **çözülmedi**. 24 PVR'nin 23'ü tamamen opak, yalnız c1l1_earth.tga kaynak alfa pikselleri içerir; alfa-testin özgün oyun davranışı henüz kanıtlanmadı. Ayrı G58 deneysel GPU shadow-map önizlemesi için **gerçek WebGL2 ve PS Vita GPU testi yoktur**.
+- **G59 CI SUCCESS:** [GitHub Actions](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38816779782). B11 özgün kaynak arşivinde C1L1_floor_001 (1 mesh, 2 üçgen), C1L1_col_01 (1 mesh, 690 üçgen) ve C1L1_building_col (17 mesh, 1.218 üçgen) doğrudan parse edildi: toplam **19 collision mesh / 2.146 vertex / 1.910 kaynak üçgen**. Yalnız host abs(normal.z) tanısı: 188 yatay, 32 eğimli, 1.690 duvar yüzeyi; native fizik motorunun gerçek yürünebilirlik eşikleri veya root transforms **kanıtlanmadı**. JSON ve collision GLB oluşturulabiliyor.
+- **İlk oynanabilir C1L1 demo yol haritası:** G55/G57 kaynak şehir mesh+atlasını G8 tek GPU render yoluyla birleştir, G59 kaynağından motor için collision ray/sweep ve oyuncu yere temasını host test et, gerçek üçüncü şahıs omuzüstü kamera (flight stage 2 / RUSH merkez geçişi) ve özgün Mark VI hareket/animasyonlarını bağla, kaynak Mission000 başlangıcı koşullarını uygula; ardından tek bir anlamlı Vita cihaz test paketi. **Oynanabilirlik, Vita FPS veya orijinal runtime shader tamamlandı iddiası yok.** G56 kalan 74 özel ışık mesh, alpha/emissive/blend, üst scene root ve gerçek motor görünürlüğü açık işlerdir.
+
 ## Lisans / içerik notu
 
 Oyun, karakterler, sesler, özgün modeller ve dokular ilgili hak sahiplerine aittir. Bu depo özel araştırma içindir. Orijinal IPA'yı, oyun varlıklarını veya telifli içerikleri izinsiz kamuya açık dağıtmayın.
