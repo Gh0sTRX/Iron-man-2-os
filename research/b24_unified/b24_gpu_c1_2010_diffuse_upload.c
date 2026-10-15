@@ -37,7 +37,8 @@ static unsigned char *downsample_source_once(unsigned char *in,
  if(!in||!w||!h)return NULL;
  unsigned oldw=*w,oldh=*h,neww=oldw,newh=oldh;
  while(neww>GPU_MAX_ATLAS_DIM||newh>GPU_MAX_ATLAS_DIM){
-  if(neww>1u)neww/=2u;if(newh>1u)newh/=2u;
+  if(neww>1u)neww/=2u;
+  if(newh>1u)newh/=2u;
  }
  if(neww==oldw&&newh==oldh)return in;
  size_t pixels=(size_t)neww*newh;
