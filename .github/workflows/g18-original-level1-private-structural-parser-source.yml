@@ -1,0 +1,61 @@
+name: G18 PRIVATE 2010 owner original level1 BCLARA data for structural scene parser NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g18-original-level1-private-structural-parser-source.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private_source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download temporary original owner IPA from same approved project source
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          mkdir -p /tmp/g18_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g18_owner/source.ipa
+          test "$(wc -c </tmp/g18_owner/source.ipa)" -eq 248613763
+      - name: Extract EXACT original level1 BCLARA binary internally, source manifest
+        run: |
+          mkdir -p /tmp/g18_output
+          python3 - <<'PY'
+          from pathlib import Path
+          from sys import path
+          import zipfile,hashlib,json,collections,re
+          path.insert(0,'research/b24_unified')
+          from b24_owner_pack_extract import decode,get_exact
+          with zipfile.ZipFile('/tmp/g18_owner/source.ipa') as z:
+            clev=z.read('Payload/IronMan2.app/clev')
+          b=get_exact(clev,decode(clev,'.bclara'),'level1.bclara')
+          assert len(b)==339733
+          source=Path('/tmp/g18_output')
+          (source/'owner-original-level1.bclara').write_bytes(b)
+          offsets={}
+          for m in re.finditer(rb'SpawnPoint\d{3}',b):
+            name=m.group().decode()
+            offsets[name]=m.start()
+          assert len(offsets)==16 and len(set(offsets.values()))==16
+          # Key file-location evidence; do not invent 3D node positions.
+          ordered=sorted(offsets.items(),key=lambda x:x[1])
+          deltas=[{'a':a,'b':c,'bytes_between_source_name_starts':q-p}
+                  for (a,p),(c,q) in zip(ordered,ordered[1:])]
+          m={'authentic_owner_2010_source_file':'level1.bclara',
+             'sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b),
+             'source_16_spawnpoint_names':offsets,'adjacent_file_offset_deltas':deltas,
+             'original_player_spawn_verified':False,'VPK_built':False}
+          (source/'G18_SOURCE_2010_LEVEL1_STRUCTURAL_OFFSETS.json').write_text(json.dumps(m,indent=2))
+          print('PASS G18 original 339733 byte BCLARA, 16 authored SpawnPoint ids, adjacent deltas',deltas)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G18_PRIVATE_OWNER_ORIGINAL_LEVEL1_BCLARA_SOURCE_STRUCTURAL_RESEARCH_NOT_VPK
+          path: /tmp/g18_output/
+          retention-days: 2
+          if-no-files-found: error
+      - name: Remove original IPA and original binary from CI workdir
+        if: always()
+        run: rm -rf /tmp/g18_owner /tmp/g18_output
