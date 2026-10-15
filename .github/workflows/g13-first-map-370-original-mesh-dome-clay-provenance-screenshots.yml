@@ -1,4 +1,4 @@
-name: G13 MAP native original 2010 370 BRES dome and light structures material UV 12 picture forensic NO VPK
+name: G13 source truth 370 original mesh UV diffuse independent source contact sheet after scarcity fix NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
