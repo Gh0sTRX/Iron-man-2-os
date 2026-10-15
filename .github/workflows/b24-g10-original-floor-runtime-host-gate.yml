@@ -43,6 +43,7 @@ jobs:
           python3 research/b24_unified/apply_b24_g11_combat_policy_source_only.py
           python3 research/b24_unified/apply_b24_g11_camera_combat_focus_source_only.py
           python3 research/b24_unified/apply_b24_g11_authentic_unibeam_and_hover_idle_source_only.py
+          python3 research/b24_unified/apply_b24_g11_practice_hit_feedback_source_only.py
           python3 research/b24_unified/apply_b24_g11_training_dummy_hit_source_only.py
           python3 - <<'PY'
           from pathlib import Path
@@ -151,6 +152,27 @@ jobs:
           grep -q 'b24_g11_practice_hit_flash(' work/src/main.c
           grep -q 'b24_g11_practice_melee_feedback.c' work/CMakeLists.txt
           echo "PASS authentic C1L1 real 3D permanent practice dummy melee hit reaction, no VPK"
+      - name: G11 actual immortal 3D target C11 valid near swing and temporary GPU hit flash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O1 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/test_b24_g11_practice_melee_feedback.c \
+            -lm -o /tmp/g11_real_3d_practice_melee
+          /tmp/g11_real_3d_practice_melee
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          gpu=Path('work/b24/b24_unified/b24_g10_practice_target_vitagl.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert 'b24_g11_practice_melee_hit(&b24_practice_hits' in main
+          assert 'b24_gpu_rt.practice_target.hit_flash=' in main
+          assert 'if(t->hit_flash>0.f)' in gpu
+          assert 'b24_g11_practice_melee_feedback.c' in cm
+          assert main.index('b24_g11_practice_melee_hit(&b24_practice_hits')<main.index('b24_gpu_runtime_draw(')
+          print("PASS G11 one real B14 native actor hitbox, 190ms GOLD impact visual on immortal test dummy, true BRES combo preserved, NO VPK")
+          PY
       - name: Strict Vita ARM objects for both C1L1 original ground/source foot modules only
         run: |
           set -euo pipefail
