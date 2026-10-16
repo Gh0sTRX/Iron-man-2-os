@@ -139,4 +139,4 @@ if __name__=='__main__':
  payload['G78_original_owner_source_WeaponDB_and_audio_provenance']=proofs
  payload['G78_VPK_generated']=False
  original_report.write_text(_json.dumps(payload,ensure_ascii=False,indent=2)+'\\n')
- print('PASS G78 and G78B original property names, all resource config source provenance and audio metadata verified; no Vita package generated')
+ print('PASS G78C original property name resolution, owner all-container provenance and per-level BCLARA template value classification, no VPK')
