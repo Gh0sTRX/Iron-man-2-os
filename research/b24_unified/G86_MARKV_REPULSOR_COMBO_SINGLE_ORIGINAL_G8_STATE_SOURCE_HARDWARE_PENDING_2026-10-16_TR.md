@@ -29,3 +29,12 @@ durumlarını orijinal kaynak model üzerinde gerçek 629 vertex tamponuyla test
 **G85 ana oyun CMake:** `-DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON -DB24_G68_CITY_BACKEND=ON -DB24_G75_SOURCE_CAPSULE=ON -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON -DB24_G85_NATIVE_MARKV_629=ON` ile `im2_beta` native ARM hedefi derlenir, *VPK üretme hedefi çağrılmaz*. Aktif G73 oyun korunur. Orijinal 248 `suitcase_ironman_*.im2v` dosyası sahnede tek B14 fizik/tek G8 hareket sahibi; G76/G77/G82 hasar/temas CPU matematiği bağımsız olarak hazır.
 
 **Henüz tamamlanmadı:** Mark V 248 hareketinin tüm oyun durum geçişleri, orijinal iOS combat isabet aktif kareleri, her `AttackEntity` özgün hasar sayısı, düşman AI + spawn, orijinal ses bağlantıları, dokunmatik oyun girişleri, touchHLE tam gameplay ve gerçek Vita QA. Bu aşamada VPK **kesinlikle oluşturulmayacak**. Önceden doğrulanan G68 şehir ve G75 kamera/yer/ışık düzeltmeleri korunacak.
+
+## Doğrulanmış son G86B kaynak + native link sonucu
+
+[GitHub Actions run **38954026551**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38954026551) **SUCCESS**:
+- **248 / 248** orijinal 2010 IronMan→Mark V 629v akışı G8 ile açılıp XYZ örneklendi; üç özgün sıfır-süreli klip doğru tek kare olarak korundu.
+- **G86 repulsor**: Gerçek kaynak G8 `suitcase_ironman_aim_ground_idle_att` ile tek kabul edilmiş atış, tam özgün süre, normal idle'a dönüş ve ikinci geçerli atış başarılı.
+- **G86B üçlü kombo**: Orijinal dosyalar `suitcase_ironman_ground_combo_1/2/3` üzerinden 266/300/500 ms ardışık hareketleri, buffer girişi, normal idle'a dönüş ve ateşlemenin çift tetiklenmemesi başarılı.
+- Mevcut G75/G68 Stark Expo haritası korunarak **G84 + G85** gerçek oyun kaynakları PS Vita ARM derleyicisiyle `im2_beta` hedefinde **bağlandı**; sadece ELF hedefi, VPK/eboot paketlemesi **YOK**.
+- Kullanıcı gerçek PS Vita'da henüz bu yeni sürümü test etmedi. **HIT FRAME, silah hasarları, NPC AI ve özgün hikâye** hâlâ eksik; bu nedenle VPK üretme yasağı sürüyor.
