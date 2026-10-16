@@ -1,0 +1,12 @@
+name: G68 original source host regression
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: ["research/b24_unified/g68_media_mayhem/**"]
+  workflow_dispatch:
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cc -std=c11 -O2 research/b24_unified/g68_media_mayhem/test_g68_mission.c -lm -o /tmp/g68test && /tmp/g68test
