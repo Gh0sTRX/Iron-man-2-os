@@ -59,6 +59,7 @@ def patch_script(script:str, name:str)->str:
                 flags+=" -DB24_G72_DIAGNOSTIC_SKYLINE=ON"
             if G73:
                 flags+=" -DB24_G73_REAL_SKY=ON"
+                flags+=" -DB24_G74_GROUND_CONTACT=ON"
         script=script.replace(cmake,cmake+" "+flags)
     # Include native original G68 files in final VPK without touching older files.
     anchor="(cd work && zip -q build-vita/"+vpk+" maps/C1L1_environment.im2map"
