@@ -69,9 +69,9 @@ def patch_script(script:str, name:str)->str:
     if G73 and "python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py" in script:
         # Append after last G9 shell here-doc has already closed.
         # Avoid embedding new nested heredocs into old verified workflow.
-        copy_sky = ("\\ncp /tmp/g73_verified_sky/G73_original_sky_mesh.g73m work/assets/ "
+        copy_sky = ("\ncp /tmp/g73_verified_sky/G73_original_sky_mesh.g73m work/assets/ "
                     "&& cp /tmp/g73_verified_sky/G73_original_sky_tex_00.g66t work/assets/ "
-                    "&& cp /tmp/g73_verified_sky/G73_original_sky_tex_01.g66t work/assets/\\n")
+                    "&& cp /tmp/g73_verified_sky/G73_original_sky_tex_01.g66t work/assets/\n")
         script += copy_sky
     if G73 and "(cd work && zip -q build-vita/" in script:
         sky_add="(cd work && zip -q build-vita/"+vpk+" assets/G73_original_sky_mesh.g73m assets/G73_original_sky_tex_*.g66t)"
