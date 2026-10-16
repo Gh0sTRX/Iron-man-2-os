@@ -17,7 +17,7 @@ G84, G83'ün yürüyüş/hover/uçuş yön animasyonlarını G8'e geçiriyordu; 
 
 - `test_g87_original_surface_transition.c`: kalkış, hover, stage2, rush, geri hover, gerçek zemin teması gecikmesi, pause, suit reset, yeniden kalkış ve hatalı enum rejimleri. Host GCC C11 -Wall -Wextra -Werror -pedantic.
 - GitHub Actions `g87-real-original-flight-land-transition-G85-source-NO-VPK.yml`, run **38955414033**: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38955414033 .
-- Aynı test gerçek önceki G8/WM/G68 ve G85 248 türetilmiş kaynak animasyon artefaktlarını yeniden birleştirir, gerçek B24 ana C kaynaklarını host syntax testinden geçirir ve **Vita ARM im2_beta** tek hedefini linklemeyi dener. `vita_create_vpk`, eboot/ALL ve cihaz kurulumu kesinlikle yapılmaz.
+- **CI SONUCU: SUCCESS (38955414033)** — gerçek G8/WM/G68 ve G85'in 248 özgün kaynak animasyon artefaktı yeniden kullanılarak G75/G84/G85/G87 birleşimi, host C11 testi, syntax testi ve VitaSDK ARM `im2_beta` **tam link** testi geçti. `.vpk` dosyası olmadığı ayrıca kontrol edildi. Derlenen ELF, PS Vita'da çalıştırılmış oyun testi değildir.
 
 ## Özellikle iddia edilmeyenler
 
