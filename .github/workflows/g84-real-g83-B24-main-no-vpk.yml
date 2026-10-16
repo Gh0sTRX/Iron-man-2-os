@@ -65,12 +65,19 @@ jobs:
           set -euo pipefail
           cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -fsyntax-only -Iwork/b24/b24_unified \
             work/b24/b24_unified/b24_g8_live_original_motion.c \
-            work/b24/b24_unified/b24_g83_authentic_timed_router.c \
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c
+            /tmp/g84_actual_109_clip_coverage.json \
             work/b24/b24_unified/b24_g83_unified_movement_aim.c \
             work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
             work/b24/b24_unified/b24_g77_melee_source_radius.c \
             work/b24/b24_unified/b24_g76_original_native_damage_math.c
           python3 research/b24_unified/g83_full_motion_aim/g83_validate_original_2010_source_clip_names.py
+      - name: Verify all 109 G83 original IM2V animation files are actually available inside reconstructed original game assets
+        run: |
+          python3 research/b24_unified/g84_main_loop_integration/g84_real_109_original_clip_stream_coverage.py \
+            --routing-c research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            --animation-dir work/animations \
+            --out /tmp/g84_actual_109_clip_coverage.json
       - name: Vita ARM object compile original integrated game modules and real main syntax WITHOUT VPK
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
