@@ -82,9 +82,13 @@ def assemble(src,ipa,anims,routes,out,report):
  * and practice dummy ARE DIAGNOSTICS, not original iOS game logic. */
 const a91=JSON.parse(document.getElementById('g91data').textContent);
 const cv91=document.getElementById('g91overlay'),gl91=cv91.getContext('webgl2',{alpha:true,depth:true});
-const state91={x:d.mc_xyz[0],y:d.mc_xyz[1],z:d.mc_xyz[2],mode:0,aim:0,
+/* G96: real 2010 G68 1910 native floor face validated by G94 C11:
+ * source street XY=(0,0), actual support Z=0.072501, and same source
+ * floor under fixed dummy XY=(0,10) verified from original polygons.
+ * The CLARA MC local transform Z25.054 is NOT proved playable spawn. */
+const state91={x:0,y:0,z:0.072501,mode:0,aim:0,
  held:new Set(),attack:'',attackTime:0,combo:0,flash:0,notice:'',age:0};
-const dummy91=[d.mc_xyz[0],d.mc_xyz[1]+6,d.mc_xyz[2]+1];
+const dummy91=[0,10,1.072501]; /* G94 native 2010 triangle ground 0.072501 + real G10 dummy offset1 */
 const decode91=s=>Uint8Array.from(atob(s),v=>v.charCodeAt(0));
 const streams91={};
 for(const [name,b64] of Object.entries(a91.streams)){
@@ -264,6 +268,10 @@ requestAnimationFrame(tick91);
 """
  body=rep(body,'function render(){if(!gl||!pr)return;',overlay+'\nfunction render(){if(!gl||!pr)return;')
  body=rep(body,'markers(v,p,w,h)}','markers(v,p,w,h);actor91(v,p,w,h)}')
+ # Initial camera was at unproven CLARA typed MC local position, dist145;
+ # default focus should expose the actual verifiable source-floor playground.
+ body=rep(body,'refreshList();updateCam();setFocus();',
+   'refreshList();updateCam();setFocus();center=[state91.x,state91.y,state91.z+1];dist=15;az=-1.1;el=.21;render();')
  if body.count('id="g91overlay"')!=1 or body.count('actor91(v,p,w,h)')!=1:
   raise ValueError('G91 original source host view modified inconsistently')
  out.parent.mkdir(parents=True,exist_ok=True);out.write_text(body)
@@ -274,6 +282,11 @@ requestAnimationFrame(tick91);
    'MarkV_authentic_original_source_triangles':len(triangles),
    'MarkV_original_2010_20hz_clips_renderable':len(source_clips),
    'real_G83_C_router_directly_used':True,
+   'G96_source_1910_native_triangle_supported_player_spawn_xyz':[0.0,0.0,0.072501],
+   'G96_source_1910_native_triangle_supported_static_dummy_xyz':[0.0,10.0,1.072501],
+   'G96_proof_actual_native_G94_collision_runner':38967068698,
+   'original_CLARA_MC_transform_is_not_proven_gameplay_spawn':True,
+   'browser_viewer_does_not_execute_G75_wall_collision_per_frame':True,
    'real_G58_host_lighting_shader_used':True,
    'original_MarkV_atlas_MCSuitCase_PVR_512x512':True,
    'original_MarkV_629_vertex_authored_uv_used':True,
