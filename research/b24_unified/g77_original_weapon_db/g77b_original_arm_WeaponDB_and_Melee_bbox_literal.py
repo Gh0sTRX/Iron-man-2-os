@@ -102,10 +102,15 @@ def main(ipa,out):
  g79_weapon_instances(ipa,out)
  from g80_original_CLARA_weapon_schema_to_26_attack_property_tags import audit as g80_real_2010_property_tags
  g80_real_2010_property_tags(ipa,out)
+ from g82_original_weapon_attack_native_TLV_decoder_probe import run as g82_2010_TLV
+ g82_2010_TLV(ipa,out)
  g78_proof=json.loads((out/'G78_NATIVE_ORIGINAL_ATTACK_DAMAGE_EntityData_PROPERTY_MEMBER_MAP.json').read_text())
  result['exact_target_methods']['G78_original_AttackEntity_ProjectileEntity_2010_loader']=g78_proof['original_WeaponDB_AttackEntity_and_ProjectileEntity_source_typed_field_loader']
  result['exact_target_methods']['G78_original_2010_resource_archive_names']={'filenames':g78_proof['2010_app_top_level_resource_filename_candidates_without_encoded_content']}
  g78_assets=json.loads((out/'G78B_REAL_2010_ALL_CONTAINER_ATTACK_DAMAGE_SOURCE_LOCATOR.json').read_text())
+ g82_data=json.loads((out/'G82_AUTHENTIC_ATTACK_MC_FULL_TLV_STRUCTURE_FORENSICS.json').read_text())
+ result['exact_target_methods']['G82_native_first_level_original_attack_MC_bytes']={
+ 'source_attack_and_Mc_TLV':g82_data['authentic_original_2010_level1_serialized_entities']}
  g80_data=json.loads((out/'G80_REAL_ORIGINAL_C1L1_WEAPON_DAMAGE_CLASS_PROPERTY_TAG_CROSSWALK.json').read_text())
  result['exact_target_methods']['G80_real_2010_attack_property_field_tags']={
     'source_attacks_schema':g80_data['authentic_class108_Attack_and_107_Weapon_schema'],
