@@ -1,0 +1,50 @@
+name: G72 Original C1L1 Sky BRES Deco001 Native-Source Probe
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g72-original-sky-native-source-probe.yml"
+      - "research/b24_unified/g72_sky_light/g72_original_sky_source_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sky:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install metadata-only original source parser dependencies
+        run: python3 -m pip install -q numpy pillow scipy trimesh gdown
+      - name: Retrieve original user-supplied Iron Man 2 iOS IPA (temporary private runner only)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g72_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g72_owner/owner_original.ipa ||
+          gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g72_owner/owner_original.ipa
+          test "$(wc -c </tmp/g72_owner/owner_original.ipa)" -eq 248613763
+      - name: Resolve original authored sky model, native source geometry, PVR sampler claims
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g72_sky_light/g72_original_sky_source_audit.py \
+            --ipa /tmp/g72_owner/owner_original.ipa \
+            --out /tmp/G72_ORIGINAL_C1L1_SKY_NATIVE_METADATA.json
+          rm -f /tmp/g72_owner/owner_original.ipa
+          python3 - <<'PY'
+          import json
+          p=json.load(open('/tmp/G72_ORIGINAL_C1L1_SKY_NATIVE_METADATA.json'))
+          assert p['source_model']=='C1L1_sky_001.bdae'
+          assert p['original_resource_ID']==22
+          assert p['source_sky_total_triangles']>0
+          assert not p['true_native_shader_and_color_semantics_proven']
+          print('PASS G72 original actual native 2010 sky source parsed, shader attribution still separate')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G72_Original_2010_Expo_Sky_C1L1_sky_001_Authored_Model_Metadata_ONLY
+          path: /tmp/G72_ORIGINAL_C1L1_SKY_NATIVE_METADATA.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Delete original owner IPA if prior stage failed
+        if: always()
+        run: rm -rf /tmp/g72_owner
