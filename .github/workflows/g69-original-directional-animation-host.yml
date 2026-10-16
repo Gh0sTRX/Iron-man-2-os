@@ -1,0 +1,36 @@
+name: G69 verified-device QA original directional motion host gate - NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g69-original-directional-animation-host.yml"
+      - "research/b24_unified/g69_device_qa/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g69_original_motion_policy:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate recovered 2010 source animation filenames
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          policy=Path('research/b24_unified/g69_device_qa/g69_motion_policy.h').read_text()
+          catalog=Path('research/B18_COMPLETE_304_PLAYER_ANIMATIONS_CATALOG_TR.md').read_text()
+          names=set(re.findall(r'"(Iron[mM]an_[^"]+\.anim)"',policy))
+          assert len(names)>=13,names
+          missing=[n for n in names if ('`'+n+'`') not in catalog]
+          assert not missing,missing
+          print('PASS G69 directional pose IDs all truly appear in original source 2010 animation catalog:',len(names))
+          PY
+      - name: Compile C11 native motion selector and 4-way regression
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic research/b24_unified/g69_device_qa/test_g69_motion_policy.c -lm -o /tmp/g69_test
+          /tmp/g69_test
+      - name: Keep legacy B24 G8 multi-direction animation baseline working
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I research/b24_unified research/b24_unified/test_b24_g8_live_original_motion.c research/b24_unified/b24_g8_live_original_motion.c -lm -o /tmp/g8_motion_test
+          /tmp/g8_motion_test
