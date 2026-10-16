@@ -19,7 +19,7 @@ def audit(ipa,out):
  sc=sorted(original['source_2010_class_schema'],key=lambda x:x['original_class_name_file_offset'])
  tokens=[]
  for pos,q in enumerate(sc):
-  if q['original_class_id'] not in (104,107,108):continue
+  # G81 also inspect nested projectile and damage class field definitions.
   end=sc[pos+1]['original_class_name_file_offset']-6 if pos+1<len(sc) else 38719
   start=q['original_class_name_file_offset']+len(q['original_class_name'])
   fields=[]
@@ -35,6 +35,9 @@ def audit(ipa,out):
        struct.unpack_from('<H',raw,a-4)[0],
       'native_tag_candidate_at_name_minus_7':struct.unpack_from('<H',raw,a-7)[0] if a>=8 and raw[a-8]==1 else None,
       'native_value_type_or_size_NOT_proven':True})
+  if q['original_class_id'] not in (104,107,108) and not any(
+      KEYWORDS.search(v['source_property']) for v in fields):
+   continue
   tokens.append({'class_id':q['original_class_id'],
     'source_class_name':q['original_class_name'],
     'schema_byte_region_start':start,
@@ -56,7 +59,7 @@ def audit(ipa,out):
    if size not in (1,2,4,8,12,16):continue
    # Source schema class tag uniqueness will be established downstream.
    for schema in tokens:
-    if schema['class_id']!=obj['original_class_id']:continue
+    # Source nested property class may differ from owning Attack class.
     same=[v for v in schema['native_schema_field_names'] if
          v['native_tag_candidate_at_name_minus_7']==tag]
     if not same:continue
@@ -69,6 +72,8 @@ def audit(ipa,out):
     else:value_i32=None;value_float=None
     possibles.append({'offset_into_instance_bytes':p,'original_native_property_tag':tag,
       'matching_original_schema_properties':[v['source_property'] for v in same],
+       'defining_native_schema_class_id':schema['class_id'],
+       'defining_native_schema_class_name':schema['source_class_name'],
       'native_field_payload_size_bytes':size,
       'raw_original_value_i32_candidate':value_i32,
       'raw_original_value_f32_candidate':value_float,
