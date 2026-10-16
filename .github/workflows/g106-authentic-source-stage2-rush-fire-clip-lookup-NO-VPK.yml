@@ -1,0 +1,38 @@
+name: G106 original 2010 MarkV Stage2 Rush Repulsor owner 248 real clip inventory
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g106-authentic-source-stage2-rush-fire-clip-lookup-NO-VPK.yml"]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_native_source_fire_clip_inventory:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g106_source_248
+      - name: Prove exact authentic stage2 rush flying and aim attack clip names
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          base=Path('/tmp/g106_source_248/g85_real_markv_animations')
+          f=sorted(base.glob('suitcase_ironman_*.im2v'))
+          assert len(f)==248,len(f)
+          for x in f:
+           name=x.stem
+           if any(w in name for w in ('fly','rush','_att','aim_float')):
+            b=x.read_bytes()
+            magic,n,frames,fps,ms=struct.unpack_from('<4sIIII',b)
+            assert magic==b'IM2V' and n==629 and fps==20
+            print('ORIGINAL_G106_CLIP',name,'duration',ms,'frames',frames)
+          print('G106_PROVEN_ALL_248',len(f))
+          PY
