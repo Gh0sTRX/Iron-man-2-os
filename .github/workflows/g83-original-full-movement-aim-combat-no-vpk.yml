@@ -31,6 +31,20 @@ jobs:
             research/b24_unified/g83_full_motion_aim/test_g83_original_movement_aim_combat.c \
             -lm -o /tmp/g83_original_combat_and_motion
           /tmp/g83_original_combat_and_motion
+      - name: Verify original G81 authored one-shot motion and shot durations with G82 input priorities
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g83_authored_timing
+          /tmp/g83_authored_timing
       - name: Vita ARM SOURCE compile (no app ELF and no VPK)
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
@@ -39,6 +53,11 @@ jobs:
               -I research/b24_unified \
               -c research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
               -o /tmp/g83_unified_motion_ARM.o
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+              -I research/b24_unified \
+              -c research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+              -o /tmp/g83_authentic_timed_router_ARM.o
+            test -s /tmp/g83_authentic_timed_router_ARM.o
             test -s /tmp/g83_unified_motion_ARM.o
             echo "PASS G83 original source 2010 flight walk aim combat coordinator compiled PS Vita ARM object; no Vita app/VPK"
           '
