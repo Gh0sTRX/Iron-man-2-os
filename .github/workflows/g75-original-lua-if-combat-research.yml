@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g75-original-lua-if-combat-research.yml"
       - "research/b24_unified/g75_device_qa/g75_2010_lua_original_if_combat_probe.py"
+      - "research/b24_unified/g75_device_qa/g75_2010_attack_conditions_opcode_context.py"
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,11 +28,16 @@ jobs:
           python3 research/b24_unified/g75_device_qa/g75_2010_lua_original_if_combat_probe.py \
            --ipa /tmp/g75_owner_lua/owned_original.ipa \
            --out /tmp/g75_owner_lua_results.json
+          python3 research/b24_unified/g75_device_qa/g75_2010_attack_conditions_opcode_context.py \
+           --ipa /tmp/g75_owner_lua/owned_original.ipa \
+           --out /tmp/g75_owner_attack_conditions.json
           rm -rf /tmp/g75_owner_lua
       - uses: actions/upload-artifact@v4
         with:
           name: G75_Genuine_2010_Level1_71_LUA_If_Branches_Combat_Engine_Callsite_Metadata_NO_VPK
-          path: /tmp/g75_owner_lua_results.json
+          path: |
+            /tmp/g75_owner_lua_results.json
+            /tmp/g75_owner_attack_conditions.json
           retention-days: 14
           if-no-files-found: error
       - name: Scrub owner original source file after fail
