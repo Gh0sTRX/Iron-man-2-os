@@ -67,7 +67,7 @@ jobs:
             Path('research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c').read_text()))
           originals=[n for n in names if n.startswith('ironman_')]
           assert originals
-          absent=[n for n in originals if not Path('work/animations/suitcase_'+n+'.im2v').exists()]
+          absent=[n for n in originals if not Path('work/animations/suitcase_'+n.removeprefix('ironman_')+'.im2v').exists()]
           assert not absent,absent
           main=Path('work/src/main.c').read_text()
           assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
