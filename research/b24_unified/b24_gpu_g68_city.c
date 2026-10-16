@@ -14,7 +14,7 @@ _Static_assert(sizeof(B24G68Batch)==16,"G68 16-byte material batch changed");
 static int exact(FILE *f,void *dst,size_t n) {
  return f && fread(dst,1,n,f)==n;
 }
-static int texture_load(uint32_t *tex,const char *filename){
+static int texture_load(uint32_t *tex,uint8_t *has_alpha,const char *filename){
  FILE *f=fopen(filename,"rb");
  if(!f)return 0;
  unsigned char magic[4];uint32_t data[3];
@@ -29,6 +29,11 @@ static int texture_load(uint32_t *tex,const char *filename){
    free(rgba);fclose(f);return 0;
  }
  fclose(f);
+ /* One-time startup scan, not repeated per frame. This is based on the
+  * authentic source PVR decoded alpha channel, never guessed material names.
+  * No extra VRAM, no extra per-frame texture copies. */
+ *has_alpha=0u;
+ for(size_t k=3;k<bytes;k+=4u)if(rgba[k]!=255u){*has_alpha=1u;break;}
  GLuint id=0;glGenTextures(1,&id);
  if(!id){free(rgba);return 0;}
  glBindTexture(GL_TEXTURE_2D,id);
@@ -95,7 +100,7 @@ int b24_g68_city_open(B24G68City *m,
  for(unsigned i=0;i<m->texture_count;i++){
    char name[256];
    if(snprintf(name,sizeof(name),"%s_tex_%02u.g66t",texture_prefix,i)
-      >=(int)sizeof(name)||!texture_load(&m->texture_ids[i],name)){
+      >=(int)sizeof(name)||!texture_load(&m->texture_ids[i],&m->material_has_alpha[i],name)){
      b24_g68_city_close(m);return 0;
    }
  }
@@ -104,10 +109,19 @@ int b24_g68_city_open(B24G68City *m,
 int b24_g68_city_draw(const B24G68City *m){
  if(!m||!m->ready||!m->vbo)return 0;
  glEnable(GL_DEPTH_TEST);glDepthFunc(GL_LESS);
- /* Preserve G68 photographed blending baseline until alpha A/B test.
-  * Native 2010 original shader/sort isn't recovered yet. */
+ /* Opt-in G71 source-alpha A/B: original G70 photographed rendering is
+  * untouched when disabled. Source alpha is scanned at initial texture load.
+  * Opaque first with depth write; transparent second WITHOUT depth write:
+  * invisible alpha=0 leaf polygons can no longer hide opaque scenery.
+  * Real original blended ordering / shaders still NOT verified on device.
+  * No extra VBO, 0 new textures, 32+32 cheap group checks per frame. */
+#ifdef B24_G71_ALPHA_PASSES
+ glDisable(GL_BLEND);
+ glDepthMask(GL_TRUE);
+#else
  glEnable(GL_BLEND);
  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+#endif
  glColor4f(1.f,1.f,1.f,1.f);
  glBindBuffer(GL_ARRAY_BUFFER,(GLuint)m->vbo);
  glEnableClientState(GL_VERTEX_ARRAY);
@@ -116,14 +130,31 @@ int b24_g68_city_draw(const B24G68City *m){
  glTexCoordPointer(2,GL_FLOAT,sizeof(G68Vtx),(const void *)(uintptr_t)12);
  glEnableClientState(GL_COLOR_ARRAY);
  glColorPointer(4,GL_UNSIGNED_BYTE,sizeof(G68Vtx),(const void *)(uintptr_t)20);
+#ifdef B24_G71_ALPHA_PASSES
+ for(unsigned pass=0;pass<2;pass++){
+   if(pass==1){
+     glDepthMask(GL_FALSE);
+     glEnable(GL_BLEND);
+     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+   }
+#endif
  for(unsigned i=0;i<m->batch_count;i++){
    const B24G68Batch *b=&m->batches[i];
+#ifdef B24_G71_ALPHA_PASSES
+   const int translucent=b->tex!=UINT32_MAX && m->material_has_alpha[b->tex];
+   if(translucent!=(int)pass)continue;
+#endif
    if(b->tex!=UINT32_MAX){
      glEnable(GL_TEXTURE_2D);
      glBindTexture(GL_TEXTURE_2D,(GLuint)m->texture_ids[b->tex]);
    }else glDisable(GL_TEXTURE_2D);
    glDrawArrays(GL_TRIANGLES,(GLint)b->first,(GLsizei)b->count);
  }
+#ifdef B24_G71_ALPHA_PASSES
+ }
+ glDepthMask(GL_TRUE);
+ glDisable(GL_BLEND); /* HUD/armor establish their own explicit GL states. */
+#endif
  glDisableClientState(GL_COLOR_ARRAY);
  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
  glDisableClientState(GL_VERTEX_ARRAY);
