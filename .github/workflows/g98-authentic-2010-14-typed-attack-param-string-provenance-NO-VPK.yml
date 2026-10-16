@@ -28,11 +28,25 @@ jobs:
           set -euo pipefail
           python3 research/b24_unified/g97_source_attack_hit/g98_actual_native_AttackEntity_typed_property_string_refs.py \
             --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
+          python3 research/b24_unified/g97_source_attack_hit/g100_native_original_level1_damage_field_serialized_probe.py \
+            --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
           python3 - <<'PY'
           import json
           from pathlib import Path
           d=json.loads(Path('/tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json').read_text())
           assert d['source_original_2010_int_and_bool_GetParamValue_call_total']==14
+          assert d['exact_source_r1_argument_cstrings_proven_count']==14
+          dm=[x for x in d['native_typed_GetParamValue_call_sites'] if x['proven_r1_argument_original_cstring']['original_key_name']=='Damage']
+          assert len(dm)==1
+          assert dm[0]['actual_original_cpp_GetParamValue_expected_type']=='int*'
+          assert dm[0]['verified_native_int_bool_output_destination_r2']==[{
+            'native_argument_r2_base_register':'r4',
+            'native_argument_r2_offset_hex':'0x60',
+            'relative_ARM_code_offset':'0x114'
+          }]
+          original=json.loads(Path('/tmp/g98_source_metadata/G100_ORIGINAL_2010_LEVEL1_CLASS108_26_ATTACK_RECORD_SCHEMA_WINDOWS.json').read_text())
+          assert original['real_attack_entity_count']==26
+          assert original['per_attack_original_damage_values_proven'] is False
           assert len(d['native_typed_GetParamValue_call_sites'])==14
           assert d['exact_original_per_attack_Damage_values_and_serialized_tlv_NOT_DECODDED'] is True
           assert d['No_fake_original_weapon_damage'] is True
@@ -47,6 +61,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: G98_ORIGINAL_2010_ATTACKENTITY_14_GETPARAMVALUE_REAL_TYPED_PROPERTY_SOURCE_META_NO_VPK
-          path: /tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json
+          path: |
+            /tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json
+            /tmp/g98_source_metadata/G100_ORIGINAL_2010_LEVEL1_CLASS108_26_ATTACK_RECORD_SCHEMA_WINDOWS.json
           retention-days: 14
           if-no-files-found: error
