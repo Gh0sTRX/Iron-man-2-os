@@ -26,6 +26,20 @@ static int b24_runtime_hud_draw(void *userdata){
 }
 int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  if(!r||r->initialized||!city_file)return 0;
+#ifdef B24_G68_CITY_BACKEND
+ /* REVERSE MERGE: G9/B17 gameplay engine remains authoritative. Only the
+  * G68 native PVR city is injected after initializing the ONE VitaGL owner.
+  * No second G68 standalone update/physics/player/mission is instantiated. */
+ (void)b24_gpu_boot_trace_mark("20 G68_SOURCE_RENDER_BEGIN");
+ if(!b24_gpu_owner_init(&r->owner,0))return 0;
+ if(!b24_g68_city_open(&r->g68_city,
+       "app0:assets/G66_city.g66m","app0:assets/G66_city")){
+   (void)b24_gpu_boot_trace_mark("20 G68_SOURCE_RENDER_FAILED");
+   b24_g68_city_close(&r->g68_city);
+   return 0;
+ }
+ (void)b24_gpu_boot_trace_mark("22 G68_SOURCE_CITY_READY");
+#else
  (void)b24_gpu_boot_trace_mark("20 C1G2_LOAD_BEGIN");
  if(!b24_gpu_c1_load(&r->city,city_file)){
   (void)b24_gpu_boot_trace_mark("20 C1G2_LOAD_FAILED");
@@ -47,18 +61,26 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
   b24_c1_uv_free(&r->city_uv);
   b24_gpu_c1_free(&r->city);return 0;
  }
+#endif
  /* Only the original B12 C1L1_Vehicles image, converted privately to C1TX.
     If absent, stay with diagnostic car colors and do not invent textures. */
+#ifndef B24_G68_CITY_BACKEND
  if(r->city_uv.loaded)
   (void)b24_gpu_c1_vehicle_atlas_open(&r->verified_vehicle_atlas,
                                       "app0:maps/C1L1_Vehicles.c1tx");
+#endif
 #ifndef B24_GPU_NATIVE_HUD
  /* Source-only comparison mode: old bitmap B22/B23 HUD retained. */
  if(!b24_gpu_hud_bridge_prepare(&r->hud)){
   b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
   b24_c1_material_source_free(&r->city_material);
   b24_c1_uv_free(&r->city_uv);
-  b24_gpu_c1_free(&r->city);return 0;
+#ifdef B24_G68_CITY_BACKEND
+  b24_g68_city_close(&r->g68_city);
+#else
+  b24_gpu_c1_free(&r->city);
+#endif
+  return 0;
  }
 #endif
  (void)b24_gpu_boot_trace_mark("33 GPU_RUNTIME_OPEN_OK");
@@ -122,9 +144,13 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
  if(!r->frames)(void)b24_gpu_boot_trace_mark("43 SCENE_FRAME_BEGIN");
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
+#ifdef B24_G68_CITY_BACKEND
+ if(!b24_gpu_owner_scene_g68(&r->owner,&r->g68_city))return 0;
+#else
  if(!b24_gpu_owner_scene_material(&r->owner,&r->city,
             r->city_uv.loaded?&r->city_uv:NULL,
             r->verified_vehicle_atlas))return 0;
+#endif
  if(!r->frames)(void)b24_gpu_boot_trace_mark("44 SCENE_DRAW_OK");
  b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
  /* Original B24 CPU flight stage drives the SAME animated armor GPU root.
@@ -154,7 +180,11 @@ void b24_gpu_runtime_close(B24GpuRuntime *r){
  b24_gpu_c1_vehicle_atlas_close(&r->verified_vehicle_atlas);
  b24_c1_material_source_free(&r->city_material);
  b24_c1_uv_free(&r->city_uv);
+#ifdef B24_G68_CITY_BACKEND
+ b24_g68_city_close(&r->g68_city);
+#else
  b24_gpu_c1_free(&r->city);
+#endif
  /* vitaGL has no stable public vglEnd in current upstream header.
     Keep shutdown OS-owned and do not attempt a second SDL GPU teardown. */
  memset(r,0,sizeof(*r));
