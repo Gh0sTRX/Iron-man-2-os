@@ -7,6 +7,7 @@ on:
       - "research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py"
       - "research/b24_unified/g85_markv_full_moveset/test_g85_all_248_markv_true_G8_im2v_stream.c"
       - "research/b24_unified/g85_markv_full_moveset/test_g86_real_markv_repulsor_animation_one_shot.c"
+      - "research/b24_unified/g85_markv_full_moveset/test_g86_markv_original_3_combo_animation.c"
   workflow_dispatch:
 permissions:
   contents: read
@@ -101,6 +102,19 @@ jobs:
             research/b24_unified/g85_markv_full_moveset/test_g86_real_markv_repulsor_animation_one_shot.c \
             -lm -o /tmp/g86_real_markv_source_repulsor
           /tmp/g86_real_markv_source_repulsor work/animations
+      - name: G86B verify original 2010 Mark V buffered 3-stage melee combo G8 real animation streams
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g85_markv_full_moveset/test_g86_markv_original_3_combo_animation.c \
+            -lm -o /tmp/g86_markv_real_combo
+          /tmp/g86_markv_real_combo work/animations
       - name: Source-only G85 enabled old B24 game main and G8/G83 actual C11 syntax QA
         run: |
           set -euo pipefail
