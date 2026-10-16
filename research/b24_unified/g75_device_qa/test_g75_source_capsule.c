@@ -27,7 +27,7 @@ int main(int argc,char **argv){
  /* Flight should not teleport arbitrary long-distance/out of source world. */
  assert(b24_g75_capsule_reconcile(&world,330.f,0.f,.0725f,
    332.f,0.f,.0725f,0,.35f,2.24f,&x,&y,&z));
- assert(x<=330.01f);
+ assert(x<=331.f-.35f+.001f); /* G67 actual edge is 331-radius; B14 world clamp is 330 separately */
  /* Rejected bad input never mutates output pointers. */
  float tx=1.f,ty=2.f,tz=3.f;
  assert(!b24_g75_capsule_reconcile(&world,NAN,0,0,1,2,3,1,.35f,2.24f,&tx,&ty,&tz));
