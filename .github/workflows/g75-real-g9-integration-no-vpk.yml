@@ -1,0 +1,76 @@
+name: G75 Real G9 B24 G68 Source Integration Host QA No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-real-g9-integration-no-vpk.yml"
+      - "research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py"
+      - "research/b24_unified/g75_device_qa/g75_apply_to_G70_original_B24_SOURCE_ONLY.py"
+      - "research/b24_unified/g75_device_qa/g75_patch_b14_camera_and_flight_SOURCE_ONLY.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve genuine verified G9 original 363 motion stream bank
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Retrieve verified original six War Machine weapon streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Retrieve only the owner's old successful 2010 G68 scene snapshot
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Reassemble genuine B24 game source with G75 patches and STOP before packaging
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+      - name: Exercise actual full B14 original world movement with G75 tuning host binary
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -Iwork/src \
+            work/src/b14_world.c \
+            research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c \
+            -lm -o /tmp/g75_full_b14
+          /tmp/g75_full_b14
+      - name: Verify isolated original G68 source collisions and native Vita ARM syntax without making app
+        run: |
+          set -euo pipefail
+          test -s work/assets/G66_original_collision.g66c
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c -lm -o /tmp/g75_full_collision
+          /tmp/g75_full_collision work/assets/G66_original_collision.g66c
+          test -z "$(find work -iname '*.vpk' -print -quit)"
+          echo "PASS G75 G9 engine + G68 source collision integrated source-only; NO VPK"
+      - name: Upload only safe original gameplay code integration metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: G75_Actual_G9_G70_Integrated_Sources_AND_Host_QA_NO_VPK
+          path: |
+            work/src/b14_world.c
+            work/src/b14_world.h
+            work/src/main.c
+            work/CMakeLists.txt
+          retention-days: 14
+          if-no-files-found: error
