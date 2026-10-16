@@ -13,7 +13,10 @@ typedef enum {
  B24_G76_NO_HIT=0,B24_G76_PRIMARY_RESOURCE_HIT=1,
  B24_G76_SECONDARY_RESOURCE_HIT=2
 } B24G76DamageResult;
-/* This exact deterministic pure core reproduces the two native float
+/* G77 audit: +0x3BC is clamped at zero after subtraction; +0x394 can
+ * be negative after an overkill subtract (original writes raw VFP result).
+ * This isolated mathematical reference omits native callbacks and death.
+ * This deterministic pure core reproduces the two native float
  * subtraction branches when input is positive finite. It does NOT map
  * original current/max or native dispatch virtual functions. */
 B24G76DamageResult b24_g76_native_damage_reference(
