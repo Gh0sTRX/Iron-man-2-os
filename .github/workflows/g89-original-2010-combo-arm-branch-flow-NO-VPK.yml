@@ -1,0 +1,75 @@
+name: G89 Original 2010 ARM Combo Step True Branch Write Source QA NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g89-original-2010-combo-arm-branch-flow-NO-VPK.yml"
+      - "research/b24_unified/g89_original_combo_native_flow/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_arm_control_flow:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pure 2010 ARM disassembler and original owner source fetcher
+        run: python3 -m pip install -q gdown capstone
+      - name: Read user-owned exact original iOS v1.0.0 2010 IPA ephemerally
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g89_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g89_private_owner/original.ipa ||
+           gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g89_private_owner/original.ipa
+          test "$(wc -c </tmp/g89_private_owner/original.ipa)" -eq 248613763
+      - name: Trace real native ARM combo +0x824 field reads writes calls and branches, no invented hit times
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g89_original_combo_native_flow/g89_decode_original_combo_arm_field_flow.py \
+            --ipa /tmp/g89_private_owner/original.ipa --out /tmp/g89_source_metadata
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('/tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json').read_text())
+          assert data['source_2010_ARM_methods_verified']==6
+          assert data['actual_source_StartMeleeAttack_combo_0x824_operations']
+          assert data['source_native_0x824_field_accesses_are_REAL'] is True
+          assert data['original_source_hit_active_start_end_frames'] is None
+          assert data['original_source_attack_per_weapon_damage_numeric_values'] is None
+          assert data['no_VPK'] is True
+          print('PASS real source ARM read/write/condition metadata only; combat invented values NO')
+          PY
+      - name: Securely remove private original 2010 source IPA regardless of test success
+        if: always()
+        run: rm -rf /tmp/g89_private_owner
+      - name: Upload SMALL source ARM provenance metadata ONLY, no game or Vita package
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G89_ORIGINAL_2010_ARM_COMBO_0x824_FIELD_BRANCH_CONTEXT_NO_VPK
+          path: /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json
+          if-no-files-found: error
+          retention-days: 14
+  old_b24_release_gate_still_blocked:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify strict VPK gate fails while original 2010 melee hitframes and damage are unknown
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g83_final_vpk_gate/g83_source_completeness_before_vpk.py \
+            --status research/b24_unified/g83_final_vpk_gate/READINESS_STATUS.json --strict &&
+            { echo "ERROR: Should not permit VPK"; exit 1; } || true
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path('research/b24_unified/g83_final_vpk_gate/READINESS_STATUS.json').read_text())
+          gates=state['gates']
+          for key in ('original_combo_power_counter_throw_grab_input_transition_conditions_verified',
+                      'original_repulsor_missile_unibeam_damage_and_hit_frames_verified',
+                      'original_WeaponDB_per_attack_damage_and_projectile_values_typed_from_2010_26_attacks'):
+              assert gates[key]['verified'] is False
+          print('PASS: source-only G89 never approves unknown source hit frame, damage or combo branches')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
