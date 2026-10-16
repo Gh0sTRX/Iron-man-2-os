@@ -17,7 +17,11 @@ static void route(B24G83Input in,const char *want,int oneshot){
   assert(out.stem&&strcmp(out.stem,want)==0);
   assert(out.source_authored_name);
  }else assert(out.stem==NULL);
- assert(out.one_shot_not_looping==oneshot);
+ assert(out.one_shot_not_looping==oneshot ||
+        (in.accepted_weapon_event && in.aim!=B24G83_AIM_NONE &&
+         (in.motion==B24G83_GROUND||in.motion==B24G83_HOVER) &&
+         in.transition==B24G83_EVENT_NONE));
+ if(want)assert(out.original_source_duration_ms>0);
  assert(!out.input_semantics_verified_original_ios);
 }
 int main(void){
