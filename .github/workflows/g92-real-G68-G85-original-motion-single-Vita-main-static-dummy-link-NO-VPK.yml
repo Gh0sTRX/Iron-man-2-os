@@ -143,11 +143,11 @@ jobs:
           assert main.count('b24_g8_motion_melee_trigger(')==1
           assert main.count('g92_debug_accepted_melee_edge=1;')==1
           assert main.count('g92_debug_accepted_melee_edge=0;')==1
-          # Original G75/G85 source versions contain either a single call
-          # or two mutually exclusive preprocessor variants, not a SECOND
-          # G92 dummy input poll.
+          # Old G75/G85/G9 main actually contains three separately guarded
+          # source melee condition occurrences. The debug target must not
+          # create a fourth. CI checks exact known assembled source here.
           count=main.count('b24_unified_should_melee(&b24_game)')
-          assert count in (1,2), ('real G8 input site count drift',count)
+          assert count==3, ('G93 original input gate count drift',count)
           assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
           assert main.count('b24_g83_timeline_tick(')==1
           assert main.count('b24_g8_motion_tick_g84(')==1
