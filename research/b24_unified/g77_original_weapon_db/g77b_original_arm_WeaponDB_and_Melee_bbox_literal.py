@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+"""G77B: exact native WeaponDB index table and Actor::TestMeleeHit radius scale.
+2010 source IPA read-only. No original code/assets exported; verified targeted
+ARM instructions and authored literal data only. No proprietary VPK output.
+"""
+from __future__ import annotations
+import argparse,subprocess,json,struct,math,zipfile
+from pathlib import Path
+import capstone
+from capstone.arm import ARM_OP_MEM,ARM_OP_REG,ARM_REG_PC
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'g76_original_combat'))
+from g76_2010_native_arm_combat_method_provenance import parse_macho
+
+TARGET=('Actor::TestMeleeHit(Actor*)','WeaponDB::GetAttackEntityByIndex(int)',
+        'WeaponDB::FindWeaponEntityById(int)','WeaponDB::GetInstance()',
+        'MainCharacter::GetCurrentMeleeAttackStep() const',
+        'Actor::CanBeHurt(Actor*)','Actor::Damage(float)')
+def main(ipa,out):
+ with zipfile.ZipFile(ipa) as z:
+  raw=z.read('Payload/IronMan2.app/IronMan2')
+ parsed=parse_macho(raw)
+ syms=parsed['entries']
+ dem=subprocess.run(['c++filt'],input='\n'.join(x[0] for x in syms)+'\n',
+                     capture_output=True,text=True,check=True).stdout.splitlines()
+ if len(dem)!=len(syms):raise ValueError('demangler names mismatch')
+ exact={}
+ for row,name in zip(syms,dem):
+  if name in TARGET and row[1]:
+   if name in exact and exact[name][1]!=row[1]:raise ValueError('multiple native C++ same method addresses')
+   exact[name]=row
+ if not ('Actor::TestMeleeHit(Actor*)' in exact and 'WeaponDB::GetAttackEntityByIndex(int)' in exact):
+  raise ValueError('2010 native expected Actor/WeaponDB method absent')
+ segments=[]
+ for addr,sz,off,sn,seg in parsed['sections']:
+  if sn=='__text':segments.append((addr,sz,off))
+ def section_offset(virtual):
+  a=virtual&~1
+  for vm,sz,off in segments:
+   if vm<=a<vm+sz:
+    ofs=off+a-vm
+    if ofs>=len(raw):raise ValueError('file is truncated')
+    return ofs
+  raise ValueError('expected 2010 ARM text location not mapped')
+ decoder=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM)
+ decoder.detail=True
+ results={}
+ for name in TARGET:
+  if name not in exact:continue
+  row=exact[name];addr=row[1]&~1
+  if row[1]&1: raise ValueError('target instruction needs thumb-aware mode')
+  size=0x180 if name.startswith('Actor::TestMeleeHit') else 0x60
+  inst=list(decoder.disasm(raw[section_offset(addr):section_offset(addr)+size],addr))
+  results[name]={'native_address_hex':hex(addr),
+                 'entry_instructions':[
+                   {'pc_rel':hex(i.address-addr),'operation':i.mnemonic,
+                    'arguments':i.op_str} for i in inst[:35]]}
+  if name=='Actor::TestMeleeHit(Actor*)':
+   at=addr+0x20
+   start=next((i for i in inst if i.address==at),None)
+   if not start or start.mnemonic!='vldr' or len(start.operands)<2:
+    raise ValueError('original native melee factor instruction changed')
+   op=start.operands[1]
+   if op.type!=ARM_OP_MEM or op.mem.base!=ARM_REG_PC:
+    raise ValueError('not original native PC-relative factor')
+   literal=((start.address+8)&~3)+op.mem.disp
+   factor=struct.unpack_from('<f',raw,section_offset(literal))[0]
+   if not math.isfinite(factor) or not .001<factor<100:raise ValueError('unknown native melee extent factor')
+   results[name]['source_original_bbox_extent_scale_literal']={
+     'pc_relative_source_literal_address':hex(literal),
+     'original_raw_float32':factor,
+     'source_assembly':'vldr s16,[pc,#0x110] and 2× bbox extent norms',
+     'caller_melee_distance_check_via_model_bbox':True,
+     'not_hit_animation_frame_or_damage_strength':True}
+  if name=='WeaponDB::GetAttackEntityByIndex(int)':
+   target_ops={'+0x10':'ldr r3, [r0, #0x38]', '+0x1c':'ldr r0, [r0, #0x30]',
+               '+0x20':'ldr r0, [r0, r1, lsl #2]'}
+   for ofs,check in target_ops.items():
+    match=next((i for i in inst if i.address==addr+int(ofs,16)),None)
+    if not match or (match.mnemonic+' '+match.op_str)!=check:
+     raise ValueError('real original native WeaponDB array lookup differs '+ofs)
+   results[name]['native_data_structure']={
+    'native_offset_attack_entry_ptr_array':hex(0x30),
+    'native_offset_attack_entry_count':hex(0x38),
+    'index_stride_bytes':4,
+    'native_return_for_out_of_bounds':'NULL',
+    'actual_weapon_power_stat_recovered':False}
+ result={'origin':'original unencrypted Gameloft 2010 iOS ARM Mach-O read-only',
+         'exact_target_methods':results,
+         'native_melee_model_bbox_scale_verified':'Actor::TestMeleeHit(Actor*)' in results,
+         'native_weapon_array_layout_verified':'WeaponDB::GetAttackEntityByIndex(int)' in results,
+         'damage_numbers_recovered':False,'no_VPK':True}
+ out.mkdir(parents=True,exist_ok=True)
+ (out/'G77B_ORIGINAL_ARM_MELEE_BOUNDING_RADIUS_AND_WEAPON_DB_LAYOUT.json').write_text(json.dumps(result,indent=2)+'\n')
+ print('PASS G77B original native WeaponDB array source +0x30/+0x38 and original model melee geometric scalar',
+       results['Actor::TestMeleeHit(Actor*)']['source_original_bbox_extent_scale_literal']['original_raw_float32'])
+ print('No original attack damage or contact frame inferred')
+if __name__=='__main__':
+ p=argparse.ArgumentParser()
+ p.add_argument('--ipa',required=True,type=Path)
+ p.add_argument('--out',required=True,type=Path)
+ a=p.parse_args();main(a.ipa,a.out)
