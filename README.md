@@ -2,7 +2,7 @@
 
 **Projenin hedefi:** Gameloft'un özgün **Iron Man 2 iOS (2010, sürüm 1.0.0)** oyununu, kaynak oyun geometrisi, materyalleri, animasyonları ve görevleri korunarak PS Vita'da çalıştırmak. Mevcut çalışma **özel araştırma/deneysel homebrew** aşamasındadır; henüz tamamlanmış bir oyun portu **değildir**.
 
-> **Güncel durum — 16 Ekim 2026 (G62 orijinal touchHLE C1L1 çalıştırıldı; G64 20.457 özgün UV+PVR üçgen doğrulandı; portun haritası henüz tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
+> **Güncel durum — 16 Ekim 2026 (G62 orijinal touchHLE C1L1 çalıştırıldı; G65 22.021 özgün UV+PVR üçgen ve kürelerin gerçek UV'si doğrulandı; portun haritası henüz tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
 
 ## Hızlı durum özeti
 
@@ -75,7 +75,7 @@ Diğer ilgili projeler: [Shadow Guardian Vita](https://github.com/MetalSyntax/Sh
 
 Mevcut **`main`** dalında eski **Asset Beta** denemesi (`source/IronMan2_Vita_GitHub_Ready_CI.zip`) ve ilgili `Build Iron Man 2 Vita Asset Beta` GitHub Actions iş akışı bulunur. Bu, dört zırh modelini gösteren ayrı bir deneysel görüntüleyicidir; **bugünkü C1L1 harita analiziyle veya tamamlanmış portla karıştırılmamalıdır**.
 
-Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`feature/b24-unified-gameplay`** dalındadır. G48–G64 araştırma testleri yeni cihaz VPK'sı oluşturmaz. Sonraki gerçek Vita sürümünün FPS'i veya sahne doğruluğu cihazda yeniden test edilmedikçe kesin kabul edilmez.
+Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`feature/b24-unified-gameplay`** dalındadır. G48–G65 araştırma testleri yeni cihaz VPK'sı oluşturmaz. Sonraki gerçek Vita sürümünün FPS'i veya sahne doğruluğu cihazda yeniden test edilmedikçe kesin kabul edilmez.
 
 
 ## G58–G59 (16 Ekim 2026) — Gerçek dokulu harita ışığı ve ilk oynanabilir için collision
@@ -83,6 +83,16 @@ Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`featur
 - **G58A CI SUCCESS:** [GitHub Actions](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38816435046). Tam olarak G55/G57 kaynak geometri ve 24 PVR atlasına ait 296 mesh/22.441 üçgen/18.774 kaynak UV+PVR üçgen korunarak host WebGL2 güneş/yön/ortam/pozlama/akşam ve atmosfer shader kontrolleri üretildi. Özgün CLARA Sun001–Sun004 yerel konum ve quaternion kayıtları korunuyor, fakat oyundaki gerçek kaynak ışık ve renk/yoğunluk/shader semantiği **çözülmedi**. 24 PVR'nin 23'ü tamamen opak, yalnız c1l1_earth.tga kaynak alfa pikselleri içerir; alfa-testin özgün oyun davranışı henüz kanıtlanmadı. Ayrı G58 deneysel GPU shadow-map önizlemesi için **gerçek WebGL2 ve PS Vita GPU testi yoktur**.
 - **G59 CI SUCCESS:** [GitHub Actions](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38816779782). B11 özgün kaynak arşivinde C1L1_floor_001 (1 mesh, 2 üçgen), C1L1_col_01 (1 mesh, 690 üçgen) ve C1L1_building_col (17 mesh, 1.218 üçgen) doğrudan parse edildi: toplam **19 collision mesh / 2.146 vertex / 1.910 kaynak üçgen**. Yalnız host abs(normal.z) tanısı: 188 yatay, 32 eğimli, 1.690 duvar yüzeyi; native fizik motorunun gerçek yürünebilirlik eşikleri veya root transforms **kanıtlanmadı**. JSON ve collision GLB oluşturulabiliyor.
 - **İlk oynanabilir C1L1 demo yol haritası:** G55/G57 kaynak şehir mesh+atlasını G8 tek GPU render yoluyla birleştir, G59 kaynağından motor için collision ray/sweep ve oyuncu yere temasını host test et, gerçek üçüncü şahıs omuzüstü kamera (flight stage 2 / RUSH merkez geçişi) ve özgün Mark VI hareket/animasyonlarını bağla, kaynak Mission000 başlangıcı koşullarını uygula; ardından tek bir anlamlı Vita cihaz test paketi. **Oynanabilirlik, Vita FPS veya orijinal runtime shader tamamlandı iddiası yok.** G56 kalan 74 özel ışık mesh, alpha/emissive/blend, üst scene root ve gerçek motor görünürlüğü açık işlerdir.
+
+## G65 — Özgün BRES FVF24 vertex RGB/UV sorunu çözüldü (16 Ekim 2026)
+
+**[G65 GitHub Actions SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876094386)** · [g65 gerçek kaynak FVF24 byte scanner](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py). G64'te kalan sorun **özgün 24 bayt vertex biçiminin atlanmasıymış**: `XYZ float32 (0..11)`, `RGBA u8 (12..15)`, `UV float32 (16..23)`. Eski ayrıştırıcı 24B mesh UV'lerini sıfır olarak sunuyordu; **128 bağlantılı mesh / 2.764 vertex / 1.866 üçgenin** eksik kanalları orijinal kullanıcı B11 kaynak arşivindeki gerçek kayıtlardan yeniden okundu.
+
+- Küreler: `Material__20` **408** ve `Material__21` **290** olmak üzere **698 üçgenin orijinal UV'si mevcut**; önceki G61/G64 “orijinal küre UV yok” varsayımı **geçersiz/superseded**. `C1L1_earth02.tga` ve `C1L1_earth.tga` için daha önce çözülmüş gerçek native shader atlas indeksleri şimdi gerçek 24B UV stream'ine bağlanabilir. Procedural spherical UV **uygulanmadı**.
+- Diğer özel yüzeyler: `Material__17` 384, `Material__19` 176, `Material__15` 92, `Material__13` 186, `Material__22` 20, `Material__23` 8 kaynak doku/UV ilişkileri ayrıştırılabiliyor. `Material__46` **288** üçgende PVR sampler henüz kanıtlanmadı; **gerçek native vertex RGBA** mevcut. `Standard_16dd` **132** üçgende UV stream var ancak kaynak U/V sabit olduğundan özel sampler/çizim davranışı hâlâ açık.
+- Kaynak-temelli özel host önizlemesi: G64'ün **20.457** gerçek UV+PVR üçgenine **1.564** ilave kaynak UV+PVR üçgeni katıldı: **22.021 / 22.441**. Geriye **132 native sabit-UV** ve **288 native RGBA-only** üçgen kalıyor. Tek bir üçgen için bile yeni mesh veya sahte UV uydurulmadı; özgün XYZ/index/world source korunuyor. Haritada 74 kaynak özel mesh (478 üçgen) hâlâ ana parent/root zincirine bağlı değil.
+- G65 yerel işlem aracı kullanıcıya ait orijinal IPA'dan **7 ilave gerçek PVR atlası** (`c1l1_building2`, `C1L1_earth02`, `C1L1_ground_light`, `C1L1_road4`, `C1L1_tree`, `C1L1_trees`, `C1L1_zi`) çözüp 3B GLB, HTML ve **CPU yazılımsal kuş bakışı** çıktılarını üretti. Burada WebGL2 tarayıcı testi GPU desteği nedeniyle açılamadı; etkileşimli görüntüleyici gerçek hedef GPU'da ayrıca doğrulanmalıdır.
+- **Önemli sınır:** Orijinal Gameloft **alpha blending / draw ordering / ışıklandırma / görünürlük** henüz eşdeğer değil. touchHLE'de önceki G62 gerçek ilk bölüm ekranı doğrulandı, ancak G65 host görüntüsü **touchHLE oyun karesi değildir**. G65 CI yalnızca kaynak byte kanıtını bağımsız çalıştırır; telifli tam IPA ya da PVR görüntülerini GitHub'a commit etmez. PS Vita test/VPK yapılmadı.
 
 ## G62–G64 (16 Ekim 2026) — touchHLE gerçek oyun karşılaştırması ve 40B BRES materyal düzeltmesi
 
