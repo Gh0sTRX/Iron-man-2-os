@@ -19,7 +19,10 @@ config=yaml.safe_load(TEXT)
 steps=config["jobs"]["build"]["steps"]
 assert len(steps)>=19, "G9 recipe truncated"
 build=ROOT/"research/b24_unified/g70_reverse_merge"
-vpk="IronMan2_GPU_B24_G70_G68_WORLD.vpk"
+# Old tested G70 remains the default; G72 is a separate opt-in artifact.
+G72=os.getenv("B24_G72_NIGHT_DIAGNOSTIC")=="1"
+vpk=("IronMan2_B24_G72_Expo_Twilight_Visual_Candidate.vpk" if G72
+     else "IronMan2_GPU_B24_G70_G68_WORLD.vpk")
 expected="IronMan2_GPU_B24_G9_BETA.vpk"
 assets=ROOT/"work/assets"
 source_vpk=Path("/tmp/g70_verified_g68_world/IronMan2_B24_G68_MarkV_Expo_Combat.vpk")
@@ -27,8 +30,9 @@ source_vpk=Path("/tmp/g70_verified_g68_world/IronMan2_B24_G68_MarkV_Expo_Combat.
 def patch_script(script:str, name:str)->str:
     if expected in script:
         script=script.replace(expected,vpk)
-    script=script.replace("IM2G00034","IM2G70001")
-    script=script.replace("Iron Man 2 - GPU B24 G9 BETA","Iron Man 2 - B24 G70 Merge")
+    script=script.replace("IM2G00034","IM2G72001" if G72 else "IM2G70001")
+    script=script.replace("Iron Man 2 - GPU B24 G9 BETA",
+                          "Iron Man 2 - G72 Twilight" if G72 else "Iron Man 2 - B24 G70 Merge")
     # One and only legacy G9 source assembly. Do not copy G68 main.c.
     marker="python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py"
     if marker in script:
@@ -42,7 +46,13 @@ def patch_script(script:str, name:str)->str:
     cmake="-DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON"
     if cmake in script:
         assert script.count(cmake)==1
-        script=script.replace(cmake,cmake+" -DB24_G68_CITY_BACKEND=ON")
+        flags="-DB24_G68_CITY_BACKEND=ON"
+        if G72:
+            flags+=" -DB24_G71_ALPHA_PASSES=ON"
+            flags+=" -DB24_G72_DUSK_ATMOSPHERE=ON"
+            flags+=" -DB24_G72_SOURCE_LIGHTING=ON"
+            flags+=" -DB24_G72_DIAGNOSTIC_SKYLINE=ON"
+        script=script.replace(cmake,cmake+" "+flags)
     # Include native original G68 files in final VPK without touching older files.
     anchor="(cd work && zip -q build-vita/"+vpk+" maps/C1L1_environment.im2map"
     if anchor in script:
@@ -108,7 +118,7 @@ def validate_output():
         assert struct.unpack_from("<4I",z.read("assets/G66_city.g66m"),4)==(1,67323,32,31)
         assert struct.unpack_from("<II",z.read("assets/G66_original_collision.g66c"),4)==(1,1910)
         assert "eboot.bin" in n
-        assert b"IM2G70001" in z.read("sce_sys/param.sfo")
+        assert (b"IM2G72001" if G72 else b"IM2G70001") in z.read("sce_sys/param.sfo")
     print("G70 VERIFIED LINKED VPK",generated.stat().st_size,"SHA256",sha256(generated.read_bytes()).hexdigest(),flush=True)
     print("5 original G9 suits; 363 original IM2V; six WM streams; EXACT tested G68 31 atlases + native 1910 collision",flush=True)
 
