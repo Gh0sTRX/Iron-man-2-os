@@ -7,34 +7,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-static void record(int mode,int aim,int dir,int run,int event){
- static const float ax[]={0.f,0.f,0.f,-1.f,1.f};
- static const float ay[]={0.f,1.f,-1.f,0.f,0.f};
- B24G83Input in={0}; B24G83Selection out={0};
- in.suit_index=B24G83_MARKVI;  /* original IronMan source -> G85 Mark V re-bake */
- in.motion=(B24G83Mode)mode;in.aim=(B24G83Aim)aim;
- in.axis_x=ax[dir];in.axis_y=ay[dir];in.run=run;
- in.transition=(B24G83Event)event;
- in.grounded_contact_verified=1;
- if(!b24_g83_select_original_motion(&in,&out)||!out.stem) {
-  fprintf(stderr,"G91 real G83 route missing mode=%d aim=%d dir=%d event=%d\n",
-    mode,aim,dir,event);exit(2);
- }
- if(strncmp(out.stem,"ironman_ironman_",16)!=0)exit(3);
- printf("%s{\"key\":\"%d_%d_%d_%d_%d\",\"original_G83\":\"%s\","
-   "\"G85_markv_stream\":\"suitcase_%s\",\"2010_input_semantics_proven\":false}",
-   (mode||aim||dir||run||event)?",":"",mode,aim,dir,run,event,
-    out.stem,out.stem+8);
-}
 int main(void){
- int first=1;
  puts("{\"G83_selector_called_from_original_C\":true,"
   "\"browser_keyboard_binding_is_DIAGNOSTIC_not_original_iOS\":true,"
   "\"source_routes\":[");
  for(int mode=0;mode<4;mode++)
   for(int aim=0;aim<=1;aim++)
    for(int dir=0;dir<5;dir++){
-    if(first)first=0;else printf(",");
+    if(mode||aim||dir)printf(",");
     B24G83Input in={0};B24G83Selection out={0};
     const float ax[]={0.f,0.f,0.f,-1.f,1.f};
     const float ay[]={0.f,1.f,-1.f,0.f,0.f};
