@@ -1,0 +1,42 @@
+name: G65 original BRES FVF24 packed native RGBA UV restore no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g65-original-BRES-FVF24-real-UV-RGBA.yml"
+      - "research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify_native_fvf24_uv_rgba:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore genuine G64 material evidence for original same triangle/vertex ordering
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/g65/source /tmp/g65/out
+          gh run download 38872391947 --repo "${{ github.repository }}" \
+            -n G64_REAL_SOURCE_BRES_20457_NATIVE_UV_PVR_WEBGL2_GLB_JSON_NO_VPK \
+            -D /tmp/g65/source
+          ls -lah /tmp/g65/source
+          test -s /tmp/g65/source/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html
+          test -s research/B11_C1L1_Source_Parser.zip
+      - name: Audit and reconstruct 24 byte vertex stream directly from original BRES
+        run: |
+          python3 -m pip install -q numpy
+          python3 -m py_compile research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py
+          python3 research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py \
+            --g64html /tmp/g65/source/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html \
+            --b11zip research/B11_C1L1_Source_Parser.zip \
+            --out /tmp/g65/out/G65_ORIGINAL_2010_NATIVE_FVF24_UV_RGBA_PROOF.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G65_REAL_ORIGINAL_2010_BRES_128_FVF24_NATIVE_UV_RGBA_698_GLOBE_FACES_SOURCE_EVIDENCE
+          path: /tmp/g65/out/*.json
+          retention-days: 14
+          if-no-files-found: error
