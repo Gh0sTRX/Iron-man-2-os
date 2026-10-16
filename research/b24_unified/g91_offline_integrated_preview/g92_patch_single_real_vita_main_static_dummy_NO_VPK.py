@@ -122,7 +122,11 @@ static unsigned g92_debug_accepted_melee_edge=0;
    +indent+'#endif\n'+indent+'}')
  main=main[:found.start()]+replacement+main[found.end():]
  assert main.count('b24_g8_motion_melee_trigger(')==1
- assert main.count('b24_unified_should_melee(&b24_game)')==1
+ # G85's MarkV opt-in has TWO mutually-exclusive compile branches with
+ # identical source input condition; only ONE is live in the G92 ARM build.
+ # The dummy must NEVER add a third should_melee poll.
+ assert main.count('b24_unified_should_melee(&b24_game)')==2
+ assert 'g92_debug_accepted_melee_edge' in main
  assert main.count('g92_debug_accepted_melee_edge=1;')==1
  for name in ('b24_g10_practice_target.h','b24_g10_practice_target.c',
               'b24_g10_practice_target_vitagl.c',
