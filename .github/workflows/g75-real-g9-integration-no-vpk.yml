@@ -64,6 +64,7 @@ jobs:
           test -z "$(find work -iname '*.vpk' -print -quit)"
           echo "PASS G75 G9 engine + G68 source collision integrated source-only; NO VPK"
       - name: Upload only safe original gameplay code integration metadata
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: G75_Actual_G9_G70_Integrated_Sources_AND_Host_QA_NO_VPK
