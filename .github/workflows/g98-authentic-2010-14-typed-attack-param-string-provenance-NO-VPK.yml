@@ -1,0 +1,52 @@
+name: G98 TRUE 2010 native 14 AttackEntity int bool param names and readonly source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g98-authentic-2010-14-typed-attack-param-string-provenance-NO-VPK.yml"
+      - "research/b24_unified/g97_source_attack_hit/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_native_2010_attack_property_keys:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original ARM source reader dependencies
+        run: python3 -m pip install -q capstone gdown
+      - name: Load private original owner exact 2010 game IPA into temp only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g98_owner_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g98_owner_private/original.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g98_owner_private/original.ipa
+          test "$(wc -c </tmp/g98_owner_private/original.ipa)" -eq 248613763
+      - name: Source exact 14 typed int/bool property names from authentic 2010 MachO ARM cstring literals
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g97_source_attack_hit/g98_actual_native_AttackEntity_typed_property_string_refs.py \
+            --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json').read_text())
+          assert d['source_original_2010_int_and_bool_GetParamValue_call_total']==14
+          assert len(d['native_typed_GetParamValue_call_sites'])==14
+          assert d['exact_original_per_attack_Damage_values_and_serialized_tlv_NOT_DECODDED'] is True
+          assert d['No_fake_original_weapon_damage'] is True
+          assert d['NO_VPK'] is True
+          print('PASS verified original AttackEntity::LoadFromFile native int/bool properties; do not invent Damage values')
+          PY
+      - name: Clear private original IPA and executable even when analysis fails
+        if: always()
+        run: rm -rf /tmp/g98_owner_private
+      - name: Share ONLY original typed property names/offsets source metadata, not original executable
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G98_ORIGINAL_2010_ATTACKENTITY_14_GETPARAMVALUE_REAL_TYPED_PROPERTY_SOURCE_META_NO_VPK
+          path: /tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json
+          retention-days: 14
+          if-no-files-found: error
