@@ -112,6 +112,16 @@ Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`featur
 
 G65 gerçek kuş bakışı CPU ekran renderı kaynak BRES geometrisi, kaynak PVRTC PVR pikselleri, kaynak UV ve vertex renklerinden oluşur; ışık/blending host **yaklaşımıdır**, touchHLE oyununun gerçek çıktısı değildir. GPU/WebGL2 testinde çalışmanın tam tarayıcı çizimi henüz doğrulanmadı; Vita testi veya yeni VPK **yok**. Kod: [FVF24 kaynak denetleyicisi](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py), [G65 tüm materyal kanıt CI](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g65_original_2010_C1L1_FVF24_uv_rgba_source_audit.py). Orijinal IPA veya telifli PVR pikselleri GitHub içine yüklenmedi.
 
+## G66 — B24 G65 için ilk gerçek PS Vita oynanabilir hareket / collision betası (16 Ekim 2026)
+
+**VitaSDK CI SUCCESS:** [G66 native PS Vita build ve VPK Artifact](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38879471661). **Title ID `IM2G65001`**, çıktı adı **`IronMan2_B24_G65_Playable_Beta.vpk`**, yaklaşık **4,95 MiB**. Farklı title ID eski B24/G10/M1/M2 testlerini üzerine yazmaz. VPK **gerçek eboot.bin, SFO ve 32 kaynak texture** içerir; ZIP doğrulaması ve SDK link testi başarılıdır. Fiziksel PS Vita boot/çalışma FPS'i henüz test edilmedi.
+
+- **Gerçek G65 harita:** Kaynak 296 BRES mesh, 22.441 üçgen, 31 PVR atlası; VitaGL birleştirilmiş 32 materyal ve 67.323 çizim köşesi. G65 dönüşümleri korunur; CPU/GPU rolleri ayrıdır.
+- **Mark VI hareket:** B11 gerçek özgün 970 üçgen Mark VI modeli ve atlası, analog hareket/kamera, hover toggle, uçuş yükselme/alçalma ve RUSH. **G10 orijinal IM2V skeletal animasyonları henüz entegre değil; model harekette statik pozlu**. Mission000 ve düşman AI yok. Tam port değil, donanım doğrulaması için oynanabilir serbest dolaşım beta.
+- **Kaynak temas/collision:** G59 kaynak 19 collision mesh / 1.910 üçgen; 0,39m yatay radius; 3 yükseklikli kaynak üçgen duvar kesitleri, source floor barycentrik düşey destek, 0,22m sabit fizik alt-adımı, hızlı RUSH'ta duvarı atlama ihtimalini azaltma, kaynak collider alanı dışına çıkışı engelleme. **Kusursuz tüm duvar/tavan çarpışmaları kanıtlanmadı**, Vita cihaz testinde sınanmalı.
+- **Cihaz testi:** [README, VitaShell kurulum, kontroller ve bilinen sınırlar](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/g66_playable/README_TEST_VITA_TR.md).
+- **Kaynak:** [G66 VitaGL gameplay ve kaynak paketleme kodları](https://github.com/Gh0sTRX/Iron-man-2-os/tree/feature/b24-unified-gameplay/research/b24_unified/g66_playable), [VitaSDK CI workflow](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/.github/workflows/b24-g65-source-playable-vita-beta.yml). Kullanıcının IPA'sı GitHub deposuna commit edilmez; geçici CI kaynak dosyası derleme sonrası silinir.
+
 ## Lisans / içerik notu
 
 Oyun, karakterler, sesler, özgün modeller ve dokular ilgili hak sahiplerine aittir. Bu depo özel araştırma içindir. Orijinal IPA'yı, oyun varlıklarını veya telifli içerikleri izinsiz kamuya açık dağıtmayın.
