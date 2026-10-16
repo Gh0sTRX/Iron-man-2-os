@@ -21,7 +21,9 @@ B24G76DamageResult b24_g76_native_damage_reference(
  }
  if(actor->secondary_float_at_actor_offset_0x394>0.f){
   float val=actor->secondary_float_at_actor_offset_0x394-damage;
-  actor->secondary_float_at_actor_offset_0x394=fmaxf(0.f,val);
+  /* G77 native ARM vstr [r0,#0x394] is RAW subtract; it does NOT
+   clamp this secondary write in Actor::Damage(float). */
+  actor->secondary_float_at_actor_offset_0x394=val;
   return B24_G76_SECONDARY_RESOURCE_HIT;
  }
  return B24_G76_NO_HIT;
