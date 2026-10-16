@@ -61,18 +61,13 @@ def install():
  g8=once(g8,''' const char *shot=b24_g8_motion_repulsor_clip(suit,mode,left_x,forward);
  if(a->repulsor_pending''',''' const char *shot=b24_g8_motion_repulsor_clip(suit,mode,left_x,forward);
 #ifdef B24_G85_NATIVE_MARKV_629
- char g85_native_shot[128]={0};
  char g85_native_desired[128]={0};
  if(suit==4){
-   /* 2010 source animation binary was re-baked onto real Mark V; do not
-      attach Mark VI 802v positions to suitcase 629v geometry. */
-   const char *original=b24_g8_motion_repulsor_clip(0,mode,left_x,forward);
-   if(original){
-     if(strncmp(original,"ironman_",8)!=0)return 0;
-     int n=snprintf(g85_native_shot,sizeof(g85_native_shot),"suitcase_%s",original+8);
-     if(n<=0||(size_t)n>=sizeof(g85_native_shot))return 0;
-     shot=g85_native_shot;
-   }
+   /* Use the original IronMan source identifier at the weapon priority
+      gate. Rewrite ONCE, below, after melee/repulsor/aim priority.
+      Previously we pre-mapped this to suitcase_ and then attempted to
+      map again, causing accepted Mark V repulsor shots to fail. */
+   shot=b24_g8_motion_repulsor_clip(0,mode,left_x,forward);
  }
 #endif
  if(a->repulsor_pending''',"real original suitcase .im2v accepted repulsor clip name")
@@ -87,6 +82,11 @@ def install():
  if(!desired|| (suit==0&&nv!=802u) || (suit==2&&nv!=1292u)){''',''' if(g84_source_clip&&!melee&&!a->repulsor_pending)
    desired=g84_source_clip;
 #ifdef B24_G85_NATIVE_MARKV_629
+ /* Preserve the native accepted repulsor event BEFORE changing filename
+    from ironman_ironman_* to suitcase_ironman_*: comparing pointers
+    after format conversion cannot prove the original shot was accepted. */
+ const int g85_native_repulsor=(suit==4&&a->repulsor_pending&&shot&&
+                               desired==shot&&!melee);
  if(suit==4&&desired){
    if(strncmp(desired,"ironman_",8)!=0)return 0;
    int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
@@ -99,6 +99,13 @@ def install():
    || (suit==4&&nv!=629u)
 #endif
    ){''',"MarkV 629 source stream prefix and exact vertex guard")
+ g8=once(g8,'''  a->whole_body_repulsor_active=(a->active&&a->repulsor_pending&&shot&&
+                                 desired==shot&&!melee);''','''  a->whole_body_repulsor_active=(a->active&&a->repulsor_pending&&shot&&
+       (desired==shot
+#ifdef B24_G85_NATIVE_MARKV_629
+        ||g85_native_repulsor
+#endif
+       )&&!melee);''', "Mark V original accepted weapon event survives exactly-once filename rewrite")
  old='''        if(!b24_unified_paused(&b24_game) && idx==0 &&
            !world.flying && b24_unified_should_melee(&b24_game))'''
  new='''#ifdef B24_G85_NATIVE_MARKV_629
