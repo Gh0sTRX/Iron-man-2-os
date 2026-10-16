@@ -23,7 +23,8 @@ static inline float b24_g72_light_factor(const float a[3],const float b[3],
 }
 static inline unsigned char b24_g72_tint(unsigned char original,float f){
  float v=(float)original*f;
- if(v<0.f)v=0.f;if(v>255.f)v=255.f;
+ if(v<0.f)v=0.f;
+ if(v>255.f)v=255.f;
  return (unsigned char)(v+.5f);
 }
 static inline void b24_g72_color(unsigned char native_rgba[4],float f){
