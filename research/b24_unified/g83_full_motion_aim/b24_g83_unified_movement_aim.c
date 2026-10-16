@@ -115,8 +115,8 @@ int b24_g83_select_original_motion(const B24G83Input *p,
   /* Animated land requires an authentic physics foot-contact event.
    * No gesture/FPS-driven automatic landing or imaginary WM retarget. */
   if(markvi &&
-     (p->transition!=B24G83_EVENT_FLY_TO_GROUND&&
-      p->transition!=B24G83_EVENT_FLY_TO_RUN||
+     ((p->transition!=B24G83_EVENT_FLY_TO_GROUND &&
+       p->transition!=B24G83_EVENT_FLY_TO_RUN) ||
       p->grounded_contact_verified)){
    stem=mk_transition[p->transition];oneshot=stem!=NULL;
   }
