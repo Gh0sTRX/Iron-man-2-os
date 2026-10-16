@@ -87,11 +87,10 @@ static B24G83Dir classify(float x,float y){
 static int valid(const B24G83Input *p){
  return p&&isfinite(p->axis_x)&&isfinite(p->axis_y)&&
     fabsf(p->axis_x)<=1.01f&&fabsf(p->axis_y)<=1.01f&&
-    p->motion>=B24G83_GROUND&&p->motion<=B24G83_RUSH&&
-    p->aim>=B24G83_AIM_NONE&&p->aim<=B24G83_AIM_M_UNCLASSIFIED&&
-    p->transition>=B24G83_EVENT_NONE&&p->transition<=B24G83_EVENT_DODGE_RIGHT&&
-    p->previous_flight_dir>=B24G83_DIR_IDLE&&
-    p->previous_flight_dir<=B24G83_DIR_R;
+    (unsigned)p->motion<=(unsigned)B24G83_RUSH&&
+    (unsigned)p->aim<=(unsigned)B24G83_AIM_M_UNCLASSIFIED&&
+    (unsigned)p->transition<=(unsigned)B24G83_EVENT_DODGE_RIGHT&&
+    (unsigned)p->previous_flight_dir<=(unsigned)B24G83_DIR_R;
 }
 int b24_g83_select_original_motion(const B24G83Input *p,
  B24G83Selection *out){
