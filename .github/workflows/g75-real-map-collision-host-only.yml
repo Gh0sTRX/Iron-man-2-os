@@ -1,0 +1,50 @@
+name: G75 Real G68 1910 Source Triangle Capsule Floor Host Regression No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-real-map-collision-host-only.yml"
+      - "research/b24_unified/g75_device_qa/b24_g75_source_capsule.*"
+      - "research/b24_unified/g75_device_qa/test_g75_source_capsule.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  ground:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve old user-Vita-verified 2010 source collision only
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g75_old_vpk
+      - name: Stage real original 1,910 wall and floor triangles in temporary RAM
+        run: |
+          python3 research/b24_unified/g70_reverse_merge/g70_stage_g68_source_scene.py \
+            --vpk /tmp/g75_old_vpk/IronMan2_B24_G68_MarkV_Expo_Combat.vpk \
+            --out /tmp/g75_old_map
+      - name: Compile and check source multilayer landing and movement capsule
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c -lm -o /tmp/g75_test
+          /tmp/g75_test /tmp/g75_old_map/G66_original_collision.g66c
+      - name: Compile isolated physics as PS Vita ARM CPU objects without app package
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -e
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -I research/b24_unified -I research/b24_unified/g75_device_qa \
+              -c research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+              -o /tmp/g75_source_capsule_arm.o
+            test -s /tmp/g75_source_capsule_arm.o
+            echo "PASS G75 Vita ARM CPU collision source-only"
+          '
