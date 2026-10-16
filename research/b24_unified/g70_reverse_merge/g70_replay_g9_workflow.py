@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rebuild G9's *actual successful* complete game engine, replacing ONLY
 its native-GPU scene backend with the independently PS Vita proven G68 C1L1.
-Purposefully consumes existing G9 CI recipe; no second gameplay main loop.
+G70 old gameplay now restores to correct repository root (not research/).\nPurposefully consumes existing G9 CI recipe; no second gameplay main loop.
 Does not alter or dispatch original G9/G68 workflows/artifacts.
 This driver MUST run on an opt-in GitHub Action after 3 artifact downloads.
 """
