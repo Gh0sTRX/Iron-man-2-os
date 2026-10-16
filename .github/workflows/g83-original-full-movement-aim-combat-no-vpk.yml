@@ -1,0 +1,44 @@
+name: G83 Original Movement Flight Walk Aim Combat Unified Source QA NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g83-original-full-movement-aim-combat-no-vpk.yml"
+      - "research/b24_unified/g83_full_motion_aim/**"
+      - "research/b24_unified/g82_original_combat/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_full_motion_and_combat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify no invented 2010 source walking flying or aim animations
+        run: |
+          python3 research/b24_unified/g83_full_motion_aim/g83_validate_original_2010_source_clip_names.py
+      - name: Compile and test B24 source walk, flight and aim router with native melee and damage math
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_original_movement_aim_combat.c \
+            -lm -o /tmp/g83_original_combat_and_motion
+          /tmp/g83_original_combat_and_motion
+      - name: Vita ARM SOURCE compile (no app ELF and no VPK)
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+              -I research/b24_unified \
+              -c research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+              -o /tmp/g83_unified_motion_ARM.o
+            test -s /tmp/g83_unified_motion_ARM.o
+            echo "PASS G83 original source 2010 flight walk aim combat coordinator compiled PS Vita ARM object; no Vita app/VPK"
+          '
