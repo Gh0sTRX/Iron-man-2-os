@@ -1,0 +1,43 @@
+name: G82 Original Combo Contact Collision Damage Integration Host and Vita ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g82-original-combat-source-integration-no-vpk.yml"
+      - "research/b24_unified/g82_original_combat/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Combine authentic original 2010 clip timing, melee collision and resource subtraction host simulation
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g82_original
+          /tmp/g82_original
+          test -z "$(find research/b24_unified/g82_original_combat -iname '*.vpk' -print -quit)"
+      - name: Cross-compile actual original source integrated C modules for PS Vita ARM WITHOUT app or VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            for source in \
+              research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+              research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+              research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c; do
+                arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+                  -I research/b24_unified -c "$source" \
+                  -o "/tmp/$(basename "$source").o"
+              done
+            echo "PASS G82 original 2010 combo+collision+damage CPU modules Vita ARM objects, NOT game VPK"
+          '
