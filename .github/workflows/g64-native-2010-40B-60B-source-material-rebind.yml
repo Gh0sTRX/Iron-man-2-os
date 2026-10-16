@@ -1,0 +1,58 @@
+name: G64 true native C1L1 source shader 40B building atlas plus material WebGL2 GLB NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g64-native-2010-40B-60B-source-material-rebind.yml"
+      - "research/b24_unified/b24_g64_source_original_C1L1_BRES_40_60_shader_sampler_recovery.py"
+      - "research/b24_unified/b24_g64_source_native_C1L1_rebound_original_PVR_viewer_GLB.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  test_authentic_BRES_source_material_patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore private source-only G57 evidence; no user IPA published
+        env:
+          GH_${{ github.token }}: TOKEN
+        run: |
+          mkdir -p /tmp/g64/g57 /tmp/g64/out
+          gh run download 38814440599 --repo "${{ github.repository }}" \
+            -n G57_ORIGINAL_2010_BRES_296_SOURCE_NODE_PVR_UV_MATERIALS_WEBGL2_HTML_GLB_NO_VPK \
+            -D /tmp/g64/g57
+          test -s /tmp/g64/g57/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html
+          test -s research/B11_C1L1_Source_Parser.zip
+      - name: Python host GLB and verified owner PVR preview dependencies
+        run: python3 -m pip install -q numpy trimesh pillow scipy
+      - name: Source-authenticate seven BRES shader 40-byte bindings then rebuild G64 texture scene
+        run: |
+          python3 -m py_compile research/b24_unified/b24_g64_source_original_C1L1_BRES_40_60_shader_sampler_recovery.py
+          python3 -m py_compile research/b24_unified/b24_g64_source_native_C1L1_rebound_original_PVR_viewer_GLB.py
+          python3 research/b24_unified/b24_g64_source_native_C1L1_rebound_original_PVR_viewer_GLB.py \
+            --g57html /tmp/g64/g57/G57_C1L1_ORIGINAL_BRES_TRS_PVR_UV_INTERACTIVE_OFFLINE.html \
+            --b11zip research/B11_C1L1_Source_Parser.zip \
+            --out /tmp/g64/out
+      - name: Fail closed on source counts and unproven original iOS globe UV
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          d=json.loads(pathlib.Path('/tmp/g64/out/G64_MATERIAL_SCENE_REPORT.json').read_text())
+          assert d['source_triangles']==22441
+          assert d['old_native_textured_faces']==18774
+          assert d['new_shader40_texture_recovery_faces']==1683
+          assert d['current_source_UV_PVR_textured_faces']==20457
+          assert d['remaining_non_source_textured_faces']==1984
+          assert d['globe_native_UV_shader_proven'] is False
+          assert d['no_new_VPK']
+          print('PASS G64: source-authenticated 1683 building triangles, 20457 real UV+PVR; globe native shader unresolved')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G64_REAL_SOURCE_BRES_20457_NATIVE_UV_PVR_WEBGL2_GLB_JSON_NO_VPK
+          path: /tmp/g64/out/*
+          retention-days: 7
+          if-no-files-found: error
