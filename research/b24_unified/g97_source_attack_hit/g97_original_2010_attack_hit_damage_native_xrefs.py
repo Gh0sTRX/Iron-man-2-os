@@ -132,6 +132,10 @@ def main(path,out):
      'native instructions',m['original_decoded_instruction_count'],
      'calls',len(m['real_native_calls']),
      'mem field',len(m['real_native_pointer_mem_accesses']))
+   if m['source_method'].startswith('Actor::CanAttack('):
+    print('G103 genuine original 2010 native Actor::CanAttack ARM instructions, unlike arbitrary class/attack IDs')
+    for a0 in m['full_bounded_original_source_opcode_metadata']:
+     print('G103 ORIG ACTOR CAN ATTACK',a0['offset_hex'],a0['mnemonic'],a0['operand_register_or_literal'])
   else:print('MISSING SOURCE SYMBOL',m['original_method_prefix_requested'])
  print('NO 2010 damage or hit frames guessed; NO VPK')
 if __name__=='__main__':
