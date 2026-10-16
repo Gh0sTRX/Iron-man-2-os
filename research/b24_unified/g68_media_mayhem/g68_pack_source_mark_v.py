@@ -5,6 +5,7 @@ Never uploads original IPA or raw source assets to Git history.
 """
 import argparse,hashlib,json,struct,sys,tempfile,zipfile
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import numpy as np
 from b24_owner_pack_extract import decode,get_exact
 from b24_hover_fire_authentic_pose_preview import source_meshes,prepare
