@@ -1,0 +1,36 @@
+name: G77 Real 2010 Melee Half Bounding Box Radius CPU and Vita ARM Source Only
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g77-original-melee-bbox-radius-source-only.yml"
+      - "research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.*"
+      - "research/b24_unified/g77_original_weapon_db/test_b24_g77_melee_source_radius.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bounded_original_maths:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile/test original ARM 0.5 half diagonal model melee detection math
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g77_original_weapon_db \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g77_original_weapon_db/test_b24_g77_melee_source_radius.c \
+            -lm -o /tmp/g77_native_melee
+          /tmp/g77_native_melee
+      - name: Compile source-only original melee math primitive on Vita ARM without VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -I research/b24_unified/g77_original_weapon_db \
+              -c research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+              -o /tmp/g77_melee_arm.o
+            test -s /tmp/g77_melee_arm.o
+            echo "PASS G77 2010 original melee half-extent collision math compiled Vita ARM; no VPK"
+          '
