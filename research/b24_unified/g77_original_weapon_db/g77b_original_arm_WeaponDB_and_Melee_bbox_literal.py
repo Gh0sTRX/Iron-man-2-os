@@ -96,10 +96,16 @@ def main(ipa,out):
  g78_resource_scan(ipa,out)
  from g78c_native_source_bclara_weapon_data_value_context import run as g78_clara_values
  g78_clara_values(ipa,out)
+ from g78d_native_class_attack_instance_inventory import audit as g78_real_instances
+ g78_real_instances(ipa,out)
  g78_proof=json.loads((out/'G78_NATIVE_ORIGINAL_ATTACK_DAMAGE_EntityData_PROPERTY_MEMBER_MAP.json').read_text())
  result['exact_target_methods']['G78_original_AttackEntity_ProjectileEntity_2010_loader']=g78_proof['original_WeaponDB_AttackEntity_and_ProjectileEntity_source_typed_field_loader']
  result['exact_target_methods']['G78_original_2010_resource_archive_names']={'filenames':g78_proof['2010_app_top_level_resource_filename_candidates_without_encoded_content']}
  g78_assets=json.loads((out/'G78B_REAL_2010_ALL_CONTAINER_ATTACK_DAMAGE_SOURCE_LOCATOR.json').read_text())
+ g78_instances=json.loads((out/'G78D_ORIGINAL_2010_CLASS_SCHEMA_WEAPON_VS_REAL_INSTANCE.json').read_text())
+ result['exact_target_methods']['G78D_authentic_weapon_scene_instance_inventory']={
+ 'genuine_combat_relevant_native_schema_classes':g78_instances['genuine_combat_relevant_native_schema_classes'],
+ 'genuine_combat_relevant_typed_native_scene_instances':g78_instances['genuine_combat_relevant_typed_native_scene_instances']}
  g78_clara=json.loads((out/'G78C_NATIVE_CLEV_BCLARA_WEAPON_FIELD_VALUE_OR_TEMPLATE_CONTEXT.json').read_text())
  result['exact_target_methods']['G78C_original_2010_clev_schema_vs_value_locations']={
    'authentic_source_scene_record_count':g78_clara['authentic_original_iOS_2010_clev_BCLARA_record_count'],
