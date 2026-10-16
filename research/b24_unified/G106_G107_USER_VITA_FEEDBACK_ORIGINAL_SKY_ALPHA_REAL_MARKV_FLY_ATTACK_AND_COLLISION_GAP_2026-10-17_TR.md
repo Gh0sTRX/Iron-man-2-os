@@ -28,7 +28,7 @@
 
 ## G107 — Neden yine duvarların içinden geçilebiliyor?
 
-Bağımsız **[G107 SUCCESS real original VPK source visual-vs-collision 38982668069](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38982668069)** [QA artifact: 120815??? (run artifact ID'yi GitHub'da gör)](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38982668069). Gerçek G104 G68 kaynak binary:
+Bağımsız **[G107 SUCCESS real original VPK source visual-vs-collision 38982668069](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38982668069)** [G107 ayrıntılı fizik-görünüm karşılaştırma raporu, artifact 12082200515](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38982668069/artifacts/12082200515). Gerçek G104 G68 kaynak binary:
 - 22.441 orijinal çizilen triangle,
 - sadece 1.910 gerçek collision triangle (bunların 1.690 steep wall olarak sınıflanıyor),
 - 12.100 kaynak orijinal opaque steep visual triangle,
