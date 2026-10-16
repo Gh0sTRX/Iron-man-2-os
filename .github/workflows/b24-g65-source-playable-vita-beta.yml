@@ -1,0 +1,131 @@
+name: B24 G65 C1L1 FIRST PLAYABLE PS Vita beta native source player collision
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/b24-g65-source-playable-vita-beta.yml","research/b24_unified/g66_playable/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  b24_g65_vita_playable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host model source tools
+        run: python3 -m pip install -q numpy pillow trimesh scipy texture2ddecoder gdown
+      - name: Restore true 2010 source G64 HTML from proven GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g66/previous /tmp/g66/native
+          gh run download 38872391947 --repo "${{ github.repository }}" \
+            -n G64_REAL_SOURCE_BRES_20457_NATIVE_UV_PVR_WEBGL2_GLB_JSON_NO_VPK \
+            -D /tmp/g66/previous
+          test -s /tmp/g66/previous/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html
+          test -s research/B11_C1L1_Source_Parser.zip
+      - name: Retrieve user-provided original 2010 IPA transiently, never commit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g66/owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g66/owner/original.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g66/owner/original.ipa
+          test "$(wc -c </tmp/g66/owner/original.ipa)" -eq 248613763
+          python3 - <<'PY'
+          import zipfile
+          z=zipfile.ZipFile('/tmp/g66/owner/original.ipa')
+          assert 'Payload/IronMan2.app/textures' in z.namelist()
+          assert 'Payload/IronMan2.app/models' in z.namelist()
+          print('Original owner IPA verified; never commit or copy into output VPK')
+          PY
+      - name: Restore complete genuine original G65 FVF24 PVR UV scene
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g66_playable/g66_rebuild_owner_g65.py \
+            --g64html /tmp/g66/previous/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html \
+            --b11zip research/B11_C1L1_Source_Parser.zip \
+            --ipa /tmp/g66/owner/original.ipa \
+            --out /tmp/g66/native
+          test -s /tmp/g66/native/G65_C1L1_SOURCE_FVF24_REAL_PVR_UV.glb
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/g66/native/G65_NATIVE_FVF24_SOURCE_AUDIT.json'))
+          e=d['source_original_face_counts']
+          assert e['source_real_uv_plus_pvr']==22021
+          assert e['native_constant_uv_tex_sampler']==132
+          assert e['source_vertex_color_only']==288
+          assert d['atlas_count_total']==31
+          print('G65 original native shader and 31 original source PVR atlases verified')
+          PY
+      - name: Reconstruct original G59 C1L1 collider and owner Mark VI
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/b24_g59_native_2010_C1L1_collision_original_source_audit.py \
+            --zip research/B11_C1L1_Source_Parser.zip \
+            --json /tmp/g66/native/G59_COLLISION_EVIDENCE.json \
+            --glb /tmp/g66/native/G59_original_collision.glb
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          z=zipfile.ZipFile('research/B11_C1L1_Source_Parser.zip')
+          Path('/tmp/g66/native/G66_Original_Mark_VI.glb').write_bytes(z.read('assets/Iron_man_mark6_textured.glb'))
+          PY
+      - name: Bake source G65 geometry and separate CPU collision for VitaGL
+        run: |
+          set -euo pipefail
+          OUT=research/b24_unified/g66_playable/assets
+          mkdir -p "$OUT"
+          python3 research/b24_unified/g66_playable/g66_pack_scene.py \
+            --g65glb /tmp/g66/native/G65_C1L1_SOURCE_FVF24_REAL_PVR_UV.glb \
+            --mark6glb /tmp/g66/native/G66_Original_Mark_VI.glb \
+            --collisionglb /tmp/g66/native/G59_original_collision.glb \
+            --out "$OUT"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          out=Path('research/b24_unified/g66_playable/assets')
+          m=json.loads((out/'G66_manifest.json').read_text())
+          assert m['scene']['triangles']==22441 and m['scene']['vertices']==67323
+          assert m['mark6']['triangles']==970 and m['colliders']['triangles']==1910
+          assert len(list(out.glob('G66_city_tex_*.g66t')))==31
+          assert len(list(out.glob('G66_armor_tex_*.g66t')))==1
+          print('PASS native source scene 22441, source CPU collider 1910, original Mark VI 970')
+          PY
+          rm -rf /tmp/g66/owner
+      - name: Real PS Vita VPK compile with pinned VitaSDK toolchain
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace/research/b24_unified/g66_playable vitasdk/vitasdk:2026.08 sh -lc \
+            'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" -DCMAKE_BUILD_TYPE=Release && cmake --build build-vita --parallel 4'
+      - name: Validate bootable installer, original source mesh and exact texture count
+        run: |
+          set -euo pipefail
+          VPK=research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk
+          test -s "$VPK"
+          unzip -t "$VPK" | tail -2
+          unzip -Z1 "$VPK" | grep -Fx 'eboot.bin'
+          unzip -Z1 "$VPK" | grep -Fx 'sce_sys/param.sfo'
+          python3 - <<'PY'
+          import zipfile,struct
+          f='research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk'
+          with zipfile.ZipFile(f) as z:
+            names=set(z.namelist())
+            assert len([n for n in names if n.endswith('.g66t')])==32
+            assert all('assets/'+x in names for x in ['G66_city.g66m','G66_armor.g66m','G66_original_collision.g66c'])
+            assert len(z.read('eboot.bin'))>25000
+            assert not any(x.endswith(('.ipa','.bdae','.bclara')) for x in names)
+            assert struct.unpack_from('<4I',z.read('assets/G66_city.g66m'),4)==(1,67323,32,31)
+            print('G66 PSVita executable and complete real source assets installed into VPK:',len(names),'files')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IRONMAN2_B24_G65_FIRST_PLAYABLE_VITA_BETA_REAL_SOURCE_COLLISION
+          path: research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk
+          retention-days: 14
+          if-no-files-found: error
+      - name: Erase original IPA work directory and raw source files
+        if: always()
+        run: rm -rf /tmp/g66/owner /tmp/g66/native /tmp/g66/previous
