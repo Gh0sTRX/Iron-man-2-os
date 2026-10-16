@@ -68,7 +68,8 @@ def install():
       attach Mark VI 802v positions to suitcase 629v geometry. */
    const char *original=b24_g8_motion_repulsor_clip(0,mode,left_x,forward);
    if(original){
-     int n=snprintf(g85_native_shot,sizeof(g85_native_shot),"suitcase_%s",original);
+     if(strncmp(original,"ironman_",8)!=0)return 0;
+     int n=snprintf(g85_native_shot,sizeof(g85_native_shot),"suitcase_%s",original+8);
      if(n<=0||(size_t)n>=sizeof(g85_native_shot))return 0;
      shot=g85_native_shot;
    }
@@ -87,7 +88,8 @@ def install():
    desired=g84_source_clip;
 #ifdef B24_G85_NATIVE_MARKV_629
  if(suit==4&&desired){
-   int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired);
+   if(strncmp(desired,"ironman_",8)!=0)return 0;
+   int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
    if(n<=0||(size_t)n>=sizeof(g85_native_desired))return 0;
    desired=g85_native_desired;
  }
