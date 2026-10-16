@@ -36,6 +36,14 @@ jobs:
              research/b24_unified/b24_gpu_g68_collision.c \
              research/b24_unified/b24_c1_original_collision.c -lm -o /tmp/g70_collision
           /tmp/g70_collision /tmp/g70_stage/assets/G66_original_collision.g66c
+      - name: Regression original C1L1 sourced walkable floor contact and nearby roof guard
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g70_reverse_merge/test_g74_real_1910_ground_support.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c -lm -o /tmp/g74_floor_test
+          /tmp/g74_floor_test /tmp/g70_stage/assets/G66_original_collision.g66c
       - name: Cross compile G70 source city renderer + collision as native Vita ARM objects
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace" \
