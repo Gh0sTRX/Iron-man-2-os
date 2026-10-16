@@ -35,7 +35,7 @@ G75'in daha önce kaynakta bulunmasına rağmen varsayılan `OFF` olan deneysel 
 ## GitHub Actions kanıtları / VPK gate
 
 - G93/G94 gerçek host + Vita ARM FULL `im2_beta` native ELF link başarılı: [run 38966964553](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38966964553). Orijinal 248 Mark V source IM2V, G68 Expo, G75 B14, G83, G84, G87, G92 ve G93 tek B24 ana oyun kaynaklarına bağlandı. Hiçbir `vita_create_vpk`, `eboot.bin`, paket veya yeni `*.vpk` yok.
-- G95 G75 orijinal Sun kaynak aydınlatma `ON`, G93/G94 1910 fizik/dummy doğrulama, tam Vita ARM ELF link: [run 38967068698](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38967068698); en son `success` kontrol edilmeden geçmiş sonucunu varsayma.
+- G95 G75 orijinal Sun kaynak aydınlatma `ON`, G93/G94 1910 fizik/dummy doğrulama, tam Vita ARM ELF link: [run 38967068698](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38967068698); **SUCCESS doğrulandı:** tüm G93/G94/G95 host kaynak testleri ve birleşik gerçek VitaSDK ARM `im2_beta` link testi geçti. VPK yok.
 - Son indirilebilir Chrome orijinal BRES/PVR kaynak animasyon sahnesi ve foto QA, G91C [run 38964509174, artifact 12073289399](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38964509174/artifacts/12073289399). Aynı tarayıcı smoke iş akışı sonraki G91 kod değişikliklerinde de koşar.
 
 ## Asıl kalan ciddi blokajlar (tam oyun seviyesinde)
@@ -48,3 +48,9 @@ G75'in daha önce kaynakta bulunmasına rağmen varsayılan `OFF` olan deneysel 
 6. En sonunda kullanıcı açıkça izin verince gerçek PS Vita ilk test build/VPK. Kullanıcı henüz izin **VERMEDİ**; kesinlikle oluşturma.
 
 **Bu alt adımda G93/G94 kaynak sorunu giderildi; oyunun tümü bitmiş değildir.** Katı `g83_final_vpk_gate/READINESS_STATUS.json` 1/11 doğrulanmış kabul kanıtında kaldı. Bu sayı genel oyun bitmişlik yüzdesi değildir.
+
+## G96 browser source yere basma/önden kamera kalite düzeltmesi — Chrome QA SUCCESS
+
+Önceki G91/Mark V browser sahnesi orijinal `level1.bclara` typed `MC` local transform Z≈25'i **oynanabilir başlangıç konumuymuş** gibi çiziyor, bu yüzden karakter zeminden kopuk durabiliyordu. G94'ün gerçek 1.910 kaynak G68 yüzey testinde kanıtlanan tek destek düzlemi üzerindeki **oyuncu test XYZ=(0,0,0.072501)** ve **ölümsüz dummy=(0,10,1.072501)** host önizlemesine aktarıldı. Kamera ilk açılışta oynanabilir oyuncuya yakın ve omuz arkası eğime benzeyen *tanısal* görüntüye yaklaştırıldı; özgün iOS kamera state eşiği olduğu iddia edilmiyor.
+
+**Tam Chrome WebGL2 yeniden çizim ve orijinal 2010 Mark V PVR/UV + G83 hareket/kombo testi SUCCESS:** [G96 run 38967469107](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38967469107), [indirilebilir HTML + ekran görüntüsü + kaynak QA artifact 12075890983](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38967469107/artifacts/12075890983). Gerçek PS Vita cihazında henüz bu yeni alt sürüm kurulup açılmadı. Browser hareket hızı, gerçek G75 collision duvarı, orijinal düşman hasarı hâlâ tam gameplay değildir.
