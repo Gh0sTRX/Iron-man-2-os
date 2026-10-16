@@ -1,0 +1,28 @@
+name: G83 Safeguard Do Not Build Iron Man 2 VPK Until Original Moveset and Combat Complete
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g83-verify-no-vpk-until-complete.yml"
+      - "research/b24_unified/g83_final_vpk_gate/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  demonstrate_current_release_is_BLOCKED:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original 2010 gameplay source has honest missing release prerequisites
+        run: |
+          set -euo pipefail
+          GATE=research/b24_unified/g83_final_vpk_gate/g83_source_completeness_before_vpk.py
+          STATUS=research/b24_unified/g83_final_vpk_gate/READINESS_STATUS.json
+          python3 "$GATE" --status "$STATUS"
+          if python3 "$GATE" --status "$STATUS" --strict; then
+            echo "INVALID: full original moveset and combat cannot be claimed ready yet" >&2
+            exit 1
+          fi
+          test -z "$(find research/b24_unified/g83_final_vpk_gate -name '*.vpk' -print -quit)"
+          echo "PASS G83 policy: NEXT VPK IS BLOCKED until original touchHLE and gameplay QA is complete"
