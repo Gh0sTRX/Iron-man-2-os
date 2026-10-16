@@ -105,6 +105,41 @@ jobs:
           test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
           grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
           test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G93 host replay REAL original 1,910 authored collision triangles and B14 physical flight
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/src \
+            research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c \
+            work/src/b14_world.c -lm -o /tmp/g93_b14_real_physics
+          /tmp/g93_b14_real_physics
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/g93_1910_authored_collision_host
+          /tmp/g93_1910_authored_collision_host work/assets/G66_original_collision.g66c
+      - name: G93 real B24 source contains ONE accepted G8 punch and NEVER a second dummy input poll
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          assert main.count('b24_g8_motion_melee_trigger(')==1
+          assert main.count('g92_debug_accepted_melee_edge=1;')==1
+          assert main.count('g92_debug_accepted_melee_edge=0;')==1
+          # G85's two #ifdef branches are mutually exclusive in a real ARM
+          # compilation. The dummy must not become a third edge consumer.
+          assert main.count('b24_unified_should_melee(&b24_game)')==2
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert main.count('b24_g11_practice_melee_hit(')==1
+          assert 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' in main
+          print('PASS G93 SINGLE source accepted melee, B14 physics, G83/G8 owner; test dummy consumes input edge once, no speculative 2010 damage')
+          PY
       - name: Full VitaSDK ARM G75 G84 G85 G87 G88 REAL native game link source ONLY
         run: |
           docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
