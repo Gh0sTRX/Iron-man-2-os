@@ -1,0 +1,126 @@
+name: G92 REAL 2010 SOURCE WORLD AND MARKV REAL VITA MAIN STATIC DEBUG DUMMY NATIVE LINK NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g92-real-G68-G85-original-motion-single-Vita-main-static-dummy-link-NO-VPK.yml"
+      - "research/b24_unified/g91_offline_integrated_preview/**"
+      - "research/b24_unified/b24_g10_practice_target.c"
+      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_city_player_debug_dummy_real_Vita_ARM:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g88_original_combat_source/test_g88_interleaved_original_event_dedup.c \
+            -lm -o /tmp/g88_native_combat_guard
+          /tmp/g88_native_combat_guard
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g88_old_g82_no_regression
+          /tmp/g88_old_g82_no_regression
+          test -z "$(find research/b24_unified -name "*.vpk" -print -quit)"
+      - name: Original 2010 G83 movement, flight, aim and combo priority regressions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g88_g83_router
+          /tmp/g88_g83_router
+      - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/g91_offline_integrated_preview/test_g92_authored_world_static_dummy_no_damage.c \
+            -lm -o /tmp/g92_real_g10_g11_immortal_dummy
+          /tmp/g92_real_g10_g11_immortal_dummy
+      - name: Restore authentic G8 all armor native animation stream source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original 2010 War Machine Gun01 to Gun04 motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore native original Stark Expo 2010 city and collision source
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore all 248 original Mark V 629 vertex skin animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 research/b24_unified/g91_offline_integrated_preview/g92_patch_single_real_vita_main_static_dummy_NO_VPK.py
+          grep -q 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' work/src/main.c
+          grep -q 'b24_g10_practice_target_draw' work/b24/b24_unified/b24_gpu_runtime.c
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: Full VitaSDK ARM G75 G84 G85 G87 G88 REAL native game link source ONLY
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G92-ELF-ONLY \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON \
+              -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON \
+              -DB24_G87_REAL_TRANSITION_EVENTS=ON \
+              -DB24_G92_STATIC_DUMMY_SOURCE_PREVIEW=ON
+            cmake --build work/build-G92-ELF-ONLY --target im2_beta --parallel 4
+            test -s work/build-G92-ELF-ONLY/im2_beta
+            test -z "$(find work -type f -name "*.vpk" -print -quit)"
+            echo "PASS genuine G68 city, G75 physics, G83 movement, G85 248 MarkV original motion, G87 transitions, G92 static 3D immortal dummy native Vita ARM ELF link. NO VPK"
+          '
