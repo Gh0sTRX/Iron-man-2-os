@@ -49,3 +49,11 @@ Yalnızca kullanıcının yetkili orijinal IPA'sı, B11 gerçek BRES/Mark VI ar�
 - \`CMakeLists.txt\`: ayrı uygulama ve gerçek PSVita VPK.
 
 **Açık:** Fizik temaslarının ve GPU render'ın gerçek Vita üzerinde doğrulanması, kaynak animasyon kliplerinin aynı actor skeleton vertex sırasına bağlanması, G65'in kalan 74 özel mesh'inin/alpha-blending'inin iyileştirilmesi, orijinal görev scriptleri.
+
+## G67 CPU çarpışma sertleştirmesi — 16 Ekim 2026
+- Yeni **IM2G67001** bağımsız Vita Title ID, **IronMan2_B24_G67_Collision_Beta.vpk**. G65 run #38880036578 ve eski IM2G65001 paketi korunur. G67'nin cihazda çalıştığı henüz iddia edilmez.
+- G66'nın 3 sabit torso duvar örneklemesi yerine her kaynak duvar üçgeni ile oyuncunun gerçek ayak–baş yüksekliği örtüşümünde dinamik 3 kesit alınır. İnce bilek ve baş-hizası orijinal duvarlar artık tek başına numune yükseklikleri arasında kaybolmaz.
+- Üçgen düzleme tam değen köşe/kenarları kesite alınır. AABB genişletme, duvar yarıçapı ve alt-adımlar korunur. Hiçbir dekoratif/fabrike duvar eklenmedi.
+- Uçuşta yürünebilir zemin altında bulunması zorunluluğu kaldırıldı; aksi halde Iron Man havada zemin üçgeni yok diye hareket edemiyordu. **Yerde** gerçek yakın zemin yüzeyi şart, büyük yükseklik atlamaları reddedilir. Düşüşe uzak zemine tek-frame teleport kaldırıldı.
+- `g67_collision.h` Vita/host ortak kaynak; `test_g67_collision.c` 16+ sentetik host regresyonu; GitHub Actions G67 host gate orijinal IPA indirimi öncesinde koşar.
+- **Önemli sınır:** hareket orta noktaları ve sürekli swept-cylinder fizik tam kanıtlanmadı; orijinal 1.910 collision üçgeninin kapsamadığı boşluklarda mutlak güvenlik garanti edilmez. Gerçek Vita FPS/çarpışma testi gereklidir.

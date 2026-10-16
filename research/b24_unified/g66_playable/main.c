@@ -6,6 +6,7 @@
  * Collision is CPU, visual is VitaGL; no fabricated collision walls.
  */
 #include <vitaGL.h>
+#include "g67_collision.h"
 #include <psp2/ctrl.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/kernel/processmgr.h>
@@ -25,7 +26,7 @@
 #define RAD 0.39f
 #define PLAYER_HEIGHT 2.15f
 
-typedef struct {float x,y,z;} Vec;
+typedef G67Vec Vec;
 typedef struct {float p[3], uv[2];unsigned char rgba[4];} Vertex;
 typedef struct {uint32_t first,count,tex,flags;} Batch;
 typedef struct {
@@ -35,12 +36,7 @@ typedef struct {
  GLuint tex[MAX_TEXTURES];
  GLuint vertex_buffer;
 } SourceMesh;
-typedef struct {
- Vec p[3];
- float minx,maxx,miny,maxy,minz,maxz;
- Vec normal;
- int wall;
-} Tri;
+typedef G67Tri Tri;
 typedef struct {
  Vec pos; float heading,camera_heading,camera_pitch,velocity_z;
  int flying,paused,show_help,cruise;
@@ -155,36 +151,8 @@ static int source_floor(float x,float y,float feet_z,float *height){
 /* At torso height, intersect actual triangle edges with a horizontal Z plane.
  * Prevents crossing source walls; collision data may be broad so use both a
  * coarse broadphase and an exact point-to-intersection-segment distance. */
-static float seg_dist2(float x,float y,float ax,float ay,float bx,float by){
- float dx=bx-ax,dy=by-ay,d=dx*dx+dy*dy;
- float t=d>1e-8f?clampf(((x-ax)*dx+(y-ay)*dy)/d,0,1):0;
- dx=x-(ax+t*dx);dy=y-(ay+t*dy);return dx*dx+dy*dy;
-}
 static int sphere_clear_at(float x,float y,float foot_z,float radius){
- /* Do not let character leave area for which the original C1L1 collider exists. */
- if(x< -325.f+radius||x>331.f-radius||y< -352.f+radius||y>255.f-radius)return 0;
- for(int sample=0;sample<3;sample++){
-  float z=foot_z+.27f+sample*.67f;
-  for(uint32_t i=0;i<nwalls;i++){
-   const Tri *t=&walls[i];if(!t->wall||z<t->minz||z>t->maxz||
-      x<t->minx-radius||x>t->maxx+radius||y<t->miny-radius||y>t->maxy+radius)continue;
-   Vec hits[3];int n=0;
-   for(int k=0;k<3;k++){
-    Vec a=t->p[k],b=t->p[(k+1)%3];
-    if((a.z<=z&&b.z>=z)||(a.z>=z&&b.z<=z)){
-     float dz=b.z-a.z;
-     if(fabsf(dz)<1e-7f)continue;
-     float f=(z-a.z)/dz;
-     Vec p=plus(a,mul(sub(b,a),f));
-     int duplicate=0;
-     for(int j=0;j<n;j++)if(fabsf(hits[j].x-p.x)+fabsf(hits[j].y-p.y)<.0005f)duplicate=1;
-     if(!duplicate&&n<3)hits[n++]=p;
-    }
-   }
-   if(n>=2&&seg_dist2(x,y,hits[0].x,hits[0].y,hits[1].x,hits[1].y)<radius*radius)return 0;
-  }
- }
- return 1;
+ return g67_wall_clear_at(walls,nwalls,x,y,foot_z,radius,PLAYER_HEIGHT);
 }
 /* Fixed 60Hz with <= 0.22m substeps: RUSH cannot skip thin geometry.
  * Attempt full displacement, then X or Y tangent slide if blocked. */
@@ -198,11 +166,11 @@ static void move_swept(Vec displacement){
   (void)source_floor(old.x,old.y,old.z,&floor_before);
   if(step.x!=0||step.y!=0){
    float tx=old.x+step.x,ty=old.y+step.y;
-   if(sphere_clear_at(tx,ty,old.z,RAD)&&source_floor(tx,ty,old.z+.25f,&fx)&&fx<=old.z+.45f){
+   if(g67_horizontal_ok(player.flying,sphere_clear_at(tx,ty,old.z,RAD),!player.flying&&source_floor(tx,ty,old.z+.25f,&fx),old.z,fx)){
     player.pos.x=tx;player.pos.y=ty;
-   }else if(sphere_clear_at(tx,old.y,old.z,RAD)&&source_floor(tx,old.y,old.z+.25f,&fx)&&fx<=old.z+.45f){
+   }else if(g67_horizontal_ok(player.flying,sphere_clear_at(tx,old.y,old.z,RAD),!player.flying&&source_floor(tx,old.y,old.z+.25f,&fx),old.z,fx)){
     player.pos.x=tx;
-   }else if(sphere_clear_at(old.x,ty,old.z,RAD)&&source_floor(old.x,ty,old.z+.25f,&fy)&&fy<=old.z+.45f){
+   }else if(g67_horizontal_ok(player.flying,sphere_clear_at(old.x,ty,old.z,RAD),!player.flying&&source_floor(old.x,ty,old.z+.25f,&fy),old.z,fy)){
     player.pos.y=ty;
    }
   }
@@ -210,7 +178,7 @@ static void move_swept(Vec displacement){
   float ground=0;
   if(source_floor(player.pos.x,player.pos.y,candidate+.4f,&ground)){
    if(candidate<ground)candidate=ground;
-   if(!player.flying&&candidate>ground+.45f&&step.z<=0)candidate=ground;
+   /* Downward gravity resolves contact without teleporting to far roofs. */
   }
   /* Ceiling test on upward movement against native walkable geometry
      directly above the player head, excluding original ground. */

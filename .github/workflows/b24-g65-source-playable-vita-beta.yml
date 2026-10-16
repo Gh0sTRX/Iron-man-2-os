@@ -1,4 +1,4 @@
-name: B24 G65 C1L1 FIRST PLAYABLE PS Vita beta native source player collision
+name: B24 G67 PS Vita source triangle anti-tunneling collision beta
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -13,6 +13,12 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: G67 host source collision and flight regression - before external assets
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g66_playable/test_g67_collision.c -lm -o /tmp/im2_g67_collision_test
+          /tmp/im2_g67_collision_test
       - name: Install host model source tools
         run: python3 -m pip install -q numpy pillow trimesh scipy texture2ddecoder gdown
       - name: Restore true 2010 source G64 HTML from proven GitHub Actions
@@ -103,14 +109,14 @@ jobs:
       - name: Validate bootable installer, original source mesh and exact texture count
         run: |
           set -euo pipefail
-          VPK=research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk
+          VPK=research/b24_unified/g66_playable/build-vita/IronMan2_B24_G67_Collision_Beta.vpk
           test -s "$VPK"
           unzip -t "$VPK" | tail -2
           unzip -Z1 "$VPK" | grep -Fx 'eboot.bin'
           unzip -Z1 "$VPK" | grep -Fx 'sce_sys/param.sfo'
           python3 - <<'PY'
           import zipfile,struct
-          f='research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk'
+          f='research/b24_unified/g66_playable/build-vita/IronMan2_B24_G67_Collision_Beta.vpk'
           with zipfile.ZipFile(f) as z:
             names=set(z.namelist())
             assert len([n for n in names if n.endswith('.g66t')])==32
@@ -118,12 +124,13 @@ jobs:
             assert len(z.read('eboot.bin'))>25000
             assert not any(x.endswith(('.ipa','.bdae','.bclara')) for x in names)
             assert struct.unpack_from('<4I',z.read('assets/G66_city.g66m'),4)==(1,67323,32,31)
-            print('G66 PSVita executable and complete real source assets installed into VPK:',len(names),'files')
+            assert b'IM2G67001' in z.read('sce_sys/param.sfo')
+            print('G67 PSVita executable and complete G65 source assets installed into VPK:',len(names),'files')
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: IRONMAN2_B24_G65_FIRST_PLAYABLE_VITA_BETA_REAL_SOURCE_COLLISION
-          path: research/b24_unified/g66_playable/build-vita/IronMan2_B24_G65_Playable_Beta.vpk
+          name: IRONMAN2_B24_G67_NATIVE_COLLISION_HARDENED_VITA_BETA
+          path: research/b24_unified/g66_playable/build-vita/IronMan2_B24_G67_Collision_Beta.vpk
           retention-days: 14
           if-no-files-found: error
       - name: Erase original IPA work directory and raw source files

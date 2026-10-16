@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VITASDK})
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake" CACHE FILEPATH "PS Vita toolchain")
 endif()
-project(IronMan2_B24_G65_Playable C)
+project(IronMan2_B24_G67_Collision C)
 set(CMAKE_C_STANDARD 11)
-set(VITA_TITLEID "IM2G65001")
+set(VITA_TITLEID "IM2G67001")
 set(VITA_VERSION "01.00")
 include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 add_executable(g65_playable main.c)
@@ -41,7 +41,7 @@ list(LENGTH ASSETS NUM_ASSETS)
 if(NUM_ASSETS LESS 30)
  message(FATAL_ERROR "G65 source assets missing: ${NUM_ASSETS}")
 endif()
-vita_create_vpk(IronMan2_B24_G65_Playable_Beta.vpk ${VITA_TITLEID} eboot.bin
+vita_create_vpk(IronMan2_B24_G67_Collision_Beta.vpk ${VITA_TITLEID} eboot.bin
  VERSION ${VITA_VERSION}
- NAME "Iron Man 2 - B24 G65 Playable Beta"
+ NAME "Iron Man 2 - B24 G67 Collision Beta"
  FILE ${PACKED})
