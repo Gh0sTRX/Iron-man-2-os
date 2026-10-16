@@ -104,6 +104,14 @@ Yeni C1L1 araştırma betikleri ve kaynak-only GitHub Actions testleri **`featur
 
 **Sonraki çözüm hedefi:** touchHLE'nin özgün C1L1 oyun render'ından **`Material__20/21` efektine ait gerçek texture coordinate generation / blending state**, sonra `Material__17/19/46` ve 74 özel mesh'in root/visibility kuralları; C1L1 host/kamera çıktılarını native oyun kareleriyle birebir kıyasla.
 
+## G65 (16 Ekim 2026) — Özgün 24B UV ve vertex RGBA formatı doğrulandı
+
+**İki bağımsız GitHub kaynak testi SUCCESS:** [FVF24 ham BRES UV testi](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876094386) · [G65 22.441 materyal yüzü sınıflandırması](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876430540). Özgün 2010 BRES'in 24 baytlık vertex dizilimi eski genel ayrıştırıcıda yanlış yorumlanıyordu: `XYZ float32@0..11, RGBA u8@12..15, UV float32@16..23`. Bu kayıtlar **128 sahne mesh'inde / 2.764 köşede** gerçek baytlarla doğrulandı; iki kürenin **698** üçgeninde UV'ler aslında sıfır değil. Eski G61–G64 “küre UV kayıp” yorumu G65 tarafından **superseded**.
+
+**G65 güncel kaynak harita görünümü:** 296 kaynağa bağlanmış mesh / 22.441 üçgen içinde **22.021** üçgen özgün PVR atlası + kaynak UV, **132** üçgen doğrulanmış atlas + sabit kaynak UV, **288** üçgen kaynak vertex rengi ama standart diffuse sampler yok. G64'ün 20.457 üçgeninden **+1.564** orijinal UV/PVR üçgeni doğrulandı. G65 yerel kullanıcı IPA'sından 7 ek PVR atlasını çözerek **31 kaynak atlası** ile offline HTML ve 3B GLB oluşturdu. BRES geometrisi, indeks sırası ve world transform değiştirilmedi. **74 ayrı küçük mesh / 478 üçgen** henüz ana hiyerarşiye bağlanmadı; CLARA visibility, özgün Gameloft alfa/blend/vertex-color combiner, fog/lighting ve hareket/animasyon runtime karşılaştırması açıktır.
+
+G65 gerçek kuş bakışı CPU ekran renderı kaynak BRES geometrisi, kaynak PVRTC PVR pikselleri, kaynak UV ve vertex renklerinden oluşur; ışık/blending host **yaklaşımıdır**, touchHLE oyununun gerçek çıktısı değildir. GPU/WebGL2 testinde çalışmanın tam tarayıcı çizimi henüz doğrulanmadı; Vita testi veya yeni VPK **yok**. Kod: [FVF24 kaynak denetleyicisi](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py), [G65 tüm materyal kanıt CI](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/b24_g65_original_2010_C1L1_FVF24_uv_rgba_source_audit.py). Orijinal IPA veya telifli PVR pikselleri GitHub içine yüklenmedi.
+
 ## Lisans / içerik notu
 
 Oyun, karakterler, sesler, özgün modeller ve dokular ilgili hak sahiplerine aittir. Bu depo özel araştırma içindir. Orijinal IPA'yı, oyun varlıklarını veya telifli içerikleri izinsiz kamuya açık dağıtmayın.
