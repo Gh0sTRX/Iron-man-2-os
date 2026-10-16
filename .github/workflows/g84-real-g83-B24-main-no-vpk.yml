@@ -65,8 +65,7 @@ jobs:
           set -euo pipefail
           cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -fsyntax-only -Iwork/b24/b24_unified \
             work/b24/b24_unified/b24_g8_live_original_motion.c \
-            work/b24/b24_unified/b24_g83_authentic_timed_router.c
-            /tmp/g84_actual_109_clip_coverage.json \
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c \
             work/b24/b24_unified/b24_g83_unified_movement_aim.c \
             work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
             work/b24/b24_unified/b24_g77_melee_source_radius.c \
@@ -104,5 +103,6 @@ jobs:
             work/b24/b24_unified/b24_g8_live_original_motion.h
             work/b24/b24_unified/b24_g83_unified_movement_aim.c
             work/b24/b24_unified/b24_g83_authentic_timed_router.c
+            /tmp/g84_actual_109_clip_coverage.json
           retention-days: 14
           if-no-files-found: error
