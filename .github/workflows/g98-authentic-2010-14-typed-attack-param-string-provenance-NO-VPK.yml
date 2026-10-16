@@ -43,7 +43,8 @@ jobs:
           assert dm[0]['verified_native_int_bool_output_destination_r2']==[{
             'native_argument_r2_base_register':'r4',
             'native_argument_r2_offset_hex':'0x60',
-            'relative_ARM_code_offset':'0x114'
+            'relative_ARM_code_offset':'0x114',
+            'object_field_parent_proven':True
           }]
           original=json.loads(Path('/tmp/g98_source_metadata/G100_ORIGINAL_2010_LEVEL1_CLASS108_26_ATTACK_RECORD_SCHEMA_WINDOWS.json').read_text())
           assert original['real_attack_entity_count']==26
