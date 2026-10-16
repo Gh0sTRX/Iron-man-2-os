@@ -38,6 +38,7 @@ typedef struct {
  B24G83Dir direction;
  int source_authored_name;
  int one_shot_not_looping;    /* use clip's ORIGINAL IM2V duration */
+ uint32_t original_source_duration_ms; /* 2010 authored, 0=unmapped */
  int input_semantics_verified_original_ios; /* always false so far */
  int needs_2010_hit_event;    /* no synthetic hits */
 } B24G83Selection;
