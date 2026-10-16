@@ -112,6 +112,24 @@ jobs:
               $HEADERS work/src/main.c
             echo "PASS REAL G85 B24 game main C source with original 248 MarkV 629v IM2V streams, Vita ARM syntax only, NO VPK"
           '
+      - name: Full Vita ARM native link of actual G75 G84 G85 source ONLY target im2_beta WITHOUT building eboot or VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G85-ELF-ONLY \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON
+            # Explicit target im2_beta only. Do NOT invoke build ALL, eboot,
+            # vita_create_vpk, or any installation archive generation target.
+            cmake --build work/build-G85-ELF-ONLY --target im2_beta --parallel 4
+            test -s work/build-G85-ELF-ONLY/im2_beta
+            test -z "$(find work -type f -name "*.vpk" -print -quit)"
+            echo "PASS G85 complete native Vita ARM link of REAL G75 G84 G85 game executable object, NO VPK, NO installed Vita app or hardware run"
+          '
       - name: Upload source evidence without duplicating owner IPA, game app, or VPK
         if: always()
         uses: actions/upload-artifact@v4
