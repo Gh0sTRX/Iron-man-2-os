@@ -1,0 +1,51 @@
+name: G62 Build official touchHLE v0.3.0 Linux for local owner-IPA test
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g62-build-official-touchhle-linux-owner-test.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build_official_touchHLE_linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install C++ Rust native Linux build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends \
+            libboost-all-dev libopenal-dev libsdl2-dev libgl1-mesa-dev \
+            libasound2-dev libudev-dev cmake clang build-essential pkg-config
+      - name: Check out upstream touchHLE pinned official release
+        run: |
+          git clone --branch v0.3.0 --depth 1 https://github.com/touchHLE/touchHLE.git /tmp/touchHLE
+          cd /tmp/touchHLE
+          git submodule update --init --recursive --depth 1
+          git rev-parse HEAD | tee /tmp/touchhle_upstream.sha
+      - name: Compile x86_64 Linux binary against dynamic SDL2 and OpenAL
+        working-directory: /tmp/touchHLE
+        run: |
+          cargo build --release --locked --no-default-features
+          test -x target/release/touchHLE
+          ldd target/release/touchHLE
+          file target/release/touchHLE
+      - name: Package official upstream runtime files - NO copyrighted original game IPA
+        run: |
+          mkdir -p /tmp/g62_runtime
+          cp /tmp/touchHLE/target/release/touchHLE /tmp/g62_runtime/touchHLE
+          cp -r /tmp/touchHLE/touchHLE_dylibs /tmp/g62_runtime/
+          cp -r /tmp/touchHLE/touchHLE_fonts /tmp/g62_runtime/
+          cp /tmp/touchHLE/OPTIONS_HELP.txt /tmp/g62_runtime/ || true
+          cp /tmp/touchHLE/LICENSE /tmp/g62_runtime/ || true
+          cp /tmp/touchhle_upstream.sha /tmp/g62_runtime/upstream_sha.txt
+          tar -C /tmp/g62_runtime -czf /tmp/g62_touchHLE_v030_linux_x86_64.tar.gz .
+          ls -lh /tmp/g62_touchHLE_v030_linux_x86_64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G62_OFFICIAL_TOUCHHLE_V030_LINUX_X86_64_RUNTIME_NO_IPA
+          path: /tmp/g62_touchHLE_v030_linux_x86_64.tar.gz
+          retention-days: 3
+          if-no-files-found: error
