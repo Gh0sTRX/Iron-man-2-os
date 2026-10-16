@@ -1,0 +1,75 @@
+name: G71 Black Atlas Forensics and GPU Alpha Two Pass ARM Validation No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g71-black-material-alpha-source-qa.yml"
+      - "research/b24_unified/g71_source_visual_qa/**"
+      - "research/b24_unified/b24_gpu_g68_city.*"
+      - "research/b24_unified/g70_reverse_merge/apply_b24_g70_scene_backend.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch known hardware booting source G68 without any new IPA download
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g71_original
+      - name: Fetch full merged G70 VitaSDK candidate for scene equality proof
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_B24_G70_Original_G9_Gameplay_Actual_G68_C1L1_5_Suits_363_Animations
+          run-id: 38893606345
+          github-token: ${{ github.token }}
+          path: /tmp/g71_merged
+      - name: Static pixel-alpha and original world identity QA
+        run: |
+          python3 research/b24_unified/g71_source_visual_qa/g71_black_material_alpha_audit.py \
+            --vpk /tmp/g71_merged/IronMan2_GPU_B24_G70_G68_WORLD.vpk \
+            --out /tmp/g71_alpha_report.json
+          python3 - <<'PY'
+          import hashlib,zipfile
+          a='/tmp/g71_original/IronMan2_B24_G68_MarkV_Expo_Combat.vpk'
+          b='/tmp/g71_merged/IronMan2_GPU_B24_G70_G68_WORLD.vpk'
+          with zipfile.ZipFile(a) as x,zipfile.ZipFile(b) as y:
+              identical=['G66_city.g66m','G66_original_collision.g66c']
+              identical += [f'G66_city_tex_{i:02d}.g66t' for i in range(31)]
+              for s in identical:
+                  assert x.read('assets/'+s)==y.read('assets/'+s),s
+              print('PASS G71: G70 and G68 have BYTE-FOR-BYTE same city, native collider, original PVR RGBA 31 material atlases')
+          PY
+      - name: Cross compile original G70 map baseline and G71 alpha A B variant as native ARM
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace/research/b24_unified vitasdk/vitasdk:2026.08 sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -c b24_gpu_g68_city.c -o /tmp/g70_orig_city.o
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -DB24_G71_ALPHA_PASSES=1 -c b24_gpu_g68_city.c -o /tmp/g71_two_pass_city.o
+              test -s /tmp/g70_orig_city.o
+              test -s /tmp/g71_two_pass_city.o
+              echo "PASS native Vita CPU/GPU interfaces both legacy G70 renderer and opt-in G71 opaque/transparent split"
+            '
+      - name: Verify no G71 double GPU context or guessed source sky claims
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('research/b24_unified/b24_gpu_g68_city.c').read_text()
+          owner=Path('research/b24_unified/b24_gpu_runtime.c').read_text()
+          cm=Path('research/b24_unified/g70_reverse_merge/apply_b24_g70_scene_backend.py').read_text()
+          assert 'B24_G71_ALPHA_PASSES' in source and cm
+          assert 'glDepthMask(GL_FALSE)' in source and 'glDepthMask(GL_TRUE)' in source
+          assert 'material_has_alpha' in source
+          assert 'b24_gpu_owner_scene_g68' in owner
+          assert 'vglInit(' not in source and 'vglSwapBuffers(' not in source
+          assert 'b14_world_tick' not in source
+          print('PASS G71 no duplicate 3D engine, no extra GPU buffers, no invented light/sky textures')
+          PY
