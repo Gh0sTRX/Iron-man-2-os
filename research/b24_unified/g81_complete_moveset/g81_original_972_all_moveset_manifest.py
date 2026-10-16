@@ -55,7 +55,7 @@ def audit(ipa:Path,out:Path):
    'original_source_file':row.name,
    'original_archive_byte_offset':row.start,
    'original_source_bytes_sha256':hashlib.sha256(source).hexdigest(),
-   'source_duration_ms':info['time_last_ms']-info['time_first_ms'],
+   'source_duration_ms':info['time_last_ms'], # original B13 duration equals last keyed timestamp; four source clips begin late
    'source_first_time_ms':info['time_first_ms'],
    'source_last_time_ms':info['time_last_ms'],
    'native_joint_track_count':info['channels'],
