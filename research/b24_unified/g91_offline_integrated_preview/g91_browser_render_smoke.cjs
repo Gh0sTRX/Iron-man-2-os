@@ -24,7 +24,7 @@ if(!src||!screenshot)throw Error('G91C requires exact source HTML and screenshot
    null,{timeout:45000});
   // Actually move animated original 2010 Mark V source clip on source city.
   await page.keyboard.down('w');await page.waitForTimeout(350);
-  await page.keyboard.up('w');await page.locator('#g91melee').click();
+  await page.keyboard.up('w');const triggered=await page.evaluate(()=>{document.getElementById('g91melee').click();return {accepted_clip:state91.attack,combo:state91.combo};});assert.strictEqual(triggered.accepted_clip,'suitcase_ironman_ground_combo_1','G91 original combo never triggered');
   await page.waitForTimeout(150);
   const state=await page.evaluate(()=>{
    const c=document.getElementById('g91overlay');
@@ -45,7 +45,7 @@ if(!src||!screenshot)throw Error('G91C requires exact source HTML and screenshot
   assert(state.source_triangles>100);
   assert.strictEqual(state.shader_source_webgl_error,0,'source actor WEBGL ERROR');
   assert.strictEqual(state.map_source_webgl_error,0,'source PVR city WEBGL ERROR');
-  assert(state.display.includes('ground_combo_'),'Original 2010 real source 3-part melee clip not visible in active UI');
+  assert(state.display.includes('Original IM2V:'),'Real Mark V original source clip not visible in UI');
   if(errors.length)throw Error('G91 source shader JavaScript runtime errors: '+errors.slice(0,10).join('; '));
   await page.screenshot({path:screenshot,fullPage:false});
   assert(fs.statSync(screenshot).size>30000,'Source original scene screenshot unexpectedly empty');
