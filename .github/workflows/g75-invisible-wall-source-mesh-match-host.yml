@@ -1,0 +1,37 @@
+name: G75 Real Expo G68 Original Invisible Wall Visual Mesh Correlation No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-invisible-wall-source-mesh-match-host.yml"
+      - "research/b24_unified/g75_device_qa/g75_source_invisible_walls_visual_match.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install scientific XYZ nearest source mesh sample tools
+        run: python3 -m pip install -q numpy scipy
+      - name: Download user known Vita-working G68 source mesh/collider VPK read-only
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g75_wall_reference
+      - name: Compare original real wall triangle plane slices vs all source visible mesh samples
+        run: |
+          python3 research/b24_unified/g75_device_qa/g75_source_invisible_walls_visual_match.py \
+            --vpk /tmp/g75_wall_reference/IronMan2_B24_G68_MarkV_Expo_Combat.vpk \
+            --out /tmp/g75_wall_comparison.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G75_Original_G68_InvisibleWall_Physics_vs_Visual_Geometry_Source_Diagnostic_NO_VPK
+          path: /tmp/g75_wall_comparison.json
+          if-no-files-found: error
+          retention-days: 14
