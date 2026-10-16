@@ -38,7 +38,9 @@ def apply():
   raise RuntimeError("The authoritative B14 gameplay flight physics disappeared")
  GAME.write_text(code)
  for name in ["b24_gpu_g68_city.h","b24_gpu_g68_city.c",
-              "b24_gpu_g68_collision.h","b24_gpu_g68_collision.c"]:
+              "b24_gpu_g68_collision.h","b24_gpu_g68_collision.c",
+              "b24_gpu_g72_sky.h","b24_gpu_g72_sky_vitagl.c",
+              "b24_gpu_g72_light.h"]:
   shutil.copy2(ROOT/"research/b24_unified"/name,RUNTIME/name)
  world=W/"src/b14_world.c"
  legacy=world.read_text()
@@ -71,6 +73,23 @@ if(B24_G68_CITY_BACKEND)
  option(B24_G71_ALPHA_PASSES "Original source 7 RGBA atlas batches separated from opaque pass" OFF)
  if(B24_G71_ALPHA_PASSES)
   target_compile_definitions(im2_beta PRIVATE B24_G71_ALPHA_PASSES=1)
+ endif()
+ # G72 A/B diagnostics only. G70 original remains untouched by default.
+ option(B24_G72_DUSK_ATMOSPHERE "Diagnostic dusk horizon until authored sky shader recovery" OFF)
+ option(B24_G72_SOURCE_LIGHTING "One-time triangle-normal baked twilight vertex color" OFF)
+ option(B24_G72_DIAGNOSTIC_SKYLINE "Temporary silhouette, not original 2010 source sky" OFF)
+ if(B24_G72_DUSK_ATMOSPHERE)
+  target_sources(im2_beta PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g72_sky_vitagl.c")
+  target_compile_definitions(im2_beta PRIVATE B24_G72_DUSK_ATMOSPHERE=1)
+  if(B24_G72_DIAGNOSTIC_SKYLINE)
+   set_source_files_properties(
+     "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g72_sky_vitagl.c"
+     PROPERTIES COMPILE_DEFINITIONS B24_G72_DIAGNOSTIC_SKYLINE=1)
+  endif()
+ endif()
+ if(B24_G72_SOURCE_LIGHTING)
+  target_compile_definitions(im2_beta PRIVATE B24_G72_SOURCE_LIGHTING=1)
  endif()
  target_sources(im2_beta PRIVATE
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g68_city.c"
