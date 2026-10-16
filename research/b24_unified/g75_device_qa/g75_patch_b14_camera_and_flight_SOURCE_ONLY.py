@@ -26,11 +26,14 @@ def calibrate(directory:Path):
         '/* G75_SOURCE_ONLY_CALIBRATION: widen right-stick to -52.7/+60 degrees. */\n'
         'w->pitch=cl(w->pitch+cl(looky,-1,1)*1.65f*dt,-.92f,1.05f);',
         'camera pitch limits')
+    # B14 source as shipped in original overlay has a compact struct,
+    # but B17/B24 dynamically extend it before G9 gameplay. Insert at
+    # the typedef end rather than matching fragile internal field order.
     h=update_once(h,
-        'float target_z, speed, cooldown, beam_time;',
-        'float target_z, speed, cooldown, beam_time;\n'
-        ' float authored_move_vx, authored_move_vy; /* G75 homebrew velocity smoothing */',
-        'B14 world velocity state')
+        '} B14World;',
+        ' float authored_move_vx, authored_move_vy; /* G75 one B14 owner */\n'
+        '} B14World;',
+        'B17/G9 assembled world velocity state')
     s=update_once(s,
         'const float velocity=(w->flying?(w->rush?4.0f:2.0f):(w->rush?2.2f:1.1f));',
         '''/* G75 exact 2010 movement speed still unknown. Gameplay candidate:
