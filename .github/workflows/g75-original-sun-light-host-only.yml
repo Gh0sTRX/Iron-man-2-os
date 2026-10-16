@@ -1,0 +1,37 @@
+name: G75 Original Sun Nodes Heuristic City Light Source-Only CPU and Vita ARM
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-original-sun-light-host-only.yml"
+      - "research/b24_unified/g75_device_qa/b24_g75_original_sun_lighting_candidate.h"
+      - "research/b24_unified/g75_device_qa/test_g75_sun_light_host.c"
+      - "research/b24_unified/b24_gpu_g68_city.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lighting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Four CLARA authored Sun sources, candidate attenuation preserving native alpha
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g75_sun
+          /tmp/g75_sun
+      - name: Compile actual VitaGL C1L1 city with optional source-node Sun lighting
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=1 \
+              -I research/b24_unified/g75_device_qa \
+              -c research/b24_unified/b24_gpu_g68_city.c \
+              -o /tmp/g75_sun_vita_city.o
+            test -s /tmp/g75_sun_vita_city.o
+            echo "PASS G75 static city source-light source-only Vita ARM"
+          '
