@@ -1,0 +1,100 @@
+name: G84 Real B24 G75 G68 G83 Source Integration NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g84-real-g83-B24-main-no-vpk.yml"
+      - "research/b24_unified/g84_main_loop_integration/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  full_real_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore genuine original G9 player animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore verified original War Machine weapon motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore original 2010 Stark Expo source G68
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Reassemble prior successful G75 complete B24 source and merge G84
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+      - name: Assert exactly one B14 physics, one G8 real IM2V, one original melee and B16 source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path("work/src/main.c").read_text()
+          cm=Path("work/CMakeLists.txt").read_text()
+          a=Path("work/b24/b24_unified/b24_g8_live_original_motion.c").read_text()
+          assert m.count("b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)")==1
+          assert m.count("b24_g8_motion_melee_trigger(")==1
+          assert m.count("b24_g8_motion_repulsor_trigger(")==1
+          assert m.count("b24_g83_timeline_tick(")==1
+          assert m.count("b24_g8_motion_tick_g84(")==1
+          assert a.count("b24_g8_motion_tick_g84(")==2
+          assert a.count("b24_g8_motion_tick(")==1
+          assert cm.count("option(B24_G84_ORIGINAL_MOVESET_ROUTER")==1
+          assert not list(Path("work").rglob("*.vpk"))
+          print("PASS G84 B24 real main one physics/gameplay/IM2V owner; NO VPK")
+          PY
+      - name: Host syntax for original G8 player and G83/G82 integrations
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -fsyntax-only -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
+            work/b24/b24_unified/b24_g77_melee_source_radius.c \
+            work/b24/b24_unified/b24_g76_original_native_damage_math.c
+          python3 research/b24_unified/g83_full_motion_aim/g83_validate_original_2010_source_clip_names.py
+      - name: Vita ARM object compile original integrated game modules and real main syntax WITHOUT VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            for unit in b24_g83_authentic_timed_router.c b24_g83_unified_movement_aim.c b24_g82_original_combat_coordinator.c b24_g8_live_original_motion.c; do
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+                -Iwork/b24/b24_unified -c "work/b24/b24_unified/$unit" -o "/tmp/$unit.o"
+            done
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -fsyntax-only \
+              -DB24_GPU_ENGINE=1 -DB24_G84_ORIGINAL_MOVESET_ROUTER=1 \
+              -Iwork/src -Iwork/b24/b24_unified work/src/main.c
+            echo "PASS G84 true game main Vita ARM source, no game build or VPK"
+          '
+      - name: Persist ONLY actual merged original B24 source evidence (no ELF / VPK)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G84_REAL_B24_G75_G68_G83_Original_Motion_Aim_Combat_Source_Only
+          path: |
+            work/src/main.c
+            work/CMakeLists.txt
+            work/b24/b24_unified/b24_g8_live_original_motion.c
+            work/b24/b24_unified/b24_g8_live_original_motion.h
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c
+          retention-days: 14
+          if-no-files-found: error
