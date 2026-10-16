@@ -1,0 +1,72 @@
+name: G72 Full G9 Gameplay G68 Original Map G71 Alpha and Opt-in Twilight Vita Candidate
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g72-full-twilight-gameplay-vita.yml"
+      - "research/b24_unified/b24_gpu_g72_*"
+      - "research/b24_unified/g72_sky_light/**"
+      - "research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  dusk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the previously proven original B24 gameplay motion stream bank
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Download War Machine authentic gun animation bank
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Download exactly hardware-tested owner G68 native city PVR atlas and triangles
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Preserve B24 B17 G9 gameplay and compile optional G72 dusk with source alpha
+        env:
+          B24_G72_NIGHT_DIAGNOSTIC: "1"
+        run: |
+          python3 -m pip install -q pyyaml
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g72_sky_light/test_g72_light.c -lm -o /tmp/g72_lighting_test
+          /tmp/g72_lighting_test
+          python3 research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py
+      - name: Validate separated package G72 shaders source map hashes and title identity
+        run: |
+          python3 - <<'PY'
+          import zipfile,hashlib,struct
+          from pathlib import Path
+          candidate=Path('work/build-vita/IronMan2_B24_G72_Expo_Twilight_Visual_Candidate.vpk')
+          with zipfile.ZipFile(candidate) as z:
+              assert z.testzip() is None
+              n=set(z.namelist())
+              assert b'IM2G72001' in z.read('sce_sys/param.sfo')
+              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2v')])==363
+              assert len([x for x in n if x.startswith('models/') and x.endswith('.im2t')])==5
+              assert struct.unpack_from('<4I',z.read('assets/G66_city.g66m'),4)==(1,67323,32,31)
+              assert struct.unpack_from('<II',z.read('assets/G66_original_collision.g66c'),4)==(1,1910)
+          print('PASS source exact city original intact and 5 suits + old B24 G9 gameplay. New dusk shaders are DIAGNOSTIC, not recovered 2010 original')
+          print('G72 VPK bytes',candidate.stat().st_size,'SHA256',hashlib.sha256(candidate.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_G72_Original_B24_Playable_Twilight_SourceCity_Alpha_Candidate_VPK
+          path: work/build-vita/IronMan2_B24_G72_Expo_Twilight_Visual_Candidate.vpk
+          retention-days: 14
+          if-no-files-found: error
