@@ -30,6 +30,8 @@ jobs:
             --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
           python3 research/b24_unified/g97_source_attack_hit/g100_native_original_level1_damage_field_serialized_probe.py \
             --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
+          python3 research/b24_unified/g97_source_attack_hit/g101_original_2010_26_attack_verified_size_prefixed_stream_probe.py \
+            --ipa /tmp/g98_owner_private/original.ipa --out /tmp/g98_source_metadata
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -49,6 +51,9 @@ jobs:
           original=json.loads(Path('/tmp/g98_source_metadata/G100_ORIGINAL_2010_LEVEL1_CLASS108_26_ATTACK_RECORD_SCHEMA_WINDOWS.json').read_text())
           assert original['real_attack_entity_count']==26
           assert original['per_attack_original_damage_values_proven'] is False
+          s101=json.loads(Path('/tmp/g98_source_metadata/G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json').read_text())
+          assert s101['source_named_instances_verified']==26
+          assert s101['original_damage_i32_value_exact_field_index_and_property_parent_PROVEN'] is False
           assert len(d['native_typed_GetParamValue_call_sites'])==14
           assert d['exact_original_per_attack_Damage_values_and_serialized_tlv_NOT_DECODDED'] is True
           assert d['No_fake_original_weapon_damage'] is True
@@ -66,5 +71,6 @@ jobs:
           path: |
             /tmp/g98_source_metadata/G98_ORIGINAL_2010_ATTACKENTITY_GETPARAMVALUE_14_TYPED_FIELD_NAMES.json
             /tmp/g98_source_metadata/G100_ORIGINAL_2010_LEVEL1_CLASS108_26_ATTACK_RECORD_SCHEMA_WINDOWS.json
+            /tmp/g98_source_metadata/G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json
           retention-days: 14
           if-no-files-found: error
