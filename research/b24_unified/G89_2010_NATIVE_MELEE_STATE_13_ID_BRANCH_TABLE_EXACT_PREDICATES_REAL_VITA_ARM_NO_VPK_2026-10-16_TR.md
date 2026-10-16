@@ -65,3 +65,27 @@ Bu C modülü yalnızca doğrulanmış kaynak predicate'leri ve reset davranış
 2. Real `AttackEntity::LoadFromFile` değerlerin doğrudan native schema instance kaynağından typed `Damage` sayısına bağlanıp bağlanamayacağını bul, unknown ise hasarı fail-closed tut.
 3. Gerçek `Actor::TestMeleeHit` combat hit-active frame ayrı source kanıtı ve `SetAttackTypeEnabled` arg1 gerçek enum eşlemesini çöz.
 4. Bütün bunlar ve kalan on sürüm kapısı olmadan **VPK çıkarmama** kuralını koru.
+
+## 6. G90 sonraki gerçek orijinal ARM bulgusu: 13 state ID, yalnız 8 benzersiz hedef blok
+
+Orijinal ARM fonksiyonunun **`0xF1DE4 MainCharacter::UpdateMeleeAttackState`** içindeki `cmp r0,#0xC; addls pc,pc,r0,lsl #2` dispatch'ine ait 13 gerçek dallanma komutu tek tek orijinal IPA Mach-O üzerinde doğrulandı. G90 kaynak:
+`g89_original_combo_native_flow/g90_extract_original_2010_melee_arm_state_dispatch_table.py`.
+
+**Doğrudan kanıtlanan durum ID → gerçek native branch target:**
+
+| Durum ID | Orijinal kod bloğu |
+|---|---|
+| 0 | `0xF2220` |
+| 1 | `0xF2080` |
+| 2 | `0xF202C` |
+| 3 | `0xF1FC8` |
+| 4, 5, 7, 8 | `0xF1F2C` — dört ayrı ID aynı kaynak başlangıcını paylaşıyor |
+| 6 | `0xF1EE0` |
+| 9, 10, 11 | `0xF1EAC` — üç bitiş ID'si aynı hedefe atlıyor |
+| 12 | `0xF1E9C` |
+
+**13 giriş, 8 benzersiz kod bloğu.** Bu ayrım kritiktir: kaynakta gerçek 13 durum ID var diye 13 farklı combo animasyonu, 13 farklı saldırı hareketi veya 13 gerçek hit-window icat etmiyoruz. Aynı koda giden state ID'lerinin davranışını belirlemek için blok içindeki koşul ve `+0x828` pending state xrefs çözülmeli.
+
+[G90 gerçek IPA kaynak analizi, C11 predicate ve Vita ARM testleri — GitHub run 38958613395](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38958613395). Bu test `*.vpk` oluşturmaz; G90 sonuçları sadece metadata JSON'dur.
+
+**Sonraki net teknik yön:** önce ortak `0xF1F2C`, `0xF1EAC` kod bloklarına gelen farklı state ID koşullarını (ve `0x828` / `0x82C` / `0x830` alanlarını) gerçek register/memory data-flow ile çöz, ardından `AttackEntity` gerçek hasar kayıtlarını tipli native şemayla çıkar. Hasar/isabet kareleri ve gerçek Vita QA olmadan yayın kapısı kapalıdır.
