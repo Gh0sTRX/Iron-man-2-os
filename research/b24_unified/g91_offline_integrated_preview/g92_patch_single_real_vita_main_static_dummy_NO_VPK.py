@@ -63,6 +63,8 @@ def apply():
 /* G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN */
 static B24G11PracticeMeleeFeedback g92_debug_feedback={0};
 static int g92_debug_floor_found=0;
+/* Shared accepted source G8 combat edge; diagnostic never polls it twice. */
+static unsigned g92_debug_accepted_melee_edge=0;
 #endif''','main include')
  anchor='''        b24_unified_tick(&b24_game,&b24_obs);
 #ifdef B24_GPU_ENGINE'''
@@ -89,7 +91,7 @@ static int g92_debug_floor_found=0;
         }
         if(g92_debug_floor_found &&
            !b24_unified_paused(&b24_game)&&!world.flying&&
-           (idx==0||idx==4)&&b24_unified_should_melee(&b24_game)){
+           (idx==0||idx==4)&&g92_debug_accepted_melee_edge){
            (void)b24_g11_practice_melee_hit(&g92_debug_feedback,
              &b24_gpu_rt.g92_practice_dummy,
              world.x,world.y,world.z,(uint32_t)now,1,1);
@@ -97,10 +99,31 @@ static int g92_debug_floor_found=0;
         if(g92_debug_floor_found)
           b24_gpu_rt.g92_practice_dummy.hit_flash=
             b24_g11_practice_hit_flash(&g92_debug_feedback,(uint32_t)now);
+        g92_debug_accepted_melee_edge=0; /* one consumed debug latch */
         /* ORIGINAL HP/mission data/weapon fire events remain untouched. */
 #endif
 #ifdef B24_GPU_ENGINE'''
  main=once(main,anchor,change,'original actual single game loop post tick')
+
+ # G93: older G92 polled b24_unified_should_melee TWICE and might lose
+ # the authentic accepted game input edge. Capture the actual one G8
+ # melee acceptance and consume it once in the same/next frame.
+ import re
+ call_pattern=r'(?m)^(?P<indent>[ \t]*)b24_g8_motion_melee_trigger\((?P<args>[^;\n]*)\);'
+ matches=list(re.finditer(call_pattern,main))
+ if len(matches)!=1:
+  raise ValueError('G93 requires 1 real B24 G8 melee call, got '+str(len(matches)))
+ found=matches[0]
+ indent=found.group('indent')
+ native_call=found.group(0).strip()
+ replacement=(indent+'{\n'+indent+' '+native_call+'\n'
+   +indent+'#ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW\n'
+   +indent+' g92_debug_accepted_melee_edge=1;\n'
+   +indent+'#endif\n'+indent+'}')
+ main=main[:found.start()]+replacement+main[found.end():]
+ assert main.count('b24_g8_motion_melee_trigger(')==1
+ assert main.count('b24_unified_should_melee(&b24_game)')==1
+ assert main.count('g92_debug_accepted_melee_edge=1;')==1
  for name in ('b24_g10_practice_target.h','b24_g10_practice_target.c',
               'b24_g10_practice_target_vitagl.c',
               'b24_g11_practice_melee_feedback.h',
