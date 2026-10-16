@@ -23,7 +23,14 @@ CANDIDATES=(
  'ProjectileEntity::UpdateCollisions()',
  'WeaponDB::GetAttackEntityByIndex(int)',
  'WeaponDB::AddNewAttackEntity(EntityData*)',
- 'WeaponMgr::InitWeaponData(EntityData*, Entity3D*, int)'
+ 'WeaponMgr::InitWeaponData(EntityData*, Entity3D*, int)',
+ 'CNPC::InitShield()',
+ 'CNPC::OnHit(Actor*, int, float)',
+ 'CNPC::UpdateStateHurt(int, CNPC::NPCStateNode&)',
+ 'CNPC::OnDie()',
+ 'Actor::CanBeHurt(Actor*)',
+ 'Actor::OnTargetDie(Actor*)',
+ 'Actor::ActiveHurtSpecialFX(bool)'
 )
 def run(ipa,out):
  with zipfile.ZipFile(ipa) as z:
