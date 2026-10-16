@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
-#include "g75_device_qa/b24_g75_original_sun_lighting_candidate.h"
+#include "b24_g75_original_sun_lighting_candidate.h"
 #endif
 #ifdef B24_G72_SOURCE_LIGHTING
 #include "b24_gpu_g72_light.h"
