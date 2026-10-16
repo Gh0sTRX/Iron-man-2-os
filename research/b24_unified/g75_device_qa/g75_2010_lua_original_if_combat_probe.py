@@ -6,6 +6,8 @@ C/ObjC source, unknown SPEED values or dynamic combat decision semantics.
 """
 import argparse,collections,json,zipfile
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from b24_owner_pack_extract import decode,get_exact
 from b24_g27_original_source_lua51_native_global_call_sites import report
 def audit(ipa,out):
