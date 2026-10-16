@@ -1,0 +1,39 @@
+name: G75 Original Moon Sky Material Submesh Source Forensics No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-original-moon-material-source-only.yml"
+      - "research/b24_unified/g75_device_qa/g75_original_moon_sky_material_source_audit.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare native authored BRES source parser
+        run: python3 -m pip install -q numpy pillow scipy trimesh gdown
+      - name: Access previously user-supplied original 2010 source privately
+        run: |
+          mkdir -p /tmp/g75_sky_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g75_sky_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g75_sky_owner/owner.ipa
+          test "$(wc -c </tmp/g75_sky_owner/owner.ipa)" -eq 248613763
+      - name: Inspect exact original sky BRES material and six authored UV groups
+        run: |
+          python3 research/b24_unified/g75_device_qa/g75_original_moon_sky_material_source_audit.py \
+            --ipa /tmp/g75_sky_owner/owner.ipa \
+            --out /tmp/g75_native_sky_moon_position_material_report.json
+          rm -rf /tmp/g75_sky_owner
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G75_Original_2010_Night_Moon_Material_2717_2718_2719_UV_Proof_No_VPK
+          path: /tmp/g75_native_sky_moon_position_material_report.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove owner archive
+        if: always()
+        run: rm -rf /tmp/g75_sky_owner
