@@ -26,6 +26,11 @@ def run(ipa:Path, output:Path):
  sky_nodes=[x for x in deco if x['source_Deco_name']=='Deco001']
  assert len(sky_nodes)==1 and sky_nodes[0]['native_raw_resource_type_uint32']==22
  sky=models[entries[21].start:entries[21].end]
+ source_texture_names=[x.name for x in decode(textures,'.tga')]
+ sky_name_candidates=[x for x in source_texture_names
+     if any(token in x.casefold() for token in
+         ('sky','night','cloud','horizon','backdrop','sunset','cityscape'))]
+
  result={
  'source_model':'C1L1_sky_001.bdae',
  'authored_deco':'Deco001',
@@ -33,6 +38,9 @@ def run(ipa:Path, output:Path):
  'zero_based_pack_slot':21,
  'sky_original_bdae_SHA256':hashlib.sha256(sky).hexdigest(),
  'source_BRES_bytes':len(sky),
+ 'original_owner_texture_archive_members':len(source_texture_names),
+ 'source_texture_sky_name_candidate_search':sky_name_candidates,
+ 'source_texture_sky_binding_PROVEN':False,
  'source_CLARA_local_transform':{
    'position_XYZ':[sky_nodes[0]['source_X'],sky_nodes[0]['source_Y'],sky_nodes[0]['source_Z']],
    'quaternion_xyzw':sky_nodes[0]['source_quat_xyzw'],
