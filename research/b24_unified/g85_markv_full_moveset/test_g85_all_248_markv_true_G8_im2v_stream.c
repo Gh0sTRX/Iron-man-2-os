@@ -16,7 +16,7 @@ int main(int argc,char **argv){
  float *first=malloc(629u*3u*sizeof(float));
  if(!pose||!first)return 3;
  while((e=readdir(dir))!=NULL){
-  if(strncmp(e->d_name,"suitcase_ironman_",16)!=0)continue;
+  if(strncmp(e->d_name,"suitcase_ironman_",17)!=0)continue;
   size_t l=strlen(e->d_name);
   if(l<=5||strcmp(e->d_name+l-5,".im2v"))continue;
   char filename[192];
