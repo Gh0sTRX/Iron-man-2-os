@@ -129,7 +129,8 @@ jobs:
            raw=Path(f'work/assets/G73_original_sky_tex_{i:02d}.g66t').read_bytes()
            assert raw[:4]==b'G66T' and struct.unpack_from('<3I',raw,4)==(1,256,256)
           city=Path('work/b24/b24_unified/b24_gpu_g68_city.c').read_text()
-          assert city.index('for(unsigned i=0;i<m->texture_count;i++){')<city.index('#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE')
+          assert city.index('for(unsigned i=0;i<m->texture_count;i++){')<city.index('#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE\n /* Four genuine')
+          assert city.count('G106 real-device regression')==1
           assert 'G106 real-device regression' in city
           print('G106 PASS sky original 6 pieces and both 256 PVR atlasses; alpha provenance now loaded BEFORE Sun vertex shading')
           PY
