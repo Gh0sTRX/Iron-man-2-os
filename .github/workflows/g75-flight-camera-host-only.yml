@@ -1,0 +1,24 @@
+name: G75 B14 Flight Pace Right Stick Source-Only Host Tests
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-flight-camera-host-only.yml"
+      - "research/b24_unified/g75_device_qa/g75_patch_b14_camera_and_flight_SOURCE_ONLY.py"
+      - "research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract known B14 source (not original iOS physics)
+        run: python3 -m zipfile -e third_person_b14/b14_overlay.zip /tmp/g75_legacy
+      - name: Calibrate movement and camera exclusively in a temporary source tree
+        run: |
+          python3 research/b24_unified/g75_device_qa/g75_patch_b14_camera_and_flight_SOURCE_ONLY.py --b14-source-dir /tmp/g75_legacy/src
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I/tmp/g75_legacy/src /tmp/g75_legacy/src/b14_world.c research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c -lm -o /tmp/g75_motion
+          /tmp/g75_motion
