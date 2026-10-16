@@ -68,7 +68,9 @@ def audit(b11zip, g64html, output):
                     if b['original_uv_mesh_positive'] and b.get('tga'):
                         counts['already_original_PVR_UV_faces']+=b['tris']; continue
                     if mesh['stride']!=24:
-                        raise AssertionError('unresolved non-FVF24 material source '+name)
+                        # Native FVF32 can already have genuine G64 UV but lack an atlas.
+                        assert b['original_uv_mesh_positive'], ('no native UV', name)
+                        source_has_uv=True
                     atlas=material_map.get(b['material'])
                     if atlas is not None:
                         if atlas.casefold() not in present_atlases: expected_new_atlases.add(atlas.casefold())
