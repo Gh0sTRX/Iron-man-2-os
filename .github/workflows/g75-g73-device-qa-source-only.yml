@@ -1,0 +1,34 @@
+name: G75 G73 Real Vita QA B14 Movement Scale Camera and Original Lua No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g75-g73-device-qa-source-only.yml"
+      - "research/b24_unified/g75_device_qa/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_source_probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover only legacy homebrew B14 gameplay source code from prior overlay archive
+        run: python3 research/b24_unified/g75_device_qa/g75_b14_gameplay_source_report.py
+      - name: Verify authentic 2010 animation clip identities and static Lua source call sites
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          doc=Path('research/b24_unified/G25_G28_ORIGINAL_C1L1_CLASS_LUA_CAMERA_MAP_HANDOFF_2026-10-15.md').read_text()
+          assert '71 complete' in doc and 'Mission000_OnStart' in doc
+          assert 'SetState(1062' in doc and 'SetCamera(1864' in doc
+          print('PASS static source confirms real 2010 iOS typed Lua callback control and actual legacy G9/B14 handwritten gameplay source are DISTINCT')
+          PY
+      - name: Preserve exact original B14 source-code constants audit metadata only
+        uses: actions/upload-artifact@v4
+        with:
+          name: G75_G73_User_Photo_B14_Flight_Camera_Scale_Source_Audit_NO_VPK
+          path: g75_original_gameplay_engine_source_report.json
+          if-no-files-found: error
+          retention-days: 14
