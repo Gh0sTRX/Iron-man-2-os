@@ -3,6 +3,9 @@
 #include "b24_gpu_owner.h"
 #ifdef B24_G68_CITY_BACKEND
 #include "b24_gpu_g68_city.h"
+#ifdef B24_G73_REAL_SKY
+#include "b24_gpu_g73_sky.h"
+#endif
 #endif
 #include "b24_gpu_c1_vehicle_texture.h"
 #include "b24_gpu_cpu_profile.h"
@@ -18,6 +21,9 @@ typedef struct {
  B24GpuC1Mesh city; /* old G9 source C1 mesh, untouched in legacy mode */
 #ifdef B24_G68_CITY_BACKEND
  B24G68City g68_city; /* authoritative photographed 2010 source G68 scene */
+#ifdef B24_G73_REAL_SKY
+ B24G73Sky original_sky;
+#endif
 #endif
  B24C1UV city_uv;
  B24C1MaterialSource city_material; /* original material LABELS, NOT atlases */
