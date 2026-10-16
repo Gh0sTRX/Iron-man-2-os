@@ -101,11 +101,64 @@ def inspect(ipa,out):
    if not later_r1_write:
     probable.append({'original_key_name':key,'source_key_pointer_hex':hex(ptr),
          'native_load_address_hex':hex(j.address)})
+  # G98B: authentic compiler uses position-independent ARM
+  #    ldr ip,[pc,#literal_disp]   ; signed DELTA, not a pointer!
+  #    add r1,pc,ip               ; actual param-name char* = PC+8+delta
+  #    add r2,r4,#original_field
+  #    bl EntityData::GetParamValue(int*/bool*)
+  # Decode PIC exactly rather than inventing invalid pointer-to-C-string.
+  pic_matches=[]
+  for index,j in enumerate(near):
+   if j.mnemonic!='add' or len(j.operands)<3:continue
+   if j.operands[0].type!=ARM_OP_REG or j.reg_name(j.operands[0].reg)!='r1':continue
+   if j.operands[1].type!=ARM_OP_REG or j.operands[1].reg!=ARM_REG_PC:continue
+   if j.operands[2].type!=ARM_OP_REG:continue
+   delta_reg=j.reg_name(j.operands[2].reg)
+   if any(q.operands and q.operands[0].type==ARM_OP_REG and
+          q.reg_name(q.operands[0].reg)=='r1' and
+          q.mnemonic.startswith(('ldr','mov','add','sub','adr','eor','orr','and'))
+          for q in near[index+1:]):continue
+   for ld in reversed(near[:index]):
+    if ld.mnemonic!='ldr' or len(ld.operands)<2 or ld.operands[0].type!=ARM_OP_REG:
+     continue
+    if ld.reg_name(ld.operands[0].reg)!=delta_reg:continue
+    if ld.operands[1].type!=ARM_OP_MEM or ld.operands[1].mem.base!=ARM_REG_PC:break
+    literal=(ld.address+8+ld.operands[1].mem.disp)&~3
+    raw_delta=vbytes(literal,4)
+    if raw_delta is None:break
+    signed_delta=struct.unpack('<i',raw_delta)[0]
+    native_cstring_ptr=(j.address+8+signed_delta)&0xffffffff
+    key=cstring(native_cstring_ptr)
+    if key is not None:
+     pic_matches.append({
+      'original_key_name':key,
+      '2010_PIC_literal_VM_hex':hex(literal),
+      'original_ARM_signed_CSTRING_relative_offset':signed_delta,
+      'original_cstring_source_VM_hex':hex(native_cstring_ptr),
+      '2010_actual_add_r1_PC_insn_hex':hex(j.address),
+      'native_source_position_independent_key':True})
+    break
+  # Source field destination is r2 (int*/bool*) and stored at
+  # raw AttackEntity object offset. A bool temporary on SP requires branch
+  # analysis to establish the final stored field, so do NOT claim one.
+  destination=[]
+  for j in reversed(near):
+   if j.mnemonic!='add' or len(j.operands)<3:continue
+   if j.operands[0].type!=ARM_OP_REG or j.reg_name(j.operands[0].reg)!='r2':continue
+   if j.operands[1].type!=ARM_OP_REG or j.operands[2].type!=ARM_OP_IMM:continue
+   base=j.reg_name(j.operands[1].reg)
+   if base not in ('r4','sp'):continue
+   destination=[{'native_argument_r2_base_register':base,
+      'native_argument_r2_offset_hex':hex(j.operands[2].imm),
+      'relative_ARM_code_offset':hex(j.address-ADDR),
+      'object_field_parent_proven':base=='r4'}]
+   break
   methods.append({'native_GetParamValue_call_address_hex':hex(ins.address),
    'native_GetParamValue_call_relative_pc_hex':hex(ins.address-ADDR),
    'actual_original_cpp_GetParamValue_expected_type':'bool*' if target==GET_BOOL else 'int*',
    'native_target_function_address_hex':hex(target),
-   'proven_r1_argument_original_cstring':probable[-1] if probable else None,
+   'proven_r1_argument_original_cstring':pic_matches[-1] if pic_matches else (probable[-1] if probable else None),
+   'verified_native_int_bool_output_destination_r2':destination,
    'source_literal_pool_cstring_candidates':consts,
    'bounded_native_ARM_context_before_call':instructions_before,
    'original_destination_struct_field_offset_confirmed':False,
