@@ -1,0 +1,48 @@
+name: G105 original 26 Attack Object110 real Damage property source crosswalk
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g105-2010-26-attack-object-damage-typed-source-slot-crosswalk.yml"
+      - "research/b24_unified/g105_original_damage_slot_crosswalk/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_26_attack_damage_parent_schema_alignment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse genuine previously validated 2010 original user-owned CLARA class108 and class110 decoded typed source metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: G98_ORIGINAL_2010_ATTACKENTITY_14_GETPARAMVALUE_REAL_TYPED_PROPERTY_SOURCE_META_NO_VPK
+          run-id: 38971308172
+          github-token: ${{ github.token }}
+          path: /tmp/g105_owner_class_provenance
+      - name: Class110 Object local 23 typed slots vs exact 26 x 54 Attack size-stream candidate matching
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g105_original_damage_slot_crosswalk/g105_align_real_26_attack_fields_against_original_object_23_descriptor.py \
+            --schema /tmp/g105_owner_class_provenance/G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json \
+            --out /tmp/g105_results/G105_2010_26_ORIGINAL_ATTACK_OBJECT_DAMAGE_TYPED_SLOT_CANDIDATE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g105_results/G105_2010_26_ORIGINAL_ATTACK_OBJECT_DAMAGE_TYPED_SLOT_CANDIDATE.json').read_text())
+          assert d['all_26_attack_field_length_prefixes_truly_decoded'] is True
+          assert len(d['class110_local_23_original_prototype_property_tag_sequence'])==23
+          assert d['safe_to_enable_2010_damage_runtime'] is False
+          assert d['exact_source_EntityData_inheritance_property_dispatch_PROVEN'] is False
+          assert d['NO_VPK'] is True
+          print('PASS G105 26 authentic Attack x 54 original CLARA property lengths source crosswalk, no invented original damage values or source AI')
+          PY
+      - name: Upload only owner game original class property slot metadata, never game binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: G105_ORIGINAL_2010_26_ATTACK_TYPED_DAMAGE_FIELD_CANDIDATE_SOURCE_ONLY
+          path: /tmp/g105_results/G105_2010_26_ORIGINAL_ATTACK_OBJECT_DAMAGE_TYPED_SLOT_CANDIDATE.json
+          retention-days: 14
+          if-no-files-found: error
