@@ -37,8 +37,8 @@ static void run_case(const char *dir,B24MotionStage stage,const char *locomotion
  assert(frame(&actor,dir,1800,stage,locomotion));
  assert(b24_g8_motion_whole_body_fire(&actor));
  assert(frame(&actor,dir,1801,stage,locomotion));
- assert(strcmp(actor.selected,locomotion==NULL?"":locomotion)!=0 ||
-        actor.transitions>=before+2);
+ char expected[160];snprintf(expected,sizeof(expected),"suitcase_%s",locomotion+8);
+ assert(strcmp(actor.selected,expected)==0);
  assert(!actor.repulsor_pending);
  assert(!b24_g8_motion_whole_body_fire(&actor));
  assert(actor.transitions==before+2);
