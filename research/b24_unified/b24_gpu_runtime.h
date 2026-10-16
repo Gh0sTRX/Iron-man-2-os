@@ -1,6 +1,9 @@
 #ifndef B24_GPU_RUNTIME_H
 #define B24_GPU_RUNTIME_H
 #include "b24_gpu_owner.h"
+#ifdef B24_G68_CITY_BACKEND
+#include "b24_gpu_g68_city.h"
+#endif
 #include "b24_gpu_c1_vehicle_texture.h"
 #include "b24_gpu_cpu_profile.h"
 #include "b24_c1_material_source.h"
@@ -12,7 +15,10 @@
 typedef struct {
  B24GpuOwner owner;
  B24CpuGpuProfile profile; /* CPU thread wall only; not GPU busy */
- B24GpuC1Mesh city;
+ B24GpuC1Mesh city; /* old G9 source C1 mesh, untouched in legacy mode */
+#ifdef B24_G68_CITY_BACKEND
+ B24G68City g68_city; /* authoritative photographed 2010 source G68 scene */
+#endif
  B24C1UV city_uv;
  B24C1MaterialSource city_material; /* original material LABELS, NOT atlases */
  uint32_t verified_vehicle_atlas; /* 0 until B12 original atlas loaded, never guessed */
