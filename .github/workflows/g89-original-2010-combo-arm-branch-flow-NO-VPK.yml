@@ -28,6 +28,9 @@ jobs:
           set -euo pipefail
           python3 research/b24_unified/g89_original_combo_native_flow/g89_decode_original_combo_arm_field_flow.py \
             --ipa /tmp/g89_private_owner/original.ipa --out /tmp/g89_source_metadata
+          python3 research/b24_unified/g89_original_combo_native_flow/g89b_original_melee_state_transition_provenance.py \
+            --g89-json /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json \
+            --out /tmp/g89_source_metadata/G89B_REAL_2010_UPDATE_MELEE_16_STATE_ACCESS_EVIDENCE.json
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -38,6 +41,10 @@ jobs:
           assert data['original_source_hit_active_start_end_frames'] is None
           assert data['original_source_attack_per_weapon_damage_numeric_values'] is None
           assert data['no_VPK'] is True
+          extra=json.loads(Path('/tmp/g89_source_metadata/G89B_REAL_2010_UPDATE_MELEE_16_STATE_ACCESS_EVIDENCE.json').read_text())
+          assert extra['original_UpdateMeleeAttackState_0x824_instruction_accesses']==16
+          assert extra['original_contact_hit_active_frame_time_proven'] is False
+          assert extra['no_VPK'] is True
           print('PASS real source ARM read/write/condition metadata only; combat invented values NO')
           PY
       - name: Securely remove private original 2010 source IPA regardless of test success
@@ -48,7 +55,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: G89_ORIGINAL_2010_ARM_COMBO_0x824_FIELD_BRANCH_CONTEXT_NO_VPK
-          path: /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json
+          path: |
+            /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json
+            /tmp/g89_source_metadata/G89B_REAL_2010_UPDATE_MELEE_16_STATE_ACCESS_EVIDENCE.json
           if-no-files-found: error
           retention-days: 14
   old_b24_release_gate_still_blocked:
