@@ -82,8 +82,7 @@ def install():
 #endif
        ) && mode<=B24M_RUN)
     melee=b24_g8_melee_tick(&a->melee,now);''',"one original melee timeline shared suit 0 or 4")
- g8=once(g8,''' if(g84_source_clip&&!melee&&!a->repulsor_pending)
-   desired=g84_source_clip;
+ g8=once(g8,''' if(g84_source_clip&&!melee&&!a->repulsor_pending)desired=g84_source_clip;
  if(!desired|| (suit==0&&nv!=802u) || (suit==2&&nv!=1292u)){''',''' if(g84_source_clip&&!melee&&!a->repulsor_pending)
    desired=g84_source_clip;
 #ifdef B24_G85_NATIVE_MARKV_629
