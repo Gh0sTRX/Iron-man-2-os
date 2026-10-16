@@ -31,6 +31,9 @@ jobs:
           python3 research/b24_unified/g89_original_combo_native_flow/g89b_original_melee_state_transition_provenance.py \
             --g89-json /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json \
             --out /tmp/g89_source_metadata/G89B_REAL_2010_UPDATE_MELEE_16_STATE_ACCESS_EVIDENCE.json
+          python3 research/b24_unified/g89_original_combo_native_flow/g90_extract_original_2010_melee_arm_state_dispatch_table.py \
+            --g89-json /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json \
+            --out /tmp/g89_source_metadata/G90_REAL_2010_MELEE_NATIVE_13_STATE_BRANCH_TABLE.json
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -45,6 +48,10 @@ jobs:
           assert extra['original_UpdateMeleeAttackState_0x824_instruction_accesses']==16
           assert extra['original_contact_hit_active_frame_time_proven'] is False
           assert extra['no_VPK'] is True
+          g90=json.loads(Path('/tmp/g89_source_metadata/G90_REAL_2010_MELEE_NATIVE_13_STATE_BRANCH_TABLE.json').read_text())
+          assert g90['original_13_way_switch_dispatch_verified'] is True
+          assert len(g90['source_state_id_to_original_ARM_branch_target'])==13
+          assert g90['original_13_internal_states_are_13_distinct_playable_combos'] is False
           print('PASS real source ARM read/write/condition metadata only; combat invented values NO')
           PY
       - name: Securely remove private original 2010 source IPA regardless of test success
@@ -58,6 +65,7 @@ jobs:
           path: |
             /tmp/g89_source_metadata/G89_REAL_ORIGINAL_2010_ARM_COMBO_0x824_BRANCH_AND_WRITES.json
             /tmp/g89_source_metadata/G89B_REAL_2010_UPDATE_MELEE_16_STATE_ACCESS_EVIDENCE.json
+            /tmp/g89_source_metadata/G90_REAL_2010_MELEE_NATIVE_13_STATE_BRANCH_TABLE.json
           if-no-files-found: error
           retention-days: 14
   old_b24_release_gate_still_blocked:
