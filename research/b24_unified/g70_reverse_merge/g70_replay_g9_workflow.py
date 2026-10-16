@@ -67,21 +67,12 @@ def patch_script(script:str, name:str)->str:
         script=script.replace(anchor,'''(cd work && zip -q build-vita/'''+vpk+''' assets/G66_city.g66m assets/G66_city_tex_*.g66t assets/G66_original_collision.g66c)
           '''+anchor)
     if G73 and "python3 research/b24_unified/apply_b24_g8_original_motion_source_only.py" in script:
-        original_sky_assets="""
-          python3 - <<'PY'
-          import pathlib,shutil
-          src=pathlib.Path('/tmp/g73_verified_sky')
-          dst=pathlib.Path('work/assets')
-          assert dst.is_dir()
-          files=['G73_original_sky_mesh.g73m',
-                 'G73_original_sky_tex_00.g66t',
-                 'G73_original_sky_tex_01.g66t']
-          for name in files:
-              assert (src/name).is_file(),(src/name)
-              shutil.copy2(src/name,dst/name)
-          print('PASS staged original 2010 real sky source geometry and authored night/moon PVRTC atlases')
-          PY"""
-        script+="\n"+original_sky_assets+"\n"
+        # Append after last G9 shell here-doc has already closed.
+        # Avoid embedding new nested heredocs into old verified workflow.
+        copy_sky = ("\\ncp /tmp/g73_verified_sky/G73_original_sky_mesh.g73m work/assets/ "
+                    "&& cp /tmp/g73_verified_sky/G73_original_sky_tex_00.g66t work/assets/ "
+                    "&& cp /tmp/g73_verified_sky/G73_original_sky_tex_01.g66t work/assets/\\n")
+        script += copy_sky
     if G73 and "(cd work && zip -q build-vita/" in script:
         sky_add="(cd work && zip -q build-vita/"+vpk+" assets/G73_original_sky_mesh.g73m assets/G73_original_sky_tex_*.g66t)"
         script=script+"\n          "+sky_add+"\n"
