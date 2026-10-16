@@ -35,6 +35,10 @@ jobs:
         run: |
           python3 research/b24_unified/g76_original_combat/g76b_arm_damage_call_graph_and_literals.py \
             --ipa /tmp/g76_private/owner_original.ipa --out /tmp/g76_public_metadata
+      - name: Decode original 2010 combat state Lua and combat weapon effects/sfx metadata
+        run: |
+          python3 research/b24_unified/g76_original_combat/g76c_real_2010_lua_combat_states_weapon_sound.py \
+            --ipa /tmp/g76_private/owner_original.ipa --out /tmp/g76_public_metadata
       - name: Remove copyrighted source archive before artifact upload
         run: rm -rf /tmp/g76_private
       - uses: actions/upload-artifact@v4
@@ -45,6 +49,7 @@ jobs:
             /tmp/g76_public_metadata/G76_ORIGINAL_ATTACK_DAMAGE_CLIP_TIMELINES.csv
             /tmp/g76_public_metadata/G76_TRUE_ORIGINAL_2010_ARM_NATIVE_COMBAT_METHOD_SYMBOLS.json
             /tmp/g76_public_metadata/G76B_ORIGINAL_2010_NATIVE_DAMAGE_COMBAT_DIRECT_CALL_GRAPH.json
+            /tmp/g76_public_metadata/G76C_ORIGINAL_2010_STATES_WEAPON_EFFECT_SOUND_SOURCE_METADATA.json
           retention-days: 14
           if-no-files-found: error
       - name: Scrub private owner archive even after failure
