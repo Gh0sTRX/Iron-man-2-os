@@ -1,0 +1,121 @@
+name: G87 Original Source Ground Hover Flight Contact Transition Native Game NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g87-real-original-flight-land-transition-G85-source-NO-VPK.yml"
+      - "research/b24_unified/g87_source_transition_events/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_g75_b14_g83_g85_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: G87 local C11 source ground contact vs hover/flight/landing state-machine regression
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g83_full_motion_aim \
+            -I research/b24_unified \
+            research/b24_unified/g87_source_transition_events/b24_g87_transition_events.c \
+            research/b24_unified/g87_source_transition_events/test_g87_original_surface_transition.c \
+            -o /tmp/g87_collision_grounded_motion_events
+          /tmp/g87_collision_grounded_motion_events
+      - name: Restore G8 2010 verified motion and rig source archive
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original WM 2010 gun node motion streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore original B24 G68/G59 world data (source use only, NO VPK)
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore the independently verified genuine 248 Mark V 629v IM2V streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Assemble genuine B24 G75 city + G84 single G83/G8 router + G85 248 MarkV + G87 sourced transitions
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path("work/src/main.c").read_text()
+          c=Path("work/CMakeLists.txt").read_text()
+          assert m.count("b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)")==1
+          assert m.count("b24_g83_timeline_tick(")==1
+          assert m.count("b24_g8_motion_tick_g84(")==1
+          assert m.count("b24_g8_motion_repulsor_trigger(")==1
+          assert m.count("b24_g8_motion_melee_trigger(")==1
+          assert m.count("b24_g87_transition_tick(")==1
+          assert "b24_g74_near_original_floor(&b24_original_walls" in m
+          assert "fabsf(world.z-g87_source_floor)<=.08f" in m
+          assert c.count("option(B24_G87_REAL_TRANSITION_EVENTS")==1
+          assert not list(Path("work").rglob("*.vpk"))
+          print("PASS B24 original grounded sourced transition integrated; ONE B14/G8/G83/B16; original MarkV, VI, WM retained, NO VPK")
+          PY
+      - name: Strict host syntax for real G75/G84/G85/G87 C integration
+        run: |
+          set -euo pipefail
+          cc -std=c11 -Wall -Wextra -Werror -pedantic \
+            -DB24_G87_REAL_TRANSITION_EVENTS=1 \
+            -DB24_G85_NATIVE_MARKV_629=1 \
+            -Iwork/b24/b24_unified \
+            -fsyntax-only work/b24/b24_unified/b24_g87_transition_events.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c
+      - name: TRUE Vita ARM native full im2_beta game LINK opt-in G75 G84 G85 G87 without VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G87-ELF-ONLY \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON \
+              -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON \
+              -DB24_G87_REAL_TRANSITION_EVENTS=ON
+            # Only the native game ELF target; NEVER build ALL, eboot or VPK.
+            cmake --build work/build-G87-ELF-ONLY --target im2_beta --parallel 4
+            test -s work/build-G87-ELF-ONLY/im2_beta
+            test -z "$(find work -name "*.vpk" -print -quit)"
+            echo "PASS G87 full Vita ARM game link with original city, MarkV 248, G83, G8, authentic triangle-grounded land events; NO VPK"
+          '
+      - name: Preserve ONLY source/host test evidence, NO game/IPA/VPK bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G87_ORIGINAL_G75_G84_G85_SOURCE_TRANSITIONS_NO_VPK
+          path: |
+            research/b24_unified/g87_source_transition_events/
+            work/src/main.c
+            work/CMakeLists.txt
+          if-no-files-found: warn
+          retention-days: 14
