@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Restore private source-only G57 evidence; no user IPA published
         env:
-          GH_${{ github.token }}: TOKEN
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/g64/g57 /tmp/g64/out
           gh run download 38814440599 --repo "${{ github.repository }}" \
