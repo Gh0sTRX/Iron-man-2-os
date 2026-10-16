@@ -53,3 +53,14 @@ G76C source-only binary scan: original `states` 2010 game pack contains 55 embed
 **STILL RESEARCH, DO NOT INVENT:** Field +0x3BC exact typed property name (shield likely); weapon stat numeric tables and original per-weapon damage values; original combo hit frame timestamps / combo input edges; native NPC rig-to-BRES state machine visual Vita integration; exact source SFX playback on Vita; whole original Lua mission execution; G75 ground/lighting/flight already source-tested but new combined Vita untested.
 **NEXT:** classify native EntityData weapon table serialization and `Actor` typed property offsets with xrefs; native `CNPC::OnHit` damage modifications and original weapon scalar register data-flow; expose a console-readable symbolic reverse-engineered STATE graph without launching copyrighted game code; map `StartMeleeAttack` and `UpdateComboAttackAction` frame action to skinned original combo one/two/three; validate original WAV fmt sample type before inserting into B24 sound owner.
 Repository scripts `research/b24_unified/g76_original_combat/g76_2010_combat_animation_binary_forensics.py`, `g76_2010_native_arm_combat_method_provenance.py`, `g76b_arm_damage_call_graph_and_literals.py`, `g76c_real_2010_lua_combat_states_weapon_sound.py`, `g76d_native_actor_damage_instructions.py`, `g76f_extract_real_riff_wave_combat_sfx_NO_VPK.py`. No executable/VPK uploaded or changed.
+
+## G76 native Actor damage math reference now implemented and ARM tested
+- Source paths:
+  `research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c/.h`,
+  `test_b24_g76_native_damage_math.c`.
+- GitHub Actions https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38927881762 **SUCCESS** for deterministic host and VitaSDK **ARM object-only** compilation. **NO new VPK**, no repackage, no user device test.
+- Recovered original source ARM `Actor::Damage(float)` two-branch arithmetic:
+  1) positive primary float at actor +0x3BC: subtract incoming float damage, clamp >=0; do **not** in the same damage event subtract excess from +0x394,
+  2) primary already depleted and positive secondary at +0x394: subtract incoming float damage, clamp >=0,
+  3) both depleted: no resource reduction.
+- Host test original-offset neutral field names demonstrates 30→20 primary, 20→0 primary on 25 hit with secondary 120 untouched, then second 60 and 0. Added API finite/positive bounds for safety are NEW and must not be mistaken for decompiled original ARM conditions. Typed HP/shield mapping, original status transition, hit reactions, native virtual callback dispatch and float attack scaling not yet restored.
