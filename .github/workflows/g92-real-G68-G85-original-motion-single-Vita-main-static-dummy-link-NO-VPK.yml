@@ -142,7 +142,9 @@ jobs:
           main=Path('work/src/main.c').read_text()
           assert main.count('b24_g8_motion_melee_trigger(')==1
           assert main.count('g92_debug_accepted_melee_edge=1;')==1
-          assert main.count('g92_debug_accepted_melee_edge=0;')==1
+          # One static initialization plus one actual per-frame consume.
+          assert main.count('g92_debug_accepted_melee_edge=0;')==2
+          assert main.count('        g92_debug_accepted_melee_edge=0; /* one consumed debug latch */')==1
           # Old G75/G85/G9 main actually contains three separately guarded
           # source melee condition occurrences. The debug target must not
           # create a fourth. CI checks exact known assembled source here.
