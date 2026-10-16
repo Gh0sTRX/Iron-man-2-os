@@ -36,6 +36,30 @@ def apply():
   raise RuntimeError("Old B24 gameplay engine GPU loop is missing")
  if "b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)" not in code:
   raise RuntimeError("The authoritative B14 gameplay flight physics disappeared")
+ # G74 exact original source non-wall walkable surface HEIGHT query.
+ # Apply ONLY in initial Ground stage of existing B14 movement motor,
+ # after G7 wall sweep. This is not a second physics integration loop.
+ world_floor_hook="          float c1_follow=fminf(7.f*dt,1.f);"
+ if code.count(world_floor_hook)!=1:
+  raise RuntimeError("G74 original B24 camera reconciler drift")
+ code=code.replace(world_floor_hook,'''
+#ifdef B24_G74_GROUND_CONTACT
+          /* G74: only snap if one original sourced floor is within
+           * [-0.5,+0.45] player-foot Z. Never lift to remote sky roof.
+           * Source collider has limited horizontal coverage; original
+           * B14 fallback stays authoritative elsewhere. */
+          if(world.flight_stage==0){
+            float g74_native_floor=0.f;
+            if(b24_g74_near_original_floor(&b24_original_walls,
+                                          world.x,world.y,world.z,
+                                          &g74_native_floor)){
+              float support_delta=g74_native_floor-world.z;
+              world.z=g74_native_floor;
+              world.cam_z+=support_delta*fminf(7.f*dt,1.f);
+            }
+          }
+#endif
+'''+world_floor_hook,1)
  GAME.write_text(code)
  for name in ["b24_gpu_g68_city.h","b24_gpu_g68_city.c",
               "b24_gpu_g68_collision.h","b24_gpu_g68_collision.c",
@@ -79,6 +103,10 @@ if(B24_G68_CITY_BACKEND)
  option(B24_G72_DUSK_ATMOSPHERE "Diagnostic dusk horizon until authored sky shader recovery" OFF)
  option(B24_G72_SOURCE_LIGHTING "One-time triangle-normal baked twilight vertex color" OFF)
  option(B24_G73_REAL_SKY "Original six BRES C1L1 sky pieces with two source night atlas material candidate assignment" OFF)
+ option(B24_G74_GROUND_CONTACT "Nearby sourced floor contact in original B24 ground stage only" OFF)
+ if(B24_G74_GROUND_CONTACT)
+  target_compile_definitions(im2_beta PRIVATE B24_G74_GROUND_CONTACT=1)
+ endif()
  if(B24_G73_REAL_SKY)
   target_sources(im2_beta PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g73_sky_vitagl.c")
