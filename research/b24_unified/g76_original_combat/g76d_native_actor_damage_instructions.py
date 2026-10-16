@@ -97,3 +97,46 @@ def run(ipa,out):
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--ipa',required=True,type=Path);p.add_argument('--out',required=True,type=Path)
  a=p.parse_args();run(a.ipa,a.out)
+ # G78 source-only IPA research: reuse the SAME authenticated 2010 owner
+ # game archive in the existing G76 CI before its secure deletion.  Do not
+ # upload the IPA, recovered executable, sound/audio or a Vita VPK.
+ # Three G77 source readers produce metadata and typed original ARM proof.
+ import sys
+ from pathlib import Path as _Path
+ _dir=_Path(__file__).resolve().parents[1]/'g77_original_weapon_db'
+ sys.path.insert(0,str(_dir))
+ from g77a_owned_2010_weapon_db_asset_origin import run as real_weapon_asset_audit
+ from g77b_original_arm_WeaponDB_and_Melee_bbox_literal import main as real_macho_weapon_audit
+ from g77c_original_sfx_www_wave_codec_audit import main as real_sound_codec_audit
+ real_weapon_asset_audit(a.ipa,a.out)
+ real_macho_weapon_audit(a.ipa,a.out)
+ real_sound_codec_audit(a.ipa,a.out)
+ # Persist concise, actually VERIFIED source stats in existing G76 JSON
+ # which the standing workflow already uploads. Metadata-only.
+ import json as _json
+ original_report=a.out/'G76D_ORIGINAL_NATIVE_DAMAGE_HP_COMBO_ARM_INSTRUCTION_TRACE.json'
+ payload=_json.loads(original_report.read_text())
+ sources={
+   'native_original_weapon_asset_audit':'G77A_REAL_2010_WEAPON_DB_ASSET_AND_FIELD_ORIGIN_AUDIT.json',
+   'real_2010_native_melee_half_bbox_weaponDB':'G77B_ORIGINAL_ARM_MELEE_BOUNDING_RADIUS_AND_WEAPON_DB_LAYOUT.json',
+   'true_2010_sfx_audio_codec_metadata':'G77C_REAL_2010_ALL_SFX_RIFF_WAV_CODEC_METADATA.json'}
+ proofs={}
+ for label,file in sources.items():
+  r=_json.loads((a.out/file).read_text())
+  if label=='real_2010_native_melee_half_bbox_weaponDB':
+   proofs[label]=r['exact_target_methods']
+  elif label=='true_2010_sfx_audio_codec_metadata':
+   proofs[label]={'original_SFX_entries':r['original_SFX_entries'],
+                  'parsed_RIFF_SFX_entries':r['parsed_RIFF_SFX_entries'],
+                  'codec_sample_rate_channel_bitdepth_combinations':
+                    r['codec_sample_rate_channel_bitdepth_combinations'],
+                  'rejected_entries':r['rejected_entries']}
+  else:
+   proofs[label]={'source_top_level_files_count':r['source_top_level_files_count'],
+                 '2010_source_weapon_named_packed_records':r['named_packed_source_records'],
+                 'candidate_resource_files':[x for x in r['real_source_app_entries']
+                    if x.get('weapon_stat_config_token_probe')]}
+ payload['G78_original_owner_source_WeaponDB_and_audio_provenance']=proofs
+ payload['G78_VPK_generated']=False
+ original_report.write_text(_json.dumps(payload,ensure_ascii=False,indent=2)+'\\n')
+ print('PASS G78 Original IPA native weapon config metadata and SFX verified; no Vita package generated')
