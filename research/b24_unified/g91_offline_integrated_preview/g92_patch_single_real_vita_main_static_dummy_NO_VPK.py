@@ -39,11 +39,11 @@ def apply():
  B24G10PracticeTarget g92_practice_dummy;
 #endif
  B24GpuC1Mesh city;''','runtime data model')
- runtime=once(runtime,'#include "b24_g10_original_foot_contact.h"',
-   '''#include "b24_g10_original_foot_contact.h"
-#ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
-#include "b24_g10_practice_target.h"
-#endif''','runtime native geometry include')
+ # Runtime include layout changed with the G68 backend; append a safe guarded
+ # include instead of coupling the debug actor to legacy G10 contact code.
+ if '#include "b24_g10_practice_target.h"' in runtime:
+  raise ValueError('G92 target declaration already present in renderer')
+ runtime='#ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW\n#include "b24_g10_practice_target.h"\n#endif\n'+runtime
  # Render only AFTER the existing original C1L1 GPU city and before next HUD.
  # In an uninitialized source world do not conjure a dummy in the void.
  runtime=once(runtime,' if(!r->frames)(void)b24_gpu_boot_trace_mark("44 SCENE_DRAW_OK");',
