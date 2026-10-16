@@ -20,6 +20,15 @@ for forbidden in ['cmake --build','vita_create_vpk','zip -q build-vita','actions
 assert 'g70_stage_g68_source_scene.py' in source_script
 print('G75 starting real G9 B24 source assembly + G68 originals. No Vita packages.',flush=True)
 subprocess.run(['bash','-eo','pipefail'],input=source_script,text=True,cwd=R,check=True)
+wsrc=(R/'work/src/b14_world.c').read_text().splitlines()
+wh=(R/'work/src/b14_world.h').read_text().splitlines()
+for idx,line in enumerate(wsrc):
+    if any(term in line for term in ('velocity','rush?', 'w->pitch','w->x=cl', 'w->y=cl',
+                                      'w->z+=', 'target_z', 'float vx', 'float vy')):
+        print('G75 TRUE MERGED B14 WORLD',idx+1,':',line,flush=True)
+for idx,line in enumerate(wh):
+    if 'B14World' in line or 'target_z' in line or 'float speed' in line:
+        print('G75 TRUE MERGED B14 HEADER',idx+1,':',line,flush=True)
 subprocess.run(['python3',str(R/'research/b24_unified/g75_device_qa/g75_apply_to_G70_original_B24_SOURCE_ONLY.py')],
     cwd=R,check=True)
 world=(R/'work/src/b14_world.c').read_text()
