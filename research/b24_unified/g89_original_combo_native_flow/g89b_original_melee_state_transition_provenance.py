@@ -45,6 +45,32 @@ def inspect(source,destination):
    'preceding_cmp_or_test_in_window':pre_cmp,
    'subsequent_native_branch_in_window':post_br,
    'no_asserted_attack_time_or_input':True}
+ # G89 C11 reference is only allowed if every predicate matches
+ # the exact ORIGINAL native read/compare/conditional-result sequence.
+ def original_after(name):
+  rows=methods[name]['combo_0x824_accesses']
+  if len(rows)!=1:raise ValueError('native 2010 predicate expected one +0x824 read/write: '+name)
+  evidence=compact(rows[0])
+  return [(x['mnemonic'],x['operands']) for x in evidence['next_7_native_instructions']]
+ exact={
+  'MainCharacter::IsInMeleeAttackState()':[
+   ('sub','r0, r1, #2'),('cmp','r0, #0xa'),('movhi','r0, #0'),('movls','r0, #1')],
+  'MainCharacter::IsInMeleeAttackEndState()':[
+   ('sub','r0, r1, #9'),('cmp','r0, #3'),('movhi','r0, #0'),('movls','r0, #1')],
+  'MainCharacter::IsInMeleeAttackSlideState() const':[
+   ('cmp','r0, #1'),('movne','r0, #0'),('moveq','r0, #1')],
+ }
+ for name,want in exact.items():
+  got=original_after(name)
+  if got[:len(want)]!=want:
+   raise ValueError('REAL ORIGINAL 2010 ARM melee predicate changed: '+name+str(got))
+ reset=methods['MainCharacter::ResetMeleeAttackState()']['combo_0x824_accesses']
+ reset_ctx=compact(reset[0])
+ if reset_ctx['last_5_native_instructions'][-1]['mnemonic']!='mov' or \
+    reset_ctx['last_5_native_instructions'][-1]['operands']!='r3, #0' or \
+    reset_ctx['next_7_native_instructions'][0]['mnemonic']!='str' or \
+    reset_ctx['next_7_native_instructions'][0]['operands']!='r3, [r0, #0x828]':
+  raise ValueError('Original iOS reset did not zero both +0x824 and +0x828')
  scenes={key:{
    'original_cpp_name':key,
    'native_start_address':val['native_address_hex'],
@@ -70,6 +96,11 @@ def inspect(source,destination):
   'original_UpdateMeleeAttackState_0x824_instruction_accesses':16,
   'original_StartMeleeAttack_native_source_bounded_index_compared_to_12':bound,
   'original_StartMeleeAttack_native_source_32bit_indexed_lookup_after_compare':indexed,
+  'all_3_native_melee_classification_predicates_exact_ARM_asserted':True,
+  'native_reset_0x824_and_0x828_zero_exact_ARM_asserted':True,
+  '2010_native_classification_truth_table':{
+    'slide':[1],'attack_state_inclusive_range':[2,12],
+    'ending_state_inclusive_range':[9,12]},
   'index_0_through_12_IS_NOT_a_proven_gameplay_attack_count':True,
   'actual_original_reset_and_predicate_functions':scenes,
   'original_start_melee_source_field_flow':start_context,
