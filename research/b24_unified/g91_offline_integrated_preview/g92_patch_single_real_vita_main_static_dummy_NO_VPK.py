@@ -21,6 +21,8 @@ def apply():
  for p in (M,H,R,CM):
   if not p.is_file():raise FileNotFoundError('G92 requires built G75/G84/G85/G87 physical game: '+str(p))
  main=M.read_text();header=H.read_text();runtime=R.read_text();cm=CM.read_text()
+ original_melee_input_sites=main.count('b24_unified_should_melee(&b24_game)')
+ if not 1<=original_melee_input_sites<=6:raise ValueError('unexpected native old B24 original input site count')
  for expect in ('G84_OPTIONAL_TRUE_B24_MAIN','B24_G85_NATIVE_MARKV_629','B24_G87_REAL_TRANSITION_EVENTS'):
   if expect not in main:raise ValueError('G92 source precondition missing: '+expect)
  if 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' in main:
@@ -122,14 +124,15 @@ static unsigned g92_debug_accepted_melee_edge=0;
    +indent+'#endif\n'+indent+'}')
  main=main[:found.start()]+replacement+main[found.end():]
  assert main.count('b24_g8_motion_melee_trigger(')==1
- # G85 and G75 source snapshots can have one or two mutually
- # exclusive compile-preprocessor references; neither creates a second
- # evaluated melee input in the active G92 build. The new G92 debug
- # callback must never poll this function in a separate branch.
+ # Preserve old source code's number of input gate references exactly;
+ # the legacy game has THREE distinct source callsites in this G75/G85
+ # reconstruction (not one!), whose original semantics are separate.
+ # G92 MUST NOT increase the count or poll an extra attack edge.
  source_guards=main.count('b24_unified_should_melee(&b24_game)')
- if source_guards not in (1,2):
-  raise ValueError('G93 unexpected accepted input call count '+str(source_guards))
- print('G93 B24 compile-source melee guards',source_guards,'G92 debug extra guards ZERO')
+ if source_guards!=original_melee_input_sites:
+  raise ValueError('G93 accidentally introduced a second combat poll')
+ print('G93 preserved exact old B24 melee input callsites',source_guards,
+       'G92 debug additional polls ZERO')
  assert 'g92_debug_accepted_melee_edge' in main
  assert main.count('g92_debug_accepted_melee_edge=1;')==1
  for name in ('b24_g10_practice_target.h','b24_g10_practice_target.c',
