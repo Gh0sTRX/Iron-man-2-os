@@ -139,4 +139,4 @@ if __name__=='__main__':
  payload['G78_original_owner_source_WeaponDB_and_audio_provenance']=proofs
  payload['G78_VPK_generated']=False
  original_report.write_text(_json.dumps(payload,ensure_ascii=False,indent=2)+'\\n')
- print('PASS G81 native nested Projectile/Damage class schema source tags and actual C1L1 Attack values examined, no Vita package')
+ print('PASS G82 original attack/player source TLV field structures examined at real native 2010 byte offsets, no VPK')
