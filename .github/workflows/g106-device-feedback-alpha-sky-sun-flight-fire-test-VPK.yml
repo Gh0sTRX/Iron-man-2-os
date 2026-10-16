@@ -1,0 +1,293 @@
+name: G106 ON-DEVICE FEEDBACK FIX Alpha Skybox Sun and MarkV Stage2 Rush Fire Vita TEST VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g106-device-feedback-alpha-sky-sun-flight-fire-test-VPK.yml"
+      - "research/b24_unified/g91_offline_integrated_preview/**"
+      - "research/b24_unified/g106_visual_repair/**"
+      - "research/b24_unified/b24_gpu_g68_city.c"
+      - "research/b24_unified/b24_g10_practice_target.c"
+      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_city_player_debug_dummy_real_Vita_ARM_and_user_approved_beta_vpk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g88_original_combat_source/test_g88_interleaved_original_event_dedup.c \
+            -lm -o /tmp/g88_native_combat_guard
+          /tmp/g88_native_combat_guard
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g88_old_g82_no_regression
+          /tmp/g88_old_g82_no_regression
+          test -z "$(find research/b24_unified -name "*.vpk" -print -quit)"
+      - name: Original 2010 G83 movement, flight, aim and combo priority regressions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g88_g83_router
+          /tmp/g88_g83_router
+      - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/g91_offline_integrated_preview/test_g92_authored_world_static_dummy_no_damage.c \
+            -lm -o /tmp/g92_real_g10_g11_immortal_dummy
+          /tmp/g92_real_g10_g11_immortal_dummy
+      - name: Restore authentic G8 all armor native animation stream source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original 2010 War Machine Gun01 to Gun04 motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore native original Stark Expo 2010 city and collision source
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore all 248 original Mark V 629 vertex skin animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Restore real 2010 six BRES authored sky pieces and the two original C1L1 PVR atlas candidates
+        uses: actions/download-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          run-id: 38902510114
+          github-token: ${{ github.token }}
+          path: /tmp/g106_original_owner_sky
+      - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 research/b24_unified/g91_offline_integrated_preview/g92_patch_single_real_vita_main_static_dummy_NO_VPK.py
+          python3 research/b24_unified/g106_visual_repair/g106_apply_original_stage2_rush_fire_source_only.py
+          test -s /tmp/g106_original_owner_sky/G73_original_sky_mesh.g73m
+          test -s /tmp/g106_original_owner_sky/G73_original_sky_tex_00.g66t
+          test -s /tmp/g106_original_owner_sky/G73_original_sky_tex_01.g66t
+          cp /tmp/g106_original_owner_sky/G73_original_sky_mesh.g73m work/assets/
+          cp /tmp/g106_original_owner_sky/G73_original_sky_tex_00.g66t work/assets/
+          cp /tmp/g106_original_owner_sky/G73_original_sky_tex_01.g66t work/assets/
+          test "$(find work/assets -maxdepth 1 -name 'G73_original_sky_tex_*.g66t' | wc -l)" -eq 2
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          p=Path('work/assets/G73_original_sky_mesh.g73m')
+          raw=p.read_bytes()
+          assert raw[:4]==b'G73M'
+          assert struct.unpack_from('<4I',raw,4)==(1,288,6,2)
+          for i in range(2):
+           raw=Path(f'work/assets/G73_original_sky_tex_{i:02d}.g66t').read_bytes()
+           assert raw[:4]==b'G66T' and struct.unpack_from('<3I',raw,4)==(1,256,256)
+          city=Path('work/b24/b24_unified/b24_gpu_g68_city.c').read_text()
+          assert city.index('for(unsigned i=0;i<m->texture_count;i++){')<city.index('#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE')
+          assert 'G106 real-device regression' in city
+          print('G106 PASS sky original 6 pieces and both 256 PVR atlasses; alpha provenance now loaded BEFORE Sun vertex shading')
+          PY
+          grep -q 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' work/src/main.c
+          grep -q 'b24_g10_practice_target_draw' work/b24/b24_unified/b24_gpu_runtime.c
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G106 authentic 2010 MarkV stage2 and rush accepted repulsor one-shot visual stream QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G106_SOURCE_FLY_ATTACK_MARKV=1 \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g106_visual_repair/test_g106_authentic_2010_markv_flight_fire_real_source.c \
+            -lm -o /tmp/g106_real_source_fly_repulsor
+          /tmp/g106_real_source_fly_repulsor work/animations
+      - name: G95 original 2010 C1L1 four Sun source node positions diagnostic GPU light candidate QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g95_source_sun_4_author_positions
+          /tmp/g95_source_sun_4_author_positions
+          grep -q 'B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE' work/CMakeLists.txt
+          grep -q 'b24_g75_light_original_vertex' work/b24/b24_unified/b24_gpu_g68_city.c
+      - name: G93 host replay REAL original 1,910 authored collision triangles and B14 physical flight
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/src \
+            research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c \
+            work/src/b14_world.c -lm -o /tmp/g93_b14_real_physics
+          /tmp/g93_b14_real_physics
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/g93_1910_authored_collision_host
+          /tmp/g93_1910_authored_collision_host work/assets/G66_original_collision.g66c
+      - name: G94 actual original G68 1910-source-face floor-place immobile dummy, no guessed collision
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g91_offline_integrated_preview/test_g94_real_source_G68_dummy_actual_floor.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            -lm -o /tmp/g94_source_g68_static_dummy_original
+          /tmp/g94_source_g68_static_dummy_original work/assets/G66_original_collision.g66c
+      - name: G93 real B24 source contains ONE accepted G8 punch and NEVER a second dummy input poll
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          assert main.count('b24_g8_motion_melee_trigger(')==1
+          assert main.count('g92_debug_accepted_melee_edge=1;')==1
+          # One static initialization plus one actual per-frame consume.
+          assert main.count('g92_debug_accepted_melee_edge=0;')==2
+          assert main.count('        g92_debug_accepted_melee_edge=0; /* one consumed debug latch */')==1
+          # Old G75/G85/G9 main actually contains three separately guarded
+          # source melee condition occurrences. The debug target must not
+          # create a fourth. CI checks exact known assembled source here.
+          count=main.count('b24_unified_should_melee(&b24_game)')
+          assert count==3, ('G93 original input gate count drift',count)
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert main.count('b24_g11_practice_melee_hit(')==1
+          assert 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' in main
+          print('PASS G93 SINGLE source accepted melee, B14 physics, G83/G8 owner; test dummy consumes input edge once, no speculative 2010 damage')
+          PY
+      - name: Assign NEW G106 standalone Vita TITLE_ID (preserve previous G106 device test)
+        run: |
+          set -euo pipefail
+          grep -q IM2G70001 work/CMakeLists.txt
+          sed -i 's/IM2G70001/IM2G10601/g' work/CMakeLists.txt
+          # Explicit user-approved TEST build only. All unsupported original
+          # weapon damage/hit windows still guarded; do not change release
+          # source-readiness 1/11 gates or pretend Vita hardware was tested.
+          grep -q IM2G10601 work/CMakeLists.txt
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+      - name: REAL VitaSDK ARM compile, sign SELF and package experimental Vita VPK with ALL G95 sources
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G106-VPK \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON \
+              -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=ON \
+              -DB24_G71_ALPHA_PASSES=ON \
+              -DB24_G73_REAL_SKY=ON \
+              -DB24_G106_SOURCE_FLY_ATTACK_MARKV=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON \
+              -DB24_G87_REAL_TRANSITION_EVENTS=ON \
+              -DB24_G92_STATIC_DUMMY_SOURCE_PREVIEW=ON
+            cmake --build work/build-G106-VPK --target im2_beta --parallel 4
+            test -s work/build-G106-VPK/im2_beta
+            cmake --build work/build-G106-VPK --parallel 4
+            test "$(find work/build-G106-VPK -maxdepth 1 -name "*.vpk" | wc -l)" -eq 1
+            echo "G106 REAL PS Vita SDK ARM main game ELF + SELF + param.sfo + VPK generated"
+          '
+      - name: Package ALL original G68 city and G85 MarkV 248 source clips and validate unique TEST VPK
+        run: |
+          set -euo pipefail
+          sudo chown -R "$(id -u):$(id -g)" work/build-G106-VPK
+          python3 research/b24_unified/g106_visual_repair/g106_pack_stark_sky_alpha_light_feedback_beta.py \
+            --work work \
+            --build work/build-G106-VPK \
+            --out work/build-G106-VPK/IronMan2_B24_G106_Alpha_Sky_Sun_FlightAttack_StarkExpo_MarkV248_Dummy_TEST.vpk
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,zipfile
+          path=Path("work/build-G106-VPK/IronMan2_B24_G106_Alpha_Sky_Sun_FlightAttack_StarkExpo_MarkV248_Dummy_TEST.vpk")
+          with zipfile.ZipFile(path) as z:
+           names=set(z.namelist())
+           assert "eboot.bin" in names and "sce_sys/param.sfo" in names
+           assert "assets/G66_original_collision.g66c" in names
+           assert "assets/G73_original_sky_mesh.g73m" in names
+           assert "assets/G73_original_sky_tex_00.g66t" in names
+           assert "assets/G73_original_sky_tex_01.g66t" in names
+           assert len([x for x in names if x.startswith("assets/G66_city_tex_") and x.endswith(".g66t")])==31
+           assert len([x for x in names if x.startswith("animations/suitcase_ironman_") and x.endswith(".im2v")])==248
+           assert z.testzip() is None
+          qa=json.loads(path.with_suffix(".qa.json").read_text())
+          assert qa["title_id"]=="IM2G10601"
+          assert qa["original_2010_enemy_npc_AI_included"] is False
+          assert qa["original_source_damage_per_26_attack_verified"] is False
+          assert qa["real_PSVita_hardware_playback_verified"] is False
+          assert qa["vpk_generated_by_real_vita_CMake"] is True
+          assert qa["G106_original_six_BRES_sky_pieces_packaged"] is True
+          assert qa["G106_alpha_two_pass_feature_compiled"] is True
+          assert qa["G106_sun_31_RGBA_atlases_preloaded_before_baking_source_material_light"] is True
+          assert qa["G106_stage2_rush_repulsor_full_original_event_parity_proven"] is False
+          print("G106 DEVICE FEEDBACK TEST VPK READY",path.stat().st_size,qa["vpk_sha256"])
+          PY
+      - name: Publish user-authorized REAL PS Vita installable TEST VPK and honesty QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_B24_G106_G71G73G95_OriginalSkyAlphaSun_Stage2RushFix_MarkV248_TestVPK
+          path: |
+            work/build-G106-VPK/IronMan2_B24_G106_Alpha_Sky_Sun_FlightAttack_StarkExpo_MarkV248_Dummy_TEST.vpk
+            work/build-G106-VPK/IronMan2_B24_G106_G95_Stark_Expo_MarkV_248_Original_Movement_Static_Dummy_TEST.qa.json
+          retention-days: 14
+          if-no-files-found: error
