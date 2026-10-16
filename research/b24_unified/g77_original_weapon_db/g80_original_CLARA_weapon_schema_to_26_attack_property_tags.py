@@ -33,6 +33,7 @@ def audit(ipa,out):
       'prefix_previous_2_bytes_hex':raw[a-4:a-2].hex(),
       'property_ID_candidate_u16_at_name_minus_4':
        struct.unpack_from('<H',raw,a-4)[0],
+      'native_tag_candidate_at_name_minus_7':struct.unpack_from('<H',raw,a-7)[0] if a>=8 and raw[a-8]==1 else None,
       'native_value_type_or_size_NOT_proven':True})
   tokens.append({'class_id':q['original_class_id'],
     'source_class_name':q['original_class_name'],
@@ -57,7 +58,7 @@ def audit(ipa,out):
    for schema in tokens:
     if schema['class_id']!=obj['original_class_id']:continue
     same=[v for v in schema['native_schema_field_names'] if
-         v['property_ID_candidate_u16_at_name_minus_4']==tag]
+         v['native_tag_candidate_at_name_minus_7']==tag]
     if not same:continue
     data=chunk[p+4:p+4+size]
     if len(data)!=size:continue
@@ -92,7 +93,7 @@ def audit(ipa,out):
  for s in tokens:
   print(' REAL_SCHEMA',s['class_id'],s['source_class_name'],'fields',len(s['native_schema_field_names']))
   print(' DAMAGE-related native schema',[(x['source_property'],
-    x['property_ID_candidate_u16_at_name_minus_4']) for x in s['native_schema_field_names']
+    x['native_tag_candidate_at_name_minus_7']) for x in s['native_schema_field_names']
       if KEYWORDS.search(x['source_property'])][:48])
  for r in records:
   if r['class']!='Attack':continue
