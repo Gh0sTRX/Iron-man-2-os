@@ -32,3 +32,13 @@ Full gameplay behavior and all original moveset/combat not yet completed: origin
 3. Run `g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py`, stage `suitcase_ironman_*.im2v` into `work/animations`.
 4. Host test all 248 using existing original source G8 stream playback test.
 5. Vita ARM source compile with flags only, no app/VPK. Latest successful GitHub Action 38951302478 proves all five steps.
+
+## G85 FINAL MORE RIGOROUS VITA NATIVE LINK CHECK (after earlier syntax check)
+
+Run [38951977567](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38951977567) **SUCCESS**. Existing original G75/G84 main, genuine 2010 G68 city source, 248 original Mark V 629v motion files, G8 actor animation streamer and G76/77/82 combat CPU model together underwent a **full real Vita ARM native compile and link** in VitaSDK Docker.
+
+Explicit CMake flags: `-DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON -DB24_G68_CITY_BACKEND=ON -DB24_G75_SOURCE_CAPSULE=ON -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON -DB24_G85_NATIVE_MARKV_629=ON`.
+
+Actual command `cmake --build work/build-G85-ELF-ONLY --target im2_beta --parallel 4` ended **[100%] Built target im2_beta**. This is a genuine fully linked *unpackaged* Vita game executable test, not just syntax check. We **deliberately NEVER invoked `vita_create_vpk`, `eboot.bin` packaging or ANY `ALL` target**. A file search asserted **zero newly generated `.vpk` files**. Source-only artifacts preserved; generated executable was not released or device tested.
+
+This confirms compile + link compatibility of the real game source code with all 248 original Mark V motion assets staged on disk. Still **NO real PS Vita hardware QA, NO original complete combat hit windows, enemy AI or 2010 game behavior**. New VPK remains forbidden by user until all those are completed.
