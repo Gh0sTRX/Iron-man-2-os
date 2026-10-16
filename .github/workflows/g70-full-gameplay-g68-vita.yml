@@ -1,0 +1,49 @@
+name: G70 Full B24 G9 Gameplay plus Device-Tested G68 Original World Vita VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g70-full-gameplay-g68-vita.yml"
+      - "research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 85
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve source animation bank for old gameplay engine
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Retrieve old gameplay War Machine authored six gun clips
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Retrieve hardware-proven G68 original city textures and native collider
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore exact successful G9 complete gameplay, then opt-in real G68 map
+        run: |
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py
+      - name: Publish strictly isolated G70 installed-game candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_B24_G70_Original_G9_Gameplay_Actual_G68_C1L1_5_Suits_363_Animations
+          path: work/build-vita/IronMan2_GPU_B24_G70_G68_WORLD.vpk
+          retention-days: 14
+          if-no-files-found: error
