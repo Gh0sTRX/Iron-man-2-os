@@ -34,19 +34,28 @@ def calibrate(directory:Path):
         ' float authored_move_vx, authored_move_vy; /* G75 one B14 owner */\n'
         '} B14World;',
         'B17/G9 assembled world velocity state')
-    s=update_once(s,
-        'const float velocity=(w->flying?(w->rush?4.0f:2.0f):(w->rush?2.2f:1.1f));',
-        '''/* G75 exact 2010 movement speed still unknown. Gameplay candidate:
-    B22's previous 15/29 source-independent design guides safe geometry pace;
-    use conservative 8.5 / 16 airborne, 2.7 / 5.2 ground in original
-    C1L1 world units, with stage-specific acceleration; no double movement. */
- const float speed_target=w->flying?(w->rush?16.0f:8.5f):
-                                     (w->rush?5.2f:2.7f);
- const float smoothing=1.f-expf(-(w->flying?(w->rush?7.f:9.f):14.f)*dt);
+    # Actual 2026-10-16 G73 merges DIFFER from old B14 v1 physics.
+    # Runtime-recovered main loop uses stages (hover 1.15, cruise 2.6,
+    # rush 5.0); never overwrite it with the simpler original B14
+    # w->rush branch and silently discard stage1/stage2 differences.
+    velocity_variants=[
+       ('const float velocity=w->flying?(w->flight_stage==3?5.0f:(w->flight_stage==2?2.6f:1.15f)):(len>=.96f?2.4f:1.1f);',
+        'const float speed_target=w->flying?(w->flight_stage==3?24.f:(w->flight_stage==2?12.f:4.2f)):(len>=.96f?5.2f:2.7f);'),
+       ('const float velocity=(w->flying?(w->rush?4.0f:2.0f):(w->rush?2.2f:1.1f));',
+        'const float speed_target=w->flying?(w->rush?24.f:12.f):(w->rush?5.2f:2.7f);')
+    ]
+    found=[(a,b) for a,b in velocity_variants if a in s]
+    if len(found)!=1:raise RuntimeError('G75 merged B14 flight controller speed branch changed; inspect actual source')
+    old,new=found[0]
+    s=update_once(s,old,'''/* G75 proposed iOS-feel flight pace, not decoded Gameloft C++.
+       Keep authentic merged stage1 HOVER stage2 CRUISE stage3 RUSH.
+       Existing B14 CPU main loop remains sole integrator. */
+ '''+new+'''
+ const float smoothing=1.f-expf(-(w->flying?(w->flight_stage==3?7.f:9.f):14.f)*dt);
  w->authored_move_vx+=(vx*speed_target-w->authored_move_vx)*smoothing;
  w->authored_move_vy+=(vy*speed_target-w->authored_move_vy)*smoothing;
-''',
-        'stage flight ground pace and acceleration')
+'''.replace('w->flight_stage==3?7.f:9.f','w->rush?7.f:9.f' if old==velocity_variants[1][0] else 'w->flight_stage==3?7.f:9.f'),
+         'merged G9 stage-specific ground hover normal RUSH velocity calibration')
     # B14 G8 expanded native source map clamp, or original tiny stand-alone B14.
     variants=[
         ('w->x=cl(w->x+vx*velocity*dt,-324.f,330.f);',
