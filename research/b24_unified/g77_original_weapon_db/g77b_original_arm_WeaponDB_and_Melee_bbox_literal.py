@@ -98,10 +98,17 @@ def main(ipa,out):
  g78_clara_values(ipa,out)
  from g78d_native_class_attack_instance_inventory import audit as g78_real_instances
  g78_real_instances(ipa,out)
+ from g79_original_26_attack_13_weapon_native_field_probe import scan as g79_weapon_instances
+ g79_weapon_instances(ipa,out)
  g78_proof=json.loads((out/'G78_NATIVE_ORIGINAL_ATTACK_DAMAGE_EntityData_PROPERTY_MEMBER_MAP.json').read_text())
  result['exact_target_methods']['G78_original_AttackEntity_ProjectileEntity_2010_loader']=g78_proof['original_WeaponDB_AttackEntity_and_ProjectileEntity_source_typed_field_loader']
  result['exact_target_methods']['G78_original_2010_resource_archive_names']={'filenames':g78_proof['2010_app_top_level_resource_filename_candidates_without_encoded_content']}
  g78_assets=json.loads((out/'G78B_REAL_2010_ALL_CONTAINER_ATTACK_DAMAGE_SOURCE_LOCATOR.json').read_text())
+ g79_instances=json.loads((out/'G79_C1L1_26_ATTACK_13_WEAPON_ORIGINAL_INSTANCE_BINARY_FIELD_PROBE.json').read_text())
+ result['exact_target_methods']['G79_true_attack_and_weapon_instance_binary_windows']={
+  'original_attack_Weapon_template_headers':g79_instances['original_template_attack_weapon_class_data'],
+  'original_2010_actual_26_attack_13_weapon_instance_source_windows':g79_instances['actual_binary_instance_payloads']
+ }
  g78_instances=json.loads((out/'G78D_ORIGINAL_2010_CLASS_SCHEMA_WEAPON_VS_REAL_INSTANCE.json').read_text())
  result['exact_target_methods']['G78D_authentic_weapon_scene_instance_inventory']={
  'genuine_combat_relevant_native_schema_classes':g78_instances['genuine_combat_relevant_native_schema_classes'],
