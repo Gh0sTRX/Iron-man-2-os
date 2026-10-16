@@ -54,6 +54,21 @@ def audit(ipa,out):
       'native_Damage_type_tag':descr['native_descriptor_type_tag'],
       'original_name_VM_or_file_offset_hex':descr['native_offset'],
       'known_2010_Attack_class108_parent_inheritance_link_verified':False})
+ # Source original 2010 Object class110 declares native int Damage,
+ # whereas Attack class108 declares only two local fields. Check whether
+ # real 54 Attack serialized property slots match a parent inherited
+ # class field prefix before giving raw int values a name.
+ object110_metadata=[]
+ for idx,cl in enumerate(schema):
+  if cl['original_class_id']!=110:continue
+  begin=cl['original_class_name_file_offset']
+  ending=schema[idx+1]['original_class_name_file_offset']-6
+  for hit in TEXT.finditer(raw,begin,ending):
+   pos=hit.start()
+   if pos<4 or struct.unpack_from('<H',raw,pos-2)[0]!=len(hit.group()):continue
+   object110_metadata.append({'source_property':hit.group().decode('ascii','replace'),
+    'original_binary_type_tag':struct.unpack_from('<H',raw,pos-4)[0],
+    'actual_original_offset_hex':hex(pos)})
  next_field_offsets=sorted(r['original_name_offset'] for r in instances)
  regions=[]
  for e in attacks:
@@ -97,6 +112,7 @@ def audit(ipa,out):
  report={'exact_original_2010_class108_Attack_schema_name':entry['original_class_name'],
   'original_Attack_class_schema_end_hex':hex(class_end),
   'original_Attack_class108_local_property_descriptors':prop_names,
+  'G103_native_Object110_full_source_local_property_list':object110_metadata,
   'G102_2010_native_clara_classes_really_declaring_integer_Damage_field':damage_owners,
   'all_26_original_named_Attack_property_size_stream_attempts':regions,
   'source_named_instances_verified':26,
@@ -109,6 +125,7 @@ def audit(ipa,out):
   json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  print('PASS G101 authentic original Attack 26 record native class108 descriptor introspection')
  print('G102 actual class declarations with source Damage property',damage_owners)
+ print('G103 REAL CLASS Object110 total native declared property descriptors',len(object110_metadata),object110_metadata)
  print('G101 ALL 26 Attack counted native property lists valid',report['all_26_length_streams_pass'])
  print('G101 ATTACK SCHEMA',entry['original_class_name'],hex(class_start),hex(class_end),
    'local defined props',prop_names)
