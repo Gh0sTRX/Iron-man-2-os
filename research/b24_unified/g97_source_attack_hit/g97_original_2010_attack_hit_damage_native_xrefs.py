@@ -13,6 +13,8 @@ from capstone.arm import ARM_OP_MEM,ARM_OP_IMM
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'g76_original_combat'))
 from g76_2010_native_arm_combat_method_provenance import parse_macho
 CHECKED_NAMES=[
+ 'EntityData::GetParamValue(char const*, int*)',
+ 'EntityData::GetParamValue(char const*, bool*)',
  'AttackEntity::LoadFromFile(', 'AttackEntity::DoAttack(',
  'AttackEntity::DoProjectileAttack(', 'ProjectileEntity::HitImpactActor(',
  'ProjectileEntity::UpdateCollisions(', 'ProjectileEntity::DoSplashDamage(',
