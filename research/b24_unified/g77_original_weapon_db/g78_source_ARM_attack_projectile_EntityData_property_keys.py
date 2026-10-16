@@ -39,6 +39,7 @@ def source(ipa,out):
  dem=subprocess.run(['c++filt'],input='\n'.join(names)+'\n',
     capture_output=True,text=True,check=True).stdout.splitlines()
  assert len(dem)==len(names)
+ native_2010_methods={entry[1]&~1:label for entry,label in zip(m['entries'],dem) if entry[1]}
  found={}
  cs=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM)
  for symbol,name in zip(m['entries'],dem):
@@ -81,6 +82,7 @@ def source(ipa,out):
      'original_native_EntityData_property':actual_name,
      'field_name_string_address':hex(name_addr) if actual_name else None,
      '2010_native_load_call_target':hex(dest),
+     'source_original_2010_data_getter_method_symbol':native_2010_methods.get(dest),
      'original_dest_member_offset':hex(raw_dest) if raw_dest is not None else None,
      'loader_CALL_relative_offset':hex(op.address-addr),
      'source_PC_rel_decode_steps':trace,
