@@ -1,0 +1,37 @@
+name: G76 Source-Recovered True 2010 ARM Two-Pool Damage Host and Vita ARM Math QA NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g76-original-native-damage-math-no-vpk.yml"
+      - "research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.*"
+      - "research/b24_unified/g76_original_combat/test_b24_g76_native_damage_math.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  math:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original ARM Actor math reference two pool subtraction and overflow host test
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g76_original_combat \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g76_original_combat/test_b24_g76_native_damage_math.c \
+            -lm -o /tmp/g76_native_actor_math
+          /tmp/g76_native_actor_math
+      - name: Verify original ARM math port as isolated PS Vita ARM object no app
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -e
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -I research/b24_unified/g76_original_combat \
+              -c research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+              -o /tmp/g76_actor_math_arm.o
+            test -s /tmp/g76_actor_math_arm.o
+            echo "PASS G76 original native actor damage arithmetic Vita ARM object only"
+          '
