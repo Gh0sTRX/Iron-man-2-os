@@ -1,0 +1,43 @@
+name: G72 Two Native 2010 Expo Sky PVR Texture Atlas Visual Source Probe
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g72-actual-sky-textures-pvr-reference.yml"
+      - "research/b24_unified/g72_sky_light/g72_original_sky_atlas_visual.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  decode:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install source original PVR decoder dependencies
+        run: python3 -m pip install -q numpy pillow scipy trimesh texture2ddecoder gdown
+      - name: Download original owner 2010 iOS IPA to disposable local temp only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g72private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g72private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g72private/owner.ipa
+          test "$(wc -c </tmp/g72private/owner.ipa)" -eq 248613763
+      - name: Source-only true sky PVR PNG preview and sky mesh UV evidence
+        run: |
+          python3 research/b24_unified/g72_sky_light/g72_original_sky_atlas_visual.py \
+            --ipa /tmp/g72private/owner.ipa \
+            --png /tmp/G72_TWO_REAL_C1L1_SKY_2010_ORIGINAL_ATLAS_CONTACT.png \
+            --json /tmp/G72_C1L1_SKY_SOURCE_PVR_NATIVE_UV.json
+          rm -rf /tmp/g72private
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G72_Original_C1L1_Sky02_Sky03_Owner_PVR_True_Source_Atlas_and_UV
+          path: |
+            /tmp/G72_TWO_REAL_C1L1_SKY_2010_ORIGINAL_ATLAS_CONTACT.png
+            /tmp/G72_C1L1_SKY_SOURCE_PVR_NATIVE_UV.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Scrub owner original source
+        if: always()
+        run: rm -rf /tmp/g72private
