@@ -79,9 +79,10 @@ jobs:
               arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
                 -Iwork/b24/b24_unified -c "work/b24/b24_unified/$unit" -o "/tmp/$unit.o"
             done
+            G84_HEADERS="$(find work -type f -name '*.h' -exec dirname {} \; | sort -u | sed 's@^@-I@' | tr '\n' ' ')"
             arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -fsyntax-only \
               -DB24_GPU_ENGINE=1 -DB24_G84_ORIGINAL_MOVESET_ROUTER=1 \
-              -Iwork/src -Iwork/b24/b24_unified work/src/main.c
+              $G84_HEADERS work/src/main.c
             echo "PASS G84 true game main Vita ARM source, no game build or VPK"
           '
       - name: Persist ONLY actual merged original B24 source evidence (no ELF / VPK)
