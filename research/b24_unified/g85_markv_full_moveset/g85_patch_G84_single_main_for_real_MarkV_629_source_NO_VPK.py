@@ -58,6 +58,19 @@ def install():
  if(a->suit_index!=0)return;
 #endif
  b24_g8_melee_press(&a->melee,now);''',"allow same old accepted combo on 629 suit")
+ g8=once(g8,''' if(a->repulsor_pending&&a->stream.file&&a->whole_body_repulsor_active&&
+    (uint32_t)(now-a->repulsor_started_ms)>=a->stream.duration_ms){''',''' if(a->repulsor_pending&&a->stream.file&&a->whole_body_repulsor_active&&
+    /* Accepted B16 event occurs on previous frame; Mark V's native
+       full-body clip duration starts when the source IM2V actually
+       changes to attack, not from button press timestamp. Other suits
+       retain untouched old G8 timing. */
+    (uint32_t)(now-
+#ifdef B24_G85_NATIVE_MARKV_629
+     (suit==4?a->started_ms:a->repulsor_started_ms)
+#else
+     a->repulsor_started_ms
+#endif
+    )>=a->stream.duration_ms){''',"original 2010 MarkV full-body fire completion measured from actual clip start")
  g8=once(g8,''' const char *shot=b24_g8_motion_repulsor_clip(suit,mode,left_x,forward);
  if(a->repulsor_pending''',''' const char *shot=b24_g8_motion_repulsor_clip(suit,mode,left_x,forward);
 #ifdef B24_G85_NATIVE_MARKV_629
