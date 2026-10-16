@@ -5,13 +5,14 @@ G83 route names exported by actual C source; light is documented HOST
 shader, NOT original iOS shader. NO claimed real hitframes/WeaponDB damage,
 PS Vita B14 physics, original input protocol or in-game screenshot.
 """
-import argparse,base64,hashlib,json,struct,sys,zipfile
+import argparse,base64,hashlib,io,json,struct,sys,zipfile
 from pathlib import Path
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from b24_owner_pack_extract import decode,get_exact
 from b24_hover_fire_authentic_pose_preview import source_meshes
+from b24_g11_original_2010_city_texture_and_window_ui_contact import pvr_pixels
 def rep(s,a,b):
  if s.count(a)!=1:raise ValueError('G91 exact owner G58 source viewer anchor changed '+str(s.count(a))+' '+a[:70])
  return s.replace(a,b,1)
@@ -23,12 +24,22 @@ def assemble(src,ipa,anims,routes,out,report):
  if not router['G83_selector_called_from_original_C']:raise ValueError('G83 C router missing')
  with zipfile.ZipFile(ipa) as z:
   packed=z.read('Payload/IronMan2.app/models')
+  all_textures=z.read('Payload/IronMan2.app/textures')
  original=get_exact(packed,decode(packed,'.bdae'),'suitcase.bdae')
  matching=[m for m in source_meshes(original) if len(m['positions'])==629]
  if len(matching)!=1:raise ValueError('genuine source B13 MarkV weighted geometry missing')
  triangles=np.asarray(matching[0]['faces'],dtype=np.int64).reshape(-1,3)
  if len(triangles)<100 or triangles.min()<0 or triangles.max()>=629:
   raise ValueError('2010 original Mark V face topology invalid')
+ original_uv=np.asarray(matching[0]['uv'],dtype='<f4')
+ if original_uv.shape!=(629,2) or not np.isfinite(original_uv).all():
+  raise ValueError('original 2010 Mark V per-vertex native UV invalid')
+ original_tga=get_exact(all_textures,decode(all_textures,'.tga'),'MC_SuitCase.tga')
+ markv_atlas,texture_info=pvr_pixels(original_tga,'MC_SuitCase.tga')
+ if markv_atlas.size!=(512,512):raise ValueError('original Mark V PVR texture dimensions not source 512x512')
+ with io.BytesIO() as output_png:
+  markv_atlas.save(output_png,format='PNG')
+  atlas_png_b64=base64.b64encode(output_png.getvalue()).decode('ascii')
  names={r['markv'] for r in router['source_routes']}
  names.update(['suitcase_ironman_ground_combo_1','suitcase_ironman_ground_combo_2',
   'suitcase_ironman_ground_combo_3','suitcase_ironman_aim_ground_idle_att'])
@@ -46,7 +57,9 @@ def assemble(src,ipa,anims,routes,out,report):
   source_clips[name]=base64.b64encode(raw).decode('ascii')
  if len(source_clips)<14:raise ValueError('too few REAL original G83 clip streams')
  payload=json.dumps({'routes':router['source_routes'],'streams':source_clips,
-    'source_triangles_u16':base64.b64encode(np.asarray(triangles,dtype='<u2').tobytes()).decode('ascii')},
+    'source_triangles_u16':base64.b64encode(np.asarray(triangles,dtype='<u2').tobytes()).decode('ascii'),
+    'real_2010_MarkV_original_native_uv_f32':base64.b64encode(original_uv.tobytes()).decode('ascii'),
+    'real_2010_MarkV_original_MC_SuitCase_PVR_PNG':atlas_png_b64},
     separators=(',',':')).replace('</','<\\/')
  controls='''<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:11px;background:#15273a">
 <strong>G91 • Özgün Mark V + gerçek BRES/PVR + hareket + antrenman hedefi</strong>
@@ -54,8 +67,10 @@ def assemble(src,ipa,anims,routes,out,report):
 <button id="g91hover">Hover (H)</button><button id="g91flight">Uçuş (F)</button>
 <button id="g91rush">Rush (Shift)</button><button id="g91aim">Nişan (L)</button>
 <button id="g91melee">Kombo (J)</button><button id="g91shot">Repulsor poz (K)</button>
+<button id="g91btnw" aria-label="ileri">↑</button><button id="g91btns" aria-label="geri">↓</button>
+<button id="g91btna" aria-label="sol">←</button><button id="g91btnd" aria-label="sağ">→</button>
 <span id="g91status" style="font:12px monospace;flex:1"></span>
-<div style="width:100%;font-size:12px;color:#c9dcea">WASD hareket | Fareyle kamera | Kaynak 2010 BRES 3B harita / PVR dokuları / G85 629 köşe ve GERÇEK üçgenler / G83 C animasyon seçimleri. G58 ışık ayarları tanısaldır, özgün iOS shader değildir. Sahnedeki turkuaz kutu kullanıcı testi için sabit ve ölümsüz dummy'dir. J isabet geri bildirimi yalnız tanısal mesafe, kaynak oyunun gerçek hasar/vuruş karesi DEĞİL. WASD hız ve yüksekliği B14 Vita fiziği değildir. NO VPK.</div>
+<div style="width:100%;font-size:12px;color:#c9dcea">WASD hareket | Fareyle kamera | Kaynak 2010 BRES 3B harita / PVR dokuları / MC_SuitCase.tga özgün zırh UV/PVR / G85 629 köşe ve GERÇEK üçgenler / G83 C animasyon seçimleri. G58 ışık ayarları tanısaldır, özgün iOS shader değildir. Sahnedeki turkuaz kutu kullanıcı testi için sabit ve ölümsüz dummy'dir. J isabet geri bildirimi yalnız tanısal mesafe, kaynak oyunun gerçek hasar/vuruş karesi DEĞİL. WASD hız ve yüksekliği B14 Vita fiziği değildir. NO VPK.</div>
 </div>'''
  body=rep(body,'<div class="canvas"><canvas id="game"',controls+'<div class="canvas"><canvas id="game"')
  body=rep(body,'<svg id="markers"></svg>',
@@ -79,7 +94,11 @@ for(const [name,b64] of Object.entries(a91.streams)){
  streams91[name]={poses:new Float32Array(raw.buffer,20),frames,ms};
 }
 const index91=new Uint16Array(decode91(a91.source_triangles_u16).buffer);
-let shader91=null,vert91=null,attrib91=-1,iu91=null,vu91=null,pu91=null,su91=null,cu91=null;
+const original_uv91=new Float32Array(decode91(a91.real_2010_MarkV_original_native_uv_f32).buffer);
+if(original_uv91.length!==629*2)throw Error('owner MarkV original UV count drift');
+const markvTex91=new Image();let markvTexLoaded91=false;
+markvTex91.src='data:image/png;base64,'+a91.real_2010_MarkV_original_MC_SuitCase_PVR_PNG;
+let shader91=null,vert91=null,uvBuf91=null,attrib91=-1,uvAttrib91=-1,tex91=null,useAtlas91=null,iu91=null,vu91=null,pu91=null,su91=null,cu91=null;
 function g91sh(type,src){
  const shader=gl91.createShader(type);gl91.shaderSource(shader,src);gl91.compileShader(shader);
  if(!gl91.getShaderParameter(shader,gl91.COMPILE_STATUS))throw Error(gl91.getShaderInfoLog(shader));
@@ -88,18 +107,34 @@ function g91sh(type,src){
 if(gl91){
  shader91=gl91.createProgram();
  gl91.attachShader(shader91,g91sh(gl91.VERTEX_SHADER,
- '#version 300 es\nin vec3 xyz;uniform mat4 p,v;uniform vec3 shift;uniform float scale;out vec3 world;\nvoid main(){world=xyz*scale+shift;gl_Position=p*v*vec4(world,1.);}'));
+ '#version 300 es\nin vec3 xyz;in vec2 uv;uniform mat4 p,v;uniform vec3 shift;uniform float scale;out vec3 world;out vec2 original_uv;\nvoid main(){world=xyz*scale+shift;original_uv=uv;gl_Position=p*v*vec4(world,1.);}'));
  gl91.attachShader(shader91,g91sh(gl91.FRAGMENT_SHADER,
- '#version 300 es\nprecision highp float;in vec3 world;uniform vec4 color;out vec4 rgba;\nvoid main(){vec3 n=normalize(cross(dFdx(world),dFdy(world)));float light=0.3+0.7*abs(dot(n,normalize(vec3(.4,.2,.89))));rgba=vec4(color.rgb*light,color.a);}'));
- gl91.bindAttribLocation(shader91,0,'xyz');gl91.linkProgram(shader91);
+ '#version 300 es\nprecision highp float;in vec3 world;in vec2 original_uv;uniform vec4 color;uniform sampler2D sourcePVR;uniform float useAtlas;out vec4 rgba;\nvoid main(){vec3 n=normalize(cross(dFdx(world),dFdy(world)));float light=0.3+0.7*abs(dot(n,normalize(vec3(.4,.2,.89))));vec4 t=useAtlas>0.5?texture(sourcePVR,original_uv):color;rgba=vec4(t.rgb*light,t.a);}'));
+ gl91.bindAttribLocation(shader91,0,'xyz');gl91.bindAttribLocation(shader91,1,'uv');gl91.linkProgram(shader91);
  if(!gl91.getProgramParameter(shader91,gl91.LINK_STATUS))throw Error('G91 WebGL overlay program');
  attrib91=gl91.getAttribLocation(shader91,'xyz');
+ uvAttrib91=gl91.getAttribLocation(shader91,'uv');
  iu91=gl91.getUniformLocation(shader91,'shift');
  vu91=gl91.getUniformLocation(shader91,'v');
  pu91=gl91.getUniformLocation(shader91,'p');
  su91=gl91.getUniformLocation(shader91,'scale');
  cu91=gl91.getUniformLocation(shader91,'color');
- vert91=gl91.createBuffer();const ib=gl91.createBuffer();
+ useAtlas91=gl91.getUniformLocation(shader91,'useAtlas');
+ vert91=gl91.createBuffer();uvBuf91=gl91.createBuffer();const ib=gl91.createBuffer();
+ gl91.bindBuffer(gl91.ARRAY_BUFFER,uvBuf91);
+ gl91.bufferData(gl91.ARRAY_BUFFER,original_uv91,gl91.STATIC_DRAW);
+ tex91=gl91.createTexture();
+ markvTex91.onload=()=>{
+  gl91.bindTexture(gl91.TEXTURE_2D,tex91);
+  gl91.texParameteri(gl91.TEXTURE_2D,gl91.TEXTURE_MIN_FILTER,gl91.LINEAR);
+  gl91.texParameteri(gl91.TEXTURE_2D,gl91.TEXTURE_MAG_FILTER,gl91.LINEAR);
+  gl91.texParameteri(gl91.TEXTURE_2D,gl91.TEXTURE_WRAP_S,gl91.REPEAT);
+  gl91.texParameteri(gl91.TEXTURE_2D,gl91.TEXTURE_WRAP_T,gl91.REPEAT);
+  gl91.pixelStorei(gl91.UNPACK_FLIP_Y_WEBGL,true);
+  gl91.texImage2D(gl91.TEXTURE_2D,0,gl91.RGBA,gl91.RGBA,gl91.UNSIGNED_BYTE,markvTex91);
+  markvTexLoaded91=true;
+ };
+ if(markvTex91.complete&&markvTex91.naturalWidth)markvTex91.onload();
  gl91.bindBuffer(gl91.ELEMENT_ARRAY_BUFFER,ib);
  gl91.bufferData(gl91.ELEMENT_ARRAY_BUFFER,index91,gl91.STATIC_DRAW);
  gl91.enable(gl91.DEPTH_TEST);gl91.disable(gl91.CULL_FACE);
@@ -141,6 +176,12 @@ document.addEventListener('keydown',event=>{
  else if(k==='shift')state91.mode=3;
  else state91.held.add(k);
 });
+for(const key of ['w','a','s','d']){
+ const el91=document.getElementById('g91btn'+key);
+ el91.addEventListener('pointerdown',e=>{e.preventDefault();state91.held.add(key);el91.setPointerCapture(e.pointerId)});
+ for(const ev of ['pointerup','pointercancel','lostpointercapture'])
+  el91.addEventListener(ev,()=>state91.held.delete(key));
+}
 document.addEventListener('keyup',event=>{
  const k=event.key.toLowerCase();state91.held.delete(k);
  if(k==='shift'&&state91.mode===3)state91.mode=2;
@@ -167,6 +208,10 @@ function actor91(view,projection,width,height){
  gl91.useProgram(shader91);gl91.uniformMatrix4fv(vu91,false,view);gl91.uniformMatrix4fv(pu91,false,projection);
  gl91.bindBuffer(gl91.ARRAY_BUFFER,vert91);
  gl91.enableVertexAttribArray(attrib91);gl91.vertexAttribPointer(attrib91,3,gl91.FLOAT,false,0,0);
+ gl91.bindBuffer(gl91.ARRAY_BUFFER,uvBuf91);
+ gl91.enableVertexAttribArray(uvAttrib91);
+ gl91.vertexAttribPointer(uvAttrib91,2,gl91.FLOAT,false,0,0);
+ gl91.bindBuffer(gl91.ARRAY_BUFFER,vert91);
  const now=performance.now(),key=clip91(now),anim=streams91[key];
  if(key!==lastClip91){lastClip91=key;start91=now}
  if(anim){
@@ -184,6 +229,9 @@ function actor91(view,projection,width,height){
   gl91.uniform3fv(iu91,[state91.x+origin91[0]*scale91,
     state91.y+origin91[1]*scale91,state91.z+origin91[2]*scale91]);
   gl91.uniform1f(su91,scale91);gl91.uniform4fv(cu91,[.85,.18,.14,1]);
+  gl91.uniform1f(useAtlas91,markvTexLoaded91?1:0);
+  gl91.activeTexture(gl91.TEXTURE0);gl91.bindTexture(gl91.TEXTURE_2D,tex91);
+  gl91.uniform1i(gl91.getUniformLocation(shader91,'sourcePVR'),0);
   gl91.drawElements(gl91.TRIANGLES,index91.length,gl91.UNSIGNED_SHORT,0);
  }
  // One fixed practice cube; no original gameplay AI, no authored hit window.
@@ -194,6 +242,7 @@ function actor91(view,projection,width,height){
  gl91.bindBuffer(gl91.ARRAY_BUFFER,vert91);
  gl91.bufferData(gl91.ARRAY_BUFFER,lines,gl91.DYNAMIC_DRAW);
  gl91.uniform3fv(iu91,dummy91);gl91.uniform1f(su91,1);
+ gl91.uniform1f(useAtlas91,0);
  gl91.uniform4fv(cu91,now<state91.flash?[1,.8,.17,1]:[.17,1,.93,1]);
  gl91.drawArrays(gl91.LINES,0,lines.length/3);
  document.getElementById('g91status').textContent=
@@ -226,6 +275,9 @@ requestAnimationFrame(tick91);
    'MarkV_original_2010_20hz_clips_renderable':len(source_clips),
    'real_G83_C_router_directly_used':True,
    'real_G58_host_lighting_shader_used':True,
+   'original_MarkV_atlas_MCSuitCase_PVR_512x512':True,
+   'original_MarkV_629_vertex_authored_uv_used':True,
+   'native_MarkV_PVR_format':texture_info,
    'native_2010_real_iOS_shader_claimed':False,
    'browser_B14_physics_live':False,
    'practice_dummy_static_infinite_health':True,
