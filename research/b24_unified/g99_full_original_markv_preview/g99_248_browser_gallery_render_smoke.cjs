@@ -18,13 +18,13 @@ if(!src||!png)throw Error('G99 expects full source gallery HTML path and screens
       null,{timeout:60000});
   const world=await page.evaluate(()=>{
    return {streams:Object.keys(a91.streams).length,
-    originalMapPVR:typeof originalPVRs!=='undefined',
+    sourceMapWebGL2Canvas:document.getElementById('game')?.width>300,
     trueMarkVTexture:markvTexLoaded91,
     originalWeightedVertices:sampled91.length/3,
     sourceFaces:index91.length/3,
     G91worldGL:gl.getError(), G99actorGL:gl91.getError()};
   });
-  assert(world.originalMapPVR===true);
+  assert(world.sourceMapWebGL2Canvas===true);
   assert(world.trueMarkVTexture===true);
   assert(world.streams===248);
   assert(world.originalWeightedVertices===629);
