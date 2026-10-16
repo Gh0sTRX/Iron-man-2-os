@@ -1,3 +1,13 @@
+## 2026-10-16 G65 — Native FVF24 original UV and RGBA discovered
+
+- Two successful G65 source CI tests: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876094386 and https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876430540.
+- Real 2010 BRES native 24B vertex record: XYZ f32 bytes 0..11, RGBA u8 bytes 12..15, UV float32 bytes 16..23. Previously G57 read 24B UV as zero. 128 linked FVF24 meshes / 2,764 source vertices verified. Both Expo globes Material__20/21 have native varying source UV on 698 triangles; any old no-UV claim superseded.
+- G64 20,457 genuine source UV/PVR triangles increased in G65 to 22,021 source native UV/PVR faces; plus 132 source-constant-UV atlas sampler triangles and 288 source vertex RGBA faces without diffuse atlas. These three groups exactly account for 22,441 linked mesh triangles. 74 small unlinked special meshes / 478 triangles remain outside verified hierarchy.
+- Seven additional original IPA PVR assets decoded LOCALLY to increase source PVR bank from 24 to 31. Local viewer HTML and 3D textured GLB generated; real source pixel+mesh 3D bird's-eye CPU-rendered full map and central Expo district images produced. CPU host directional lighting/vertex tint/alpha are approximation; actual 2010 game shader blend and dynamic visibility not reproduced.
+- G65 second CI detected FVF32 Material__13 with existing authentic UV but missing sampler. Validator updated to preserve original FVF32 UV and source native 40/60B atlas. Shader/root/mission and original runtime draw state still unresolved; no PS Vita/VPK test.
+- Do not distribute original IPA or owner asset bytes publicly on GitHub. Only source code and source-only GitHub Actions audit committed.
+- User instruction: render real source asset 3D bird's-eye preview at END of next progress result, never image generation. Files must be path-verified before linked in a fresh chat.
+
 ## 2026-10-16 G65 native FVF24 UV+RGBA recovery — source proof confirmed; 3D host previews, NO VPK
 - Independent GitHub Actions G65 success https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38876094386 and parser `research/b24_unified/b24_g65_original_2010_BRES_FVF24_native_RGBA_UV_recovery.py` on `feature/b24-unified-gameplay`.
 - Critical correction to G61/G64: the original BRES 2010 **24-byte FVF** actually stores **float32 XYZ at +0, packed uint8 RGBA at +12, float32 UV at +16/+20**. Earlier G57 assigned false zero UV to FVF24. Direct native byte scan crossvalidated **128 originally linked FVF24 meshes / 2,764 vertices / 1,866 faces**, including **698 Expo globe faces** (`Material__20=408`, `Material__21=290`) whose original UV is now recovered, **not procedural sphere mapping**.
