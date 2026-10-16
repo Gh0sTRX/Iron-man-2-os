@@ -1,0 +1,27 @@
+name: G68 Mark V first mission Vita build
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/b24-g68-vita.yml"
+      - "research/b24_unified/g68_media_mayhem/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original Mark V mission candidate source + VitaSDK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash research/b24_unified/g68_media_mayhem/g68_build_ci.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          path: research/b24_unified/g68_media_mayhem/build_src/build-vita/IronMan2_B24_G68_MarkV_Expo_Combat.vpk
+          if-no-files-found: error
+          retention-days: 14
