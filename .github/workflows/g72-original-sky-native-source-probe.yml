@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install metadata-only original source parser dependencies
-        run: python3 -m pip install -q numpy pillow scipy trimesh gdown
+        run: python3 -m pip install -q numpy pillow scipy trimesh texture2ddecoder gdown
       - name: Retrieve original user-supplied Iron Man 2 iOS IPA (temporary private runner only)
         run: |
           set -euo pipefail
@@ -29,6 +29,8 @@ jobs:
           python3 research/b24_unified/g72_sky_light/g72_original_sky_source_audit.py \
             --ipa /tmp/g72_owner/owner_original.ipa \
             --out /tmp/G72_ORIGINAL_C1L1_SKY_NATIVE_METADATA.json
+          python3 research/b24_unified/g72_sky_light/g73_pack_actual_original_sky.py \
+            --ipa /tmp/g72_owner/owner_original.ipa --out /tmp/g73_authored_sky
           rm -f /tmp/g72_owner/owner_original.ipa
           python3 - <<'PY'
           import json
@@ -43,6 +45,17 @@ jobs:
         with:
           name: G72_Original_2010_Expo_Sky_C1L1_sky_001_Authored_Model_Metadata_ONLY
           path: /tmp/G72_ORIGINAL_C1L1_SKY_NATIVE_METADATA.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload genuine native sky six meshes and downsized 2 PVR reference atlases
+        uses: actions/upload-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          path: |
+            /tmp/g73_authored_sky/G73_original_sky_mesh.g73m
+            /tmp/g73_authored_sky/G73_original_sky_tex_00.g66t
+            /tmp/g73_authored_sky/G73_original_sky_tex_01.g66t
+            /tmp/g73_authored_sky/G73_SKY_PROVENANCE.json
           retention-days: 14
           if-no-files-found: error
       - name: Delete original owner IPA if prior stage failed
