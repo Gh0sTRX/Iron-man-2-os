@@ -1,0 +1,127 @@
+name: G85 Real MarkV 248 Moves into G84 Main G8 B14 Source ONLY NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g85-markv-248-real-B24-source-integration-NO-VPK.yml"
+      - "research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py"
+      - "research/b24_unified/g85_markv_full_moveset/test_g85_all_248_markv_true_G8_im2v_stream.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reuse actual verified G8 2010 motion streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore 2010 War Machine original rigid weapon animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore the old real Stark Expo tested city + G59 original triangle collider
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore G85 verified ALL 248 real original IronMan B13 clips baked to MarkV 629 vertices
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Build real G75 B24 single gameplay source then G84 + G85 extensions without compiling a VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          test -d /tmp/g85_original_248_src/g85_real_markv_animations
+          test "$(find /tmp/g85_original_248_src/g85_real_markv_animations -maxdepth 1 -name '*.im2v' | wc -l)" -eq 248
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 - <<'PY'
+          import json,struct,re
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g85_original_248_src/g85_metadata/G85_MarkV_Original_629v_ANIM_Valid_Source.json').read_text())
+          assert j['genuine_all_248_complete']
+          assert j['inverse_bind_max_error']<.0002
+          model=Path('work/models/suitcase.im2t').read_bytes()
+          assert model[:4]==b'IM2T' and struct.unpack_from('<I',model,4)[0]==629
+          assert len(list(Path('work/animations').glob('suitcase_ironman_*.im2v')))==248
+          names=set(re.findall(r'"((?:ironman|warmachine)_(?:ironman|warmachine)_[a-z0-9_]+)"',
+            Path('research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c').read_text()))
+          originals=[n for n in names if n.startswith('ironman_')]
+          assert originals
+          absent=[n for n in originals if not Path('work/animations/suitcase_'+n+'.im2v').exists()]
+          assert not absent,absent
+          main=Path('work/src/main.c').read_text()
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g8_motion_melee_trigger(')==1
+          assert main.count('b24_g8_motion_repulsor_trigger(')==1
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert Path('work/CMakeLists.txt').read_text().count('option(B24_G85_NATIVE_MARKV_629')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('PASS G85 original MarkV real 629 vertex source model, all 248 original IronMan B13 streams staged, every G83 IronMan route is genuine 629v, one B14/G8/B16; NO VPK')
+          PY
+      - name: Check EVERY 248 source G85 animation through real G8 native IM2V stream OPEN and interpolate
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            research/b24_unified/g85_markv_full_moveset/test_g85_all_248_markv_true_G8_im2v_stream.c \
+            -lm -o /tmp/g85_markv_actual_2010_streamer_test
+          /tmp/g85_markv_actual_2010_streamer_test work/animations
+      - name: Source-only G85 enabled old B24 game main and G8/G83 actual C11 syntax QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -DB24_G85_NATIVE_MARKV_629=1 \
+            -Iwork/b24/b24_unified -fsyntax-only \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            work/b24/b24_unified/b24_g83_authentic_timed_router.c
+      - name: Vita ARM C source compile MarkV-enabled G8+G83 and whole actual game main no ELF or VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            for unit in b24_g8_live_original_motion.c b24_g83_unified_movement_aim.c b24_g83_authentic_timed_router.c; do
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+                -DB24_G85_NATIVE_MARKV_629=1 \
+                -Iwork/b24/b24_unified -c "work/b24/b24_unified/$unit" -o "/tmp/$unit.o"
+            done
+            HEADERS="$(find work -name "*.h" -type f | xargs -n1 dirname | sort -u | sed "s@^@-I@" | tr "\n" " ")"
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -fsyntax-only \
+              -DB24_GPU_ENGINE=1 \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=1 \
+              -DB24_G85_NATIVE_MARKV_629=1 \
+              $HEADERS work/src/main.c
+            echo "PASS REAL G85 B24 game main C source with original 248 MarkV 629v IM2V streams, Vita ARM syntax only, NO VPK"
+          '
+      - name: Upload source evidence without duplicating owner IPA, game app, or VPK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G85_REAL_B24_G84_G75_248_MARKV_629V_SOURCE_ACTIVE_NO_VPK
+          path: |
+            work/src/main.c
+            work/CMakeLists.txt
+            work/b24/b24_unified/b24_g8_live_original_motion.c
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c
+            work/b24/b24_unified/b24_g83_unified_movement_aim.h
+          if-no-files-found: error
+          retention-days: 14
