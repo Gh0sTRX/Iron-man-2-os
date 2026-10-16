@@ -39,6 +39,7 @@ jobs:
           dm=[x for x in d['native_typed_GetParamValue_call_sites'] if x['proven_r1_argument_original_cstring']['original_key_name']=='Damage']
           assert len(dm)==1
           assert dm[0]['actual_original_cpp_GetParamValue_expected_type']=='int*'
+          print('G98 VERIFIED DAMAGE INT SRC r2 destination',dm[0]['verified_native_int_bool_output_destination_r2'])
           assert dm[0]['verified_native_int_bool_output_destination_r2']==[{
             'native_argument_r2_base_register':'r4',
             'native_argument_r2_offset_hex':'0x60',
