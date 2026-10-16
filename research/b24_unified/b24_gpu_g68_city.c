@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
+#include "g75_device_qa/b24_g75_original_sun_lighting_candidate.h"
+#endif
 #ifdef B24_G72_SOURCE_LIGHTING
 #include "b24_gpu_g72_light.h"
 #endif
@@ -92,7 +95,7 @@ int b24_g68_city_open(B24G68City *m,
    }
  }
 
-#ifdef B24_G72_SOURCE_LIGHTING
+#if defined(B24_G72_SOURCE_LIGHTING) && !defined(B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE)
  /* Re-use the ONE existing startup CPU geometry allocation.
   * No source UV/XYZ/alpha edits, only reversible shader-like vertex tint. */
  for(uint32_t i=0;i<m->batch_count;i++){
@@ -109,6 +112,28 @@ int b24_g68_city_open(B24G68City *m,
      for(uint32_t p=0;p<3;p++)
        b24_g72_color(geometry[k+p].rgba,factor);
    }
+ }
+#endif
+#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
+ /* Four genuine CLARA Sun node positions, heuristic point falloff. One-time
+  * city VBO color bake; alpha, original positions and UV stay byte-identical.
+  * This is a lighting RESEARCH VARIANT, not Gameloft shader recovery. */
+ for(uint32_t i=0;i<m->batch_count;i++){
+  const B24G68Batch *batch=&m->batches[i];
+  if(batch->tex==UINT32_MAX||m->material_has_alpha[batch->tex])continue;
+  for(uint32_t j=batch->first;j<batch->first+batch->count;j+=3u){
+   G68Vtx *v0=&geometry[j],*v1=&geometry[j+1],*v2=&geometry[j+2];
+   const B24G75Vec a={v0->xyz[0],v0->xyz[1],v0->xyz[2]};
+   const B24G75Vec b={v1->xyz[0],v1->xyz[1],v1->xyz[2]};
+   const B24G75Vec c={v2->xyz[0],v2->xyz[1],v2->xyz[2]};
+   const B24G75Vec u=b24_g75_sub(b,a),v=b24_g75_sub(c,a);
+   const B24G75Vec n={u.y*v.z-u.z*v.y,u.z*v.x-u.x*v.z,u.x*v.y-u.y*v.x};
+   for(uint32_t k=0;k<3;k++){
+    G68Vtx *p=&geometry[j+k];
+    b24_g75_light_original_vertex(p->rgba,
+          (B24G75Vec){p->xyz[0],p->xyz[1],p->xyz[2]},n);
+   }
+  }
  }
 #endif
  /* Renderer owner already created the one VitaGL context. */
