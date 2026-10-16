@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
  B24G68Batch batches[B24_G68_BATCH_MAX];
  uint32_t texture_ids[B24_G68_TEX_MAX];
+ uint8_t material_has_alpha[B24_G68_TEX_MAX]; /* computed once from real G66T pixels */
  uint32_t vbo,vertices,batch_count,texture_count,ready;
 } B24G68City;
 int b24_g68_city_open(B24G68City *city,
