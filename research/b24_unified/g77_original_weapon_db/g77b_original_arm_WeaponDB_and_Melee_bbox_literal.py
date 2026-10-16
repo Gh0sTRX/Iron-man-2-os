@@ -90,6 +90,11 @@ def main(ipa,out):
          'native_melee_model_bbox_scale_verified':'Actor::TestMeleeHit(Actor*)' in results,
          'native_weapon_array_layout_verified':'WeaponDB::GetAttackEntityByIndex(int)' in results,
          'damage_numbers_recovered':False,'no_VPK':True}
+ from g78_source_ARM_attack_projectile_EntityData_property_keys import source as g78_property_audit
+ g78_property_audit(ipa,out)
+ g78_proof=json.loads((out/'G78_NATIVE_ORIGINAL_ATTACK_DAMAGE_EntityData_PROPERTY_MEMBER_MAP.json').read_text())
+ result['exact_target_methods']['G78_original_AttackEntity_ProjectileEntity_2010_loader']=g78_proof['original_WeaponDB_AttackEntity_and_ProjectileEntity_source_typed_field_loader']
+ result['exact_target_methods']['G78_original_2010_resource_archive_names']={'filenames':g78_proof['2010_app_top_level_resource_filename_candidates_without_encoded_content']}
  out.mkdir(parents=True,exist_ok=True)
  (out/'G77B_ORIGINAL_ARM_MELEE_BOUNDING_RADIUS_AND_WEAPON_DB_LAYOUT.json').write_text(json.dumps(result,indent=2)+'\n')
  print('PASS G77B original native WeaponDB array source +0x30/+0x38 and original model melee geometric scalar',
