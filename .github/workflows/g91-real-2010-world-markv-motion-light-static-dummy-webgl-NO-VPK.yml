@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install original source host stream decoder dependencies
-        run: python3 -m pip install -q numpy pillow gdown
+        run: python3 -m pip install -q numpy pillow gdown texture2ddecoder
       - name: Recover real G58 already verified original BRES PVR sun host HTML
         env:
           GH_TOKEN: ${{ github.token }}
@@ -89,6 +89,8 @@ jobs:
           assert j['original_owner_PVR_diffuse_atlases']==24
           assert j['MarkV_authentic_2010_weighted_skin_vertices']==629
           assert j['MarkV_authentic_original_source_triangles']>100
+          assert j['original_MarkV_atlas_MCSuitCase_PVR_512x512'] is True
+          assert j['original_MarkV_629_vertex_authored_uv_used'] is True
           assert j['MarkV_original_2010_20hz_clips_renderable']>=14
           assert j['real_G83_C_router_directly_used']
           assert j['practice_dummy_static_infinite_health']
