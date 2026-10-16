@@ -105,6 +105,16 @@ jobs:
           test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
           grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
           test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G95 original 2010 C1L1 four Sun source node positions diagnostic GPU light candidate QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g95_source_sun_4_author_positions
+          /tmp/g95_source_sun_4_author_positions
+          grep -q 'B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE' work/CMakeLists.txt
+          grep -q 'b24_g75_light_original_vertex' work/b24/b24_unified/b24_gpu_g68_city.c
       - name: G93 host replay REAL original 1,910 authored collision triangles and B14 physical flight
         run: |
           set -euo pipefail
@@ -167,6 +177,7 @@ jobs:
               -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
               -DB24_G68_CITY_BACKEND=ON \
               -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=ON \
               -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
               -DB24_G85_NATIVE_MARKV_629=ON \
               -DB24_G87_REAL_TRANSITION_EVENTS=ON \
