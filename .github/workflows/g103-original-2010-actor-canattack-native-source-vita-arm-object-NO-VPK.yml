@@ -1,0 +1,35 @@
+name: G103 ORIGINAL 2010 Actor CanAttack Proven Partial Permission C11 PS Vita ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g103-original-2010-actor-canattack-native-source-vita-arm-object-NO-VPK.yml"
+      - "research/b24_unified/g103_partial_original_actor_attack_permission/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_original_2010_actor_attack_classifier_safe_subset:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: G103 verify source original 2010 ARM Actor CanAttack known permission classes C11 host table
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g103_partial_original_actor_attack_permission/b24_g103_verified_original_actor_attack_classification.c \
+            research/b24_unified/g103_partial_original_actor_attack_permission/test_b24_g103_verified_original_actor_attack_classification.c \
+            -o /tmp/g103_native_original_attacker_classification
+          /tmp/g103_native_original_attacker_classification
+      - name: Original 2010 proven subset compile as REAL PS Vita ARM source object, no game release
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+              -c research/b24_unified/g103_partial_original_actor_attack_permission/b24_g103_verified_original_actor_attack_classification.c \
+              -o /tmp/g103_true_2010_native_actor_permission_ARM.o
+            test -s /tmp/g103_true_2010_native_actor_permission_ARM.o
+            echo "PASS original 2010 ARM source Actor::CanAttack subset compiled true Vita ARM object; target dynamic vtable and attacker type1 still UNKNOWN"
+          '
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
