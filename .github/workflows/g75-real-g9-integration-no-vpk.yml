@@ -7,6 +7,7 @@ on:
       - "research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py"
       - "research/b24_unified/g75_device_qa/g75_apply_to_G70_original_B24_SOURCE_ONLY.py"
       - "research/b24_unified/g75_device_qa/g75_patch_b14_camera_and_flight_SOURCE_ONLY.py"
+      - "research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c"
   workflow_dispatch:
 permissions:
   contents: read
