@@ -1,5 +1,8 @@
 #include "b24_gpu_runtime.h"
 #include "b24_gpu_boot_trace.h"
+#ifdef B24_G72_DUSK_ATMOSPHERE
+#include "b24_gpu_g72_sky.h"
+#endif
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
@@ -144,6 +147,11 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
  if(!r->frames)(void)b24_gpu_boot_trace_mark("43 SCENE_FRAME_BEGIN");
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
+#ifdef B24_G72_DUSK_ATMOSPHERE
+ /* Source city stays unchanged: camera-relative temporary background only,
+  * old B24 GPU owner still clears, owns ALL passes and swaps once. */
+ if(!b24_g72_draw_dusk_atmosphere(c->pitch,c->orbit))return 0;
+#endif
 #ifdef B24_G68_CITY_BACKEND
  if(!b24_gpu_owner_scene_g68(&r->owner,&r->g68_city))return 0;
 #else
