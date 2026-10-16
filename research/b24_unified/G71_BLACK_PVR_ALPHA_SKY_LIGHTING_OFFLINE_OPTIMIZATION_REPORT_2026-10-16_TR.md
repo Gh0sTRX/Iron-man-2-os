@@ -1,0 +1,31 @@
+# G71 — Real G68/G70 C1L1 black atlas, sky & lighting technical investigation — 2026-10-16
+
+## User instructions / constraints
+The user is away from PS Vita and asks to keep doing host-side optimization, troubleshoot black-rectangle materials, report precise progress, and provide small authentic-source preview at the end. NO invented gameplay or new VPK needed, and preserve the verified G68 geometry + G70 five-suit/363-stream B24 original gameplay.
+
+## WHAT WAS ACTUALLY VERIFIED
+- GitHub Actions **success**: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38895216548
+- G70 VPK previously CI built: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38893606345, still hardware untested. SHA256 of original G70: `75433cedeb77ca858d5a26a41e995e110b40a10b96affce33190aca80317e134`.
+- Compared official prior artifact VPKs directly: G68 real hardware tested G66 city mesh, 31 original city RGBA texture files and native 1910 face G59 collider **identical byte for byte** to G70. So merging did NOT remove or replace city atlas pixels. (Actual Vita G70 render still unknown.)
+- 31 original source city textures, total *uncompressed level-0 atlas* **9,785,344 bytes = 9.332 MiB**. Original city interleaved float3 + float2 + RGBA vertex buffer **67,323 * 24 = 1,615,752 bytes = 1.541 MiB** (excluding mesh headers). No extra GPU texture copies allocated by G71. These sums are source-level lower bounds, NOT actual Vita VRAM measurements.
+- **7** original RGBA texture banks have alpha <255: `[1,6,7,9,15,19,20]`. They account for exactly **1,282 original scene triangles (7 original groups)**. Remaining **21,159 triangles (25 scene groups)** have opaque diffuse texture alpha and vertex RGBA alpha=255. Some fully transparent atlas pixels contain nonblack RGB values (normal for straight RGBA), so black rectangles cannot be proved to be simply missing PNG files.
+- G70 renderer before this patch enabled blending for every scene batch and wrote depth for all 32 groups in their original packed order. For alpha=0 pixels, GL depth can still occlude a surface that ought to show behind vegetation. This is a **plausible, mechanically grounded explanation**, not an independently verified root cause for each photographed black plane.
+- G71 C `B24_G71_ALPHA_PASSES` opt-in test: opaque 25 scene batches first, **depth write ON and blend OFF**; then 7 translucent atlas batches, **depth test ON, depth write OFF, blend ON**. All 32 original batches are drawn exactly once; no new textures, geometry, VBOs or new gameplay loop. Source RGBA alpha classification scanned during one-time G66T load, not per frame.
+- The opt-in old G70 baseline (macro OFF) and G71 new transparency path (macro ON) both cross compiled with `arm-vita-eabi-gcc`, `-Wall -Wextra -Werror` in VitaSDK 2026.08. **No G71 PS Vita VPK created or device visual improvement yet confirmed.**
+- Correct native 2010 shader blend/alpha-discard, material-depth sorting, cutout threshold and actual transparency rendering not recovered. Source-level alpha ordering is better-founded, but G71 is an experimental A/B patch. 7 group centroid sort / multi-material split possible later; no made-up alpha threshold yet.
+
+## Skybox and environmental lighting
+- Earlier G68 hardware photos show dark/black sky because G68 compiled renderer uses `glClearColor(.011,.025,.078,1)`; G70 old B24 GPU owner uses `glClearColor(.015,.025,.045,1)`. No actual original sky panorama/sky shader is bound to the world frame. Recoloring clear cannot be passed off as recovered original sky texture.
+- G29/G30 source analysis recovered **four** real authored Sun Light CLARA nodes: Sun001 (-23.170,-21.477,37.670), Sun004 (-21.325,-20.287,37.906), Sun002 (-19.994,-21.699,37.906), Sun003 (-32.448,100.158,29.493); native encoded `0xFFBEAEFF` resembling color, unknown real channel interpretation and light strength. These are original script transform coordinates, not proof of final original per-pixel light model.
+- G58A had already implemented offline **host-only** adjustable ambient, sun, exposure, fog and alpha cutout test (G57 source city viewer). That work was never integrated with G70 GPU and was not actual Gameloft source shader. Next investigate source sky/scattering stage and physical VitaGPU fixed shader constraints. Do not upload an invented skybox as a genuine source texture.
+
+## Expo hemisphere and remaining material artifacts
+- Earlier G34 original BRES analysis showed approximately **4,145 original-source triangles** relying on nonstandard material, vertex-color or shader paths rather than ordinary recovered diffuse+UV. Native `Material__20` contributed **408 triangles on two hemisphere meshes**; native `c1l1_3building` covers complex arched structures. These nonstandard shader materials cannot be fixed merely by alpha sorting. At present many source triangles have reconstructed diffuse but not original multi-pass lighting or blending semantics. Black sections and cyan overbright geometries need specific original author shader parameter research, not painted arbitrary colors.
+- G71 small source-based VTK diagnostic C1L1 aerial image generated from actual G70 G66M/31 native atlas assets plus G68 original Mark V mesh; *blue background and simple material lighting are diagnostic desktop choices*, NOT PS Vita captured game, nor new original 2010 sky/light source.
+
+## Remaining work
+1. First merged G70 hardware device QA (boot, input, HUD and B14/G59 floor collision and visible atlas), user not currently at Vita.
+2. When available, A/B compare G70 baseline vs G71 alpha pass compiled in new independent app ID. Verify translucent vegetation, globe alpha, backdrop geometry, no unexpected missing faces or 60fps drop, memory. Do not churn multiple beta VPK now.
+3. Optional distant-z depth bucket sort for translucent surfaces if necessary; avoid per-frame heap allocations; preserve native 31 atlas and source 22,441 triangles.
+4. Sun Light source shader combiner + atmosphere sky render after forensic match; do not invent official color values. Test with original touchHLE screenshots if available.
+5. GPU overdraw/culling and old B24 363 stream memory measurements once real G70 device screenshot/video captured; no ungrounded FPS projection.
