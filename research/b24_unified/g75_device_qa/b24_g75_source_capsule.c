@@ -110,7 +110,8 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
   * source collision resolver. Game still calls only ONE B14 motion tick. */
  float dx=x1-x0,dy=y1-y0,dz=z1-z0;
  int steps=(int)ceilf(fmax2(fmax2(fabsf(dx),fabsf(dy)),fabsf(dz))/.22f);
- if(steps<1)steps=1;if(steps>80)steps=80;
+ if(steps<1)steps=1;
+ if(steps>80)steps=80;
  float x=x0,y=y0,z=z0;
  const float stepx=dx/steps,stepy=dy/steps,stepz=dz/steps;
  for(int k=0;k<steps;k++){
