@@ -54,3 +54,35 @@ int b24_g70_g68_collision_load(B24C1OriginalCollision *out,const char *path){
  b24_c1_original_collision_free(out);
  *out=tmp;return 1;
 }
+
+/* G74 query: real 2010 source nonwall triangles, exact XY barycentric Z.
+ * Never recover distant roofs below/above the actor. Port of the tested G67
+ * source_floor principle into G9's sole B14 controller (not G67 player loop).
+ * Broadphase first, double-winding barycentric compatible. */
+int b24_g74_near_original_floor(const B24C1OriginalCollision *c,
+ float x,float y,float feet_z,float *floor_z){
+ if(!c||!c->ready||!floor_z||
+    !good(x)||!good(y)||!good(feet_z))return 0;
+ float best=-100000.f;
+ int found=0;
+ for(uint32_t i=0;i<c->count;i++){
+  const B24C1OriginalCollisionFace *t=&c->faces[i];
+  if(t->wall||x<t->minx-.0001f||x>t->maxx+.0001f||
+     y<t->miny-.0001f||y>t->maxy+.0001f||
+     t->minz>feet_z+.45f||t->maxz<feet_z-.5f)continue;
+  const float *p=t->xyz;
+  float bx=p[3]-p[0],by=p[4]-p[1];
+  float cx=p[6]-p[0],cy=p[7]-p[1];
+  float det=bx*cy-by*cx;
+  if(fabsf(det)<1e-7f)continue;
+  float dx=x-p[0],dy=y-p[1];
+  float u=(dx*cy-dy*cx)/det;
+  float v=(bx*dy-by*dx)/det;
+  if(u<-.0002f||v<-.0002f||u+v>1.0002f)continue;
+  float h=p[2]+u*(p[5]-p[2])+v*(p[8]-p[2]);
+  if(!good(h)||h>feet_z+.45f||h<feet_z-.5f)continue;
+  if(!found||h>best){best=h;found=1;}
+ }
+ if(found)*floor_z=best;
+ return found;
+}
