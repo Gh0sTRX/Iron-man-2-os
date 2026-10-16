@@ -49,8 +49,24 @@ def patch_script(script:str, name:str)->str:
         assert script.count(anchor)==1
         script=script.replace(anchor,'''(cd work && zip -q build-vita/'''+vpk+''' assets/G66_city.g66m assets/G66_city_tex_*.g66t assets/G66_original_collision.g66c)
           '''+anchor)
-    # Old workflow contains machine-independent G9 assertions for source-only
-    # archival col mesh; keep alongside real G68 collider for audit.
+    # The old G9 QA gates must assert the intentionally CHANGED G70
+    # source collider loader and widened hardware-tested G68 map bounds.
+    # These are replacement assertions, not skipped tests.
+    if "b24_c1_original_collision_load(&b24_original_walls" in script:
+        script=script.replace(
+            "b24_c1_original_collision_load(&b24_original_walls",
+            "b24_g70_g68_collision_load(&b24_original_walls")
+    if "G8 original C1L1 full movement" in name:
+        replacements={
+           "w.x=272.99f":"w.x=329.99f",
+           "assert(w.x<=273.001f)":"assert(w.x<=330.001f)",
+           "'-270.f,273.f'":"' -324.f,330.f'".replace(" ",""),
+           "'-297.f,191.f'":"' -351.f,254.f'".replace(" ",""),
+        }
+        for original,updated in replacements.items():
+            if original not in script:
+                raise RuntimeError("Cannot update G8 source bounds test: "+original)
+            script=script.replace(original,updated)
     return script
 
 def step_run(index,step):
