@@ -7,6 +7,9 @@
 - G68 artifact ID **12039049497**: `IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK`; ZIP archive 6,075,265 bytes. 14-day retention; VERIFY expiry before sending links.
 - Inside ZIP: `IronMan2_B24_G68_MarkV_Expo_Combat.vpk`, Vita TITLE_ID `IM2G68001`.
 - VitaSDK/vitaGL native executable, eboot, SFO, VPK zip CRC and asset layout verified in run 38885906487.
+- Direct artifact ZIP was retrieved, one VPK extracted and independently verified (ZIP CRC, 40 VPK entries, eboot, SFO, G65 scene, G59 collision, MarkV original 7 animation streams).
+- Exact VPK: `IronMan2_B24_G68_MarkV_Expo_Combat.vpk`, **6,138,788 bytes**, SHA256 **`cfc7f7cac6131152cf2ef0dbbcbaa5d0f7522cbe865134dd26aaf4d26975ea11`**. Current conversation mounted direct file at `/mnt/data/IronMan2_B24_G68_MarkV_Expo_Combat.vpk`; NEVER assume this sandbox path in another session without checking.
+- Independently inspected original BRES armor package: 902 faces / 2706 flattened GPU vertices / 1 source batch / native Z-range 0.0133–2.2488 and authored UV range 0.0105–1.0036. Seven motion clips have nonzero intermediate frame motions (including idle, walk, fire, hover, rush, melee, land); this alone does not establish Vita render success.
 - This is a **build-only verification**. NO actual Vita hardware test, FPS, input behaviour or graphical outcome confirmed by owner yet.
 
 ## Original 2010 sources recovered and genuinely used
