@@ -141,6 +141,15 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
    * drift grounded character through an unverified support surface. */
   if(!grounded&&wall_clear(world,x,y,nextz,radius,height))z=nextz;
   else if(grounded&&accepted>0.f)z=nextz;
+  else if(grounded&&wall_clear(world,x,y,nextz,radius,height)){
+   /* In G9 landing transition, B14 sets flying=false BEFORE the actor
+    * reaches the rooftop. Allow vertical descent when currently floating
+    * above every authored support, and STOP at the first actually crossed
+    * original roof/ground. Do not leave suit frozen mid-air. */
+   float original_support;
+   if(!b24_g74_near_original_floor(world,x,y,z,&original_support))
+     z=nextz;
+  }
  }
  *ox=x;*oy=y;*oz=z;
  return 1;
