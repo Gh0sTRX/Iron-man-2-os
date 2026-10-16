@@ -66,6 +66,12 @@ if(B24_G68_CITY_BACKEND)
    message(FATAL_ERROR "G68 city uses existing B24 VitaGL GPU owner, not SDL framebuffer")
  endif()
  target_compile_definitions(im2_beta PRIVATE B24_G68_CITY_BACKEND=1)
+ # G71 EXPERIMENTAL: one opt-in runtime source-alpha reorder, G70 default
+ # untouched until desktop contrast preview and hardware acceptance.
+ option(B24_G71_ALPHA_PASSES "Original source 7 RGBA atlas batches separated from opaque pass" OFF)
+ if(B24_G71_ALPHA_PASSES)
+  target_compile_definitions(im2_beta PRIVATE B24_G71_ALPHA_PASSES=1)
+ endif()
  target_sources(im2_beta PRIVATE
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g68_city.c"
    "${CMAKE_CURRENT_SOURCE_DIR}/b24/b24_unified/b24_gpu_g68_collision.c")
