@@ -106,6 +106,16 @@ jobs:
           PY
           node --check /tmp/g91/out/g91_source_viewer_syntax.js
           test -z "$(find . /tmp/g91/out -type f -name '*.vpk' -print -quit)"
+      - name: Actually run original 2010 source WebGL2 city PVR sun and MarkV 629 rig in headless Chrome
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable)"
+          echo "Source WEBGL2 diagnostic in actual browser: $CHROME"
+          npm install -s --no-audit --no-fund --prefix /tmp/g91/browser playwright-core@1.56.1
+          G91_CHROME="$CHROME" node research/b24_unified/g91_offline_integrated_preview/g91_browser_render_smoke.cjs \
+            /tmp/g91/out/G91_ACTUAL_2010_SOURCE_MARKV_MOVEMENT_COMBAT_LIGHT_STATIC_DUMMY_OFFLINE.html \
+            /tmp/g91/out/G91C_REAL_OWNER_SOURCE_WEBGL2_RUNTIME_SCREENSHOT_HOST_NOT_VITA.png
+          test -s /tmp/g91/out/G91C_REAL_OWNER_SOURCE_WEBGL2_RUNTIME_SCREENSHOT_HOST_NOT_VITA.png
       - name: Securely delete full private original iOS IPA and extracted full Mark V bank
         if: always()
         run: rm -rf /tmp/g91/private /tmp/g91/g85
@@ -118,5 +128,6 @@ jobs:
             /tmp/g91/out/G91_ACTUAL_2010_SOURCE_MARKV_MOVEMENT_COMBAT_LIGHT_STATIC_DUMMY_OFFLINE.html
             /tmp/g91/out/G91_ACTUAL_SOURCE_FIDELITY_HOST_QA.json
             /tmp/g91/out/G91_ACTUAL_C_G83_SOURCE_ROUTING.json
+            /tmp/g91/out/G91C_REAL_OWNER_SOURCE_WEBGL2_RUNTIME_SCREENSHOT_HOST_NOT_VITA.png
           if-no-files-found: error
           retention-days: 14
