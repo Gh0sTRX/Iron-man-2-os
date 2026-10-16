@@ -42,7 +42,7 @@ def calibrate(directory:Path):
  const float smoothing=1.f-expf(-(w->flying?(w->rush?7.f:9.f):14.f)*dt);
  w->authored_move_vx+=(vx*speed_target-w->authored_move_vx)*smoothing;
  w->authored_move_vy+=(vy*speed_target-w->authored_move_vy)*smoothing;
- const float velocity=0.f; /* legacy scalar variable no longer governs XY */''',
+''',
         'stage flight ground pace and acceleration')
     # B14 G8 expanded native source map clamp, or original tiny stand-alone B14.
     variants=[
@@ -77,12 +77,6 @@ def calibrate(directory:Path):
         'w->z+=cl(w->target_z-w->z,-2.5f*dt,2.5f*dt);',
         'w->z+=cl(w->target_z-w->z,-7.f*dt,7.f*dt);',
         'vertical acceleration cap')
-    # velocity is deliberately fixed to 0 to make old interpolation lines
-    # easily recognized; no unused-variable compile warnings (const used by
-    # optional old unrelated lines would be inert). Remove unused declaration
-    # if only source constants no old references.
-    if s.count('velocity')==1:
-        s=s.replace(' const float velocity=0.f; /* legacy scalar variable no longer governs XY */','')
     # Keep XML / GitHub source modules isolated, write only after all validations.
     world.write_text(s)
     header.write_text(h)
