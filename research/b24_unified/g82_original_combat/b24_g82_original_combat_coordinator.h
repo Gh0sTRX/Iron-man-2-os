@@ -19,6 +19,17 @@ typedef struct {
  uint32_t last_target_id;
  unsigned accepted_hits;
  unsigned rejected_unverified_events;
+ /* G88 defensive source-event dedup: previous implementation remembered
+  * ONLY the last target/event pair; A -> B -> A duplicated A's damage.
+  * Keep ALL observed accepted event/target pairs in a bounded combo phase.
+  * Saturation FAILS CLOSED, never evicts a previous pair and re-hits.
+  * This is our Vita integration guard, NOT original iOS contact semantics. */
+#define B24_G88_MAX_VERIFIED_CONTACTS_PER_COMBO_PHASE 32u
+ unsigned g88_verified_contact_count;
+ uint32_t g88_verified_event_ids[B24_G88_MAX_VERIFIED_CONTACTS_PER_COMBO_PHASE];
+ uint32_t g88_verified_target_ids[B24_G88_MAX_VERIFIED_CONTACTS_PER_COMBO_PHASE];
+ unsigned g88_duplicates_rejected;
+ unsigned g88_capacity_rejected;
 } B24G82Combat;
 typedef struct {
  uint32_t observed_original_event_id;
