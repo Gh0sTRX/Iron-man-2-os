@@ -1,0 +1,29 @@
+name: G63 build PVRTC decoder wheel offline local original IPA inspection
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g63-fetch-pvrtc-decoder-wheel-no-ipa.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  collect_decoder:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download prebuilt LGPL or licensed PVR texel decoder manylinux x86_64
+        run: |
+          mkdir -p /tmp/g63_wheel
+          python3 -m pip download --only-binary=:all: --no-deps \
+            --platform manylinux2014_x86_64 --python-version 3.13 \
+            --implementation cp --abi abi3 texture2ddecoder==1.0.6 \
+            -d /tmp/g63_wheel
+          test "$(find /tmp/g63_wheel -type f | wc -l)" -eq 1
+          ls -lh /tmp/g63_wheel
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G63_PVRTC_NATIVE_PYTHON_DECODER_WHEEL_NO_GAMEDATA
+          path: /tmp/g63_wheel/*.whl
+          retention-days: 3
+          if-no-files-found: error
