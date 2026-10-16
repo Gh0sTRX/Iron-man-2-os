@@ -14,7 +14,7 @@ if(!src||!png)throw Error('G99 expects full source gallery HTML path and screens
   const page=await browser.newPage({viewport:{width:1600,height:980},deviceScaleFactor:1});
   page.on('pageerror',e=>console.error('G99 owner source render page error:',String(e)));
   await page.goto('file://'+src,{waitUntil:'load',timeout:160000});
-  await page.waitForFunction(()=>window?.a91!==undefined && Object.keys(a91.streams).length===248,
+  await page.waitForFunction(()=>typeof a91!=='undefined' && Object.keys(a91.streams).length===248,
       null,{timeout:60000});
   const world=await page.evaluate(()=>{
    return {streams:Object.keys(a91.streams).length,
