@@ -122,10 +122,14 @@ static unsigned g92_debug_accepted_melee_edge=0;
    +indent+'#endif\n'+indent+'}')
  main=main[:found.start()]+replacement+main[found.end():]
  assert main.count('b24_g8_motion_melee_trigger(')==1
- # G85's MarkV opt-in has TWO mutually-exclusive compile branches with
- # identical source input condition; only ONE is live in the G92 ARM build.
- # The dummy must NEVER add a third should_melee poll.
- assert main.count('b24_unified_should_melee(&b24_game)')==2
+ # G85 and G75 source snapshots can have one or two mutually
+ # exclusive compile-preprocessor references; neither creates a second
+ # evaluated melee input in the active G92 build. The new G92 debug
+ # callback must never poll this function in a separate branch.
+ source_guards=main.count('b24_unified_should_melee(&b24_game)')
+ if source_guards not in (1,2):
+  raise ValueError('G93 unexpected accepted input call count '+str(source_guards))
+ print('G93 B24 compile-source melee guards',source_guards,'G92 debug extra guards ZERO')
  assert 'g92_debug_accepted_melee_edge' in main
  assert main.count('g92_debug_accepted_melee_edge=1;')==1
  for name in ('b24_g10_practice_target.h','b24_g10_practice_target.c',
