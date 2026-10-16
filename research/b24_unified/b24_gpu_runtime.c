@@ -42,6 +42,16 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
    return 0;
  }
  (void)b24_gpu_boot_trace_mark("22 G68_SOURCE_CITY_READY");
+#ifdef B24_G73_REAL_SKY
+ /* ACTUAL BRES authored sky, PVR material bindings provisional, never
+  * a second GL context, zero impact on B14 gameplay state. */
+ if(!b24_g73_sky_open(&r->original_sky)){
+   (void)b24_gpu_boot_trace_mark("22 G73_NATIVE_SKY_LOAD_FAILED");
+   b24_g68_city_close(&r->g68_city);
+   return 0;
+ }
+ (void)b24_gpu_boot_trace_mark("22 G73_NATIVE_SKY_READY");
+#endif
 #else
  (void)b24_gpu_boot_trace_mark("20 C1G2_LOAD_BEGIN");
  if(!b24_gpu_c1_load(&r->city,city_file)){
@@ -153,6 +163,9 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  if(!b24_g72_draw_dusk_atmosphere(c->pitch,c->orbit))return 0;
 #endif
 #ifdef B24_G68_CITY_BACKEND
+#ifdef B24_G73_REAL_SKY
+ if(!b24_g73_sky_draw(&r->original_sky))return 0;
+#endif
  if(!b24_gpu_owner_scene_g68(&r->owner,&r->g68_city))return 0;
 #else
  if(!b24_gpu_owner_scene_material(&r->owner,&r->city,
@@ -189,6 +202,9 @@ void b24_gpu_runtime_close(B24GpuRuntime *r){
  b24_c1_material_source_free(&r->city_material);
  b24_c1_uv_free(&r->city_uv);
 #ifdef B24_G68_CITY_BACKEND
+#ifdef B24_G73_REAL_SKY
+ b24_g73_sky_close(&r->original_sky);
+#endif
  b24_g68_city_close(&r->g68_city);
 #else
  b24_gpu_c1_free(&r->city);
