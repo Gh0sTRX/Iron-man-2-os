@@ -121,6 +121,19 @@ jobs:
             research/b24_unified/b24_c1_original_collision.c \
             -lm -o /tmp/g93_1910_authored_collision_host
           /tmp/g93_1910_authored_collision_host work/assets/G66_original_collision.g66c
+      - name: G94 actual original G68 1910-source-face floor-place immobile dummy, no guessed collision
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g91_offline_integrated_preview/test_g94_real_source_G68_dummy_actual_floor.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            -lm -o /tmp/g94_source_g68_static_dummy_original
+          /tmp/g94_source_g68_static_dummy_original work/assets/G66_original_collision.g66c
       - name: G93 real B24 source contains ONE accepted G8 punch and NEVER a second dummy input poll
         run: |
           set -euo pipefail
