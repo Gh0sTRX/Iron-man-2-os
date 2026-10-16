@@ -53,6 +53,9 @@ jobs:
           assert original['per_attack_original_damage_values_proven'] is False
           s101=json.loads(Path('/tmp/g98_source_metadata/G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json').read_text())
           assert s101['source_named_instances_verified']==26
+          assert s101['all_26_length_streams_pass'] is True
+          assert s101['exact_original_2010_class108_Attack_schema_name']=='Attack'
+          assert len(s101['G102_2010_native_clara_classes_really_declaring_integer_Damage_field'])>=1
           assert s101['original_damage_i32_value_exact_field_index_and_property_parent_PROVEN'] is False
           assert len(d['native_typed_GetParamValue_call_sites'])==14
           assert d['exact_original_per_attack_Damage_values_and_serialized_tlv_NOT_DECODDED'] is True
