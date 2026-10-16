@@ -1,4 +1,5 @@
 #include "b24_g83_unified_movement_aim.h"
+#include "b24_g83_authentic_2010_source_durations.h"
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
@@ -193,7 +194,8 @@ int b24_g83_select_original_motion(const B24G83Input *p,
  }
  out->stem=stem;
  out->source_authored_name=stem!=NULL;
- out->one_shot_not_looping=oneshot;
+ out->one_shot_not_looping=oneshot || (fire && aim!=B24G83_AIM_NONE && (ground||hover));
+ out->original_source_duration_ms=b24_g83_authentic_source_duration(stem);
  /* UNKNOWN original iOS input semantics and damage hit frames stay false */
  out->input_semantics_verified_original_ios=0;
  out->needs_2010_hit_event=fire;
@@ -212,6 +214,7 @@ int b24_g83_select_combined(B24G82Combat *combat,uint32_t time_ms,
     out->stem=melee;
     out->source_authored_name=1;
     out->one_shot_not_looping=1;
+    out->original_source_duration_ms= combat->clip.phase==1?266u:combat->clip.phase==2?300u:500u;
     out->needs_2010_hit_event=1;
    }
   }
