@@ -31,6 +31,29 @@ def audit(ipa,out):
   prop_names.append({'property_name':m.group().decode('ascii','replace'),
     'name_original_offset_hex':hex(start),
     'original_declared_type_tag_2bytes_before_len':struct.unpack_from('<H',raw,start-4)[0]})
+ # Which ACTUAL original native CLARA class prototypes define a property
+ # spelled exactly Damage? Attack id108 declares only AttackType and
+ # Position, so inherited base and/or attached EntityData rules must be
+ # decoded before assigning one of the 54 serialized field slots to Damage.
+ damage_owners=[]
+ for index,cl in enumerate(schema):
+  begin=cl['original_class_name_file_offset']+len(cl['original_class_name'])
+  ending=(schema[index+1]['original_class_name_file_offset']-6
+          if index+1<len(schema) else 38719)
+  descriptors=[]
+  for mat in TEXT.finditer(raw,begin,ending):
+   st=mat.start()
+   if st<4 or struct.unpack_from('<H',raw,st-2)[0]!=len(mat.group()):continue
+   name=mat.group().decode('ascii','replace')
+   tag=struct.unpack_from('<H',raw,st-4)[0]
+   descriptors.append({'name':name,'native_descriptor_type_tag':tag,'native_offset':hex(st)})
+  for descr in descriptors:
+   if descr['name']=='Damage':
+    damage_owners.append({'2010_original_class_id':cl['original_class_id'],
+      '2010_original_class_name':cl['original_class_name'],
+      'native_Damage_type_tag':descr['native_descriptor_type_tag'],
+      'original_name_VM_or_file_offset_hex':descr['native_offset'],
+      'known_2010_Attack_class108_parent_inheritance_link_verified':False})
  next_field_offsets=sorted(r['original_name_offset'] for r in instances)
  regions=[]
  for e in attacks:
@@ -74,6 +97,7 @@ def audit(ipa,out):
  report={'exact_original_2010_class108_Attack_schema_name':entry['original_class_name'],
   'original_Attack_class_schema_end_hex':hex(class_end),
   'original_Attack_class108_local_property_descriptors':prop_names,
+  'G102_2010_native_clara_classes_really_declaring_integer_Damage_field':damage_owners,
   'all_26_original_named_Attack_property_size_stream_attempts':regions,
   'source_named_instances_verified':26,
   'all_26_length_streams_pass':all(x['length_prefixed_boundary_parse_succeeded'] for x in regions),
@@ -84,6 +108,8 @@ def audit(ipa,out):
  (out/'G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json').write_text(
   json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  print('PASS G101 authentic original Attack 26 record native class108 descriptor introspection')
+ print('G102 actual class declarations with source Damage property',damage_owners)
+ print('G101 ALL 26 Attack counted native property lists valid',report['all_26_length_streams_pass'])
  print('G101 ATTACK SCHEMA',entry['original_class_name'],hex(class_start),hex(class_end),
    'local defined props',prop_names)
  for r in regions[:7]:
