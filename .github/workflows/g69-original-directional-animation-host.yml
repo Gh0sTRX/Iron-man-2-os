@@ -32,5 +32,9 @@ jobs:
           /tmp/g69_test
       - name: Keep legacy B24 G8 multi-direction animation baseline working
         run: |
-          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I research/b24_unified research/b24_unified/test_b24_g8_live_original_motion.c research/b24_unified/b24_g8_live_original_motion.c -lm -o /tmp/g8_motion_test
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I research/b24_unified research/b24_unified/test_b24_g8_live_original_motion.c \
+            research/b24_unified/b24_g8_live_original_motion.c \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/b24_original_im2v_stream.c \
+            research/b24_unified/b24_hover_pose_blend.c -lm -o /tmp/g8_motion_test
           /tmp/g8_motion_test
