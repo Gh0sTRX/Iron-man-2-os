@@ -17,7 +17,7 @@ CHECKED_NAMES=[
  'AttackEntity::DoProjectileAttack(', 'ProjectileEntity::HitImpactActor(',
  'ProjectileEntity::UpdateCollisions(', 'ProjectileEntity::DoSplashDamage(',
  'ProjectileEntity::LoadFromFile(', 'WeaponDB::AddNewAttackEntity(',
- 'WeaponDB::GetAttackEntityByIndex(', 'Actor::Damage(',
+ 'WeaponDB::GetAttackEntityByIndex(', 'Actor::CanAttack(', 'Actor::Damage(',
  'Actor::TestMeleeHit(', 'CNPC::OnHit(', 'MainCharacter::UpdateMeleeAttackState(',
  'MainCharacter::UpdateComboAttackAction(', 'MainCharacter::DoUniBeamAttack(',
 ]
