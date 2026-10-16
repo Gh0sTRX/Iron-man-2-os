@@ -1,0 +1,78 @@
+name: G99 ALL 248 REAL Original 2010 MarkV Animation Searchable WebGL2 Gallery NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g99-all-248-source-markv-full-offline-webgl-gallery-NO-VPK.yml"
+      - "research/b24_unified/g99_full_original_markv_preview/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_2010_all_248_markv_author_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore verified genuine original 2010 G96 Stark Expo 3D PVR native MarkV host WebGL stage
+        uses: actions/download-artifact@v4
+        with:
+          name: G91_2010_REAL_STARK_EXPO_MARKV_MOVEMENT_COMBAT_SUN_STATIC_DUMMY_BROWSER_PREVIEW_NO_VPK
+          run-id: 38967469107
+          github-token: ${{ github.token }}
+          path: /tmp/g99/original_scene
+      - name: Restore original owned game G85 Mark V all 248 actual 629 vertex rig pose clips
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g99/source_248
+      - name: Build fully offline 248/248 authentic 2010 Mark V original animation searchable and playable 3D gallery
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy
+          mkdir -p /tmp/g99/build
+          python3 research/b24_unified/g99_full_original_markv_preview/g99_248_source_clips_add_selectable_gallery.py \
+            --html /tmp/g99/original_scene/G91_ACTUAL_2010_SOURCE_MARKV_MOVEMENT_COMBAT_LIGHT_STATIC_DUMMY_OFFLINE.html \
+            --animations /tmp/g99/source_248/g85_real_markv_animations \
+            --out /tmp/g99/build/G99_AUTHENTIC_2010_FULL_248_MARKV_629V_WEBGL3D_MOVEMENT_COMBAT_ALL_ANIMS_OFFLINE.html \
+            --qa /tmp/g99/build/G99_ALL_248_REAL_2010_MARKV_SOURCE_POSE_QA.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g99/build/G99_ALL_248_REAL_2010_MARKV_SOURCE_POSE_QA.json').read_text())
+          assert j['original_2010_MarkV_all_248_source_clips']==248
+          assert j['source_all_original_baked_20Hz_frames']>=248
+          assert len(j['original_source_named_clips'])==248
+          assert j['all_248_clips_NATIVE_VITA_GAMEPLAY_STATE_MAPPED'] is False
+          assert j['original_2010_damage_frame_or_attack_permissions_proven'] is False
+          assert j['NO_VPK'] is True
+          print('PASS G99 Original full 248 native Mark V 2010 animation source audit 629 weighted vertices each; NO game-input 248 mapping claims')
+          PY
+      - name: Actual headless Chrome WebGL2 run all 248 gallery original PVR map rendered + source combo clip
+        run: |
+          set -euo pipefail
+          G99_CHROME="$(command -v google-chrome || command -v google-chrome-stable)"
+          mkdir -p /tmp/g99/browser
+          npm install -s --no-audit --no-fund --prefix /tmp/g99/browser playwright-core@1.56.1
+          G99_CHROME="$G99_CHROME" node research/b24_unified/g99_full_original_markv_preview/g99_248_browser_gallery_render_smoke.cjs \
+            /tmp/g99/build/G99_AUTHENTIC_2010_FULL_248_MARKV_629V_WEBGL3D_MOVEMENT_COMBAT_ALL_ANIMS_OFFLINE.html \
+            /tmp/g99/build/G99_REAL_2010_ALL_248_SOURCE_GALLERY_CHROME_WEBGL2_HOST_SCREENSHOT.png
+          test -s /tmp/g99/build/G99_REAL_2010_ALL_248_SOURCE_GALLERY_CHROME_WEBGL2_HOST_SCREENSHOT.png
+          test -z "$(find . /tmp/g99/build -type f -name '*.vpk' -print -quit)"
+      - name: Remove private 248 animation source temp files; maintain only user-owned private artifact
+        if: always()
+        run: rm -rf /tmp/g99/source_248
+      - name: Upload full source-only playable 248 MarkV 3D animation viewer and QA no VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G99_ALL_248_AUTHENTIC_2010_MARKV_ANIMATIONS_STARK_EXPO_DUMMY_OFFLINE_3D_HTML_NO_VPK
+          path: |
+            /tmp/g99/build/G99_AUTHENTIC_2010_FULL_248_MARKV_629V_WEBGL3D_MOVEMENT_COMBAT_ALL_ANIMS_OFFLINE.html
+            /tmp/g99/build/G99_ALL_248_REAL_2010_MARKV_SOURCE_POSE_QA.json
+            /tmp/g99/build/G99_REAL_2010_ALL_248_SOURCE_GALLERY_CHROME_WEBGL2_HOST_SCREENSHOT.png
+          if-no-files-found: error
+          retention-days: 14
