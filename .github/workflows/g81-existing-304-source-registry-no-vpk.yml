@@ -1,0 +1,43 @@
+name: G81 Verified Original 304 Player Moveset Index Source Only NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g81-existing-304-source-registry-no-vpk.yml"
+      - "research/b24_unified/g81_complete_moveset/g81_existing_304_authenticated_legacy_catalog_host.py"
+      - "research/B18_COMPLETE_304_PLAYER_ANIMATIONS_CATALOG_TR.md"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  documented_2010_moves:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover true already audited 248 IronMan and 56 WarMachine source clip names, channels and durations
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g81_complete_moveset/g81_existing_304_authenticated_legacy_catalog_host.py \
+            --doc research/B18_COMPLETE_304_PLAYER_ANIMATIONS_CATALOG_TR.md \
+            --out /tmp/g81_source
+      - name: Require no VPK release and preserve all unverified game logic boundaries
+        run: |
+          python3 - <<'PY'
+          import json
+          with open('/tmp/g81_source/G81_304_PLAYER_MOVES_SOURCE_REGISTRY_NO_IPA_NO_VPK.json') as f:
+           data=json.load(f)
+          assert len(data['G81_documented_2010_player_moves'])==304
+          assert not data['approved_to_package_new_test_VPK']
+          assert not data['real_touchHLE_original_game_reference_playback_performed_in_this_step']
+          assert not data['original_weapon_damage_value_per_instance_verified']
+          print('PASS G81 exact documented original move names, no assumption of completed combat')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G81_AUTHENTIC_304_PLAYER_MOVES_CANONICAL_SOURCE_ROUTING_NO_VPK
+          path: |
+            /tmp/g81_source/G81_304_PLAYER_MOVES_SOURCE_REGISTRY_NO_IPA_NO_VPK.json
+            /tmp/g81_source/G81_304_PLAYER_MOVES_SOURCE_REGISTRY.csv
+          retention-days: 14
+          if-no-files-found: error
