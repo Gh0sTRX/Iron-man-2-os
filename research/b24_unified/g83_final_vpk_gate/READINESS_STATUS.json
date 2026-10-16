@@ -1,12 +1,12 @@
 {
   "title": "Iron Man 2 B24 next test VPK source completion guard",
   "updated": "2026-10-16",
-  "notes": "Do not mark any gate verified until objectively demonstrated. Data extraction and isolated host unit tests do not prove entire game integrated.",
+  "notes": "G89 truthfully approves ONLY the fully sourced 972/972 index gate; hardware gameplay and original hit/damage/AI remain unverified. Release readiness is not feature percentages.",
   "gates": {
     "original_2010_972_animation_source_record_indexed": {
-      "verified": false,
-      "evidence_uri": null,
-      "test_details": null
+      "verified": true,
+      "evidence_uri": "https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38926792920",
+      "test_details": "Original owner IPA anims bank 972/972 authentic named clips with decoded per-joint position/quaternion track metadata passed G76 source parser; independent G81 304/304 original IronMan/WM subset compared to legacy B18. Index completeness ONLY; not 972 skinned/playable motions."
     },
     "all_338_player_named_clips_implemented_as_rig_compatible_streams": {
       "verified": false,
