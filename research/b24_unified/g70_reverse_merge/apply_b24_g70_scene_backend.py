@@ -5,7 +5,7 @@ No new G68 main.c or G68 mission/player code is copied into working game.
 """
 from pathlib import Path
 import shutil
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(__file__).resolve().parents[3]
 W=ROOT/"work"
 GAME=W/"src/main.c"
 RUNTIME=W/"b24/b24_unified"
