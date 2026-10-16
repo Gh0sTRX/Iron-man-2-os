@@ -89,9 +89,21 @@ int b24_g68_city_open(B24G68City *m,
    free(geometry);fclose(f);memset(m,0,sizeof(*m));return 0;
  }
  fclose(f);
+ /* G106 real-device regression: G95 Sun baking previously inspected
+  * m->material_has_alpha BEFORE loading any atlas pixels. That array was
+  * still all-zero, so the authored alpha material exclusion NEVER ran.
+  * Load true original 31 G66T RGBA images now, scan alpha exactly once,
+  * THEN shade only genuinely opaque 2010 mesh batches. */
+ for(unsigned i=0;i<m->texture_count;i++){
+   char name[256];
+   if(snprintf(name,sizeof(name),"%s_tex_%02u.g66t",texture_prefix,i)
+      >=(int)sizeof(name)||!texture_load(&m->texture_ids[i],&m->material_has_alpha[i],name)){
+     free(geometry);b24_g68_city_close(m);return 0;
+   }
+ }
  for(size_t i=0;i<m->vertices;i++){
    for(int j=0;j<3;j++)if(!isfinite(geometry[i].xyz[j])){
-     free(geometry);memset(m,0,sizeof(*m));return 0;
+     free(geometry);b24_g68_city_close(m);return 0;
    }
  }
 
@@ -138,20 +150,13 @@ int b24_g68_city_open(B24G68City *m,
 #endif
  /* Renderer owner already created the one VitaGL context. */
  GLuint buffer=0;glGenBuffers(1,&buffer);
- if(!buffer){free(geometry);memset(m,0,sizeof(*m));return 0;}
+ if(!buffer){free(geometry);b24_g68_city_close(m);return 0;}
  m->vbo=buffer;
  glBindBuffer(GL_ARRAY_BUFFER,buffer);
  glBufferData(GL_ARRAY_BUFFER,(GLsizeiptr)bytes,geometry,GL_STATIC_DRAW);
  glBindBuffer(GL_ARRAY_BUFFER,0);
  free(geometry);
  if(glGetError()!=GL_NO_ERROR){b24_g68_city_close(m);return 0;}
- for(unsigned i=0;i<m->texture_count;i++){
-   char name[256];
-   if(snprintf(name,sizeof(name),"%s_tex_%02u.g66t",texture_prefix,i)
-      >=(int)sizeof(name)||!texture_load(&m->texture_ids[i],&m->material_has_alpha[i],name)){
-     b24_g68_city_close(m);return 0;
-   }
- }
  m->ready=1;return 1;
 }
 int b24_g68_city_draw(const B24G68City *m){
