@@ -18,6 +18,7 @@ int main(void){
  float a=distance(&ground),b=distance(&fast);
  float c=distance(&flight),d=distance(&rush);
  printf("G75 0.96s ground=%0.3f run=%0.3f air=%0.3f rush=%0.3f\n",a,b,c,d);
+ fprintf(stderr,"G75 G9 reconstructed source movement four real displacements: %.7f %.7f %.7f %.7f\n",a,b,c,d);
  assert(a>1.f&&a<4.f);
  assert(b>a*1.4f);
  assert(c>b*1.15f);
