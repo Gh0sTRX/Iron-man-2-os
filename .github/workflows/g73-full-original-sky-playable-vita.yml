@@ -1,0 +1,82 @@
+name: G73 Full B24 Playable Real 2010 Expo Night Skyline and Moon Sky Vita Test Candidate
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g73-full-original-sky-playable-vita.yml"
+      - "research/b24_unified/b24_gpu_g73_*"
+      - "research/b24_unified/g72_sky_light/g73_pack_actual_original_sky.py"
+      - "research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_night_sky:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the previously proven original B24 gameplay motion stream bank
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Download War Machine authentic gun animation bank
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Download exactly hardware-tested owner G68 native city PVR atlas and triangles
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Download real 2010 BRES sky model and original night/skyline PVRTC textures
+        uses: actions/download-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          run-id: 38902510114
+          github-token: ${{ github.token }}
+          path: /tmp/g73_verified_sky
+      - name: Preserve B24 B17 G9 gameplay and build G73 true sky + G71 alpha and G72 ambient
+        env:
+          B24_G73_NATIVE_NIGHT_SKY: "1"
+        run: |
+          python3 -m pip install -q pyyaml
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g72_sky_light/test_g72_light.c -lm -o /tmp/g72_lighting_test
+          /tmp/g72_lighting_test
+          python3 research/b24_unified/g70_reverse_merge/g70_replay_g9_workflow.py
+      - name: Validate separated package G72 shaders source map hashes and title identity
+        run: |
+          python3 - <<'PY'
+          import zipfile,hashlib,struct
+          from pathlib import Path
+          candidate=Path('work/build-vita/IronMan2_B24_G73_Expo_Original_Night_Sky_Candidate.vpk')
+          with zipfile.ZipFile(candidate) as z:
+              assert z.testzip() is None
+              n=set(z.namelist())
+              assert b'IM2G73001' in z.read('sce_sys/param.sfo')
+              assert len([x for x in n if x.startswith('animations/') and x.endswith('.im2v')])==363
+              assert len([x for x in n if x.startswith('models/') and x.endswith('.im2t')])==5
+              assert struct.unpack_from('<4I',z.read('assets/G66_city.g66m'),4)==(1,67323,32,31)
+              assert struct.unpack_from('<II',z.read('assets/G66_original_collision.g66c'),4)==(1,1910)
+              assert z.read('assets/G73_original_sky_mesh.g73m')[:4]==b'G73M'
+              assert len(z.read('assets/G73_original_sky_tex_00.g66t'))==16+256*256*4
+              assert len(z.read('assets/G73_original_sky_tex_01.g66t'))==16+256*256*4
+          print('PASS G73 actual 2010 sky geometry/atlas candidate, original source G68 city, G9 gameplay retained; source material bindings not fully verified')
+          print('G72 VPK bytes',candidate.stat().st_size,'SHA256',hashlib.sha256(candidate.read_bytes()).hexdigest())
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IronMan2_G73_B24_Playable_Authentic_2010_Expo_Sky_Model_Moon_Skyline_Candidate_VPK
+          path: work/build-vita/IronMan2_B24_G73_Expo_Original_Night_Sky_Candidate.vpk
+          retention-days: 14
+          if-no-files-found: error
