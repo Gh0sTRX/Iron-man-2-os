@@ -1,0 +1,53 @@
+name: G97 SOURCE 2010 Original AttackEntity Projectile Damage True ARM Tracing NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g97-original-2010-attack-entity-hit-damage-native-NO-VPK.yml"
+      - "research/b24_unified/g97_source_attack_hit/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_native_original_2010_combat_method_provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencies Capstone native ARM and original user-owned source
+        run: python3 -m pip install -q capstone gdown
+      - name: Ephemerally acquire authenticated user-provided original 2010 iOS IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g97_private_source
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g97_private_source/original.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g97_private_source/original.ipa
+          test "$(wc -c </tmp/g97_private_source/original.ipa)" -eq 248613763
+      - name: Decode REAL 2010 iOS AttackEntity Load DoAttack DoProjectile Collision Damage source
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g97_source_attack_hit/g97_original_2010_attack_hit_damage_native_xrefs.py \
+            --ipa /tmp/g97_private_source/original.ipa \
+            --out /tmp/g97_source_metadata
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path('/tmp/g97_source_metadata/G97_AUTHENTIC_2010_ATTACK_ENTITY_PROJECTILE_HIT_DAMAGE_ARM_PROVENANCE.json').read_text())
+          assert r['targeted_original_ARM_function_records_found'] >= 7
+          assert r['WEAPON_DB_SERIALIZED_DATA_ACTUALLY_TYPED'] is False
+          assert r['HIT_ACTIVE_START_END_ACTUALLY_PROVED'] is False
+          assert r['NO_ORIGINAL_IPA_GAME_BINARY_COMMITTED'] is True
+          assert r['NO_VPK'] is True
+          print('PASS ORIGINAL source native symbol and branch/field evidence only, source-first combat release gate FAIL CLOSED')
+          PY
+      - name: Ephemeral source securely removed
+        if: always()
+        run: rm -rf /tmp/g97_private_source
+      - name: Publish ARM CALL/CFG metadata only, NOT game binary or VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G97_ORIGINAL_2010_ATTACKENTITY_PROJECTILE_HIT_DAMAGE_REAL_ARM_METADATA_ONLY_NO_VPK
+          path: /tmp/g97_source_metadata/G97_AUTHENTIC_2010_ATTACK_ENTITY_PROJECTILE_HIT_DAMAGE_ARM_PROVENANCE.json
+          retention-days: 14
+          if-no-files-found: error
