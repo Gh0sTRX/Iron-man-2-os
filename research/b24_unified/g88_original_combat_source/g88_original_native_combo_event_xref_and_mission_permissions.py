@@ -35,7 +35,14 @@ def decode_original_macho(original):
   methods[name].append(sym)
   byaddress[sym[1]&~1].append(name)
  for need in FOCUS:
-  if len(methods[need])!=1:raise ValueError('original 2010 expected symbol missing or ambiguous: '+need)
+  # The real 2010 Mach-O symtab contains duplicate entries/aliases at
+  # identical function addresses. A duplicate NAME is not a distinct
+  # native executable implementation; only reject DIFFERENT addresses.
+  real_addresses={sym[1]&~1 for sym in methods[need]}
+  if len(real_addresses)!=1:
+   similar=[k for k in methods if need.split('(')[0] in k][:8]
+   raise ValueError('original 2010 function missing or divergent native address: '+
+     need+' entries='+str(len(methods[need]))+' alternatives='+str(similar))
  addresses=sorted(set(s[1]&~1 for s in syms))
  d_arm=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM)
  d_thumb=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_THUMB)
