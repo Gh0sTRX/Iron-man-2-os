@@ -97,16 +97,16 @@ def install():
    || (suit==4&&nv!=629u)
 #endif
    ){''',"MarkV 629 source stream prefix and exact vertex guard")
- old='''         if(!b24_unified_paused(&b24_game) && idx==0 &&
-            !world.flying && b24_unified_should_melee(&b24_game))'''
+ old='''        if(!b24_unified_paused(&b24_game) && idx==0 &&
+           !world.flying && b24_unified_should_melee(&b24_game))'''
  new='''#ifdef B24_G85_NATIVE_MARKV_629
          /* G85_NATIVE_MARKV_629: retain ONE existing user combo button
             owner, now valid also for 629v original Mark V suit index 4. */
-         if(!b24_unified_paused(&b24_game) && (idx==0||idx==4) &&
-            !world.flying && b24_unified_should_melee(&b24_game))
+        if(!b24_unified_paused(&b24_game) && (idx==0||idx==4) &&
+           !world.flying && b24_unified_should_melee(&b24_game))
 #else
-         if(!b24_unified_paused(&b24_game) && idx==0 &&
-            !world.flying && b24_unified_should_melee(&b24_game))
+        if(!b24_unified_paused(&b24_game) && idx==0 &&
+           !world.flying && b24_unified_should_melee(&b24_game))
 #endif'''
  main=once(main,old,new,"original accepted melee event only once")
  cm+='''
