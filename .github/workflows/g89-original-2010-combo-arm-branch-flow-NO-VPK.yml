@@ -82,3 +82,29 @@ jobs:
           print('PASS: source-only G89 never approves unknown source hit frame, damage or combo branches')
           PY
           test -z "$(find . -type f -name '*.vpk' -print -quit)"
+
+  original_melee_native_state_classification_C11_vita_ARM:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run truly source-derived native 2010 state classification and reset C11 reference
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g89_original_combo_native_flow/b24_g89_real_2010_melee_state_predicates.c \
+            research/b24_unified/g89_original_combo_native_flow/test_g89_real_2010_melee_state_predicates.c \
+            -o /tmp/g89_native_2010_state_predicates
+          /tmp/g89_native_2010_state_predicates
+          test -z "$(find research/b24_unified/g89_original_combo_native_flow -name '*.vpk' -print -quit)"
+      - name: Compile authentic ARM-derived 2010 source predicate C reference PS Vita ARM object only NO VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+              -c research/b24_unified/g89_original_combo_native_flow/b24_g89_real_2010_melee_state_predicates.c \
+              -o /tmp/g89_2010_real_native_derived_melee_state_ARM.o
+            test -s /tmp/g89_2010_real_native_derived_melee_state_ARM.o
+            test -z "$(find research/b24_unified/g89_original_combo_native_flow -name "*.vpk" -print -quit)"
+            echo "PASS 2010 native state predicates exact port C ABI ARM object ONLY, NO VPK"
+          '
