@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef B24_G72_SOURCE_LIGHTING
+#include "b24_gpu_g72_light.h"
+#endif
 /* Original G68 VPK G66M/G66T GPU ABI, not original private .bdae serialized
  * format. Exactly the SAME already hardware-tested first level batches.
  * Keep source world coordinates and UVs intact; no map recenter or re-bake. */
@@ -88,6 +91,26 @@ int b24_g68_city_open(B24G68City *m,
      free(geometry);memset(m,0,sizeof(*m));return 0;
    }
  }
+
+#ifdef B24_G72_SOURCE_LIGHTING
+ /* Re-use the ONE existing startup CPU geometry allocation.
+  * No source UV/XYZ/alpha edits, only reversible shader-like vertex tint. */
+ for(uint32_t i=0;i<m->batch_count;i++){
+   const B24G68Batch *b=&m->batches[i];
+   /* Avoid guessing shaders for alpha vegetation/cards and apparent
+    * emissive signage atlas groups. Exact 2010 combiner not yet known. */
+   if(b->tex==UINT32_MAX ||
+      b->tex==1u||b->tex==6u||b->tex==7u||b->tex==9u||
+      b->tex==15u||b->tex==19u||b->tex==20u||
+      b->tex==22u||b->tex==25u)continue;
+   for(uint32_t k=b->first;k<b->first+b->count;k+=3u){
+     float factor=b24_g72_light_factor(geometry[k].xyz,
+                       geometry[k+1].xyz,geometry[k+2].xyz);
+     for(uint32_t p=0;p<3;p++)
+       b24_g72_color(geometry[k+p].rgba,factor);
+   }
+ }
+#endif
  /* Renderer owner already created the one VitaGL context. */
  GLuint buffer=0;glGenBuffers(1,&buffer);
  if(!buffer){free(geometry);memset(m,0,sizeof(*m));return 0;}
