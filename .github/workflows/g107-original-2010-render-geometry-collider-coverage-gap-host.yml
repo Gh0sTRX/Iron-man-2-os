@@ -1,0 +1,46 @@
+name: G107 genuine 2010 Stark Expo visible collision gap map diagnosis
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g107-original-2010-render-geometry-collider-coverage-gap-host.yml"
+      - "research/b24_unified/g107_render_collision_gap/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  authored_source_world_collision_gap:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore exactly the original G104 device-tested 2010 Stark Expo VPK
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_B24_G104_G95_Source_OriginalStarkExpo_MarkV248_Dummy_TestVPK
+          run-id: 38974292901
+          github-token: ${{ github.token }}
+          path: /tmp/g107_original
+      - name: Compare original 22441 visual polygon walls against source 1910 physics polygons spatially
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g107_render_collision_gap/g107_compare_visible_2010_world_vs_original_1910_physics.py \
+            --vpk /tmp/g107_original/IronMan2_B24_G104_G95_Stark_Expo_MarkV_248_Original_Movement_Static_Dummy_TEST.vpk \
+            --out /tmp/g107_qa/G107_REAL_2010_STARKEXPO_VISIBLE_WALL_MISSING_SOURCE_COLLISION_CANDIDATES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          q=json.loads(Path('/tmp/g107_qa/G107_REAL_2010_STARKEXPO_VISIBLE_WALL_MISSING_SOURCE_COLLISION_CANDIDATES.json').read_text())
+          assert q['visible_source_total_triangles']==22441
+          assert q['existing_original_collision_faces']==1910
+          assert q['does_not_enable_invented_unproven_collision']
+          assert q['source_opaque_visual_steep_wall_triangles']>0
+          print('G107 original user Vita reported penetrations source visual/physics gap counts verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G107_Original_2010_22441_VisualFaces_1910_Collider_Source_Gaps_QA
+          path: /tmp/g107_qa/G107_REAL_2010_STARKEXPO_VISIBLE_WALL_MISSING_SOURCE_COLLISION_CANDIDATES.json
+          if-no-files-found: error
+          retention-days: 14
