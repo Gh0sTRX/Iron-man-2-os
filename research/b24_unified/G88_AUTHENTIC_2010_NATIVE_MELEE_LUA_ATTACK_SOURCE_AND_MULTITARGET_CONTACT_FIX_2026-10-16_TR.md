@@ -40,7 +40,7 @@ GitHub Actions ilk G88 CI denemesinde orijinal sembol tablosunda aynı adrese i�
 
 ## 3. Tam oyun derlemesi ve VPK kuralı
 
-Aynı yeni G88 workflow diğer bağımsız job'da `G75→G84→G85→G87` tekrar birleştirir; güncellenen gerçek `G82` multi-target safety modülüyle sadece Vita ARM `im2_beta` ELF target'ı linkler. **Oyun paketlemesi, `eboot.bin`, VPK, Vita gerçek donanım testi YOK.** Workflow sadece kaynak güvenilirliğini ölçer.
+Aynı yeni G88 workflow diğer bağımsız job'da `G75→G84→G85→G87` tekrar birleştirir; güncellenen gerçek `G82` multi-target safety modülüyle sadece Vita ARM `im2_beta` ELF target'ı linkler. **Oyun paketlemesi, `eboot.bin`, VPK, Vita gerçek donanım testi YOK.** **G88 son GitHub Actions run 38956768062 — HER İKİ İŞ SUCCESS.** Gerçek 2010 orijinal iOS Mach-O ARM/Lua kaynak araştırma işi ve diğer G75/G84/G85/G87/G88 birleşik oyun PS Vita ARM `im2_beta` **tam link** işi başarılı. Yalnız gerçek donanım çalıştırması yapılmadı. `*.vpk` yokluğu doğrulandı. Workflow sadece kaynak güvenilirliğini ölçer.
 
 ## 4. Yapılmayanlar ve sonraki öncelik
 
