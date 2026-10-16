@@ -92,9 +92,16 @@ def main(ipa,out):
          'damage_numbers_recovered':False,'no_VPK':True}
  from g78_source_ARM_attack_projectile_EntityData_property_keys import source as g78_property_audit
  g78_property_audit(ipa,out)
+ from g78b_original_all_resource_attack_config_provenance import probe as g78_resource_scan
+ g78_resource_scan(ipa,out)
  g78_proof=json.loads((out/'G78_NATIVE_ORIGINAL_ATTACK_DAMAGE_EntityData_PROPERTY_MEMBER_MAP.json').read_text())
  result['exact_target_methods']['G78_original_AttackEntity_ProjectileEntity_2010_loader']=g78_proof['original_WeaponDB_AttackEntity_and_ProjectileEntity_source_typed_field_loader']
  result['exact_target_methods']['G78_original_2010_resource_archive_names']={'filenames':g78_proof['2010_app_top_level_resource_filename_candidates_without_encoded_content']}
+ g78_assets=json.loads((out/'G78B_REAL_2010_ALL_CONTAINER_ATTACK_DAMAGE_SOURCE_LOCATOR.json').read_text())
+ result['exact_target_methods']['G78B_authentic_2010_game_asset_config_locations']={
+   'largest_original_app_resources':g78_assets['largest_original_app_resources'][:45],
+   'source_property_name_location_hits':g78_assets['original_property_name_location_hits']
+ }
  out.mkdir(parents=True,exist_ok=True)
  (out/'G77B_ORIGINAL_ARM_MELEE_BOUNDING_RADIUS_AND_WEAPON_DB_LAYOUT.json').write_text(json.dumps(result,indent=2)+'\n')
  print('PASS G77B original native WeaponDB array source +0x30/+0x38 and original model melee geometric scalar',
