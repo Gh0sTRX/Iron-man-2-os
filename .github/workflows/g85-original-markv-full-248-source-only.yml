@@ -1,0 +1,60 @@
+name: G85 Authentic 2010 MarkV 629v ALL IronMan Moves Source Bake NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g85-original-markv-full-248-source-only.yml"
+      - "research/b24_unified/g85_markv_full_moveset/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_markv_movement:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install genuine original B13 source skin/rig and animation dependencies
+        run: |
+          python3 -m pip install -q numpy scipy pillow trimesh texture2ddecoder gdown
+      - name: Download owner-supplied original 2010 iOS game IPA (private temp only)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g85_owner
+          gdown 1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I -O /tmp/g85_owner/2010_ironman2.ipa ||
+            gdown 131--LA4lrPKxpieS6LFKftIpkMY8YWsA -O /tmp/g85_owner/2010_ironman2.ipa
+          test "$(wc -c </tmp/g85_owner/2010_ironman2.ipa)" -eq 248613763
+      - name: Bake first 12 ORIGINAL Iron Man anims onto REAL Mark V 629 vertices for safe source validation
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g85_markv_full_moveset/g85_bake_all_248_original_IronMan_onto_suitcase_629_im2v.py \
+            --ipa /tmp/g85_owner/2010_ironman2.ipa \
+            --out /tmp/g85_real_markv_animations \
+            --manifest /tmp/g85_metadata/G85_MarkV_Original_629v_ANIM_Valid_Source.json \
+            --limit 12
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          m=json.loads(Path('/tmp/g85_metadata/G85_MarkV_Original_629v_ANIM_Valid_Source.json').read_text())
+          assert m['original_2010_anim_bank_IronMan_count']==248
+          assert m['genuine_IronMan_source_clips_baked_as_MarkV']==12
+          assert m['inverse_bind_max_error']<.0002
+          assert not m['genuine_all_248_complete'] and m['source_only_smoke_subset']
+          for row in m['baked_motion_files']:
+           b=Path('/tmp/g85_real_markv_animations')/row['vita_stream_name']
+           assert struct.unpack('<4sIIII',b.read_bytes()[:20])==(
+             b'IM2V',629,row['sample_frames_20hz'],20,row['duration_ms'])
+           assert b.stat().st_size==row['bytes']
+          print('PASS G85 original owner BRES rig authentic source animation and 629-v IM2V sample validation. ZERO VPK')
+          PY
+      - name: Drop owner IPA from ephemeral runner before archiving source-only evidence
+        if: always()
+        run: rm -rf /tmp/g85_owner
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_NATIVE_12_POSE_SOURCE_SMOKE_NOT_VPK
+          path: |
+            /tmp/g85_metadata/G85_MarkV_Original_629v_ANIM_Valid_Source.json
+            /tmp/g85_real_markv_animations/*.im2v
+          retention-days: 14
+          if-no-files-found: error
