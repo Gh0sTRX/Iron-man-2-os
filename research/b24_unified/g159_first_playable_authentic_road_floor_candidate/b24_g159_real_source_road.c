@@ -74,9 +74,12 @@ int b24_g159_road_open(B24G159Road *r,const char *path){
   src.minz=src.maxz=src.p[2];
   for(unsigned k=1;k<3;k++){
    float x=src.p[3*k],y=src.p[3*k+1],z=src.p[3*k+2];
-   if(x<src.minx)src.minx=x;if(x>src.maxx)src.maxx=x;
-   if(y<src.miny)src.miny=y;if(y>src.maxy)src.maxy=y;
-   if(z<src.minz)src.minz=z;if(z>src.maxz)src.maxz=z;
+   if(x<src.minx)src.minx=x;
+   if(x>src.maxx)src.maxx=x;
+   if(y<src.miny)src.miny=y;
+   if(y>src.maxy)src.maxy=y;
+   if(z<src.minz)src.minz=z;
+   if(z>src.maxz)src.maxz=z;
   }
   /* Original drawing material "road" is a *candidate*, only triangles
    * with real projected XY area can provide stable authored-Z support.
