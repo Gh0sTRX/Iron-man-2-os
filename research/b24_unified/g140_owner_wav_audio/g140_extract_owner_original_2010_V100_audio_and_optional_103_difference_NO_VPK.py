@@ -3,7 +3,8 @@
 audio metadata, filename-scoped Level1 unmodified WAV export and offline
 FFmpeg PCM 48k stereo preview, optional 1.0.3 SHA-by-filename comparison.
 No original IPA or WAV payload is committed to GitHub. NO Vita VPK.
-Authoritative extracted Level1 WAV 73 original items tested 2026-10-17.
+Authoritative extracted Level1 WAV 76 items including 88/320 ARM-mapped
+owner native source cues tested 2026-10-17.
 """
 from pathlib import Path
 from collections import Counter
@@ -29,8 +30,8 @@ def riff_fmt(raw):
  return fmt
 def selected_2010_level1(name):
  return ('vfx_dialogue_level1_' in name or 'vfx_briefing_level1_' in name or
-  name.startswith(('m_expo_','sfx_ambiance_expo','sfx_expo_')) or
-  name in ('m_ch1_action.www','sfx_repulsor_shoot.www',
+  name.startswith(('m_expo_','sfx_ambiance_expo','sfx_expo_','vfx_intro_level1_')) or
+  name in ('m_pre_cutscene_intro.www','m_ch1_action.www','sfx_repulsor_shoot.www',
            'sfx_combo_1.www','sfx_missile_minigame_hover.www'))
 def audit_ipa(path,out=None):
  row=[]
@@ -55,7 +56,7 @@ def run(v100,out,v103):
  data=audit_ipa(v100,selected)
  if len(data)!=803:raise ValueError('not verified owner original iOS version1.0.0 803 WWW')
  names=[r for r in data if r['selected_Level1_by_filename_NOT_original_numeric_ID']]
- if len(names)!=73:raise ValueError('source first level filename inventory changed')
+ if len(names)!=76:raise ValueError('source first level filename inventory changed')
  report={'source_iOS_2010_v100_bytes':v100.stat().st_size,
  'audio_all_original_WWW_RIFF_WAVE_count':len(data),'original_Level1_selected_WAV_count':len(names),
  'codec_counts':[{'codec':codec,'channels':ch,'hz':hz,'bits':bits,'count':num}
@@ -79,7 +80,8 @@ def run(v100,out,v103):
  (out/'G140_original_2010_all_audio_sha_codec_Level1_manifest.json').write_text(
    json.dumps(report,ensure_ascii=False,indent=2)+'\n')
  proof=[]
- for name in ('m_expo_intro_cutscene_1.www','m_ch1_action.www',
+ for name in ('m_expo_intro_cutscene_1.www','m_pre_cutscene_intro.www',
+  'vfx_intro_level1_jarvis_1.www','m_ch1_action.www',
   'vfx_briefing_level1_jarvis.www','vfx_dialogue_level1_tony_1.www',
   'sfx_repulsor_shoot.www','sfx_ambiance_expo.www'):
   source=selected/name.replace('.www','.wav')
