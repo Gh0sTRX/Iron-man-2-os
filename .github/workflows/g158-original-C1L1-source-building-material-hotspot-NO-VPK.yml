@@ -22,6 +22,13 @@ jobs:
           run-id: 38974292901
           github-token: ${{ github.token }}
           path: /tmp/g158_g104_owner_original
+      - name: Restore G64 source-authentic original named 2010 PVR records READ ONLY
+        uses: actions/download-artifact@v4
+        with:
+          name: G64_REAL_SOURCE_BRES_20457_NATIVE_UV_PVR_WEBGL2_GLB_JSON_NO_VPK
+          run-id: 38872391947
+          github-token: ${{ github.token }}
+          path: /tmp/g158_original_G64
       - name: G158 trace 628 Z2.82955 source visual-only samples back to 32 authentic original city render groups
         run: |
           set -euo pipefail
@@ -44,6 +51,23 @@ jobs:
           assert j['does_not_modify_native_collision'] and j['new_vpk'] is False
           assert (root/'G158_original_source_material_hotspot_visual_only.svg').stat().st_size>10000
           print('G158 PASS exact original authored source visual-only 628 sample attribution, source material/solidity NOT invented')
+          PY
+      - name: Exact original PVR name identity crossmatch (no guessed filename or solidity)
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pillow
+          test -s /tmp/g158_original_G64/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html
+          original=$(find /tmp/g158_g104_owner_original -name '*.vpk' -print -quit)
+          python3 research/b24_unified/g158_original_source_building_material_gap/g158_match_G66_atlas_to_G64_real_PVR_names_read_only_NO_VPK.py --g104-original-vpk "$original" --g64-source-html /tmp/g158_original_G64/G64_SOURCE_REAL_UV_PVR_RECOVERED_VIEWER.html --out /tmp/g158_real_group_hotspots/G158_original_2010_G66_atlas_names_exact_RGBA_crosscheck.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g158_real_group_hotspots/G158_original_2010_G66_atlas_names_exact_RGBA_crosscheck.json').read_text())
+          assert d['G64_original_named_PVR_records']==24
+          assert d['G66_actual_2010_source_atlases']==31
+          assert d['name_match_is_exact_pixel_provenance_not_source_object_or_solidness']
+          assert d['no_original_pixel_payload_exported'] and d['no_new_vpk']
+          print('G158 PASS exact pixel source names if authentic; remaining G65 extended atlases not guessed')
           PY
       - uses: actions/upload-artifact@v4
         if: success()
