@@ -11,7 +11,10 @@ from pathlib import Path
 ENUM={'MissionPause':'MISSION_PAUSE','Show':'SHOW','Hide':'HIDE',
       'Enable':'ENABLE','Disable':'DISABLE','SetState':'SETSTATE',
       'SetInputEnabled':'SETINPUT','PlayVoice':'PLAYVOICE',
-      'SetCamera':'SETCAMERA'}
+      'SetCamera':'SETCAMERA','PauseMusic':'PAUSE_MUSIC',
+      'HideUI':'HIDE_UI','BlackScreenOn':'BLACK_SCREEN_ON',
+      'PlayMusic':'PLAY_MUSIC','ShowTut':'SHOW_TUT',
+      'IsTutConfirmed':'IS_TUT_CONFIRMED'}
 def run(source,out):
  d=json.loads(source.read_text())
  assert d['original_native_Lua_GLOBAL_CALL_candidates']==1035
@@ -20,7 +23,7 @@ def run(source,out):
  intro=next(x for x in rows if x['original_callback']=='Mission000_OnStart')
  events=[x for x in intro['original_static_global_CALL_sites']
          if x['source_bytecode_PC']<73]
- assert len(events)>=14
+ assert len(events)==24, 'Original iOS 2010 Mission000 prebranch 24 native Lua API call sites'
  seen=set();lines=[]
  for e in sorted(events,key=lambda x:x['source_bytecode_PC']):
   pc=e['source_bytecode_PC'];name=e['native_global_function']
@@ -30,6 +33,10 @@ def run(source,out):
   if name not in ENUM:raise ValueError('G137 unresolved original authored prebranch Lua native API '+name)
   a0=args[0] if args else 0
   a1=args[1] if len(args)>1 else 0
+  a2=args[2] if len(args)>2 else 0
+  if not isinstance(a2,(int,float)) or isinstance(a2,bool) or not float(a2).is_integer():
+   raise ValueError('G137 original native Lua third argument not exactly numeric '+repr((pc,name,a2)))
+
   if isinstance(a0,bool) or not isinstance(a0,(int,float)) or (a0 and not float(a0).is_integer()):
    raise ValueError('G137 original Lua arg0 not owner scene identifier '+str((pc,name,a0)))
   if isinstance(a1,str) and not re.fullmatch(r'[A-Za-z_]{1,24}',a1):
@@ -42,8 +49,8 @@ def run(source,out):
   elif isinstance(a1,str):
    numeric1=0;bool1=0;string1=json.dumps(a1)
   else:raise ValueError('G137 untyped original Lua source arg1')
-  lines.append(' { %d, B24_G137_CALL_%s, %d, %d, %s, %d, 1 },'%
-   (pc,ENUM[name],int(a0),numeric1,string1,int(bool1)))
+  lines.append(' { %d, B24_G137_CALL_%s, %d, %d, %d, %s, %d, 1 },'%
+   (pc,ENUM[name],int(a0),numeric1,int(a2),string1,int(bool1)))
  actual={(e['source_bytecode_PC'],e['native_global_function']):e for e in events}
  for pc,name,arg0 in ((1,'MissionPause',None),(6,'Show',1456),(34,'SetState',1062),
                        (43,'Hide',1062),(50,'SetInputEnabled',14),(70,'PlayVoice',320)):
