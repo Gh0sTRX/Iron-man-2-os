@@ -1,0 +1,59 @@
+name: G129 first mission REAL 2010 Lua MarkV flight permission and level1 mission chain source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g129-first-Mission000-2010-lua-real-level1-MarkV-flight-ability-audit-NO-VPK.yml"
+      - "research/b24_unified/g129_first_mission_source_rules/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_iOS_level1_mission_sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original 2010 71 script full parsed typed class source (existing artifact, NO owner IPA download)
+        uses: actions/download-artifact@v4
+        with:
+          name: G26_ORIGINAL_2010_C1L1_71_REAL_LUA51_TYPED_CLASS_EVENT_CALLBACKS_NO_VPK
+          run-id: 38749278130
+          github-token: ${{ github.token }}
+          path: /tmp/g129_real_lua
+      - name: Original 2010 1035 LUA GETGLOBAL CALL source IDs (existing artifact)
+        uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g129_real_lua
+      - name: Decode first level original mission sequence / MarkV fly-ability only where REAL original iOS Lua proves
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g129_first_mission_source_rules/g129_original_2010_level1_MarkV_ability_mission_chain_from_Lua51.py
+          python3 research/b24_unified/g129_first_mission_source_rules/g129_original_2010_level1_MarkV_ability_mission_chain_from_Lua51.py \
+            --g26 /tmp/g129_real_lua/source_lua.json \
+            --g27 /tmp/g129_real_lua/original_lua_calls.json \
+            --out /tmp/g129_Mission000/G129_2010_ORIGINAL_LEVEL1_MISSION_SUITCASE_FLIGHT_RIGHTS_TYPED_CALLS_SOURCE_NOT_EXECUTED.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g129_Mission000/G129_2010_ORIGINAL_LEVEL1_MISSION_SUITCASE_FLIGHT_RIGHTS_TYPED_CALLS_SOURCE_NOT_EXECUTED.json').read_text())
+          assert d['original_lua_callbacks_total']==71
+          assert d['mission_class_callback_count']==45
+          assert d['original_intro_first_static_Lua_branch_PC']==73
+          assert d['original_Mission000_start_requires_idle_state_source_proven']
+          assert not d['original_MarkV_first_level_can_fly_PROVEN']
+          assert not d['original_MarkV_first_level_cannot_fly_PROVEN']
+          assert not d['Lua_native_branches_and_loops_executed_or_controlflow_reconstructed']
+          assert d['NO_VPK']
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G129_ORIGINAL_2010_LEVEL1_SUITCASE_MISSION_ACTOR_INTRO_MARKV_FLIGHT_GATES_NOT_GUESSED_NO_VPK
+          path: /tmp/g129_Mission000/G129_2010_ORIGINAL_LEVEL1_MISSION_SUITCASE_FLIGHT_RIGHTS_TYPED_CALLS_SOURCE_NOT_EXECUTED.json
+          if-no-files-found: error
+          retention-days: 14
