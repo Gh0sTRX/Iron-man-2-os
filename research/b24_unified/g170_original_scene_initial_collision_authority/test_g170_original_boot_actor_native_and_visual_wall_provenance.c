@@ -3,6 +3,7 @@
 #include "b24_g156_exact_vertical_triangle_contact.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 /* Original G161 B14 starts x=0,y=0,z=0. G167 120-frame ground
  * accepted only up to y≈0.98. Determine which EXACT 2010 G66C wall
@@ -47,6 +48,15 @@ static void audit(const B24C1OriginalCollision *w,const B24G108Grid *g,
 }
 int main(int argc,char**argv){
  if(argc!=3)return 2;
+ FILE *source=fopen(argv[1],"rb");
+ assert(source);
+ char magic[4]={0};uint32_t header[4]={0},groups[32][4]={0};
+ assert(fread(magic,1,4,source)==4&&!memcmp(magic,"G66M",4));
+ assert(fread(header,4,4,source)==4&&header[0]==1&&header[2]==32&&header[3]==31);
+ assert(fread(groups,16,32,source)==32);
+ fclose(source);
+ printf("G170 ORIGINAL 2010 drawable group 21 exact G66M source atlas=%u source_start_vertex=%u source_count=%u (source texture atlas index, not solidity evidence)\n",
+   groups[21][2],groups[21][0],groups[21][1]);
  B24C1OriginalCollision w={0};B24G108Grid g={0};
  assert(b24_g70_g68_collision_load(&w,argv[2]));
  assert(w.count==1910u&&w.wall_count==1690u);
