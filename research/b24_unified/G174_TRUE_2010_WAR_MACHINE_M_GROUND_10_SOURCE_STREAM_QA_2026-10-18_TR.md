@@ -10,7 +10,7 @@ G172 orijinal B18 klip adları/sürelerini G83 seçiciye ekledi. Ancak bu, dosya
 - Gerçek `warmachine.im2t` için önceden doğrulanmış **1292 skin vertex** ile G83 War Machine `AIM_M_UNCLASSIFIED` seçildi. Ground idle, F/B/L/R ve bunların saldırı `_att` karşılıkları: **10/10**.
 - Her seçimin `B18` özgün klip süresi G172 isim/süre tablosuyla eşleştirildi. Her seçim, mevcut **tek G8/G85 orijinal skinned IM2V streamer** üzerinden açıldı; `animator.active`, açık gerçek stream, seçili özgün dosya adı, `stream.nv=1292` ve metadata duration kontrol edildi.
 - Eski B16 repulsor beklemesi veya sahte `whole_body_repulsor_active` tetiklenmedi. **Gerçek oyun silah atışı üretilmedi.**
-- Gerçek host test **GitHub Actions 39075264633 içinde G174 adımı PASS**. İşin tamamındaki VitaSDK ARM `im2_beta` ELF-only aşaması ayrıca kontrol edilmeli; adım başarı bilgisi cihaz testi anlamına gelmez.
+- Gerçek host test **GitHub Actions 39075264633 içinde G174 adımı PASS**. Aynı GitHub Actions koşusundaki tam VitaSDK ARM `im2_beta` **ELF-only derlemesi de SUCCESS**; [Actions 39075264633](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39075264633). Bu başarı gerçek PS Vita cihaz testinin kanıtı değildir.
 
 ## Bilmiyoruz — kullanıcı için çok önemli
 
