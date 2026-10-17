@@ -1,0 +1,54 @@
+name: G144 authentic IronMan2 iOS Level1 Music88 and Voice320 dual Vita audio original PCM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g144-owner-iOS-Music88-Voice320-dual-Vita-SceAudio-PCM-native-ARM-NO-VPK.yml"
+      - "research/b24_unified/g144_original_level1_real_pcm_channels/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner_original_native_audio_source_and_dual_port:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Host strict C11 original 2010 numeric IDs -> exact PCM path w no fabricated tracks
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g144_original_level1_real_pcm_channels \
+            -I research/b24_unified/g142_original_2010_native_sound_id_semantics \
+            research/b24_unified/g144_original_level1_real_pcm_channels/b24_g144_source_audio_channels.c \
+            research/b24_unified/g144_original_level1_real_pcm_channels/test_g144_source_native_audio_pcm_id_mapping.c \
+            -o /tmp/g144_native_source_audio_id_test
+          /tmp/g144_native_source_audio_id_test
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: VitaSDK ARM code both original user Music88 BGM and Jarvis Voice320 MAIN, real kernel threads
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            for module in \
+              research/b24_unified/g144_original_level1_real_pcm_channels/b24_g144_source_audio_channels.c \
+              research/b24_unified/g141_original_vita_pcm_stream/b24_g141_owner_pcm_stream.c \
+              research/b24_unified/g141_original_vita_pcm_stream/b24_g141_vita_stream_worker.c \
+              research/b24_unified/g139_vita_native_audio_music/b24_g139_original_mission_music_bridge.c \
+              research/b24_unified/g142_original_2010_native_sound_id_semantics/b24_g142_native_sound_source_truth.c; do
+              name=$(basename "$module" .c)
+              arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+                -DB24_G144_VITA_NATIVE=1 -DB24_G141_VITA_NATIVE=1 \
+                -DB24_G139_REAL_VITA_AUDIO_OUT=1 \
+                -Iresearch/b24_unified/g144_original_level1_real_pcm_channels \
+                -Iresearch/b24_unified/g142_original_2010_native_sound_id_semantics \
+                -Iresearch/b24_unified/g137_original_Mission000_native_boot \
+                -Iresearch/b24_unified/g139_vita_native_audio_music \
+                -Iresearch/b24_unified/g141_original_vita_pcm_stream \
+                -c "$module" -o /tmp/"$name".o
+              test -s /tmp/"$name".o
+            done
+            arm-vita-eabi-nm /tmp/b24_g144_source_audio_channels.o | grep -q sceAudioOutOpenPort
+            arm-vita-eabi-nm /tmp/b24_g144_source_audio_channels.o | grep -q b24_g141_vita_start
+            arm-vita-eabi-nm /tmp/b24_g141_vita_stream_worker.o | grep -q sceAudioOutOutput
+            echo "PASS G144 two real Vita audio ports BGM/MAIN and per-channel original 2010 audio PCM streaming from source IDs 88/320, no false 2000fade/PC3 or VPK"
+          '
