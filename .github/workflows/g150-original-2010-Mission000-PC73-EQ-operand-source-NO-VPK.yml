@@ -1,0 +1,63 @@
+name: G150 actual 2010 Mission000 PC73 EQ operand truth NO VPK
+
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g150-original-2010-Mission000-PC73-EQ-operand-source-NO-VPK.yml"
+      - "research/b24_unified/g150_original_Mission000_PC73_EQ_source_truth/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original_owner_2010_lua_eq73:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source parser and dependencies
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path("research/b24_unified/g150_original_Mission000_PC73_EQ_source_truth/g150_probe_true_original_2010_Mission000_PC73_lua_EQ.py")
+          ast.parse(p.read_text())
+          print("G150 Python source-only parser syntax PASS")
+          PY
+      - name: Download user-provided original 1.0.0 IPA ephemerally
+        run: |
+          mkdir -p /tmp/g150_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g150_original/owner.ipa || gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g150_original/owner.ipa
+          test "$(wc -c </tmp/g150_original/owner.ipa)" -eq 248613763
+      - name: Decode exact original iOS 2010 Lua PC73 EQ operands and branch PC74/78
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g150_original_Mission000_PC73_EQ_source_truth/g150_probe_true_original_2010_Mission000_PC73_lua_EQ.py --ipa /tmp/g150_original/owner.ipa --out /tmp/G150_ORIGINAL_2010_PC73_LUA_EQ_SOURCE_ONLY.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          j=json.loads(Path("/tmp/G150_ORIGINAL_2010_PC73_LUA_EQ_SOURCE_ONLY.json").read_text())
+          assert j["source_full_instructions"]==937
+          assert j["native_query_PC71"]["global"]=="IsTutConfirmed"
+          assert j["source_PC74_JMP"]["jump_to_pc"]==79
+          assert j["source_PC78_JMP"]["jump_to_pc"]==71
+          assert not j["source_original_PC73_boolean_branch_emulated"]
+          assert not j["new_vpk"]
+          print("G150 original iOS 2010 real Lua PC73 operand/branch source PASS; no fabricated progress")
+          PY
+      - name: Remove original owner IPA and guard against VPK
+        if: always()
+        run: |
+          rm -rf /tmp/g150_original
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G150_2010_ORIGINAL_MISSION000_PC73_EQ_OPERANDS_SOURCE_ONLY
+          path: /tmp/G150_ORIGINAL_2010_PC73_LUA_EQ_SOURCE_ONLY.json
+          retention-days: 14
+          if-no-files-found: error
