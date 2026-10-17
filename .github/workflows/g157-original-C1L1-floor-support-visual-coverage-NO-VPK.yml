@@ -1,0 +1,63 @@
+name: G157 original C1L1 world nonwall floor support vs rendered surface audit NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g157-original-C1L1-floor-support-visual-coverage-NO-VPK.yml"
+      - "research/b24_unified/g157_original_floor_support_visual_coverage/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  read_only_original_C1L1_visual_vs_native_floor_qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore earlier genuine owner G104 original scene source read-only
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_B24_G104_G95_Source_OriginalStarkExpo_MarkV248_Dummy_TestVPK
+          run-id: 38974292901
+          github-token: ${{ github.token }}
+          path: /tmp/g157_preexisting_G104_source
+      - name: Compute first C1L1 original native floor vs original opaque visual geometry XY support
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g157_original_floor_support_visual_coverage/g157_original_floor_support_visual_audit.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=list(Path('/tmp/g157_preexisting_G104_source').rglob('*.vpk'))
+          assert len(p)==1,('G157 needs exactly one preexisting G104 owner VPK',p)
+          assert p[0].stat().st_size==94566476, 'G104 authenticated original asset size drift'
+          print('G157 original G104 VPK read-only:',p[0].name)
+          PY
+          original=$(find /tmp/g157_preexisting_G104_source -name '*.vpk' -print -quit)
+          python3 research/b24_unified/g157_original_floor_support_visual_coverage/g157_original_floor_support_visual_audit.py --preexisting-source-vpk "$original" --outdir /tmp/g157_original_floor_coverage
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g157_original_floor_coverage/G157_original_first_level_floor_support_coverage.json').read_text())
+          assert d['source_stats']['original_collision_nonwall_faces']==220
+          assert d['source_stats']['original_collision_wall_faces']==1690
+          assert sum(d['classification_counts'].values())==6561
+          assert any(abs(z-2.82955)<.005 for z in d['known_G75_exact_source_stacked_support_heights'])
+          assert not d['source_floor_coverage_proven_for_entire_world']
+          assert not d['native_vita_visual_hardware_test_passed']
+          assert not d['new_vpk']
+          assert Path('/tmp/g157_original_floor_coverage/G157_source_floor_coverages_only.svg').stat().st_size>10000
+          print('G157 real source original XY support/visual overlay QA PASS, no invented physics')
+          PY
+      - name: No new IPA, game executable or VPK outputs published
+        run: |
+          set -euo pipefail
+          test -z "$(find research/b24_unified/g157_original_floor_support_visual_coverage \( -name '*.vpk' -o -name '*.ipa' \) -print -quit)"
+          test -z "$(find /tmp/g157_original_floor_coverage \( -name '*.vpk' -o -name '*.ipa' \) -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G157_Original_2010_C1L1_Floor_Visual_Coverage_Metadata_SVG_NO_VPK
+          path: /tmp/g157_original_floor_coverage/
+          retention-days: 14
+          if-no-files-found: error
