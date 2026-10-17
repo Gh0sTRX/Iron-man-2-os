@@ -36,23 +36,28 @@ int main(void){
  assert(!quest.requested_MarkV_hidden&&!quest.requested_input14_disabled);
  assert(!quest.requested_tutorial_339);
  assert(!b24_g137_mission000_is_gameplay_released(&quest));
- /* failed physical port-volume call DOES NOT advance PC3 */
- assert(state.vol_calls==1&&sound.pause_call_count==0);
+ /* ORIGINAL 2010 ARM 0x17ECC != a generic audio output mute.
+  * Real PauseMusic stops Game current track with parameter 2000.f.
+  * G139 native SceAudio volume helper can mute but must NEVER pretend
+  * this acked the owner's Mission000 native PC3. */
+ assert(sound.pause_call_count==0&&state.vol_calls==0);
  state.allow_volume=1;
  status=b24_g137_mission000_dispatch_verified_prefix(
   &quest,b24_g139_original_Mission000_audio_dispatch,&sound);
  assert(status==B24_G137_BLOCKED_NATIVE_SCENE_BINDING);
- assert(quest.next_source_lua_pc==6);
- assert(quest.cursor==2&&quest.actually_dispatched_count==2);
- assert(sound.output_open&&sound.music_paused);
- assert(sound.native_output_volume_applied&&sound.pause_call_count==1);
+ assert(quest.next_source_lua_pc==3&&quest.cursor==1);
+ assert(sound.pause_call_count==0);
+ /* Device output control itself is valid, but independent of the 2010
+  * owner source stop-current-track native mission operation. */
+ assert(b24_g139_music_pause(&sound));
  assert(state.last_l==0&&state.last_r==0);
+ assert(sound.music_paused&&sound.pause_call_count==1);
  assert(b24_g139_music_resume(&sound));
  assert(!sound.music_paused&&state.last_l==32768&&state.last_r==32768);
  assert(!sound.original_2010_sound_ID88_track_mapped);
  assert(!b24_g137_mission000_is_gameplay_released(&quest));
  b24_g139_music_close(&sound);
  assert(state.close_calls==1);
- puts("G139 PASS original 2010 Lua PC1 MissionPause PC3 PauseMusic dispatch with verified opened audio port and successful output control, blocks actual native unbound QTE Show1456 at PC6; no fake original SoundManager/music88/voice320 or game release, no VPK");
+ puts("G139 HOST PASS: audio port open/mute/unmute valid, but real iOS PauseMusic must fade-stop source Game+0xEC current BGM with 2000.0, so native Mission000 still BLOCKED PC3 until current track bound. NO VPK");
  return 0;
 }
