@@ -6,7 +6,7 @@
 /* G159 REAL road-only original G66M geometry. Source batch 12 is 2010
  * c1l1_road.tga by exact decoded original RGBA byte identity.
  * It is intentionally NOT a source iOS physics-solidness proof. */
-static int finite(float x){return isfinite(x)&&fabsf(x)<100000.f;}
+static int g159_good_float(float x){return isg159_good_float(x)&&fabsf(x)<100000.f;}
 static int tri_z(const B24G159RoadFace *t,float x,float y,float *z){
  if(x<t->minx-.0001f||x>t->maxx+.0001f||
     y<t->miny-.0001f||y>t->maxy+.0001f)return 0;
@@ -19,7 +19,7 @@ static int tri_z(const B24G159RoadFace *t,float x,float y,float *z){
  const float a=(dx*by-dy*bx)/det,b=(ax*dy-ay*dx)/det;
  if(a<-.0002f||b<-.0002f||a+b>1.0002f)return 0;
  *z=p[2]+a*(p[5]-p[2])+b*(p[8]-p[2]);
- return finite(*z);
+ return g159_good_float(*z);
 }
 void b24_g159_road_close(B24G159Road *r){
  if(!r)return;
@@ -63,7 +63,7 @@ int b24_g159_road_open(B24G159Road *r,const char *path){
     fclose(f);b24_g159_road_close(&tmp);return 0;
    }
    for(int j=0;j<3;j++){
-    if(!finite(vertex[j])){
+    if(!g159_good_float(vertex[j])){
      fclose(f);b24_g159_road_close(&tmp);return 0;
     }
     src.p[3*k+j]=vertex[j];
@@ -97,8 +97,8 @@ int b24_g159_road_open(B24G159Road *r,const char *path){
 }
 int b24_g159_road_near(const B24G159Road *r,float x,float y,
  float footz,float *support){
- if(!r||!r->ready||!support||!finite(x)||!finite(y)||
-    !finite(footz))return 0;
+ if(!r||!r->ready||!support||!g159_good_float(x)||!g159_good_float(y)||
+    !g159_good_float(footz))return 0;
  int found=0;float best=-100000.f;
  for(uint32_t i=0;i<r->count;i++){
   const B24G159RoadFace *f=&r->faces[i];
@@ -112,8 +112,8 @@ int b24_g159_road_near(const B24G159Road *r,float x,float y,
 }
 int b24_g159_road_crossed(const B24G159Road *r,float x,float y,
  float oldz,float newz,float *support){
- if(!r||!r->ready||!support||!finite(x)||!finite(y)||
-    !finite(oldz)||!finite(newz)||newz>oldz+.05f)return 0;
+ if(!r||!r->ready||!support||!g159_good_float(x)||!g159_good_float(y)||
+    !g159_good_float(oldz)||!g159_good_float(newz)||newz>oldz+.05f)return 0;
  int found=0;float best=-100000.f;
  for(uint32_t i=0;i<r->count;i++){
   const B24G159RoadFace *f=&r->faces[i];
