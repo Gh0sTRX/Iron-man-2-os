@@ -2,7 +2,9 @@
 
 **Projenin hedefi:** Gameloft'un özgün **Iron Man 2 iOS (2010, sürüm 1.0.0)** oyununu, kaynak oyun geometrisi, materyalleri, animasyonları ve görevleri korunarak PS Vita'da çalıştırmak. Mevcut çalışma **özel araştırma/deneysel homebrew** aşamasındadır; henüz tamamlanmış bir oyun portu **değildir**.
 
-> **Güncel durum — 16 Ekim 2026 (G62 orijinal touchHLE C1L1 çalıştırıldı; G65 22.021 özgün UV+PVR üçgen ve kürelerin gerçek UV'si doğrulandı; portun haritası henüz tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
+> **En son geliştirme — 17 Ekim 2026, G153:** Orijinal 2010 ilk görev Mission000 Lua PC71–85 akışı gerçek 1.0.0 IPA bytecode ile doğrulandı: `IsTutConfirmed()` → kaynak `Wait(10)` döngüsü → `StopVoice()` → `ShowTut(340,1,1)`. G149 geçerli Lua false sonucu ile native callback hatasını ayırır; G152 gerçek kaynak koşul durum makinesidir. G153 engellenmiş özgün Lua olayını sonraki karelerde aynı PC'den yeniden deneyebilir. **[G153 gerçek tek PS Vita ARM `im2_beta` ELF derlemesi ve kaynak host testleri SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39040191350)**. Ancak PC6 QTE1456 gerçek render/gesture, PC67 özgün font HUD, gerçek `Wait(10)` zaman birimi, ses durdurma, oyun görevi tamamlanması ve fiziksel cihaz testi **henüz yoktur**. **Yeni VPK üretilmedi.** [Ayrıntılı G151–G153 teknik devir](research/b24_unified/G151_G153_ORIGINAL_MISSION000_PC73_WAIT10_TRUE_BRANCH_SOURCE_AND_VITA_ARM_2026_10_17_TR.md).
+
+> **16 Ekim tarihî harita durumu — (G62 orijinal touchHLE C1L1 çalıştırıldı; G65 22.021 özgün UV+PVR üçgen ve kürelerin gerçek UV'si doğrulandı; portun haritası henüz tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
 
 ## Hızlı durum özeti
 
