@@ -1,0 +1,119 @@
+name: G125 real original 2010 touchHLE headless PulseAudio virtual output official GDB combat NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g125-2010-original-touchhle-PulseAudio-virtual-device-GDB-combat-NO-VPK.yml"
+      - "research/b24_unified/g112_real_touchhle_gameplay_trace/**"
+      - "research/b24_unified/g113_original_macho_runtime_dylib/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_2010_game_under_original_ios_arm_touchhle_GDB_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    env:
+      LIBGL_ALWAYS_SOFTWARE: "1"
+      MESA_GL_VERSION_OVERRIDE: "2.1"
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+      # Official game reached native ARM 2010 iOS code but hosted Linux
+      # OpenAL device was unavailable on headless Actions/Xvfb.
+      # OpenAL Soft null output driver still exercises guest game's source
+      # audio API without needing a physical host sound card.
+      ALSOFT_DRIVERS: "pulse"
+      SDL_AUDIODRIVER: "pulseaudio"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight original touchHLE tracing Python syntax and pure script source BEFORE huge owner IPA or emulator downloads
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g112_real_touchhle_gameplay_trace/g112_run_2010_real_game_touchhle_gdb.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Install actual ARM-v6 GDB remote debugger, virtual screen and screenshot tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gdb-multiarch xvfb scrot libgl1-mesa-dri libasound2t64 libfuse2t64 pulseaudio pulseaudio-utils libpulse0 xdotool
+          python3 -m pip install -q gdown
+      - name: Build OFFICIAL touchHLE v0.3.0 OPEN-SOURCE on Linux (avoid third-party broken AppImage /tmp/CQK forced dylib)
+        timeout-minutes: 18
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -qq libboost-dev libopenal-dev libsdl2-dev libgl1-mesa-dev libx11-dev
+          git clone --depth 1 --branch v0.3.0 --recurse-submodules \
+            https://github.com/touchHLE/touchHLE.git /tmp/g112_official_touchhle
+          cd /tmp/g112_official_touchhle
+          git submodule update --init --recursive
+          cargo build --release --locked --no-default-features --jobs 3
+          test -x target/release/touchHLE
+          ln -sfn /tmp/g112_official_touchhle/touchHLE_dylibs target/release/touchHLE_dylibs
+          ln -sfn /tmp/g112_official_touchhle/touchHLE_fonts target/release/touchHLE_fonts
+          cp touchHLE_default_options.txt target/release/ || true
+          echo "Official upstream touchHLE v0.3.0 compiled from source: no patched CQK AppImage, for owner 2010 iOS original ARM function runtime trace"
+          python3 -m py_compile $GITHUB_WORKSPACE/research/b24_unified/g112_real_touchhle_gameplay_trace/g112_run_2010_real_game_touchhle_gdb.py
+      - name: Download user-provided decrypted original 2010 Iron Man 2 IPA into EPHEMERAL runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g112_original_PRIVATE
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g112_original_PRIVATE/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g112_original_PRIVATE/owner.ipa
+          test "$(wc -c </tmp/g112_original_PRIVATE/owner.ipa)" -eq 248613763
+          mkdir -p /tmp/g112_original_PRIVATE/real_app
+          unzip -q /tmp/g112_original_PRIVATE/owner.ipa 'Payload/IronMan2.app/*' -d /tmp/g112_original_PRIVATE/real_app
+          test -s /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app/IronMan2
+          test -s /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app/Info.plist
+      - name: Audit actual user 2010 ARM original dynamically loaded dylib paths to diagnose touchHLE exit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g112_public_report
+          python3 research/b24_unified/g113_original_macho_runtime_dylib/g113_2010_owner_arm_macho_load_dylib_safety_audit.py \
+            --ipa /tmp/g112_original_PRIVATE/owner.ipa --out /tmp/g112_public_report
+          test -s /tmp/g112_public_report/G113_REAL_ORIGINAL_2010_GAME_MACHO_LIBRARY_DEPENDENCY_AUDIT.json
+      - name: Start private in-memory PulseAudio null sink for original 2010 OpenAL/SDL without audio thread panic
+        run: |
+          set -euo pipefail
+          pulseaudio --daemonize=yes --exit-idle-time=-1 --log-target=file:/tmp/g125_pulse_log || true
+          sleep 2
+          pactl info
+          pactl load-module module-null-sink sink_name=g125_ios_2010_virtual sink_properties=device.description=OriginalIronMan2 || true
+          pactl set-default-sink g125_ios_2010_virtual
+          pactl list short sinks
+      - name: Execute original 2010 native game in touchHLE GDB and record source combat function callbacks
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g112_public_report
+          timeout 115s xvfb-run -a -s '-screen 0 1280x768x24' \
+            python3 research/b24_unified/g112_real_touchhle_gameplay_trace/g112_run_2010_real_game_touchhle_gdb.py \
+            --app /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app \
+            --touchhle /tmp/g112_official_touchhle/target/release/touchHLE \
+            --out /tmp/g112_public_report --seconds 45
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g112_public_report/G112_REAL_2010_GAME_TOUCHHLE_BRK_RESULT_NO_VPK.json')
+          q=json.loads(p.read_text())
+          assert q['VPK_generated'] is False
+          assert not q['original_ARM_binary_ever_published']
+          print('G112 truthful real original game ARM emulator result',q)
+          PY
+      - name: Ensure original owned IPA and decrypted executable never leave ephemeral GitHub runner
+        if: always()
+        run: |
+          rm -rf /tmp/g112_original_PRIVATE
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Share only original game dynamic ARM source register callbacks and host diagnostic screenshots NO IPA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G112_2010_TOUCHHLE_REAL_ORIGINAL_GAME_ARM_GDB_COMBAT_TRACE_NO_VPK_NO_IPA
+          path: |
+            /tmp/g112_public_report/G112_REAL_2010_GAME_TOUCHHLE_BRK_RESULT_NO_VPK.json
+            /tmp/g112_public_report/G113_REAL_ORIGINAL_2010_GAME_MACHO_LIBRARY_DEPENDENCY_AUDIT.json
+            /tmp/g112_public_report/G112_REAL_ORIGINAL_TOUCHHLE_HOST_LOG.txt
+            /tmp/g112_public_report/G112_REAL_ORIGINAL_ARM_GDB_NATIVE_FUNCTION_CALLS.txt
+            /tmp/g112_public_report/G112_REAL_2010_GDB_HOST_PROCESS_STATUS.txt
+            /tmp/g112_public_report/G112_touchHLE_host_real_game_T*.png
+            /tmp/g112_public_report/G112_touchHLE_host_final.png
+          retention-days: 14
+          if-no-files-found: warn
