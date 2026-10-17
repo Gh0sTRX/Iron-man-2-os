@@ -23,7 +23,7 @@ REQUIRED_FLAGS=(
  "B24_G73_REAL_SKY",
  "B24_G106_SOURCE_FLY_ATTACK_MARKV",
  "B24_G108_SOURCE_VISUAL_WALLS",
- "B24_G134_LIMIT_LONG_FRAME_DISPLACEMENT",  # patch marker is in C source
+ "G134_LIMIT_LONG_FRAME_DISPLACEMENT",  # patch marker is in C source
  "B24_G136_SOURCE_B14_WORLD_BOUNDS",
  "B24_G156_CONTINUOUS_TRI_CONTACT",
  "B24_G159_ROAD_FLOOR_CANDIDATE",
@@ -39,7 +39,7 @@ def pack(work,build,out):
     road=(work/"b24/b24_unified/b24_g159_real_source_road.c").read_text()
     csr=(work/"b24/b24_unified/b24_g160_original_road_spatial.c").read_text()
     for flag in REQUIRED_FLAGS:
-        present=flag in (src if flag=="B24_G134_LIMIT_LONG_FRAME_DISPLACEMENT" else cm)
+        present=flag in (src if flag=="G134_LIMIT_LONG_FRAME_DISPLACEMENT" else cm)
         if not present:raise ValueError("G161 source missing "+flag)
     if main.count("b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)")!=1:
         raise ValueError("Not ONE original B14 player game")
@@ -50,7 +50,7 @@ def pack(work,build,out):
     if "b24_g160_index_query" not in csr:raise ValueError("G160 original source index module missing")
     cache=(build/"CMakeCache.txt").read_text()
     for flag in REQUIRED_FLAGS:
-        if flag=="B24_G134_LIMIT_LONG_FRAME_DISPLACEMENT":continue
+        if flag=="G134_LIMIT_LONG_FRAME_DISPLACEMENT":continue
         if (flag+":BOOL=ON") not in cache:
             raise ValueError("G161 actual VitaSDK build flag must be ON "+flag)
     if "IM2G16101" not in cm or "IM2G10601" in cm:
