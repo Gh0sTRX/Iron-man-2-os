@@ -167,6 +167,16 @@ def produce(path,outdir):
     xs=list(range(-ROI_HALF,ROI_HALF+1,GRID_STEP))
     ys=list(range(-ROI_HALF,ROI_HALF+1,GRID_STEP))
     counts=collections.Counter()
+    # G157B: XY-only maps incorrectly mix stacked 2010 floors and roofs.
+    # Split by actual G75 source stacked QA heights, plus two explicitly
+    # diagnostic arbitrary flight heights. They are NOT player spawn Z.
+    source_height_layers=(
+        ("z0_0725",.0725),("z2_82955",2.82955),
+        ("z6_67306",6.67306),("z15_diagnostic",15.),
+        ("z35_diagnostic",35.))
+    near_height_tol=.5
+    height_counts={name:collections.Counter() for name,_ in source_height_layers}
+    height_cells={name:[] for name,_ in source_height_layers}
     tile_stats=collections.defaultdict(collections.Counter)
     max_native=0;max_visual=0;closest_height_delta=[]
     samples=[]
@@ -177,6 +187,12 @@ def produce(path,outdir):
             b=sample_heights(vidx,x,y)
             result=classify(a,b)
             counts[result]+=1
+            for slug,source_z in source_height_layers:
+                limited_native=[z for z in a if abs(z-source_z)<=near_height_tol]
+                limited_visual=[z for z in b if abs(z-source_z)<=near_height_tol]
+                classification=classify(limited_native,limited_visual)
+                height_counts[slug][classification]+=1
+                height_cells[slug].append((x,y,classification))
             tile_stats[(x//32,y//32)][result]+=1
             max_native=max(max_native,len(a))
             max_visual=max(max_visual,len(b))
@@ -197,6 +213,13 @@ def produce(path,outdir):
            "grid_points":len(samples),"region_is_original_mission_spawn":False,
            "sampling_method":"exact XY barycentric point in source triangle (both native G75 and visible opaque non-steep authored source faces)"},
        "classification_counts":dict(counts),
+       "source_height_layer_window_tolerance_original_Z_units":near_height_tol,
+       "height_slice_counts":{
+           slug:{"probe_height":z,"classification_counts":dict(height_counts[slug]),
+               "not_proof_of_actual_player_foot_height":True}
+           for slug,z in source_height_layers},
+       "height_slice_role":"The first 3 height planes correspond to proven stacked G75 test at [-1.319,-6.747]; z15/z35 are explicitly diagnostic heights. Each plane uses +/-0.5 original units only. Different XY points may have different terrain heights; missing near-plane support does NOT mean a hole in a different-height scene.",
+       "xy_projected_all_z_misleading_due_to_stacked_platforms":True,
        "classification_meaning":{
            "both":"At sampled XY source G75 native nonwall and original opaque visible nonwall surface intersect, heights may differ.",
            "native_only":"Only G75 native authored nonwall source at this XY; possible invisible collision proxy.",
@@ -233,14 +256,44 @@ def produce(path,outdir):
        for k,x in (("both",16),("native_only",164),("visual_only",336),("neither",497)))
     svg='<svg xmlns="http://www.w3.org/2000/svg" width="685" height="656" viewBox="0 0 685 656"><rect width="100%" height="100%" fill="#151c26"/><text x="16" y="18" fill="white" font-family="Arial" font-size="15">G157: Original C1L1 native/visible non-steep face coverage (NOT a playable map)</text><g transform="translate(16 32)">'+''.join(shapes)+'</g>'+legend+'<text x="16" y="645" fill="#b2bac8" font-size="11">XY grid: -160..+160, step 4 original units. All Z layers projected. Not a collision/solidity decision.</text></svg>'
     (outdir/"G157_source_floor_coverages_only.svg").write_text(svg,encoding="utf-8")
+    # Distinct Z-height slices, never imply a visually flat area at a
+    # different height is safe ground. The SVG is occupancy metadata only.
+    for slug,source_z in source_height_layers:
+        layer_shapes=[]
+        for x,y,state in height_cells[slug]:
+            sx=(x+ROI_HALF)//GRID_STEP
+            sy=(ROI_HALF-y)//GRID_STEP
+            layer_shapes.append(
+                f'<rect x="{sx*7}" y="{sy*7}" width="7" height="7" fill="{palette[state]}"/>')
+        source_caption=(f'G157 original C1L1 sampled XY at Z={source_z:.5f}'
+                        ' +/- 0.5 (NOT a playable map)')
+        legend2="".join(
+            f'<rect x="{px}" y="615" width="15" height="15" fill="{palette[k]}"/>'
+            f'<text x="{px+20}" y="628" fill="#eeeeee" font-size="13">'
+            f'{html.escape(k)} ({height_counts[slug][k]})</text>'
+            for k,px in (("both",16),("native_only",164),
+                         ("visual_only",336),("neither",497)))
+        layer_svg=('<svg xmlns="http://www.w3.org/2000/svg" width="685" height="656"'
+                   ' viewBox="0 0 685 656"><rect width="100%" height="100%"'
+                   ' fill="#151c26"/><text x="16" y="18" fill="white"'
+                   f' font-family="Arial" font-size="15">{html.escape(source_caption)}'
+                   '</text><g transform="translate(16 32)">'
+                   +''.join(layer_shapes)+'</g>'+legend2+
+                   '<text x="16" y="645" fill="#b2bac8" font-size="11">'
+                   'Only near this Z (not whole vertical stack); original authored solidity unknown.</text></svg>')
+        (outdir/f"G157_{slug}_floor_support_overlay.svg").write_text(
+            layer_svg,encoding="utf-8")
     lines=["x,y,has_native_nonwall,has_visual_opaque_nonwall,native_layers,visible_layers"]
     for x,y,state,nc,vc in samples:
         lines.append(f"{x},{y},{int(nc>0)},{int(vc>0)},{nc},{vc}")
     (outdir/"G157_source_ground_support_grid.csv").write_text("\n".join(lines)+"\n",encoding="utf-8")
     print("G157 SOURCE original 2010 C1L1:",source_stats)
     print("G157 known G75 stacked source supports at (-1.319,-6.747):",reference_native)
-    print("G157 XY grid world source support-vs-visible:",dict(counts))
-    print("G157 true source triangulation complete; no fake authored solids, no FPS, no VPK")
+    print("G157 XY grid ALL HEIGHTS world source support-vs-visible:",dict(counts))
+    for slug,source_z in source_height_layers:
+        print("G157 original height-limited slice",slug,"z",source_z,
+              "source native/visual:",dict(height_counts[slug]))
+    print("G157 TRUE HEIGHT-LIMITED original scene source audit, no fake authored solids, no FPS, no VPK")
 
 def main():
     p=argparse.ArgumentParser()
