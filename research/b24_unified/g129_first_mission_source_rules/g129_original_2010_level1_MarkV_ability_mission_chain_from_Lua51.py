@@ -71,9 +71,13 @@ def inspect(g26,g27,out):
  intro=next(x for x in stage if x['original_native_callback']=='Mission000_OnStart')
  prologue=[c for c in intro['interesting_calls_static_NOT_execution_order']
      if c['native_Lua_PC']<73]
+ # G42 confirms ONLY 12 Deco enable/disable calls before PC73.
+ # Camera source ID 1868 appears elsewhere in Mission000 body: it is
+ # explicitly WRONG to force both SetCamera calls into prebranch prefix.
+ # G27 independently proves all 3 callsites in full Mission000 body.
  check={(x['original_native_function_name'],
         int(x['literal_args_from_2010_Lua_static_registers'][0]))
-     for x in prologue
+     for x in intro['interesting_calls_static_NOT_execution_order']
      if x['literal_args_from_2010_Lua_static_registers'] and
        isinstance(x['literal_args_from_2010_Lua_static_registers'][0],(int,float))
        and not isinstance(x['literal_args_from_2010_Lua_static_registers'][0],bool)}
@@ -86,6 +90,7 @@ def inspect(g26,g27,out):
   'original_lua_callbacks_total':71,
   'mission_class_callback_count':45,
   'original_intro_first_static_Lua_branch_PC':73,
+  'original_intro_unbranched_prefix_CAMERA_call_1868_required':False,
   'original_intro_prologue_source_call_ids':[{'function':x['original_native_function_name'],
     'pc':x['native_Lua_PC'],
     'args':x['literal_args_from_2010_Lua_static_registers']}
