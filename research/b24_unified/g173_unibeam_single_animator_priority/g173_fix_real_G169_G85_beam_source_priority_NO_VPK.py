@@ -44,7 +44,7 @@ def patch():
 #endif''',"G8 source include")
  s=one(s,
  ''' if(g84_source_clip&&!melee&&!a->repulsor_pending)
-    desired=g84_source_clip;''',
+   desired=g84_source_clip;''',
  '''#ifdef B24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY
  /* G169 source-authored Beam1/2/3 was dropped by old repulsor pose
   * priority. Only the accepted B16->G169 actor-selected ORIGINAL Beam
@@ -63,12 +63,12 @@ def patch():
     desired=g84_source_clip;
 #endif''',"G85 live sole G8 clip priority")
  s=one(s,
- '''  if(suit==4&&desired){
-    if(strncmp(desired,"ironman_",8)!=0)return 0;
-    int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
-    if(n<=0||(size_t)n>=sizeof(g85_native_desired))return 0;
-    desired=g85_native_desired;
-  }''',
+ ''' if(suit==4&&desired){
+   if(strncmp(desired,"ironman_",8)!=0)return 0;
+   int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
+   if(n<=0||(size_t)n>=sizeof(g85_native_desired))return 0;
+   desired=g85_native_desired;
+ }''',
  '''  if(suit==4&&desired){
 #ifdef B24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY
     /* G169 already supplies the genuine 2010 Mark V suitcase_ name.
