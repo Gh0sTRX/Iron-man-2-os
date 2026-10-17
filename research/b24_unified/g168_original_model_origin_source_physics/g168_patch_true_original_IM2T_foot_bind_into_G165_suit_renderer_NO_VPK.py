@@ -48,7 +48,7 @@ def main():
   "    float native_bind_min_z; /* 2010 authored IM2T source rest minimum, stable during G8 motion */\n"
   "} IM2Model;","renderer_h")
  data["renderer_c"]=once(data["renderer_c"],
-  "     tmp.center_z=(minz+maxz)*0.5f;",
+  "tmp.center_z=(minz+maxz)*0.5f;",
   "     tmp.center_z=(minz+maxz)*0.5f;\n"
   "     tmp.native_bind_min_z=minz; /* actual 2010 original rest mesh, not animated foot bob */",
   "renderer_c")
