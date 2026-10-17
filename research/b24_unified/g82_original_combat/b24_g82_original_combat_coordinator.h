@@ -4,6 +4,9 @@
 #include "../b24_g8_melee_source_chain.h"
 #include "../g76_original_combat/b24_g76_original_native_damage_math.h"
 #include "../g77_original_weapon_db/b24_g77_melee_source_radius.h"
+#ifdef B24_G111_NATIVE_SOURCE_GATES
+#include "b24_g111_original_source_entitydata_and_combat_permission.h"
+#endif
 /* Source-only coordinator. The original 2010 game:
  * - has source IM2V animation durations, now in G8;
  * - has real model bounding-box half diagonal check, G77;
@@ -44,6 +47,17 @@ typedef struct {
  B24G77Vec3 original_attacker_world_contact;
  B24G77Vec3 original_target_world_contact;
  float original_global_melee_tolerance; /* not decoded; caller supplied */
+#ifdef B24_G111_NATIVE_SOURCE_GATES
+ /* 2010 Actor native input and EntityData names MUST actually originate
+  * from original scene/AI; zero-value default is always UNVERIFIED.
+  * Old B14 dummy never supplies this; its flash remains DEBUG only. */
+ const B24G111OriginalEntityData *original_2010_attack_entitydata;
+ int original_actor_fields_0x2b8_verified;
+ int32_t original_attacker_actor_field_0x2b8;
+ int32_t original_target_actor_field_0x2b8;
+ int original_melee_state_field_0x824_verified;
+ uint32_t original_melee_state_field_0x824;
+#endif
 } B24G82Contact;
 void b24_g82_request_melee(B24G82Combat *state,uint32_t now_ms,int grounded,
                             int paused);
