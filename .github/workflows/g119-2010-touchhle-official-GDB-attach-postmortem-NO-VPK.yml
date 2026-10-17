@@ -1,4 +1,4 @@
-name: G119 Diagnose AUTHENTIC 2010 touchHLE GDB Client Status from G112B NO VPK
+name: G119C Diagnose original 2010 touchHLE RSP after real source runtime boot NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: G112_2010_TOUCHHLE_REAL_ORIGINAL_GAME_ARM_GDB_COMBAT_TRACE_NO_VPK_NO_IPA
-          run-id: 39016727515
+          run-id: 39017745551
           github-token: ${{ github.token }}
           path: /tmp/g119_GDB_original_owner_source
       - name: Print exact official original iOS emulator and gdb-multiarch client errors (no original IPA)
