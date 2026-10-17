@@ -26,7 +26,7 @@ def run(ipa,out):
     name=data[p:p+16].split(b'\0',1)[0].decode('ascii','replace')
     sec_vm,sec_size,sec_off=struct.unpack_from('<3I',data,p+32)
     sec_flags,reserved1,reserved2=struct.unpack_from('<3I',data,p+56)
-    if name in ('__stubs','__symbol_stub','__picsymbolstub4'):
+    if sec_flags&0xff==0x8 or name in ('__stubs','__symbol_stub','__picsymbolstub4'):
      stubs.append(dict(section=name,vm=sec_vm,sz=sec_size,
         flags=sec_flags,indirect_index=reserved1,stub_bytes=reserved2))
   pos+=sz
@@ -64,6 +64,24 @@ def run(ipa,out):
     '2010_source_import_dyld_symbol_resolution':match,
     'source_resolution_unique':len(match)==1})
  if not all(x['source_resolution_unique'] for x in imported):
+  # Report original 2010 ARM call targets' actual Mach-O section
+  # provenance, never assume an imported library call when it may be a
+  # statically compiled function.
+  probe=[];pos=28
+  for _ in range(ncmds):
+   cmd,sz=struct.unpack_from('<II',data,pos)
+   if cmd==1:
+    count=struct.unpack_from('<I',data,pos+48)[0]
+    for j in range(count):
+     sp=pos+56+68*j
+     name=data[sp:sp+16].split(b'\\0',1)[0].decode('ascii','replace')
+     vm,ln,off=struct.unpack_from('<3I',data,sp+32)
+     fg,r1,r2=struct.unpack_from('<3I',data,sp+56)
+     if any(vm<=target<vm+ln for target in (0x47111c,0x470e88)):
+      probe.append({'section':name,'vm':hex(vm),'size':ln,
+       'flags':hex(fg),'indirect_start':r1,'reserved2_stub_bytes':r2})
+   pos+=sz
+  print('G110 actual ORIGINAL dynamic-call sections for exact targets:',probe)
   print('Native 2010 IMPORT section candidates:',stubs)
   raise ValueError('native original ARM import stub mapping unresolved; no fake std::string claim')
  report={'original_owner':'2010 iOS IronMan2 user IPA',
