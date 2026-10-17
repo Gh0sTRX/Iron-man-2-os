@@ -258,6 +258,27 @@ def produce(vpk,outdir):
     outdir.mkdir(parents=True,exist_ok=True)
     (outdir/"G158_real_C1L1_building_surface_attribution.json").write_text(
         json.dumps(audit,ensure_ascii=False,indent=2)+"\n")
+    # Actual original road-material XY observation carried to the already
+    # existing G75 gameplay C floor solver. This is source-backed
+    # diagnostic evidence, not a synthesized collision floor.
+    road_rows=[r for r in middle_unmatched.values()
+               if any(g["group"]==12 and g["atlas"]==12
+                      for g in r["all_source_groups_at_xy"])]
+    if len(road_rows)!=548:
+        raise ValueError("G158 actual source road group QA fixture drift")
+    road=sorted(road_rows,key=lambda r:(r["y"],r["x"]))[0]
+    if road["nearest_native_nonwall_z"] is None or (
+            road["observed_source_visual_z"]-
+            road["nearest_native_nonwall_z"]<2.):
+        raise ValueError("G158 road/native height gap fixture not source proven")
+    (outdir/"G158_source_road_vs_native_G75_floor_fixture.txt").write_text(
+        f'{road["x"]} {road["y"]} '
+        f'{road["observed_source_visual_z"]} '
+        f'{road["nearest_native_nonwall_z"]}\n')
+    print("G158 original road XY native G75 C runtime fixture:",
+          road["x"],road["y"],
+          road["observed_source_visual_z"],
+          road["nearest_native_nonwall_z"])
     (outdir/"G158_visual_only_original_groups.csv").write_text(
         "group,atlas,sampled_xy,unique_triangles,original_solidity_unproven\n"+
         "".join(f'{x["original_G66_draw_group"]},{x["original_atlas_id"]},'
