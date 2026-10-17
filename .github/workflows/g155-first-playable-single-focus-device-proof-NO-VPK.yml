@@ -1,0 +1,32 @@
+name: G155 first playable release evidence and WIP1 scope policy (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/first_playable_gate/**"
+      - ".github/workflows/g155-first-playable-single-focus-device-proof-NO-VPK.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  block_false_first_mission_release_claims:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source evidence and fail-closed current state
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s research/b24_unified/first_playable_gate -p 'test_first_playable_gate.py' -v
+          python3 research/b24_unified/first_playable_gate/verify_first_playable_gate.py
+      - name: Assert --require-ready properly refuses unsupported first playable claim
+        run: |
+          set -euo pipefail
+          if python3 research/b24_unified/first_playable_gate/verify_first_playable_gate.py --require-ready; then
+            echo 'FAIL: first mission prematurely marked device ready'
+            exit 1
+          else
+            code=$?
+            test "$code" -eq 2
+          fi
+          echo 'PASS release candidate BLOCKED until all real PS Vita evidence exists'
+          test -z "$(find research/b24_unified/first_playable_gate -name '*.vpk' -print -quit)"
