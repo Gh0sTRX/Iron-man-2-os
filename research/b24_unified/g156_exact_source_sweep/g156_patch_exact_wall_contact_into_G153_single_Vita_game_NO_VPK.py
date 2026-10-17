@@ -123,13 +123,8 @@ static int finite3(float x,float y,float z){
 # movement owner, GPU path, game tick or VPK.
 option(B24_G156_CONTINUOUS_TRI_CONTACT "Continuous Z-clipped sourced triangle/capsule collision in native and visual-source walls" OFF)
 if(B24_G156_CONTINUOUS_TRI_CONTACT)
- if(NOT B24_G108_SOURCE_VISUAL_WALLS OR NOT B24_G75_SOURCE_CAPSULE
-    OR NOT B24_G134_LIMIT_LONG_FRAME_DISPLACEMENT)
-  # G134 source patch is a source marker, not guaranteed CMake option,
-  # so the actual source marker is validated by this Python patch.
-  if(NOT B24_G108_SOURCE_VISUAL_WALLS OR NOT B24_G75_SOURCE_CAPSULE)
-   message(FATAL_ERROR "G156 requires single original G75 and G108 collision")
-  endif()
+ if(NOT B24_G108_SOURCE_VISUAL_WALLS OR NOT B24_G75_SOURCE_CAPSULE)
+  message(FATAL_ERROR "G156 requires single original G75 and G108 collision")
  endif()
  target_compile_definitions(im2_beta PRIVATE B24_G156_CONTINUOUS_TRI_CONTACT=1)
 endif()
