@@ -1,0 +1,38 @@
+name: G149 original Lua PC72 typed boolean gate (host, NO VPK)
+
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g149_original_L1_PC72_typed_lua_return/**"
+      - ".github/workflows/g149-real-original-PC72-Lua-bool-source-gate-NO-VPK.yml"
+  workflow_dispatch:
+
+jobs:
+  original-source-host-c11:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile original G147 actor and G149 source with G137 types
+        run: |
+          set -euo pipefail
+          BASE=research/b24_unified
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I "$BASE/g137_original_Mission000_native_boot" \
+            -I "$BASE/g147_genuine_2010_tutorial_ui_gate" \
+            -I "$BASE/g149_original_L1_PC72_typed_lua_return" \
+            "$BASE/g147_genuine_2010_tutorial_ui_gate/b24_g147_authentic_tutorial_actor.c" \
+            "$BASE/g149_original_L1_PC72_typed_lua_return/b24_g149_native_lua_bool_return.c" \
+            "$BASE/g149_original_L1_PC72_typed_lua_return/test_g149_original_PC72_typed_lua_return.c" \
+            -o /tmp/g149_original_pc72_test
+          /tmp/g149_original_pc72_test
+      - name: Python syntax and no VPK
+        run: |
+          python -B - <<'PY'
+          import ast
+          from pathlib import Path
+          p=Path("research/b24_unified/g149_original_L1_PC72_typed_lua_return/g149_integrate_typed_lua_boolean_PC72_to_G147_one_main_NO_VPK.py")
+          ast.parse(p.read_text())
+          assert not list(Path("research/b24_unified/g149_original_L1_PC72_typed_lua_return").rglob("*.vpk"))
+          print("G149 Python source syntax PASS; host tests do not prove full Vita ELF or device")
+          PY
