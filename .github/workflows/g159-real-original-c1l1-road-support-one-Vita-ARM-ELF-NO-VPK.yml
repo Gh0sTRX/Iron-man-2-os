@@ -486,6 +486,25 @@ jobs:
           assert not list(Path('work').rglob('*.vpk'))
           print('G159 PASS source road source asset+one G75 native floor owner integration, no new VPK')
           PY
+      - name: G159 actual unified G75 capsule integrates road source without overriding original native ground
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g159_first_playable_authentic_road_floor_candidate/test_g159_one_native_G75_capsule_with_true_city.c \
+            -lm -o /tmp/g159_original_one_native_capsule
+          /tmp/g159_original_one_native_capsule work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
       - name: G156 verify continuous source exact triangle collision replaces only both 3 sample wall checks
         run: |
           set -euo pipefail
