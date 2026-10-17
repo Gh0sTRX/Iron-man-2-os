@@ -41,6 +41,8 @@ int main(void){
  assert(m.next_source_lua_pc==73);
  assert(m.requested_mission_pause&&m.requested_MarkV_idle);
  assert(m.requested_MarkV_hidden&&m.requested_input14_disabled);
+ assert(m.requested_tutorial_339&&m.requested_tutorial_confirmation_query);
+ assert(b24_g137_source_lua_event_count==24);
  assert(!b24_g137_mission000_is_gameplay_released(&m));
  assert(c.applied+applied==b24_g137_source_lua_event_count);
  assert(b24_g137_mission000_dispatch_verified_prefix(&m,good,&applied)==
