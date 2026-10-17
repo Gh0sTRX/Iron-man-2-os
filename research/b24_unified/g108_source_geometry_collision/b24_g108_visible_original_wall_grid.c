@@ -96,9 +96,12 @@ int b24_g108_grid_load(B24G108Grid *g,const char *path,
    w.minz=w.maxz=w.p[2];
    for(int k=1;k<3;k++){
     const float x=w.p[k*3],y=w.p[k*3+1],z=w.p[k*3+2];
-    if(x<w.minx)w.minx=x;if(x>w.maxx)w.maxx=x;
-    if(y<w.miny)w.miny=y;if(y>w.maxy)w.maxy=y;
-    if(z<w.minz)w.minz=z;if(z>w.maxz)w.maxz=z;
+    if(x<w.minx)w.minx=x;
+    if(x>w.maxx)w.maxx=x;
+    if(y<w.miny)w.miny=y;
+    if(y>w.maxy)w.maxy=y;
+    if(z<w.minz)w.minz=z;
+    if(z>w.maxz)w.maxz=z;
    }
    const float ux=w.p[3]-w.p[0],uy=w.p[4]-w.p[1],uz=w.p[5]-w.p[2];
    const float vx=w.p[6]-w.p[0],vy=w.p[7]-w.p[1],vz=w.p[8]-w.p[2];
@@ -160,7 +163,8 @@ typedef struct {float x,y;} Vec;
 static float distance_segment2(Vec p,Vec a,Vec b){
  const float dx=b.x-a.x,dy=b.y-a.y,d=dx*dx+dy*dy;
  float t=d>1.e-9f?((p.x-a.x)*dx+(p.y-a.y)*dy)/d:0.f;
- if(t<0)t=0;if(t>1)t=1;
+ if(t<0)t=0;
+ if(t>1)t=1;
  const float px=p.x-a.x-t*dx,py=p.y-a.y-t*dy;
  return px*px+py*py;
 }
