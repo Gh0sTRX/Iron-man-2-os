@@ -35,18 +35,18 @@ if script.count(start)!=1 or script.count(end)!=1 or script.count('gdown ' )!=1:
  raise ValueError('gdown original owner IPA source script not unique; refuse blind source patch')
 i=script.index(start);j=script.index(end,i)+len(end)
 stage="""python3 - <<'PYSOURCEG145'
-          from pathlib import Path
-          import hashlib,struct,zipfile
-          original=Path('/tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk')
-          with zipfile.ZipFile(original) as source:
-            data=source.read('maps/C1L1_Vehicles.c1tx')
-          assert len(data)==1048596
-          assert struct.unpack_from('<4sIIII',data)==(b'C1TX',1,512,512,0)
-          dest=Path('work/maps/C1L1_Vehicles.c1tx')
-          dest.parent.mkdir(parents=True,exist_ok=True)
-          dest.write_bytes(data)
-          print('G145 ORIGINAL-G9-PROVEN iOS VEHICLES C1TX REUSED SHA256',hashlib.sha256(data).hexdigest())
-          PYSOURCEG145"""
+from pathlib import Path
+import hashlib,struct,zipfile
+original=Path('/tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk')
+with zipfile.ZipFile(original) as source:
+    data=source.read('maps/C1L1_Vehicles.c1tx')
+assert len(data)==1048596
+assert struct.unpack_from('<4sIIII',data)==(b'C1TX',1,512,512,0)
+dest=Path('work/maps/C1L1_Vehicles.c1tx')
+dest.parent.mkdir(parents=True,exist_ok=True)
+dest.write_bytes(data)
+print('G145 ORIGINAL-G9-PROVEN iOS VEHICLES C1TX REUSED SHA256',hashlib.sha256(data).hexdigest())
+PYSOURCEG145"""
 script=script[:i]+stage+script[j:]
 if 'gdown ' in script or 'owner.ipa' in script:
  raise ValueError('G145 original IPA re-download remnants not removed')
