@@ -1,0 +1,57 @@
+name: G151 original 2010 L1 Lua PC75-78 wait loop NO VPK
+
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g151-source-original-2010-L1-Lua-PC75-78-loop-NO-VPK.yml"
+      - "research/b24_unified/g151_original_Mission000_PC75_78_wait_loop/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original_source_PC75_to_PC78:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original source forensics script syntax
+        run: |
+          python3 -m pip install -q gdown
+          python3 -m py_compile research/b24_unified/g151_original_Mission000_PC75_78_wait_loop/g151_inspect_original_2010_L1_Lua_PC70_85_metadata_NO_VPK.py
+      - name: Fetch user provided original 2010 owner IPA temporarily
+        run: |
+          mkdir -p /tmp/g151_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g151_original/owner.ipa || gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g151_original/owner.ipa
+          test "$(wc -c </tmp/g151_original/owner.ipa)" -eq 248613763
+      - name: Decode exact source Lua PC75-78 instructions and PC79 return
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g151_original_Mission000_PC75_78_wait_loop/g151_inspect_original_2010_L1_Lua_PC70_85_metadata_NO_VPK.py --ipa /tmp/g151_original/owner.ipa --out /tmp/G151_Original_2010_L1_Lua_PC68_85_Metadata.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("/tmp/G151_Original_2010_L1_Lua_PC68_85_Metadata.json")
+          d=json.loads(p.read_text())
+          assert d['original_total_lua_instructions']==937
+          assert d['source_PC73_false_path_entry']==75
+          assert d['source_PC73_true_path_entry']==79
+          assert d['source_PC78_jmp_back_to']==71
+          assert not d['source_complete_runtime_VM_implemented']
+          assert not d['new_VPK']
+          print('G151 original Lua PC75-78 actual native opcode metadata PASS')
+          PY
+      - name: Delete original game IPA and verify no VPK was produced
+        if: always()
+        run: |
+          rm -rf /tmp/g151_original
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G151_Original_2010_L1_Lua_PC68_85_Metadata_NO_VPK
+          path: /tmp/G151_Original_2010_L1_Lua_PC68_85_Metadata.json
+          retention-days: 14
+          if-no-files-found: error
