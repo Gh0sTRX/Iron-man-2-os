@@ -1,0 +1,37 @@
+name: G119 Diagnose AUTHENTIC 2010 touchHLE GDB Client Status from G112B NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g119-2010-touchhle-official-GDB-attach-postmortem-NO-VPK.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_guest_ARM_gdb_remote_postmortem:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G112_2010_TOUCHHLE_REAL_ORIGINAL_GAME_ARM_GDB_COMBAT_TRACE_NO_VPK_NO_IPA
+          run-id: 39016727515
+          github-token: ${{ github.token }}
+          path: /tmp/g119_GDB_original_owner_source
+      - name: Print exact official original iOS emulator and gdb-multiarch client errors (no original IPA)
+        run: |
+          set -euo pipefail
+          echo '=== REAL 2010 emulator GDB ARM debugger status ==='
+          if test -f /tmp/g119_GDB_original_owner_source/G112_REAL_2010_GDB_HOST_PROCESS_STATUS.txt; then
+            cat /tmp/g119_GDB_original_owner_source/G112_REAL_2010_GDB_HOST_PROCESS_STATUS.txt | tail -100
+          else
+            echo 'NO_GDB_PROCESS_STATUS_FILE; GDB did not start or produce output'
+          fi
+          echo '=== original session ==='
+          cat /tmp/g119_GDB_original_owner_source/G112_REAL_2010_GAME_TOUCHHLE_BRK_RESULT_NO_VPK.json
+          echo '=== GDB data file ==='
+          if test -f /tmp/g119_GDB_original_owner_source/G112_REAL_ORIGINAL_ARM_GDB_NATIVE_FUNCTION_CALLS.txt; then
+            tail -90 /tmp/g119_GDB_original_owner_source/G112_REAL_ORIGINAL_ARM_GDB_NATIVE_FUNCTION_CALLS.txt
+          fi
+          test -z "$(find . -name '*.vpk' -print -quit)"
