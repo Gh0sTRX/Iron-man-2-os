@@ -11,7 +11,8 @@ static float dist2(float px,float py,float ax,float ay,
                    float bx,float by) {
  float dx=bx-ax,dy=by-ay,dd=dx*dx+dy*dy;
  float t=dd>1.e-10f?((px-ax)*dx+(py-ay)*dy)/dd:0;
- if(t<0)t=0;if(t>1)t=1;
+ if(t<0)t=0;
+ if(t>1)t=1;
  float qx=px-(ax+t*dx),qy=py-(ay+t*dy);
  return qx*qx+qy*qy;
 }
