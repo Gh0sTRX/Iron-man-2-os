@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g112-original-iron-man-2-2010-touchhle-linux-GDB-source-capture-NO-VPK.yml"
       - "research/b24_unified/g112_real_touchhle_gameplay_trace/**"
+      - "research/b24_unified/g113_original_macho_runtime_dylib/**"
   workflow_dispatch:
 permissions:
   contents: read
@@ -50,6 +51,13 @@ jobs:
           unzip -q /tmp/g112_original_PRIVATE/owner.ipa 'Payload/IronMan2.app/*' -d /tmp/g112_original_PRIVATE/real_app
           test -s /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app/IronMan2
           test -s /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app/Info.plist
+      - name: Audit actual user 2010 ARM original dynamically loaded dylib paths to diagnose touchHLE exit
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g112_public_report
+          python3 research/b24_unified/g113_original_macho_runtime_dylib/g113_2010_owner_arm_macho_load_dylib_safety_audit.py \
+            --ipa /tmp/g112_original_PRIVATE/owner.ipa --out /tmp/g112_public_report
+          test -s /tmp/g112_public_report/G113_REAL_ORIGINAL_2010_GAME_MACHO_LIBRARY_DEPENDENCY_AUDIT.json
       - name: Execute original 2010 native game in touchHLE GDB and record source combat function callbacks
         run: |
           set -euo pipefail
@@ -80,6 +88,7 @@ jobs:
           name: G112_2010_TOUCHHLE_REAL_ORIGINAL_GAME_ARM_GDB_COMBAT_TRACE_NO_VPK_NO_IPA
           path: |
             /tmp/g112_public_report/G112_REAL_2010_GAME_TOUCHHLE_BRK_RESULT_NO_VPK.json
+            /tmp/g112_public_report/G113_REAL_ORIGINAL_2010_GAME_MACHO_LIBRARY_DEPENDENCY_AUDIT.json
             /tmp/g112_public_report/G112_REAL_ORIGINAL_TOUCHHLE_HOST_LOG.txt
             /tmp/g112_public_report/G112_REAL_ORIGINAL_ARM_GDB_NATIVE_FUNCTION_CALLS.txt
             /tmp/g112_public_report/G112_REAL_2010_GDB_HOST_PROCESS_STATUS.txt
