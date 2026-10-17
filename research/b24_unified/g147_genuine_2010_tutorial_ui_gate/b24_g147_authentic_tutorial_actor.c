@@ -1,5 +1,22 @@
 #include "b24_g147_authentic_tutorial_actor.h"
 #include <string.h>
+int b24_g147_source_native_StringMgr_translate(
+ void *ctx,int rawID,int *nativeID){
+ (void)ctx;
+ if(!nativeID||rawID!=339)return 0;
+ /* Original 2010 native ARM StringMgr::strIDClara2Real:
+  * VM0xCE8D4 loads 339, VM0xCE8D4-8 subtracts one to 338.
+  * Original section0 "about.english" has 255 strings; 338<345,
+  * select section1 "chap1.english" (90 entries), local83.
+  * Packed UI index=(section<<12)|local = 0x1053. */
+ *nativeID=0x1053;
+ return 1;
+}
+const char *b24_g147_source_english_real_tutorial_text(int nativeID){
+ if(nativeID==0x1053)
+  return "Are you ready to face the crowd, sir?";
+ return 0;
+}
 void b24_g147_tutorial_init(B24G147Tutorial *q){
  if(!q)return;
  memset(q,0,sizeof(*q));
