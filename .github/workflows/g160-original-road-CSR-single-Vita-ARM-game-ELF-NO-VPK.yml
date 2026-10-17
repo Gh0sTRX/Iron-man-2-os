@@ -522,7 +522,8 @@ jobs:
             -I work/b24/b24_unified \
             work/b24/b24_unified/b24_g75_source_capsule.c \
             work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
-            work/b24/b24_unified/b24_g159_real_source_road.c \            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
             work/b24/b24_unified/b24_gpu_g68_collision.c \
             work/b24/b24_unified/b24_c1_original_collision.c \
             research/b24_unified/g159_first_playable_authentic_road_floor_candidate/test_g159_one_native_G75_capsule_with_true_city.c \
