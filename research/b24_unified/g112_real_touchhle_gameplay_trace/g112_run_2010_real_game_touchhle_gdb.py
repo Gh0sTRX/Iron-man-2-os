@@ -19,6 +19,10 @@ def run(app, exe, out, sec):
  proc=None;debug=None
  probes=[
   ("AttackEntity_LoadFromFile",0xa934c),
+  # EXACT ORIGINAL source G98: BL GetParamValue(Damage) 0xa9464,
+  # next instruction original AttackEntity+0x60 already holds returned
+  # 4-byte integer. Caller name mapping still needs actual source actor ID.
+  ("AttackEntity_Damage_Native_Real_Value_AfterGetParam",0xa9468),
   ("EntityData_GetParamValue_INT",0xd7548),
   ("Actor_TestMeleeHit",0xdfd94),
   ("Actor_CanAttack",0xd9278),
@@ -38,12 +42,20 @@ def run(app, exe, out, sec):
    "commands",
    "silent",
    "set $"+ident+"=$"+ident+"+1",
-   "if $"+ident+"<=5",
+   "if $"+ident+"<=32",
    'printf "ORIGINAL_IOS_2010_G112_HIT '+name+' count=%u pc=0x%x r0=0x%x r1=0x%x r2=0x%x lr=0x%x\\n", $'+ident+',$pc,$r0,$r1,$r2,$lr',
    "end",
    "continue",
    "end"
   ])
+  if name=="AttackEntity_Damage_Native_Real_Value_AfterGetParam":
+   lines[-4:-4]=[
+    # This is an authentic original 2010 iOS ARM stored field, NOT the
+    # heuristic C1L1 serialized slot. Print actual runtime integer.
+    "if $"+ident+"<=32",
+    'printf "ORIGINAL_IOS_2010_RUNTIME_DAMAGE_SOURCE AttackEntity=0x%x raw_int=%d\\n", $r4, *(int*)($r4+0x60)',
+    "end"
+   ]
  lines.append("continue")
  script.write_text("\n".join(lines)+"\n")
  start=time.monotonic()
