@@ -13,7 +13,7 @@ import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1]))
+sys.path.insert(0, str(HERE.parents[0]))
 from b24_owner_pack_extract import decode, get_exact
 from b24_g27_original_source_lua51_native_global_call_sites import NativeLua, HEADER, report as g27report
 
