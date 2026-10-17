@@ -8,7 +8,7 @@ permissions:
   contents: read
   actions: read
 jobs:
-  2010_original_native_methods:
+  original_2010_native_methods:
     runs-on: ubuntu-24.04
     timeout-minutes: 7
     steps:
