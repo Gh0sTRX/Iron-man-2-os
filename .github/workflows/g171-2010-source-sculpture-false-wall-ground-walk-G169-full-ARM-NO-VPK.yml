@@ -7,6 +7,7 @@ on:
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
+      - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -841,6 +842,25 @@ jobs:
           assert not list(work.rglob('*.vpk'))
           print('G173 exact authored native 2010 UniBeam G169 -> single genuine G8/G85 IM2V load real animation names; stage2/rush damage, B16 and original native event semantics unchanged')
           PY
+      - name: G174 load all ten genuine 2010 1292 vertex War Machine M Ground IM2V poses through G172 G83 and sole G8 stream, native weapon semantics not guessed
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=1 \
+            -DB24_G172_WM_NATIVE_M_GROUND_BANK=1 -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_g76_original_native_damage_math.c \
+            work/b24/b24_unified/b24_g77_melee_source_radius.c \
+            work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g174_warmachine_true_native_ground_stream/test_g174_real_2010_WM_10_M_ground_stream_one_animator.c \
+            -lm -o /tmp/g174_REAL_original_2010_WM_G83_G8_10_source_streams
+          /tmp/g174_REAL_original_2010_WM_G83_G8_10_source_streams work/animations
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
       - name: G159 actual unified G75 capsule integrates road source without overriding original native ground
         run: |
           set -euo pipefail
