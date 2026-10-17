@@ -1,0 +1,55 @@
+name: G123 original 2010 CNPC State Predicates MissionKill Skybox native ARM evidence NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g123-original-iOS-CNPC-native-state-predicates-mission-kill-skybox-NO-VPK.yml"
+      - "research/b24_unified/g123_native_NPC_real_state/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_ARM_NPC_native_predicates_and_mission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight actual original 2010 ARM opcode source probe
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g123_native_NPC_real_state/g123_extract_original_2010_npc_real_small_predicates_and_mission_branch.py
+          python3 -m pip install -q capstone gdown
+      - name: Original owner 2010 IPA read ephemerally, no proprietary executable persisted
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g123_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g123_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g123_private/owner.ipa
+          test "$(wc -c </tmp/g123_private/owner.ipa)" -eq 248613763
+      - name: Extract original native 2010 ARM branch logic for NPC attack states kill mission and skybox
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g123_native_NPC_real_state/g123_extract_original_2010_npc_real_small_predicates_and_mission_branch.py \
+            --ipa /tmp/g123_private/owner.ipa --out /tmp/g123_source
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g123_source/G123_REAL_2010_NPC_CONDITIONS_MISSIONKILL_SKYBOX_ARM_NATIVE_SOURCE_BRANCHES.json').read_text())
+          assert j['source_user_2010_iOS_own_Arm_MachO']
+          assert len(j['bounded_original_class_method_provenance'])==11
+          assert not j['original_CNPC_full_AI_gameplay_state_machine_ported']
+          assert not j['new_vpk_created']
+          print('PASS original owner 2010 native ARM method CFG metadata and real branch operands')
+          PY
+      - name: Always delete original 2010 IPA before publishing metadata
+        if: always()
+        run: |
+          rm -rf /tmp/g123_private
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G123_ORIGINAL_iOS_2010_CNPC_STATE_MISSION_KILL_SKYBOX_GENUINE_ARM_BRANCHES_NO_VPK
+          path: /tmp/g123_source/G123_REAL_2010_NPC_CONDITIONS_MISSIONKILL_SKYBOX_ARM_NATIVE_SOURCE_BRANCHES.json
+          retention-days: 14
+          if-no-files-found: error
