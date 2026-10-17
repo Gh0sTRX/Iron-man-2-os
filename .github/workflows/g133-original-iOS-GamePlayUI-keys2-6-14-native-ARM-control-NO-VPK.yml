@@ -1,0 +1,49 @@
+name: G133 original 2010 native GamePlayUI key2 key6 key14 branch semantics NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g133-original-iOS-GamePlayUI-keys2-6-14-native-ARM-control-NO-VPK.yml"
+      - "research/b24_unified/g133_original_ui_keys/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_2010_UI_key2_key6_14_native_ARM:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate actual 2010 owner ARM analysis tool
+        run: |
+          python3 -m pip install -q gdown capstone
+          python3 -m py_compile research/b24_unified/g133_original_ui_keys/g133_extract_2010_GamePlayUI_SetUIKeyEnabled_key2_key6_exact_ARM_cases.py
+      - name: Original owner 2010 IPA strictly ephemeral
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g133_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g133_private/owner.ipa || gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g133_private/owner.ipa
+          test "$(wc -c </tmp/g133_private/owner.ipa)" -eq 248613763
+      - name: Resolve full 2010 genuine GamePlayUI key2 key6 and key14 exact branches
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g133_original_ui_keys/g133_extract_2010_GamePlayUI_SetUIKeyEnabled_key2_key6_exact_ARM_cases.py --ipa /tmp/g133_private/owner.ipa --out /tmp/g133_source
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g133_source/G133_REAL_2010_ORIGINAL_UI_KEY2_KEY6_SPECIAL14_FULL_ARM_SWITCH.json').read_text())
+          assert j['cases_key2_key6_special14_PC']=={'2':'0x1d3fc','6':'0x1d41c','14':'0x1d2d8'}
+          assert not j['new_vpk']
+          PY
+      - name: Always remove private original game binaries
+        if: always()
+        run: |
+          rm -rf /tmp/g133_private
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G133_OWNER_iOS_2010_L1_UI_KEY2_KEY6_KEY14_AUTHENTIC_ARM_DISPATCH_NO_VPK
+          path: /tmp/g133_source/G133_REAL_2010_ORIGINAL_UI_KEY2_KEY6_SPECIAL14_FULL_ARM_SWITCH.json
+          retention-days: 14
+          if-no-files-found: error
