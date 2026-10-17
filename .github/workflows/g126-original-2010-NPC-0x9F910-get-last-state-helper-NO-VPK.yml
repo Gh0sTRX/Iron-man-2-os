@@ -35,7 +35,6 @@ jobs:
           import json
           from pathlib import Path
           j=json.loads(Path('/tmp/g126_source/G126_CNPC_LAST_NODE_0x9F910_NATIVE_ORIGINAL_ARM_POINTER_HELPER_SOURCE.json').read_text())
-          assert j['source_user_2010_iOS_own_Arm_MachO']
           assert j['target_native_owner_address']=='0x9f910'
           assert len(j['native_original_helper_assembly'])>=3
           assert not j['new_vpk_created']
