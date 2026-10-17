@@ -1,0 +1,51 @@
+name: G154 original 2010 Lua Wait native ARM registration source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g154-original-2010-MachO-Lua-Wait-native-handler-no-VPK.yml"
+      - "research/b24_unified/g154_native_original_2010_Lua_Wait_registration/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_native_MachO_Lua_Wait_registration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original Mach-O source-only forensics Python
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q gdown
+          python3 -m py_compile research/b24_unified/g154_native_original_2010_Lua_Wait_registration/g154_probe_original_2010_MachO_Lua_Wait_native_function_NO_VPK.py
+      - name: Fetch original owner 1.0.0 IPA only in ephemeral CI worker
+        run: |
+          mkdir -p /tmp/g154_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g154_original/owner.ipa || gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g154_original/owner.ipa
+          test "$(wc -c </tmp/g154_original/owner.ipa)" -eq 248613763
+      - name: Inspect original native Lua Wait against original ARM ShowTut PauseMusic PlayVoice anchors
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g154_native_original_2010_Lua_Wait_registration/g154_probe_original_2010_MachO_Lua_Wait_native_function_NO_VPK.py --ipa /tmp/g154_original/owner.ipa --out /tmp/G154_original_native_Lua_Wait_source_metadata.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/G154_original_native_Lua_Wait_source_metadata.json').read_text())
+          assert r['source_executable_bytes']==7480208
+          assert not r['wait_time_unit_proven']
+          assert not r['new_vpk']
+          print('G154 read-only native Lua Wait evidence; no runtime time-unit guess, no Vita asset')
+          PY
+      - name: Always erase original 2010 user game and verify no VPK
+        if: always()
+        run: |
+          rm -rf /tmp/g154_original
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G154_Original_2010_Native_Lua_Wait_ARM_registration_metadata_NO_VPK
+          path: /tmp/G154_original_native_Lua_Wait_source_metadata.json
+          retention-days: 14
+          if-no-files-found: error
