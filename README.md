@@ -147,3 +147,9 @@ G65 gerçek kuş bakışı CPU ekran renderı kaynak BRES geometrisi, kaynak PVR
 ## Lisans / içerik notu
 
 Oyun, karakterler, sesler, özgün modeller ve dokular ilgili hak sahiplerine aittir. Bu depo özel araştırma içindir. Orijinal IPA'yı, oyun varlıklarını veya telifli içerikleri izinsiz kamuya açık dağıtmayın.
+
+## G172 (18 Ekim 2026) — War Machine'in 10 özgün Aim_M_Ground animasyonunun kaynak yönlendirmesi, VPK yok
+
+2010 iOS B18 kataloğunda gerçekten yer alan `Warmachine_Aim_M_Ground` 5 yön/idle ve 5 `_Att` klibi, önceki G83 War Machine seçim tablosunda gözden kaçıyordu. G172, gerçek kaynak kliplerin özgün adlarını ve 1600/866/1399 ms sürelerini doğrulayıp `B24_G172_WM_NATIVE_M_GROUND_BANK` opt-in ayarıyla **aynı G83/G8 animator** üzerinden yönlendirir. B14 fiziği, G171 kaynak collider düzeltmesi ve G169 üç aşamalı Uni-Beam korunur. C11 host regresyonu ve 10 gerçek `.im2v` dosyası için CI kontrolü aynı G171 workflow'una eklendi; yalnız Vita ARM ELF hedefleniyor, yeni VPK yok. Devir ve bütün sınırlar: [G172 kaynak raporu](research/b24_unified/G172_ORIGINAL_2010_WAR_MACHINE_AIM_M_GROUND_NATIVE_SOURCE_ONLY_2026-10-18_TR.md).
+
+**Eksik/engel:** Canlı port G84 input'u henüz `AIM_M_UNCLASSIFIED` üretmiyor; bu nedenle animasyon seçicisindeki kaynak tamamlaması **Vita'da aktif on yeni hareket** anlamına gelmiyor. Native 2010 `M` silah semantiği, WM Gun01–04 soketleri, roket eşlemesi ve isabet zamanları henüz kanıtlanmadı. GitHub Actions CI sonucu, cihaz FPS ve gerçek iOS heykel geçirgenliği de doğrulanmış sayılmaz. Özgün zırh/world parent scale, gece sky–lighting, melee 13-state ve açılış QTE çalışmaları devam ediyor.
