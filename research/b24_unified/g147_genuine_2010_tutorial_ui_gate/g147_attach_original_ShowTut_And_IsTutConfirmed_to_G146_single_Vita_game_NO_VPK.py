@@ -40,11 +40,13 @@ def run():
    ' return b24_g142_owner_source_music_call(music,e);',
    '''#ifdef B24_G147_NATIVE_LUA_TUTORIAL_SOURCE_GATE
  if(e->original_lua_pc==67&&e->opcode==B24_G137_CALL_SHOW_TUT){
-  /* Original 2010 TextID339 must be resolved via StringMgr native
-   * strIDClara2Real first. The real UI tutorial renderer and fonts
-   * are NOT bound; never pass invented translation or ack the call. */
+  /* G147A native 2010 ARM VM0xCE8CC StringMgr source CLARA339
+   * translates to native TextID0x1053 = chap1.english[83].
+   * Actual original UI TextBox renderer/font and PC73 Lua branch are
+   * still NOT linked; pass verified translator but never ack absent draw. */
   return b24_g147_lua_ShowTut_PC67(
-      &g147_original_L1_source_tutorial,e,NULL,NULL,NULL);
+      &g147_original_L1_source_tutorial,e,
+      b24_g147_source_native_StringMgr_translate,NULL,NULL);
  }
  if(e->original_lua_pc==72&&e->opcode==B24_G137_CALL_IS_TUT_CONFIRMED){
   /* Real ARM native Lua query returns boolean; existing G137
