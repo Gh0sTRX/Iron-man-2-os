@@ -1,0 +1,38 @@
+name: G152 original iOS tutorial PC73 Wait10 StopVoice ShowTut340 C11 host NO VPK
+
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g152_source_original_tutorial_condition_runtime/**"
+      - ".github/workflows/g152-source-original-L1-tutorial-Wait10-StopVoice-ShowTut340-host-NO-VPK.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_typed_original_lua_branch_C11:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile source-authentic 2010 tutorial truth with G147 and G149 real C actors
+        run: |
+          set -euo pipefail
+          BASE=research/b24_unified
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I "$BASE/g137_original_Mission000_native_boot" \
+            -I "$BASE/g147_genuine_2010_tutorial_ui_gate" \
+            -I "$BASE/g149_original_L1_PC72_typed_lua_return" \
+            -I "$BASE/g152_source_original_tutorial_condition_runtime" \
+            "$BASE/g147_genuine_2010_tutorial_ui_gate/b24_g147_authentic_tutorial_actor.c" \
+            "$BASE/g149_original_L1_PC72_typed_lua_return/b24_g149_native_lua_bool_return.c" \
+            "$BASE/g152_source_original_tutorial_condition_runtime/b24_g152_source_tutorial_loop.c" \
+            "$BASE/g152_source_original_tutorial_condition_runtime/test_g152_original_PC73_Wait10_StopVoice_ShowTut340.c" \
+            -o /tmp/g152_source_original_L1_tutorial_test
+          /tmp/g152_source_original_L1_tutorial_test
+      - name: No proprietary game data, no fake Vita build and NO VPK
+        run: |
+          set -euo pipefail
+          test -z "$(find research/b24_unified/g152_source_original_tutorial_condition_runtime -name '*.vpk' -o -name '*.ipa')"
+          echo "G152 host C11 tested only; full Vita main not claimed"
