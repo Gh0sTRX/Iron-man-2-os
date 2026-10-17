@@ -52,6 +52,25 @@ jobs:
           assert (root/'G158_original_source_material_hotspot_visual_only.svg').stat().st_size>10000
           print('G158 PASS exact original authored source visual-only 628 sample attribution, source material/solidity NOT invented')
           PY
+      - name: G158 prove original road G66M source height vs ACTUAL G75 C runtime source floor evaluator
+        run: |
+          set -euo pipefail
+          original=$(find /tmp/g158_g104_owner_original -name '*.vpk' -print -quit)
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          p=next(Path('/tmp/g158_g104_owner_original').rglob('*.vpk'))
+          with zipfile.ZipFile(p) as z:
+           Path('/tmp/G158_original_2010_C1L1_G66C_EPHEMERAL.g66c').write_bytes(z.read('assets/G66_original_collision.g66c'))
+          PY
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I research/b24_unified \
+            research/b24_unified/g158_original_source_building_material_gap/test_g158_true_road_G75_native_source_ground.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c -lm -o /tmp/g158_real_original_source_floor_runtime
+          /tmp/g158_real_original_source_floor_runtime \
+            /tmp/G158_original_2010_C1L1_G66C_EPHEMERAL.g66c \
+            /tmp/g158_real_group_hotspots/G158_source_road_vs_native_G75_floor_fixture.txt
+          rm -f /tmp/G158_original_2010_C1L1_G66C_EPHEMERAL.g66c
       - name: Exact original PVR name identity crossmatch (no guessed filename or solidity)
         run: |
           set -euo pipefail
