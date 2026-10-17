@@ -1,0 +1,385 @@
+name: G139 native Vita SceAudio BGM port and original 2010 Mission000 PauseMusic PC3 QTE gate ELF NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g139-original-Mission000-PauseMusic-real-Vita-SceAudio-BGM-ELF-NO-VPK.yml"
+      - "research/b24_unified/g91_offline_integrated_preview/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g111_original_game_combat_gates/**"
+      - "research/b24_unified/g124_2010_real_NPC_source_predicates/**"
+      - "research/b24_unified/g127_native_owner_StateMgr/**"
+      - "research/b24_unified/g134_true_original_collision_sweep/**"
+      - "research/b24_unified/g136_fix_source_B14_scene_bounds/**"
+      - "research/b24_unified/g137_original_Mission000_native_boot/**"
+      - "research/b24_unified/g139_vita_native_audio_music/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g82_original_combat/**"
+      - "research/b24_unified/g106_visual_repair/**"
+      - "research/b24_unified/b24_g10_practice_target.c"
+      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_original_arm_strcasecmp_memcpy_actor_categories_g82_and_g108_real_world_vita_elf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g88_original_combat_source/test_g88_interleaved_original_event_dedup.c \
+            -lm -o /tmp/g88_native_combat_guard
+          /tmp/g88_native_combat_guard
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g88_old_g82_no_regression
+          /tmp/g88_old_g82_no_regression
+          test -z "$(find research/b24_unified -name "*.vpk" -print -quit)"
+      - name: Original 2010 G83 movement, flight, aim and combo priority regressions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g88_g83_router
+          /tmp/g88_g83_router
+      - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/g91_offline_integrated_preview/test_g92_authored_world_static_dummy_no_damage.c \
+            -lm -o /tmp/g92_real_g10_g11_immortal_dummy
+          /tmp/g92_real_g10_g11_immortal_dummy
+      - name: Restore authentic G8 all armor native animation stream source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original 2010 War Machine Gun01 to Gun04 motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore native original Stark Expo 2010 city and collision source
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore all 248 original Mark V 629 vertex skin animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Restore original G27 source verified 2010 Level1 71 Lua callback native CALLs
+        uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g137_real_Level1_Lua
+      - name: Restore authenticated original 2010 six BRES sky meshes two PVRTC atlas files
+        uses: actions/download-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          run-id: 38902510114
+          github-token: ${{ github.token }}
+          path: /tmp/g108_original_sky
+      - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 research/b24_unified/g75_device_qa/g75_reassemble_old_real_game_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 research/b24_unified/g91_offline_integrated_preview/g92_patch_single_real_vita_main_static_dummy_NO_VPK.py
+          python3 research/b24_unified/g106_visual_repair/g106_apply_original_stage2_rush_fire_source_only.py
+          python3 research/b24_unified/g108_source_geometry_collision/g108_enable_original_visible_wall_grid_in_single_G75_main_NO_VPK.py
+          python3 research/b24_unified/g111_original_game_combat_gates/g111_apply_authentic_2010_entitydata_actor_melee_to_single_B24_SOURCE_ONLY.py
+          python3 research/b24_unified/g124_2010_real_NPC_source_predicates/g124_add_native_original_2010_npc_state_to_real_Vita_game_ELF_ONLY.py
+          python3 research/b24_unified/g127_native_owner_StateMgr/g127_integrate_original_2010_states_mgr_get_state_into_ONE_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g134_true_original_collision_sweep/g134_patch_2010_source_world_substeps_NO_VPK.py
+          python3 research/b24_unified/g136_fix_source_B14_scene_bounds/g136_patch_B14_original_render_source_bounds_NO_VPK.py
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_emit_original_Mission000_lua_prefix_from_G27.py \
+            --g27 /tmp/g137_real_Level1_Lua/original_lua_calls.json \
+            --out work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_patch_authentic_Mission000_source_live_to_one_game_NO_VPK.py
+          python3 research/b24_unified/g139_vita_native_audio_music/g139_patch_original_Mission000_PauseMusic_with_real_Vita_SceAudio_NO_VPK.py
+          cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
+          test -s work/assets/G73_original_sky_mesh.g73m
+          grep -q 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' work/src/main.c
+          grep -q 'b24_g10_practice_target_draw' work/b24/b24_unified/b24_gpu_runtime.c
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G127 authenticate source original 2010 StatesMgr GetState(-1) plus native CNPC attack-state chain from 0x9F910 0xE1A20
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g124_real_original_NPC_source_state.c \
+            work/b24/b24_unified/b24_g127_authentic_2010_states_mgr.c \
+            research/b24_unified/g127_native_owner_StateMgr/test_g127_true_2010_source_states_mgr.c \
+            -o /tmp/g127_original_native_source_state_getter_host
+          /tmp/g127_original_native_source_state_getter_host
+          grep -q B24_G127_ORIGINAL_STATESMGR_SOURCE work/CMakeLists.txt
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G124 original CNPC real attack enum 4 5 SetState priority signed fire clock MissionConditionKill SkyBox early gate host QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g124_real_original_NPC_source_state.c \
+            research/b24_unified/g124_2010_real_NPC_source_predicates/test_g124_real_original_2010_NPC_logic.c \
+            -o /tmp/g124_original_2010_npc_native_mechanics_host
+          /tmp/g124_original_2010_npc_native_mechanics_host
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G111 verified original 2010 ARM GetParamValue strcmp memcpy Actor category & melee live G82 damage guard host regression
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G111_NATIVE_SOURCE_GATES=1 \
+            -I research/b24_unified \
+            -I research/b24_unified/g82_original_combat \
+            -I research/b24_unified/g111_original_game_combat_gates \
+            -I research/b24_unified/g103_partial_original_actor_attack_permission \
+            -I research/b24_unified/g89_original_combo_native_flow \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g111_original_game_combat_gates/b24_g111_original_source_entitydata_and_combat_permission.c \
+            research/b24_unified/g103_partial_original_actor_attack_permission/b24_g103_verified_original_actor_attack_classification.c \
+            research/b24_unified/g89_original_combo_native_flow/b24_g89_real_2010_melee_state_predicates.c \
+            research/b24_unified/g111_original_game_combat_gates/test_g111_native_original_2010_attack_getparam_actor_source_B24_G82.c \
+            -lm -o /tmp/g111_original_source_melee_hit_runtime
+          /tmp/g111_original_source_melee_hit_runtime
+          grep -q 'B24_G111_NATIVE_SOURCE_GATES' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G108 source-authored 2010 visible opaque steep wall spatial grid test with original 1910 collider
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g108_source_geometry_collision/test_g108_native_2010_visible_wall_grid.c \
+            -lm -o /tmp/g108_real_source_wall_grid
+          /tmp/g108_real_source_wall_grid work/assets/G66_city.g66m work/assets/G66_original_collision.g66c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G128 physical source coordinate bounds from actual 2010 environment, no more hidden central beta 672x624 viewport
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          c=Path('work/b24/b24_unified/b24_g75_source_capsule.c').read_text()
+          h=Path('work/b24/b24_unified/b24_g108_visible_original_wall_grid.h').read_text()
+          s=Path('work/b24/b24_unified/b24_g108_visible_original_wall_grid.c').read_text()
+          assert 'G128: the old G75 constant rectangle' in c
+          assert 'b24_g108_grid_source_bounds_allow(&g108_source_steep_walls,x,y,r)' in c
+          assert '#define G108_X0 (-2048.f)' in s
+          assert '#define G108_Y0 (-2048.f)' in s
+          assert '#define G108_NX 256' in s
+          assert '#define G108_NY 256' in s
+          assert 'source_minx' in h and 'source_miny' in h
+          assert c.count('b24_g108_grid_load(')==1
+          assert c.count('b24_g108_grid_clear(')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('PASS G128 source-original 2010 full map bounds plus G75 one B14 capsule; mission-specific fly permission left unguessed')
+          PY
+      - name: G108 original movement original G68 source wall one B14 owner and original sky staging source regression
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path('work/src/main.c').read_text()
+          g=Path('work/b24/b24_unified/b24_g75_source_capsule.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_g8_motion_tick_g84(')==1
+          assert m.count('b24_g83_timeline_tick(')==1
+          assert g.count('b24_g108_grid_load(')==1 and g.count('b24_g108_grid_clear(')==1
+          for flag in ('B24_G108_SOURCE_VISUAL_WALLS','B24_G106_SOURCE_FLY_ATTACK_MARKV','B24_G71_ALPHA_PASSES','B24_G73_REAL_SKY'):
+           assert flag in cm
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G108 original 2010 map structural collision new wall source single G75; no VPK')
+          PY
+      - name: G95 original 2010 C1L1 four Sun source node positions diagnostic GPU light candidate QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g95_source_sun_4_author_positions
+          /tmp/g95_source_sun_4_author_positions
+          grep -q 'B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE' work/CMakeLists.txt
+          grep -q 'b24_g75_light_original_vertex' work/b24/b24_unified/b24_gpu_g68_city.c
+      - name: G137 original 2010 Mission000 native source PC1 through PC70 first Lua EQ branch PC73, fail-closed QTE binding
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g137_source_mission000_intro.c \
+            work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c \
+            research/b24_unified/g137_original_Mission000_native_boot/test_g137_real_source_Mission000_boot.c \
+            -o /tmp/g137_true_owner_2010_level1_lua_introlive
+          /tmp/g137_true_owner_2010_level1_lua_introlive
+          grep -q B24_G137_MISSION000_REAL_SOURCE_EVENTS work/CMakeLists.txt
+          grep -q g137_real_source_Mission000 work/src/main.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G139 original 2010 Lua PauseMusic PC3 only accepted after real valid output port and output volume acknowledgment
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g137_source_mission000_intro.c \
+            work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c \
+            work/b24/b24_unified/b24_g139_original_mission_music_bridge.c \
+            research/b24_unified/g139_vita_native_audio_music/test_g139_real_source_Mission000_native_music_group.c \
+            -o /tmp/g139_real_sound_output_acknowledged_source_Mission000
+          /tmp/g139_real_sound_output_acknowledged_source_Mission000
+          test "$(grep -c 'b24_g139_native_vita_audio_backend()' work/src/main.c)" -eq 1
+          grep -q 'SceAudio_stub' work/CMakeLists.txt
+          grep -q 'B24_G139_REAL_VITA_AUDIO_OUT' work/CMakeLists.txt
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G136B original 2010 scene real G66M full 67323 vertex source AABB proves B14 legacy x330/y254 clamp is gone
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G136_SOURCE_B14_WORLD_BOUNDS=1 \
+            -I work/src \
+            research/b24_unified/g136_fix_source_B14_scene_bounds/test_g136_B14_original_world_not_clipped_early.c \
+            work/src/b14_world.c -lm -o /tmp/g136b_original_world_no_center_clipping
+          /tmp/g136b_original_world_no_center_clipping
+          grep -q G136_REAL_CITY_BOUND_B14_WORLD_SOURCE work/src/b14_world.c
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G134 urgent original source 2010 wall no large frame teleport original triangle capsule native C11
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g134_true_original_collision_sweep/test_g134_long_frame_2010_source_wall_tunneling.c \
+            -lm -o /tmp/g134_source_2010_thin_wall_safe
+          /tmp/g134_source_2010_thin_wall_safe
+          grep -q 'G134_LIMIT_LONG_FRAME_DISPLACEMENT' work/b24/b24_unified/b24_g75_source_capsule.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G93 host replay REAL original 1,910 authored collision triangles and B14 physical flight
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/src \
+            research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c \
+            work/src/b14_world.c -lm -o /tmp/g93_b14_real_physics
+          /tmp/g93_b14_real_physics
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/g93_1910_authored_collision_host
+          /tmp/g93_1910_authored_collision_host work/assets/G66_original_collision.g66c
+      - name: G94 actual original G68 1910-source-face floor-place immobile dummy, no guessed collision
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g91_offline_integrated_preview/test_g94_real_source_G68_dummy_actual_floor.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            -lm -o /tmp/g94_source_g68_static_dummy_original
+          /tmp/g94_source_g68_static_dummy_original work/assets/G66_original_collision.g66c
+      - name: G93 real B24 source contains ONE accepted G8 punch and NEVER a second dummy input poll
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          assert main.count('b24_g8_motion_melee_trigger(')==1
+          assert main.count('g92_debug_accepted_melee_edge=1;')==1
+          # One static initialization plus one actual per-frame consume.
+          assert main.count('g92_debug_accepted_melee_edge=0;')==2
+          assert main.count('        g92_debug_accepted_melee_edge=0; /* one consumed debug latch */')==1
+          # Old G75/G85/G9 main actually contains three separately guarded
+          # source melee condition occurrences. The debug target must not
+          # create a fourth. CI checks exact known assembled source here.
+          count=main.count('b24_unified_should_melee(&b24_game)')
+          assert count==3, ('G93 original input gate count drift',count)
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert main.count('b24_g11_practice_melee_hit(')==1
+          assert 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' in main
+          print('PASS G93 SINGLE source accepted melee, B14 physics, G83/G8 owner; test dummy consumes input edge once, no speculative 2010 damage')
+          PY
+      - name: Real VitaSDK ARM source FULL game G111 original 2010 named Damage and Actor hit gates alongside G108 G106 source movement ELF ONLY NO VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G139-ELF-ONLY \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON \
+              -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=ON \
+              -DB24_G71_ALPHA_PASSES=ON \
+              -DB24_G73_REAL_SKY=ON \
+              -DB24_G106_SOURCE_FLY_ATTACK_MARKV=ON \
+              -DB24_G108_SOURCE_VISUAL_WALLS=ON \
+              -DB24_G136_SOURCE_B14_WORLD_BOUNDS=ON \
+              -DB24_G137_MISSION000_REAL_SOURCE_EVENTS=ON \
+              -DB24_G139_REAL_VITA_AUDIO_OUT=ON \
+              -DB24_G111_NATIVE_SOURCE_GATES=ON \
+              -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
+              -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON \
+              -DB24_G87_REAL_TRANSITION_EVENTS=ON \
+              -DB24_G92_STATIC_DUMMY_SOURCE_PREVIEW=ON
+            cmake --build work/build-G139-ELF-ONLY --target im2_beta --parallel 4
+            test -s work/build-G139-ELF-ONLY/im2_beta
+            test -z "$(find work -type f -name "*.vpk" -print -quit)"
+            echo "PASS G139 original Mission000 PauseMusic real Vita SceAudio BGM source output port and successful SetVolume -> PC3 ack, QTE1456 PC6 remains unbound; G136B/G134 original city G127 NPC G111 combat same ARM ELF, NO VPK"
+          '
