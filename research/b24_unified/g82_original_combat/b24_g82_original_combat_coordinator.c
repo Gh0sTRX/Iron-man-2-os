@@ -38,6 +38,28 @@ B24G76DamageResult b24_g82_resolve_source_contact(
   state->rejected_unverified_events++;
   return B24_G76_NO_HIT;
  }
+#ifdef B24_G111_NATIVE_SOURCE_GATES
+ /* G111 is the live original-2010-native combat DATA gate, not a cosmetic
+  * combo animation check. 2010 ARM source G110: GetParamValue(Damage) uses
+  * case-insensitive name lookup + true 4-byte memcpy from typed EntityData;
+  * G103 source Actor::CanAttack+0x2B8, G89 native state predicate +0x824.
+  * Original caller MUST explicitly prove all three. Debug G92 dummy NEVER
+  * has source attack-instance values or an authentic actor-category field.
+  * Unknown original values are blocked instead of taking fixture numbers
+  * as real 2010 combat. */
+ int32_t native_damage=0;
+ if(!b24_g111_native_source_attack_permission_and_damage(
+       event->original_2010_attack_entitydata,
+       event->original_actor_fields_0x2b8_verified,
+       event->original_attacker_actor_field_0x2b8,
+       event->original_target_actor_field_0x2b8,
+       event->original_melee_state_field_0x824_verified,
+       event->original_melee_state_field_0x824,&native_damage) ||
+    fabsf(event->original_attack_damage-(float)native_damage)>.001f){
+    state->rejected_unverified_events++;
+    return B24_G76_NO_HIT;
+ }
+#endif
  const unsigned step=state->clip.phase;
  if(step<1||step>3||event->observed_original_combo_step!=step)
   return B24_G76_NO_HIT;
