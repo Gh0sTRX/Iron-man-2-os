@@ -121,6 +121,11 @@ static int finite3(float x,float y,float z){
 # inside the same G75 and G108 wall tests. No new source face/solidity,
 # movement owner, GPU path, game tick or VPK.
 option(B24_G156_CONTINUOUS_TRI_CONTACT "Continuous Z-clipped sourced triangle/capsule collision in native and visual-source walls" OFF)
+# This source transform is unconditional once explicitly installed; if OFF,
+# reject the build instead of silently running the replacement algorithm.
+if(NOT B24_G156_CONTINUOUS_TRI_CONTACT)
+ message(FATAL_ERROR "G156 source files already patched: explicitly set B24_G156_CONTINUOUS_TRI_CONTACT=ON or rebuild the unmodified G153 source tree")
+endif()
 if(B24_G156_CONTINUOUS_TRI_CONTACT)
  if(NOT B24_G108_SOURCE_VISUAL_WALLS OR NOT B24_G75_SOURCE_CAPSULE)
   message(FATAL_ERROR "G156 requires single original G75 and G108 collision")
