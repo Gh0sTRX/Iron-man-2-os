@@ -26,9 +26,9 @@
       "id": "solid_collision",
       "name": "Floor, buildings, wall and ceiling player capsule",
       "state": "device_regression_open",
-      "source_evidence": "G134 swept collision, G136B source map bounds, G153 native ELF compile",
-      "device_evidence": "G104 user observed character entering building geometry; corrections not physically retested",
-      "acceptance": "On-device repeatable collision test at recorded coordinates and stress movement; no gross building/floor penetration",
+      "source_evidence": "G134 sweep limits per-step teleport; G108 supplemental original opaque visual candidates; G156 source-mode exact continuous vertical cylinder contact removes a verified geometric three-Z-sample miss (C11 host SUCCESS, full ARM/retest tracked separately). Source 1910 native faces are not a proof that every visible building is solid.",
+      "device_evidence": "G104 physical PS Vita user saw building penetration; the G156 source correction has not been tested on physical PS Vita. Remains open.",
+      "acceptance": "On real PS Vita retest at reproducible original G104 wall coordinates, including steep slanted wall, building front, corners, long-frame rush and normal flight; no gross wall tunneling, no false blocking of open scenery; document FPS impact.",
       "owner": "physics",
       "mandatory": true
     },
@@ -90,5 +90,5 @@
     "first_level_playable_claim_allowed": false,
     "candidate_vpk_auto_allowed": false
   },
-  "next_action": "Resolve world rendering and collision on one reproducible hardware comparison, then PC6 original QTE1456, then full mission flow."
+  "next_action": "First verify integrated G156 single Vita ARM ELF and native source 1910-collider/G108 geometry regressions; obtain one meaningful real-Vita test for source map/collision/sky, rather than expanding audio/QTE feature scope."
 }
