@@ -63,6 +63,11 @@ B24G137Stage b24_g137_mission000_dispatch_verified_prefix(
   if(e->opcode==B24_G137_CALL_SETINPUT&&
      e->source_arg0==14&&!e->original_arg1_boolean)
    m->requested_input14_disabled=1;
+  if(e->opcode==B24_G137_CALL_SHOW_TUT&&e->source_arg0==339&&
+      e->source_arg1==13&&e->source_arg2==0)
+   m->requested_tutorial_339=1;
+  if(e->opcode==B24_G137_CALL_IS_TUT_CONFIRMED)
+   m->requested_tutorial_confirmation_query=1;
   m->cursor++;
   m->actually_dispatched_count++;
   m->unresolved_scene_event=0;
