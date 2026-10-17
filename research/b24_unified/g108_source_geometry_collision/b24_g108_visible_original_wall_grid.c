@@ -13,10 +13,10 @@
  * never infer mission's playable flight volume from that geometry AABB.
  */
 #define G108_CELL 12.f
-#define G108_X0 (-1248.f)
-#define G108_Y0 (-1116.f)
-#define G108_NX 144
-#define G108_NY 144
+#define G108_X0 (-2048.f)
+#define G108_Y0 (-2048.f)
+#define G108_NX 256
+#define G108_NY 256
 #define G108_NCELLS (G108_NX*G108_NY)
 #define G108_MAX_CANDIDATES 18000u
 #define G108_MAX_CELL_REFERENCES 320000u
@@ -90,9 +90,15 @@ int b24_g108_grid_load(B24G108Grid *g,const char *path,
   if(y<tmp.source_miny)tmp.source_miny=y;
   if(y>tmp.source_maxy)tmp.source_maxy=y;
  }
+ fprintf(stderr,"G128 REAL original 2010 G66 city exact visual bounds: X=%.3f..%.3f Y=%.3f..%.3f; indexed source rect X=%.3f..%.3f Y=%.3f..%.3f\\n",
+   tmp.source_minx,tmp.source_maxx,tmp.source_miny,tmp.source_maxy,
+   G108_X0,G108_X0+G108_CELL*G108_NX,
+   G108_Y0,G108_Y0+G108_CELL*G108_NY);
  if(tmp.source_minx<G108_X0||tmp.source_maxx>G108_X0+G108_CELL*G108_NX||
-    tmp.source_miny<G108_Y0||tmp.source_maxy>G108_Y0+G108_CELL*G108_NY)
-  goto fail;
+    tmp.source_miny<G108_Y0||tmp.source_maxy>G108_Y0+G108_CELL*G108_NY){
+   fprintf(stderr,"G128 actual original 2010 source AABB exceeds proposed grid, abort rather than silently discard source walls\\n");
+   goto fail;
+ }
  uint32_t cursor=0;
  const uint8_t translucent[31]={
   0,1,0,0,0,0,1,1,0,1,0,0,0,0,0,1,
