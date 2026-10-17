@@ -1,0 +1,56 @@
+name: G138 ORIGINAL 2010 iOS SoundManager PauseMusic Lua Voice320 Music88 real ARM audio metadata NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g138-authentic-2010-iOS-Lua-PauseMusic-SoundManager-ARM-audio-bank-NO-VPK.yml"
+      - "research/b24_unified/g138_original_audio_owner/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_iOS_Lua_sound_native_audio_from_owner:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: preflight exact iOS ARM disassembler and original wave metadata decoder
+        run: |
+          python3 -m pip install -q gdown capstone
+          python3 -m py_compile research/b24_unified/g138_original_audio_owner/g138_owner_2010_actual_native_PauseMusic_lua_SoundManager_Arm_audio_asset_inventory.py
+      - name: user original 2010 owner IPA only transient, never artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g138_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g138_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g138_private/owner.ipa
+          test "$(wc -c </tmp/g138_private/owner.ipa)" -eq 248613763
+      - name: Original 2010 Lua PauseMusic PC3 PlayMusic88 Voice320 and owner SoundManager ARM and WAVE bank forensic
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g138_original_audio_owner/g138_owner_2010_actual_native_PauseMusic_lua_SoundManager_Arm_audio_asset_inventory.py \
+            --ipa /tmp/g138_private/owner.ipa --out /tmp/g138_metadata
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g138_metadata/G138_ORIGINAL_2010_NATIVE_PauseMusic_PlayMusic88_PlayVoice320_AUDIO_BANK_PROVENANCE_NO_VPK.json')
+          d=json.loads(p.read_text())
+          names=[m['source_cpp'] for m in d['owner_2010_native_music_sound_cpp_and_Arm']]
+          assert any('SoundManager::PauseAllMusic()' in n for n in names)
+          assert any('PauseMusic(lua_State' in n for n in names)
+          assert len(d['authentic_original_RIFF_music_sfx_voice_file_metadata'])>150
+          assert not d['original_WAV_binary_files_exported'] and not d['VPK_generated']
+          print('PASS G138 genuine original 2010 native PauseMusic Lua & SoundManager ARM and owner WAVE metadata only')
+          PY
+      - name: always wipe original private original game
+        if: always()
+        run: |
+          rm -rf /tmp/g138_private
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G138_original_2010_Lua_PauseMusic_SoundManager_voice320_music88_SFX_wave_metadata_NO_VPK
+          path: /tmp/g138_metadata/G138_ORIGINAL_2010_NATIVE_PauseMusic_PlayMusic88_PlayVoice320_AUDIO_BANK_PROVENANCE_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
