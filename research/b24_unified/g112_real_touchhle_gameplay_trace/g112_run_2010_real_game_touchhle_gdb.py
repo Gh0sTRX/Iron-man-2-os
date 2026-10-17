@@ -32,7 +32,10 @@ def run(app, exe, out, sec):
  script=out/"g112_original_owner_dynamic_arm_brk.gdb"
  lines=["set pagination off","set confirm off","set height 0",
         "set logging file "+str(gdblog),"set logging overwrite on","set logging enabled on",
-        "file "+str(app/"IronMan2"),"set architecture arm",
+        # GNU gdb-multiarch cannot parse 32-bit iOS Mach-O; original ARM
+        # guest is already loaded by touchHLE, use raw RSP memory and
+        # original verified absolute ARM source addresses instead.
+        "set architecture arm",
         "target remote 127.0.0.1:9001"]
  for name,address in probes:
   ident="g112_"+name.lower()
@@ -116,7 +119,7 @@ def run(app, exe, out, sec):
  hits=[x for x in content.splitlines() if "ORIGINAL_IOS_2010_G112_HIT" in x]
  result={
   "original_game":"owner-authentic 2010 Gameloft Iron Man 2 iOS 1.0.0",
-  "emulator":"touchHLE v0.3.0 experimental Linux AppImage",
+  "emulator":"touchHLE v0.3.0 official upstream source-built Linux RSP",
   "original_ARM_binary_ever_published":False,
   "VPK_generated":False,
   "gdb_server_socket_reached":online,
