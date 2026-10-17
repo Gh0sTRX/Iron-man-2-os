@@ -44,9 +44,16 @@ int b24_g139_original_Mission000_audio_dispatch(void *ctx,
  B24G139Music *m=(B24G139Music*)ctx;
  if(event->original_lua_pc==1&&
     event->opcode==B24_G137_CALL_MISSION_PAUSE)return 1;
+ /* G142 REAL 2010 iOS ARM CORRECTION: PauseMusic(lua_State*)
+  * 0x17ECC calls Game::StopCrtBGM(2000.f) 0x97728, which calls
+  * SoundManager::StopMusic([Game+0xEC],2000.f). It DOES NOT call
+  * SoundManager::PauseAllMusic and is NOT "mute BGM port".
+  * Until current 2010 BGM ID/track/fade-stop callback is actually
+  * bound, do not acknowledge PC3 or advance Mission000. The native
+  * G139 music_pause() remains a real output-control utility only. */
  if(event->original_lua_pc==3&&
     event->opcode==B24_G137_CALL_PAUSE_MUSIC)
-  return b24_g139_music_pause(m);
+  return 0;
  /* QTE source Show(1456) Lua PC6 remains unbound; DO NOT auto
   * enable 2/6 or fake MissionResume from later Lua branches. */
  return 0;
