@@ -17,6 +17,12 @@ jobs:
       LIBGL_ALWAYS_SOFTWARE: "1"
       MESA_GL_VERSION_OVERRIDE: "2.1"
       APPIMAGE_EXTRACT_AND_RUN: "1"
+      # Official game reached native ARM 2010 iOS code but hosted Linux
+      # OpenAL device was unavailable on headless Actions/Xvfb.
+      # OpenAL Soft null output driver still exercises guest game's source
+      # audio API without needing a physical host sound card.
+      ALSOFT_DRIVERS: "null"
+      SDL_AUDIODRIVER: "dummy"
     steps:
       - uses: actions/checkout@v4
       - name: Preflight original touchHLE tracing Python syntax and pure script source BEFORE huge owner IPA or emulator downloads
