@@ -39,7 +39,7 @@ def run(app, exe, out, sec):
    "silent",
    "set $"+ident+"=$"+ident+"+1",
    "if $"+ident+"<=5",
-   'printf "ORIGINAL_IOS_2010_G112_HIT '+name+' count=%u pc=0x%x r0=0x%x r1=0x%x r2=0x%x lr=0x%x\\n", 
+   'printf "ORIGINAL_IOS_2010_G112_HIT '+name+' count=%u pc=0x%x r0=0x%x r1=0x%x r2=0x%x lr=0x%x\\n", $'+ident+',$pc,$r0,$r1,$r2,$lr',
    "end",
    "continue",
    "end"
