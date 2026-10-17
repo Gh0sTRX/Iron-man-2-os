@@ -1,0 +1,35 @@
+name: G137P original 2010 Mission000 first 73 Lua source function list preflight NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g137-preflight-original-Mission000-all-prefix-function-calls-NO-VPK.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  first_2010_Lua_Mission000_unbranched_function_list:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g137_source
+      - name: Print all exact source prebranch 2010 Lua native CALLs, known typed args, no execution
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g137_source/original_lua_calls.json').read_text())
+          intro=next(x for x in d['source_lua_static_CALLBACK_instructions_and_id_links'] if x['original_callback']=='Mission000_OnStart')
+          events=sorted((x for x in intro['original_static_global_CALL_sites'] if x['source_bytecode_PC']<73),key=lambda x:x['source_bytecode_PC'])
+          assert events
+          print('G137P EXACT ORIGINAL LEVEL1 MISSION000 PREFIRST EQ PC73 SOURCE',len(events))
+          for x in events:
+           print('G137P ORIGINAL 2010 LUA PC',x['source_bytecode_PC'],'FUNC',x['native_global_function'],'ARGS',repr(x['literal_or_statically_tracked_arguments']))
+          assert not list(Path('.').rglob('*.vpk'))
+          PY
