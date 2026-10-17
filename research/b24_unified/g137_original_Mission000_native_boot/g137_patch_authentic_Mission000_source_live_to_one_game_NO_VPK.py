@@ -3,7 +3,8 @@
 linear prefix PC<73 (mission pause, QTE scene, Deco, idle actor, input14)
 into already assembled ONE Vita game main under opt-in source flag.
 IMPORTANT: only MissionPause scoped state is currently ACTUALLY bound;
-2010 QTE/Deco/Camera entity actions unresolved = fail closed at PC6.
+2010 PauseMusic PC3 is first unbound native action; QTE PC6 and
+Deco/Camera engine callbacks remain unavailable. Fail closed at PC3.
 No fake autoplay PC914/927 and no invented flight unlock/mission resume.
 This is a live hooked, source-ID-correct in-game dispatcher, not a complete
 Lua VM or implemented original mission. No VPK.
@@ -62,7 +63,8 @@ static int g137_real_scene_MissionPause_only(void *ctx,const B24G137Event *e){
                &g137_real_source_Mission000,
                g137_real_scene_MissionPause_only,NULL);
         }
-        /* QTE ID1456 Show is still unbound: preserve source PC6 and
+        /* PauseMusic at PC3 and QTE ID1456 Show at PC6 lack a bound
+         * native scene/audio API: retain first unsupported source PC and
          * do not fabricate camera/Deco visibility, MarkV flight rights,
          * PC914/927 UI unlock or MissionResume PC935. */
 #endif
@@ -72,8 +74,9 @@ static int g137_real_scene_MissionPause_only(void *ctx,const B24G137Event *e){
 
 # G137 first actual original 2010 native Mission000 source intro events
 # for PC<73 linked into EXISTING player/physics main. OFF by default.
-# QTE entity/class native scene callbacks unresolved => stop at PC6.
-option(B24_G137_MISSION000_REAL_SOURCE_EVENTS "Link source-proven 2010 Level1 Mission000 prefirst branch events into real game, fail-closed QTE, not original full Lua VM" OFF)
+# PauseMusic is first unavailable native binding at PC3; never skip it
+# just to display QTE ID1456 at PC6.
+option(B24_G137_MISSION000_REAL_SOURCE_EVENTS "Link source-proven 2010 Level1 Mission000 prefirst branch events into real game, fail-closed native audio/QTE, not original full Lua VM" OFF)
 if(B24_G137_MISSION000_REAL_SOURCE_EVENTS)
  if(NOT B24_G136_SOURCE_B14_WORLD_BOUNDS OR NOT B24_G127_ORIGINAL_STATESMGR_SOURCE)
   message(FATAL_ERROR "G137 full original Mission000 needs current one G136B source world and G127 class runtime")
@@ -86,5 +89,5 @@ endif()
 '''
  M.write_text(main);CM.write_text(cm)
  assert not list(W.rglob('*.vpk'))
- print("G137 owner REAL 2010 Level1 Lua native Mission000 PC1 MissionPause bound inside actual B24 main; source QTE Show remains blocked PC6, no invented NPC/camera/no fake first flight unlock/mission resume, NO VPK")
+ print("G137 owner REAL 2010 Level1 Lua native Mission000 PC1 MissionPause bound inside actual B24 main; source PauseMusic unbound PC3 (QTE Show PC6 likewise) remains blocked, no invented NPC/camera/no fake first flight unlock/mission resume, NO VPK")
 if __name__=='__main__':patch()
