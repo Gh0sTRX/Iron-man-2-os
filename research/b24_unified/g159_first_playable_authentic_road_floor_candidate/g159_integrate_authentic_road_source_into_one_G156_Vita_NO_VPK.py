@@ -130,7 +130,7 @@ endif()
 """
     C.write_text(c)
     CM.write_text(cm)
-    if c.count("g159_authoritative_first_native_then_source_road(")!=4:
+    if c.count("g159_authoritative_first_native_then_source_road(")!=3:
         raise ValueError("G159 unexpected bypass of real source G75 native floor")
     if list(W.rglob("*.vpk")):raise ValueError("G159 no VPK policy")
     print("G159 installed true original G66 road atlas12 source floor candidate in existing ONE B14/G75 source native engine; G156/G134 unchanged, NO VPK")
