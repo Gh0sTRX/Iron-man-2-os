@@ -17,13 +17,20 @@ typedef enum {
  B24_G137_CALL_SETSTATE=6,
  B24_G137_CALL_SETINPUT=7,
  B24_G137_CALL_PLAYVOICE=8,
- B24_G137_CALL_SETCAMERA=9
+ B24_G137_CALL_SETCAMERA=9,
+ B24_G137_CALL_PAUSE_MUSIC=10,
+ B24_G137_CALL_HIDE_UI=11,
+ B24_G137_CALL_BLACK_SCREEN_ON=12,
+ B24_G137_CALL_PLAY_MUSIC=13,
+ B24_G137_CALL_SHOW_TUT=14,
+ B24_G137_CALL_IS_TUT_CONFIRMED=15
 } B24G137Call;
 typedef struct {
  uint16_t original_lua_pc;
  uint16_t opcode;
  int32_t source_arg0;
  int32_t source_arg1;
+ int32_t source_arg2;
  const char *source_arg1_string;
  uint8_t original_arg1_boolean;
  uint8_t original_args_reliable;
@@ -47,6 +54,8 @@ typedef struct {
  uint8_t requested_MarkV_idle;
  uint8_t requested_MarkV_hidden;
  uint8_t requested_input14_disabled;
+ uint8_t requested_tutorial_339;
+ uint8_t requested_tutorial_confirmation_query;
  uint8_t unresolved_scene_event;
 } B24G137Mission000;
 typedef int (*B24G137SceneHandler)(void *context,const B24G137Event *event);
