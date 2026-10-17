@@ -20,10 +20,14 @@ typedef struct {
  uint32_t cell_index_count,ready;
  uint32_t skipped_alpha,skipped_duplicate,skipped_large;
  uint32_t skipped_not_steep;
+ /* G128 actual original 2010 source G66 city, not guessed beta bounds. */
+ float source_minx,source_maxx,source_miny,source_maxy;
 } B24G108Grid;
 int b24_g108_grid_load(B24G108Grid *g,const char *visual_g66m,
  const B24C1OriginalCollision *native_collider);
 void b24_g108_grid_close(B24G108Grid *g);
+int b24_g108_grid_source_bounds_allow(const B24G108Grid *g,
+ float x,float y,float radius);
 int b24_g108_grid_clear(const B24G108Grid *g,float x,float y,float footz,
  float radius,float height);
 /* QA only: find a true source visual wall for a self-intersection test. */
