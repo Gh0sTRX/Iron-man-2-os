@@ -194,10 +194,10 @@ jobs:
           s=Path('work/b24/b24_unified/b24_g108_visible_original_wall_grid.c').read_text()
           assert 'G128: the old G75 constant rectangle' in c
           assert 'b24_g108_grid_source_bounds_allow(&g108_source_steep_walls,x,y,r)' in c
-          assert '#define G108_X0 (-1248.f)' in s
-          assert '#define G108_Y0 (-1116.f)' in s
-          assert '#define G108_NX 144' in s
-          assert '#define G108_NY 144' in s
+          assert '#define G108_X0 (-2048.f)' in s
+          assert '#define G108_Y0 (-2048.f)' in s
+          assert '#define G108_NX 256' in s
+          assert '#define G108_NY 256' in s
           assert 'source_minx' in h and 'source_miny' in h
           assert c.count('b24_g108_grid_load(')==1
           assert c.count('b24_g108_grid_clear(')==1
