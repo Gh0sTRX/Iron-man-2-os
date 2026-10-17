@@ -26,9 +26,9 @@
       "id": "solid_collision",
       "name": "Floor, buildings, wall and ceiling player capsule",
       "state": "device_regression_open",
-      "source_evidence": "G156 full one-game Vita ARM ELF succeeds #39045921585 (exact wall contact). G157 height-source collision/visual survey G66M 22441 vs G66C native 1910 source. G158 verified real iOS named PVR pixel match: G66 atlas12=c1l1_road.tga, atlas17=c1l1_flower_bed.tga. At middle-Z 628 visible/no-native sample XY, 548 are road and 54 flower bed. All 548 sampled road Z2.6937, nearest current port source G75 G66C nonwall Z0.0725, gap +2.6212; real existing gameplay C function b24_g74_near_original_floor returns unsupported at road visual height in authentic XY(-160,-160), supported at native Z0.0725; host source CI SUCCESS #39049316919. Original iOS runtime solidness or parent transform not proven.",
-      "device_evidence": "G104 physical Vita showed building penetration and black sky; no G156-G158 Vita retest. G158 host actual G75 C function confirms road display-vs-floor support at one authentic source coordinate, NOT complete Vita gameplay test. Remains OPEN.",
-      "acceptance": "Prove native original iOS 2010 world parent transforms and road/floor collision material ownership; repair road Z support using source evidence not arbitrary solidity, verify current G75 native gameplay ground across original road XY and roofs; physical Vita regression wall/building/road/Stage2-flight tests and frame-time evidence.",
+      "source_evidence": "G156 authored G66C/G108 exact wall source z-contact full Vita ARM #39045921585. G158 original named `c1l1_road.tga` exact pixel source atlas12, original road Z2.6937 vs native Z0.0725 and real G75 C runtime lacked support #39049316919. G159 new opt-in actual C1L1 source 753-triangle road-floor support fallback in SAME G75 native-first B14 engine; actual original city C11 G75 capsule movement x=-160 to -159.96 at road Z2.6937, legacy native ground z0.0725 unchanged; source collision G134/G156/G108 preserved; full single Vita ARM ELF success #39050573076. Experimental port policy, not verified iOS original solidity.",
+      "device_evidence": "G104 physical Vita saw building penetration; NO G159 physical Vita test. Native-source original road callback host C11 movement and Vita ARM cross build success #39050573076, not actual console gameplay or FPS. Remains OPEN.",
+      "acceptance": "Test deliberate single G159-on real-Vita C1L1 scene at original road/elevated walkway/native lower surface plus G156 walls and G106 sky/alpha + G83 Stage2/RUSH; require actual device video/XY height/fps and no fall/sink. Separately verify original iOS CLARA/BRES collision floor material/parent transform before claiming faithful native solidity.",
       "owner": "physics",
       "mandatory": true
     },
@@ -90,5 +90,5 @@
     "first_level_playable_claim_allowed": false,
     "candidate_vpk_auto_allowed": false
   },
-  "next_action": "Stop additional Lua/audio/QTE detail: original road surface atlas12 548 source sample XY at Z2.6937 vs native G75 nonwall Z0.0725 gap 2.6212, actual source C floor callback unsupported at road level (G158). Next prove C1L1_ground_001/ floor_001 / col_01 / building_col BRES/CLARA world transform and authored floor ownership, then repair one B14 owner and run one deliberate physical Vita QA; keep release BLOCKED and no auto VPK."
+  "next_action": "G159 direct source-road gameplay candidate now integrated and ARM built #39050573076; next one purposeful real Vita QA (road support vs old native base, real G156 walls, G106 sky/alpha, flight attack and FPS) with user authorization for a single tester VPK when appropriate. Do not repeat Z-report digging, do not claim true original road solidity/mission playable. Gate remains BLOCKED."
 }
