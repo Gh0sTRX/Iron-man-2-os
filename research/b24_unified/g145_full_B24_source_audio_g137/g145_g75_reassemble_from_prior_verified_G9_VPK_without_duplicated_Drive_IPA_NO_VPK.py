@@ -31,7 +31,7 @@ if len(match)!=1:raise ValueError('Original G9 one authoritative assembly step e
 script=m.patch_script(match[0]['run'],match[0]['name'])
 start='python3 -m pip install -q gdown texture2ddecoder'
 end='rm -rf /tmp/b24g7-owner'
-if script.count(start)!=1 or script.count(end)!=1 or script.count('gdown ' )!=1:
+if script.count(start)!=1 or script.count(end)!=1 or script.count("gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I'")!=1:
  raise ValueError('gdown original owner IPA source script not unique; refuse blind source patch')
 i=script.index(start);j=script.index(end,i)+len(end)
 stage="""python3 - <<'PYSOURCEG145'
@@ -48,7 +48,7 @@ dest.write_bytes(data)
 print('G145 ORIGINAL-G9-PROVEN iOS VEHICLES C1TX REUSED SHA256',hashlib.sha256(data).hexdigest())
 PYSOURCEG145"""
 script=script[:i]+stage+script[j:]
-if 'gdown ' in script or 'owner.ipa' in script:
+if "gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I'" in script or '/tmp/b24g7-owner/original.ipa' in script:
  raise ValueError('G145 original IPA re-download remnants not removed')
 for forbidden in ('cmake --build','vita_create_vpk','actions/upload-artifact','zip -q build-vita'):
  if forbidden in script:raise ValueError('prohibited package creation in G145 source assembly: '+forbidden)
