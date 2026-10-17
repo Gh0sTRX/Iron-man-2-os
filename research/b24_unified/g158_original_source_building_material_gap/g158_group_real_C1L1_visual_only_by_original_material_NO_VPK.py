@@ -198,13 +198,41 @@ def produce(vpk,outdir):
                  "sample_hits":v} for key,v in bygroup.most_common(10)],
             "not_source_playability_decision":True
         })
-    material_rows=[{"original_G66_draw_group":g,"original_atlas_id":t,
-                    "sample_xy_count":n,
-                    "unique_source_triangle_indices_touching_samples":
-                    len(material_unique_triangles[(g,t)]),
-                    "source_material_or_native_solidness_unproven":True}
-        for (g,t),n in sorted(material_samples.items(),
-                             key=lambda x:(-x[1],x[0]))]
+    import statistics
+    # Source-height diagnosis by original texture group, never turn pixel
+    # identity into a physics offset or source-authored world transform.
+    grouped_rows=collections.defaultdict(list)
+    for row in middle_unmatched.values():
+        for group in row["all_source_groups_at_xy"]:
+            grouped_rows[(group["group"],group["atlas"])].append(row)
+    material_rows=[]
+    for (g,t),n in sorted(material_samples.items(),
+                          key=lambda x:(-x[1],x[0])):
+        examples=grouped_rows[(g,t)]
+        if len(examples)!=n:
+            raise ValueError("Original source material/sample dedup drift")
+        vis=[x["observed_source_visual_z"] for x in examples]
+        old_heights=[x["nearest_native_nonwall_z"] for x in examples]
+        vertical_deltas=[x["visual_minus_nearest_native_z"] for x in examples]
+        material_rows.append({
+            "original_G66_draw_group":g,
+            "original_atlas_id":t,
+            "sample_xy_count":n,
+            "unique_source_triangle_indices_touching_samples":
+                len(material_unique_triangles[(g,t)]),
+            "visible_source_Z_min_median_max":[
+                round(min(vis),4),round(statistics.median(vis),4),
+                round(max(vis),4)],
+            "nearest_original_collision_nonwall_Z_min_median_max":
+                [round(min(old_heights),4),
+                 round(statistics.median(old_heights),4),
+                 round(max(old_heights),4)] if all(z is not None for z in old_heights) else None,
+            "visual_minus_nearest_original_collision_Z_min_median_max":
+                [round(min(vertical_deltas),4),
+                 round(statistics.median(vertical_deltas),4),
+                 round(max(vertical_deltas),4)] if all(z is not None for z in vertical_deltas) else None,
+            "source_material_or_native_solidness_unproven":True
+        })
     audit={
         "source":"G104 pre-existing authentic 2010 C1L1 source, direct G66M draw group and G66C nonwall barycentric tests",
         "original_source_snapshot_G104_run_id":38974292901,
