@@ -1,5 +1,6 @@
 #include "b24_g75_source_capsule.h"
 #include "b24_gpu_g68_collision.h"
+#include "b24_g159_real_source_road.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -25,6 +26,8 @@ static void eval(const B24C1OriginalCollision *w,float x,float y,float z,
 int main(int argc,char **argv){
  if(argc!=2)return 2;
  B24C1OriginalCollision w={0};
+ B24G159Road road={0};
+ assert(b24_g159_road_open(&road,"app0:assets/G66_city.g66m"));
  assert(b24_g70_g68_collision_load(&w,argv[1]));
  assert(w.count==1910u&&w.wall_count==1690u);
  int grounded_samples=0,blocked_ground=0,air_ok_ground_blocked=0;
@@ -42,7 +45,8 @@ int main(int argc,char **argv){
     float native=0.f;
     if(b24_g74_near_original_floor(&w,xs[i],ys[j],target,&native))
       z=native;
-    else if(level==1)z=target;
+    else if(b24_g159_road_near(&road,xs[i],ys[j],target,&z))
+      { /* Verified actual road polygon under this XY, not guessed height. */ }
     else continue;
     int ground=0,air=0;
     eval(&w,xs[i],ys[j],z,.12f,0.f,&ground,&air);
@@ -64,6 +68,7 @@ int main(int argc,char **argv){
  printf("G166 original C1L1 G161 exact single G75 native physics: %d original source support/road probes, %d ground-motion blocked, %d airborne blocked, %d source cases WALK STUCK but FLIGHT MOVES; G159 authenticated road(-160,-160,2.6937) grounded move=%d air move=%d\n",
  grounded_samples,blocked_ground,blocked_air,air_ok_ground_blocked,roadg,roada);
  assert(grounded_samples>0);
+ b24_g159_road_close(&road);
  b24_c1_original_collision_free(&w);
  puts("G166 DIAGNOSTIC COMPLETE: this reports original authored G66 source 2010 ground vs flight, no invented walk-speed correction and NO VPK");
  return 0;
