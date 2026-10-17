@@ -26,6 +26,14 @@ typedef struct {
 } B24G147Tutorial;
 typedef int (*B24G147TextTranslator)(void *ctx,int original_clara_string_id,int *real_text_id_out);
 typedef int (*B24G147TutorialRenderer)(void *ctx,int game_ui_text_id,int native_ui_mode,int third);
+/* G147A actual owner-native StringMgr::strIDClara2Real(int*)
+ * VM0xCE8CC: original 1-based 339 -> source 0-based 338. Section1
+ * ("chap1.english") starts after section0 255 entries, so local 83:
+ * (1 << 12) | 83 = 0x1053. Source English text[83] verified
+ * from original user 2010 IPA text_english archive, not a mock. */
+int b24_g147_source_native_StringMgr_translate(void *ctx,
+ int source_clara_one_based_id,int *out_native_text_id);
+const char *b24_g147_source_english_real_tutorial_text(int native_text_id);
 void b24_g147_tutorial_init(B24G147Tutorial *q);
 int b24_g147_lua_ShowTut_PC67(B24G147Tutorial *q,
  const B24G137Event *e,B24G147TextTranslator translate,
