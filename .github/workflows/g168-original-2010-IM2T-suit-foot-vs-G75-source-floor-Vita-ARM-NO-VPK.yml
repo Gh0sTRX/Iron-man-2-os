@@ -1,0 +1,777 @@
+name: G168 correct actual original 2010 IM2T armor renderer foot anchor vs G75 authored source physics one Vita ARM ELF NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g168-original-2010-IM2T-suit-foot-vs-G75-source-floor-Vita-ARM-NO-VPK.yml"
+      - "research/b24_unified/g168_original_model_origin_source_physics/**"
+      - "research/b24_unified/g166_original_ground_stuck_source_diagnostics/**"
+      - "research/b24_unified/g165_warmachine_source_directional_motion/**"
+      - "research/b24_unified/g164_source_sky_camera_framing/**"
+      - "research/b24_unified/g163_first_world_aim_facing_input/**"
+      - "research/b24_unified/g160_original_road_spatial_perf/**"
+      - "research/b24_unified/g159_first_playable_authentic_road_floor_candidate/**"
+      - "research/b24_unified/g156_exact_source_sweep/**"
+      - "research/b24_unified/g149_original_L1_PC72_typed_lua_return/**"
+      - "research/b24_unified/g152_source_original_tutorial_condition_runtime/**"
+      - "research/b24_unified/g153_source_original_mission_resume_retry_one_vita/**"
+      - "research/b24_unified/g91_offline_integrated_preview/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g111_original_game_combat_gates/**"
+      - "research/b24_unified/g124_2010_real_NPC_source_predicates/**"
+      - "research/b24_unified/g127_native_owner_StateMgr/**"
+      - "research/b24_unified/g134_true_original_collision_sweep/**"
+      - "research/b24_unified/g136_fix_source_B14_scene_bounds/**"
+      - "research/b24_unified/g137_original_Mission000_native_boot/**"
+      - "research/b24_unified/g139_vita_native_audio_music/**"
+      - "research/b24_unified/g141_original_vita_pcm_stream/**"
+      - "research/b24_unified/g142_original_2010_native_sound_id_semantics/**"
+      - "research/b24_unified/g144_original_level1_real_pcm_channels/**"
+      - "research/b24_unified/g145_full_B24_source_audio_g137/**"
+      - "research/b24_unified/g146_QTE_original_level1_scene/**"
+      - "research/b24_unified/g147_genuine_2010_tutorial_ui_gate/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g82_original_combat/**"
+      - "research/b24_unified/g106_visual_repair/**"
+      - "research/b24_unified/b24_g10_practice_target.c"
+      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_original_arm_strcasecmp_memcpy_actor_categories_g82_and_g108_real_world_vita_elf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g88_original_combat_source/test_g88_interleaved_original_event_dedup.c \
+            -lm -o /tmp/g88_native_combat_guard
+          /tmp/g88_native_combat_guard
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g88_old_g82_no_regression
+          /tmp/g88_old_g82_no_regression
+          test -z "$(find research/b24_unified -name "*.vpk" -print -quit)"
+      - name: Original 2010 G83 movement, flight, aim and combo priority regressions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g88_g83_router
+          /tmp/g88_g83_router
+      - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/g91_offline_integrated_preview/test_g92_authored_world_static_dummy_no_damage.c \
+            -lm -o /tmp/g92_real_g10_g11_immortal_dummy
+          /tmp/g92_real_g10_g11_immortal_dummy
+      - name: Restore authentic G8 all armor native animation stream source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original 2010 War Machine Gun01 to Gun04 motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore native original Stark Expo 2010 city and collision source
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore all 248 original Mark V 629 vertex skin animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Restore original G27 source verified 2010 Level1 71 Lua callback native CALLs
+        uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g137_real_Level1_Lua
+      - name: Restore authenticated original 2010 six BRES sky meshes two PVRTC atlas files
+        uses: actions/download-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          run-id: 38902510114
+          github-token: ${{ github.token }}
+          path: /tmp/g108_original_sky
+      - name: Restore prior successful original 2010 G9 Vita real source vehicle atlas snapshot, avoid redundant 248MB owner IPA Drive quota
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_GPU_B24_G9_BETA_Original_C1L1_363_SourceMotion_6_WMGun_Test
+          run-id: 38623462548
+          github-token: ${{ github.token }}
+          path: /tmp/g145_authenticated_previous_G9
+      - name: Confirm ORIGINAL G9 native 2010 Vehicles C1TX source from successful prior build, not a placeholder or reconstructed painting
+        run: |
+          set -euo pipefail
+          test -s /tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,struct,hashlib
+          path=Path('/tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk')
+          with zipfile.ZipFile(path) as z:
+            assert z.testzip() is None
+            data=z.read('maps/C1L1_Vehicles.c1tx')
+          assert len(data)==1048596 and struct.unpack_from('<4sIIII',data)==(b'C1TX',1,512,512,0)
+          print('G145 VERIFIED original prebuilt G9 real iOS vehicle PNG-derived C1TX 512x512 original source reused',hashlib.sha256(data).hexdigest())
+          PY
+      - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 -m py_compile research/b24_unified/g145_full_B24_source_audio_g137/g145_g75_reassemble_from_prior_verified_G9_VPK_without_duplicated_Drive_IPA_NO_VPK.py
+          python3 research/b24_unified/g145_full_B24_source_audio_g137/g145_g75_reassemble_from_prior_verified_G9_VPK_without_duplicated_Drive_IPA_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 research/b24_unified/g91_offline_integrated_preview/g92_patch_single_real_vita_main_static_dummy_NO_VPK.py
+          python3 research/b24_unified/g106_visual_repair/g106_apply_original_stage2_rush_fire_source_only.py
+          python3 research/b24_unified/g108_source_geometry_collision/g108_enable_original_visible_wall_grid_in_single_G75_main_NO_VPK.py
+          python3 research/b24_unified/g111_original_game_combat_gates/g111_apply_authentic_2010_entitydata_actor_melee_to_single_B24_SOURCE_ONLY.py
+          python3 research/b24_unified/g124_2010_real_NPC_source_predicates/g124_add_native_original_2010_npc_state_to_real_Vita_game_ELF_ONLY.py
+          python3 research/b24_unified/g127_native_owner_StateMgr/g127_integrate_original_2010_states_mgr_get_state_into_ONE_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g134_true_original_collision_sweep/g134_patch_2010_source_world_substeps_NO_VPK.py
+          python3 research/b24_unified/g136_fix_source_B14_scene_bounds/g136_patch_B14_original_render_source_bounds_NO_VPK.py
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_emit_original_Mission000_lua_prefix_from_G27.py \
+            --g27 /tmp/g137_real_Level1_Lua/original_lua_calls.json \
+            --out work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_patch_authentic_Mission000_source_live_to_one_game_NO_VPK.py
+          python3 -m py_compile research/b24_unified/g145_full_B24_source_audio_g137/g145_patch_original_L1_dual_audio_to_one_real_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g145_full_B24_source_audio_g137/g145_patch_original_L1_dual_audio_to_one_real_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g146_QTE_original_level1_scene/g146_link_real_2010_QTE1456_source_scene_gate_into_G145_one_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g147_genuine_2010_tutorial_ui_gate/g147_attach_original_ShowTut_And_IsTutConfirmed_to_G146_single_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g149_original_L1_PC72_typed_lua_return/g149_integrate_typed_lua_boolean_PC72_to_G147_one_main_NO_VPK.py
+          python3 research/b24_unified/g153_source_original_mission_resume_retry_one_vita/g153_integrate_G149_G152_PC73_and_retry_into_one_G147_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g156_exact_source_sweep/g156_patch_exact_wall_contact_into_G153_single_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g159_first_playable_authentic_road_floor_candidate/g159_integrate_authentic_road_source_into_one_G156_Vita_NO_VPK.py
+          python3 research/b24_unified/g160_original_road_spatial_perf/g160_integrate_CSR_into_G159_one_real_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g163_first_world_aim_facing_input/g163_patch_G161_one_Vita_aim_no_rotation_on_strafe_NO_VPK.py
+          python3 research/b24_unified/g164_source_sky_camera_framing/g164_patch_G163_original_sky_relative_and_hero_perspective_NO_VPK.py
+          python3 research/b24_unified/g165_warmachine_source_directional_motion/g165_patch_original_WM_ground_directional_one_G83_NO_VPK.py
+          python3 research/b24_unified/g168_original_model_origin_source_physics/g168_patch_true_original_IM2T_foot_bind_into_G165_suit_renderer_NO_VPK.py
+          cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
+          test -s work/assets/G73_original_sky_mesh.g73m
+          grep -q 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' work/src/main.c
+          grep -q 'b24_g10_practice_target_draw' work/b24/b24_unified/b24_gpu_runtime.c
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G127 authenticate source original 2010 StatesMgr GetState(-1) plus native CNPC attack-state chain from 0x9F910 0xE1A20
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g124_real_original_NPC_source_state.c \
+            work/b24/b24_unified/b24_g127_authentic_2010_states_mgr.c \
+            research/b24_unified/g127_native_owner_StateMgr/test_g127_true_2010_source_states_mgr.c \
+            -o /tmp/g127_original_native_source_state_getter_host
+          /tmp/g127_original_native_source_state_getter_host
+          grep -q B24_G127_ORIGINAL_STATESMGR_SOURCE work/CMakeLists.txt
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G124 original CNPC real attack enum 4 5 SetState priority signed fire clock MissionConditionKill SkyBox early gate host QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g124_real_original_NPC_source_state.c \
+            research/b24_unified/g124_2010_real_NPC_source_predicates/test_g124_real_original_2010_NPC_logic.c \
+            -o /tmp/g124_original_2010_npc_native_mechanics_host
+          /tmp/g124_original_2010_npc_native_mechanics_host
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G111 verified original 2010 ARM GetParamValue strcmp memcpy Actor category & melee live G82 damage guard host regression
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G111_NATIVE_SOURCE_GATES=1 \
+            -I research/b24_unified \
+            -I research/b24_unified/g82_original_combat \
+            -I research/b24_unified/g111_original_game_combat_gates \
+            -I research/b24_unified/g103_partial_original_actor_attack_permission \
+            -I research/b24_unified/g89_original_combo_native_flow \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g111_original_game_combat_gates/b24_g111_original_source_entitydata_and_combat_permission.c \
+            research/b24_unified/g103_partial_original_actor_attack_permission/b24_g103_verified_original_actor_attack_classification.c \
+            research/b24_unified/g89_original_combo_native_flow/b24_g89_real_2010_melee_state_predicates.c \
+            research/b24_unified/g111_original_game_combat_gates/test_g111_native_original_2010_attack_getparam_actor_source_B24_G82.c \
+            -lm -o /tmp/g111_original_source_melee_hit_runtime
+          /tmp/g111_original_source_melee_hit_runtime
+          grep -q 'B24_G111_NATIVE_SOURCE_GATES' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G108 source-authored 2010 visible opaque steep wall spatial grid test with original 1910 collider
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g108_source_geometry_collision/test_g108_native_2010_visible_wall_grid.c \
+            -lm -o /tmp/g108_real_source_wall_grid
+          /tmp/g108_real_source_wall_grid work/assets/G66_city.g66m work/assets/G66_original_collision.g66c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G128 physical source coordinate bounds from actual 2010 environment, no more hidden central beta 672x624 viewport
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          c=Path('work/b24/b24_unified/b24_g75_source_capsule.c').read_text()
+          h=Path('work/b24/b24_unified/b24_g108_visible_original_wall_grid.h').read_text()
+          s=Path('work/b24/b24_unified/b24_g108_visible_original_wall_grid.c').read_text()
+          assert 'G128: the old G75 constant rectangle' in c
+          assert 'b24_g108_grid_source_bounds_allow(&g108_source_steep_walls,x,y,r)' in c
+          assert '#define G108_X0 (-2048.f)' in s
+          assert '#define G108_Y0 (-2048.f)' in s
+          assert '#define G108_NX 256' in s
+          assert '#define G108_NY 256' in s
+          assert 'source_minx' in h and 'source_miny' in h
+          assert c.count('b24_g108_grid_load(')==1
+          assert c.count('b24_g108_grid_clear(')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('PASS G128 source-original 2010 full map bounds plus G75 one B14 capsule; mission-specific fly permission left unguessed')
+          PY
+      - name: G108 original movement original G68 source wall one B14 owner and original sky staging source regression
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path('work/src/main.c').read_text()
+          g=Path('work/b24/b24_unified/b24_g75_source_capsule.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_g8_motion_tick_g84(')==1
+          assert m.count('b24_g83_timeline_tick(')==1
+          assert g.count('b24_g108_grid_load(')==1 and g.count('b24_g108_grid_clear(')==1
+          for flag in ('B24_G108_SOURCE_VISUAL_WALLS','B24_G106_SOURCE_FLY_ATTACK_MARKV','B24_G71_ALPHA_PASSES','B24_G73_REAL_SKY'):
+           assert flag in cm
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G108 original 2010 map structural collision new wall source single G75; no VPK')
+          PY
+      - name: G95 original 2010 C1L1 four Sun source node positions diagnostic GPU light candidate QA
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g95_source_sun_4_author_positions
+          /tmp/g95_source_sun_4_author_positions
+          grep -q 'B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE' work/CMakeLists.txt
+          grep -q 'b24_g75_light_original_vertex' work/b24/b24_unified/b24_gpu_g68_city.c
+      - name: G137 original 2010 Mission000 native source PC1 through PC70 first Lua EQ branch PC73, fail-closed QTE binding
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g137_source_mission000_intro.c \
+            work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c \
+            research/b24_unified/g137_original_Mission000_native_boot/test_g137_real_source_Mission000_boot.c \
+            -o /tmp/g137_true_owner_2010_level1_lua_introlive
+          /tmp/g137_true_owner_2010_level1_lua_introlive
+          grep -q B24_G137_MISSION000_REAL_SOURCE_EVENTS work/CMakeLists.txt
+          grep -q g137_real_source_Mission000 work/src/main.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G147 real original iOS 2010 GamePlayUI ShowTut PC67 plus IsTutConfirmed PC72 actual ARM source state
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g147_genuine_2010_tutorial_ui_gate/g147_attach_original_ShowTut_And_IsTutConfirmed_to_G146_single_Vita_game_NO_VPK.py
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g147_authentic_tutorial_actor.c \
+            research/b24_unified/g147_genuine_2010_tutorial_ui_gate/test_g147_original_2010_tutorial_gate.c \
+            -o /tmp/g147_original_2010_Lua_tutorial_PC67_72
+          /tmp/g147_original_2010_Lua_tutorial_PC67_72
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert m.count('b24_g83_timeline_tick(')==1
+          assert m.count('b24_g147_lua_ShowTut_PC67(')==1
+          assert m.count('b24_g147_lua_IsTutConfirmed_native(')==1
+          assert 'B24_G147_NATIVE_LUA_TUTORIAL_SOURCE_GATE' in cm
+          assert not list(Path('work').rglob('*.vpk'))
+          PY
+      - name: G146 actual 2010 Level1 native CLARA InteractiveObj QTE scene actor ID1456 class94 child1458 source XYZ quaternion no fake event
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g146_true_2010_QTE_actor.c \
+            research/b24_unified/g146_QTE_original_level1_scene/test_g146_source_QTE_1456_real_identity_mission_event.c \
+            -lm -o /tmp/g146_original_2010_QTE_source_native_test
+          /tmp/g146_original_2010_QTE_source_native_test
+          grep -q B24_G146_SOURCE_2010_QTE_1456 work/CMakeLists.txt
+          grep -q 'b24_g146_qte_show_source_Lua_PC6' work/src/main.c
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G145 TRUE source initial Game current BGM=-1 Mission000 PC3 empty music only, PC6 original QTE1456 blocked, original voice/music exact
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g137_source_mission000_intro.c \
+            work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c \
+            work/b24/b24_unified/b24_g142_native_sound_source_truth.c \
+            research/b24_unified/g145_full_B24_source_audio_g137/test_g145_true_2010_first_mission_empty_BGM_then_QTE.c \
+            -o /tmp/g145_source_game_empty_bgm_to_true_qte
+          /tmp/g145_source_game_empty_bgm_to_true_qte
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g144_source_audio_channels.c \
+            research/b24_unified/g144_original_level1_real_pcm_channels/test_g144_source_native_audio_pcm_id_mapping.c \
+            -o /tmp/g145_true_source_music88_voice320
+          /tmp/g145_true_source_music88_voice320
+          test "$(grep -c 'b24_g144_source_audio_init(&g145_original_vita_channels)' work/src/main.c)" -eq 1
+          grep -q 'B24_G145_SOURCE_MISSION_AUDIO' work/CMakeLists.txt
+          grep -q 'SceAudio_stub' work/CMakeLists.txt
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G136B original 2010 scene real G66M full 67323 vertex source AABB proves B14 legacy x330/y254 clamp is gone
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G136_SOURCE_B14_WORLD_BOUNDS=1 \
+            -I work/src \
+            research/b24_unified/g136_fix_source_B14_scene_bounds/test_g136_B14_original_world_not_clipped_early.c \
+            work/src/b14_world.c -lm -o /tmp/g136b_original_world_no_center_clipping
+          /tmp/g136b_original_world_no_center_clipping
+          grep -q G136_REAL_CITY_BOUND_B14_WORLD_SOURCE work/src/b14_world.c
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G134 urgent original source 2010 wall no large frame teleport original triangle capsule native C11
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g134_true_original_collision_sweep/test_g134_long_frame_2010_source_wall_tunneling.c \
+            -lm -o /tmp/g134_source_2010_thin_wall_safe
+          /tmp/g134_source_2010_thin_wall_safe
+          grep -q 'G134_LIMIT_LONG_FRAME_DISPLACEMENT' work/b24/b24_unified/b24_g75_source_capsule.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G93 host replay REAL original 1,910 authored collision triangles and B14 physical flight
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/src \
+            research/b24_unified/g75_device_qa/test_g75_gameplay_motion.c \
+            work/src/b14_world.c -lm -o /tmp/g93_b14_real_physics
+          /tmp/g93_b14_real_physics
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_source_capsule.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/g93_1910_authored_collision_host
+          /tmp/g93_1910_authored_collision_host work/assets/G66_original_collision.g66c
+      - name: G94 actual original G68 1910-source-face floor-place immobile dummy, no guessed collision
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g91_offline_integrated_preview/test_g94_real_source_G68_dummy_actual_floor.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            -lm -o /tmp/g94_source_g68_static_dummy_original
+          /tmp/g94_source_g68_static_dummy_original work/assets/G66_original_collision.g66c
+      - name: G93 real B24 source contains ONE accepted G8 punch and NEVER a second dummy input poll
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          assert main.count('b24_g8_motion_melee_trigger(')==1
+          assert main.count('g92_debug_accepted_melee_edge=1;')==1
+          # One static initialization plus one actual per-frame consume.
+          assert main.count('g92_debug_accepted_melee_edge=0;')==2
+          assert main.count('        g92_debug_accepted_melee_edge=0; /* one consumed debug latch */')==1
+          # Old G75/G85/G9 main actually contains three separately guarded
+          # source melee condition occurrences. The debug target must not
+          # create a fourth. CI checks exact known assembled source here.
+          count=main.count('b24_unified_should_melee(&b24_game)')
+          assert count==3, ('G93 original input gate count drift',count)
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert main.count('b24_g11_practice_melee_hit(')==1
+          assert 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' in main
+          print('PASS G93 SINGLE source accepted melee, B14 physics, G83/G8 owner; test dummy consumes input edge once, no speculative 2010 damage')
+          PY
+      - name: G153 G149 original typed PC72 and G152 Wait10 source loop C11 in ONE Vita main
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g147_authentic_tutorial_actor.c \
+            work/b24/b24_unified/b24_g149_native_lua_bool_return.c \
+            work/b24/b24_unified/b24_g152_source_tutorial_loop.c \
+            research/b24_unified/g152_source_original_tutorial_condition_runtime/test_g152_original_PC73_Wait10_StopVoice_ShowTut340.c \
+            -o /tmp/g153_real_original_pc73_native_gate
+          /tmp/g153_real_original_pc73_native_gate
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert m.count('b24_g83_timeline_tick(')==1
+          assert m.count('b24_g137_mission000_dispatch_verified_prefix(')>=2
+          assert 'B24_G149_NATIVE_LUA_BOOL_PC72_SOURCE_GATE' in cm
+          assert 'B24_G153_REAL_SOURCE_MISSION_RETRY_LOOP' in cm
+          assert 'b24_g152_tutorial_loop_step(' in m
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G153 PASS source original PC73 Wait10 and G137 blocked-event tick retry, NO VPK')
+          PY
+      - name: G159 direct source-authentic road surface vs existing G75 native 2010 collision real gameplay ABI
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -Iwork/b24/b24_unified \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g159_first_playable_authentic_road_floor_candidate/test_g159_real_original_road_and_native_floor.c \
+            -lm -o /tmp/g159_real_source_road_floor
+          /tmp/g159_real_source_road_floor work/assets/G66_city.g66m work/assets/G66_original_collision.g66c
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          src=Path('work/b24/b24_unified/b24_g75_source_capsule.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert src.count('b24_g159_road_open(')==1
+          assert src.count('b24_g159_road_crossed(')==1
+          assert src.count('b24_g159_road_near(')==1
+          assert src.count('g159_authoritative_first_native_then_source_road(')==3
+          assert '#define g159_authoritative_first_native_then_source_road b24_g74_near_original_floor' in src
+          assert 'B24_G159_ROAD_FLOOR_CANDIDATE' in cm
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G159 PASS source road source asset+one G75 native floor owner integration, no new VPK')
+          PY
+      - name: G160 exact original C1L1 753 road source polygon OLD fullscan vs CSR ~60k parity queries
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            research/b24_unified/g160_original_road_spatial_perf/test_g160_exact_original_road_source_spatial_vs_fullscan.c \
+            -lm -o /tmp/g160_real_source_road_index_vs_original_fullscan
+          /tmp/g160_real_source_road_index_vs_original_fullscan work/assets/G66_city.g66m
+          python3 - <<'PY'
+          from pathlib import Path
+          c=Path('work/b24/b24_unified/b24_g159_real_source_road.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          main=Path('work/src/main.c').read_text()
+          assert c.count('b24_g160_index_query(')==2
+          assert c.count('b24_g160_index_build(')==1
+          assert 'B24_G160_ROAD_SPATIAL_INDEX' in cm
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G160 indexed source road exact low-Z/road-Z parity and one source game owner PASS')
+          PY
+      - name: G163 verify moving backwards/sideways while aimed actor stays facing reticle ground or hover only
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            work/b24/b24_unified/b24_g163_aim_facing.c \
+            research/b24_unified/g163_first_world_aim_facing_input/test_g163_camera_aim_strafe_original_game.c \
+            -lm -o /tmp/g163_cam_aim_backpedal
+          /tmp/g163_cam_aim_backpedal
+          python3 - <<'PY'
+          from pathlib import Path
+          main=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g163_aim_heading(')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert 'B24_G163_CAMERA_AIM_FACING' in cm
+          assert 'B24_G160_ROAD_SPATIAL_INDEX' in cm
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G163 real G161 main no duplicate game physics, camera/crosshair stable, aimed actor only source heading changes')
+          PY
+      - name: G164 genuine 2010 skyline and moon sky view camera-relative rotation plus original model scale untouched
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            work/b24/b24_unified/b24_g164_camera_sky_framing.c \
+            research/b24_unified/g164_source_sky_camera_framing/test_g164_authored_sky_2010_camera_relative_and_suit_framing.c \
+            -lm -o /tmp/g164_real_sky_rotation_hero_framing
+          /tmp/g164_real_sky_rotation_hero_framing
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('work/b24/b24_unified/b24_gpu_runtime.c').read_text()
+          main=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert p.count('b24_g164_source_sky_view(')==1
+          assert p.count('b24_g164_camera_framing(')==1
+          assert p.count('glLoadMatrixf(skyview);')==1
+          assert 'B24_G164_CAMERA_RELATIVE_ORIGINAL_SKY' in cm
+          assert 'B24_G164_HERO_CAMERA_FRAMING' in cm
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G164 original source sky truly camera-relative, center crosshair and 2.2355 suit geometry unchanged')
+          PY
+      - name: G168 verify all original 2010 IM2T armor authored foot source, never rescale models or source city
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g168_original_model_origin_source_physics/g168_qa_true_2010_IM2T_original_rest_anchor_NO_VPK.py --models work/models --out /tmp/G168_original_source_armor_foot_math_NO_ASSETS.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          c=Path('work/src/renderer.c').read_text()
+          h=Path('work/src/renderer.h').read_text()
+          adapter=Path('work/b24/b24_unified/b24_gpu_suit_im2_adapter.c').read_text()
+          gpu=Path('work/b24/b24_unified/b24_gpu_suit_vitagl.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          main=Path('work/src/main.c').read_text()
+          d=json.loads(Path('/tmp/G168_original_source_armor_foot_math_NO_ASSETS.json').read_text())
+          assert len(d['original_armor_meshes'])>=5
+          assert 'tmp.native_bind_min_z=minz' in c
+          assert 'float native_bind_min_z;' in h
+          assert 's->source.native_bind_min_z=m->native_bind_min_z;' in adapter
+          assert 'b24_gpu_suit_matrix(root,pose,src->native_bind_min_z)' in gpu
+          assert 'B24_G168_ORIGINAL_SUIT_RENDER_FOOT' in cm
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g75_capsule_reconcile(')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G168 proved genuine original IM2T bind source rest foot alignment is render-only, original G75 B14 gameplay intact')
+          PY
+      - name: G166 actual ORIGINAL 2010 G161 source city ground Z candidates vs airborne XY B14 G75 position reconciliation
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g166_original_ground_stuck_source_diagnostics/test_g166_actual_G161_ground_in_place_flight_moves.c \
+            -lm -o /tmp/g166_real_device_ground_freeze_vs_airborne
+          /tmp/g166_real_device_ground_freeze_vs_airborne work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G168 one actual Vita game code audit actor-model-collision and original weapon entrypoints
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          r=Path('work')
+          plans={
+            'src/main.c':['b14_world_init(&world','world.head_height','b14_world_tick(&world','old_c1x','b24_g75_capsule_reconcile','b24_gpu_runtime_draw','b24_g8_motion_tick','b16_combat_fire','B16_UNIBEAM','G137_'],
+            'src/b14_world.c':['w->target_z=0','world_init','w->z+=','w->cam_z+='],
+            'src/renderer.c':['center_z','im2_render'],
+            'src/renderer.h':['center_z','typedef struct','IM2Model'],
+            'b24/b24_unified/b24_gpu_runtime.c':['suit_pose','b24_gpu_suit','camera_distance','b24_g73_sky_draw'],
+            'b24/b24_unified/b24_gpu_suit_vitagl.c':['p->z-center_z','b24_gpu_suit_matrix']
+          }
+          for file,keys in plans.items():
+            p=r/file
+            if not p.exists():continue
+            lines=p.read_text().splitlines()
+            print('G168 SOURCE-AUDIT FILE',file,'lines',len(lines))
+            seen=set()
+            for key in keys:
+              hits=[i for i,t in enumerate(lines) if key in t]
+              print('G168 KEY',key,'hits',hits[:8])
+              for pos in hits[:3]:
+                for j in range(max(0,pos-9),min(len(lines),pos+19)):
+                  if j not in seen:
+                    print(f'G168 {file}:{j+1}: {lines[j][:200]}')
+                    seen.add(j)
+          print('G168 source audit done: source source has not been modified by this audit')
+          PY
+      - name: G167 actual B14 joystick ground first-spawn ticks through original G75 city collision diagnosis
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -I work/src -I work/b24/b24_unified \
+            work/src/b14_world.c \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g167_grounded_actual_start_input/replay_g167_real_B14_G75_from_initial_spawn.c \
+            -lm -o /tmp/g167_actual_B14_original_G75
+          /tmp/g167_actual_B14_original_G75 work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G165 actual original 2010 WM ground/source flight clip G83 fallback regression
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g76_original_native_damage_math.c \
+            work/b24/b24_unified/b24_g77_melee_source_radius.c \
+            work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g165_warmachine_source_directional_motion/test_g165_WM_real_source_clip_directional_fallback.c \
+            -lm -o /tmp/g165_real_2010_warmachine_routes
+          /tmp/g165_real_2010_warmachine_routes
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('work/b24/b24_unified/b24_g83_unified_movement_aim.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          game=Path('work/src/main.c').read_text()
+          assert src.count('B24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK')==2
+          assert 'wm_ground_aim[dir]' in src
+          assert 'B24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK' in cm
+          assert game.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert game.count('b24_g83_timeline_tick(')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G165 one original G8/G83 source WM 5 real directional ground and Rush makes no fake keyframes')
+          PY
+      - name: G159 actual unified G75 capsule integrates road source without overriding original native ground
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g159_first_playable_authentic_road_floor_candidate/test_g159_one_native_G75_capsule_with_true_city.c \
+            -lm -o /tmp/g159_original_one_native_capsule
+          /tmp/g159_original_one_native_capsule work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G156 verify continuous source exact triangle collision replaces only both 3 sample wall checks
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            research/b24_unified/g156_exact_source_sweep/test_g156_continuous_original_wall_height.c \
+            -lm -o /tmp/g156_original_source_continuous_geometry
+          /tmp/g156_original_source_continuous_geometry
+          python3 - <<'PY'
+          from pathlib import Path
+          d=Path('work/b24/b24_unified')
+          a=(d/'b24_g75_source_capsule.c').read_text()
+          b=(d/'b24_g108_visible_original_wall_grid.c').read_text()
+          m=Path('work/src/main.c').read_text()
+          c=Path('work/CMakeLists.txt').read_text()
+          assert a.count('b24_g156_exact_vertical_triangle_contact(')==1
+          assert b.count('b24_g156_exact_vertical_triangle_contact(')==1
+          assert 'static int slice(' not in a and 'static int wall_slice(' not in b
+          assert 'G134_LIMIT_LONG_FRAME_DISPLACEMENT' in a
+          assert 'B24_G156_CONTINUOUS_TRI_CONTACT' in c
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_unified_tick(&b24_game,&b24_obs);')==1
+          assert m.count('b24_g83_timeline_tick(')==1
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G156 PASS exact original face continuous wall height, both original native and visual-supplement collision, one physics tick, NO VPK')
+          PY
+      - name: Real VitaSDK ARM source FULL game G111 original 2010 named Damage and Actor hit gates alongside G108 G106 source movement ELF ONLY NO VPK
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            cmake -S work -B work/build-G168-ELF-ONLY \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$VITASDK/share/vita.toolchain.cmake" \
+              -DB24_ENABLE_GPU=ON -DB24_ENABLE_NATIVE_HUD=ON \
+              -DB24_G68_CITY_BACKEND=ON \
+              -DB24_G75_SOURCE_CAPSULE=ON \
+              -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=ON \
+              -DB24_G71_ALPHA_PASSES=ON \
+              -DB24_G73_REAL_SKY=ON \
+              -DB24_G106_SOURCE_FLY_ATTACK_MARKV=ON \
+              -DB24_G108_SOURCE_VISUAL_WALLS=ON \
+              -DB24_G136_SOURCE_B14_WORLD_BOUNDS=ON \
+              -DB24_G137_MISSION000_REAL_SOURCE_EVENTS=ON \
+              -DB24_G145_SOURCE_MISSION_AUDIO=ON \
+              -DB24_G146_SOURCE_2010_QTE_1456=ON \
+              -DB24_G147_NATIVE_LUA_TUTORIAL_SOURCE_GATE=ON \
+              -DB24_G149_NATIVE_LUA_BOOL_PC72_SOURCE_GATE=ON \
+              -DB24_G153_REAL_SOURCE_MISSION_RETRY_LOOP=ON \
+              -DB24_G156_CONTINUOUS_TRI_CONTACT=ON \
+              -DB24_G159_ROAD_FLOOR_CANDIDATE=ON \
+              -DB24_G160_ROAD_SPATIAL_INDEX=ON \
+              -DB24_G163_CAMERA_AIM_FACING=ON \
+              -DB24_G164_CAMERA_RELATIVE_ORIGINAL_SKY=ON \
+              -DB24_G164_HERO_CAMERA_FRAMING=ON \
+              -DB24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=ON \
+              -DB24_G168_ORIGINAL_SUIT_RENDER_FOOT=ON \
+              -DB24_G111_NATIVE_SOURCE_GATES=ON \
+              -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
+              -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
+              -DB24_G84_ORIGINAL_MOVESET_ROUTER=ON \
+              -DB24_G85_NATIVE_MARKV_629=ON \
+              -DB24_G87_REAL_TRANSITION_EVENTS=ON \
+              -DB24_G92_STATIC_DUMMY_SOURCE_PREVIEW=ON
+            cmake --build work/build-G168-ELF-ONLY --target im2_beta --parallel 4
+            test -s work/build-G168-ELF-ONLY/im2_beta
+            test -z "$(find work -type f -name "*.vpk" -print -quit)"
+            echo "PASS G165 Vita ARM one game ELF: WM source grounded/rush fallback opt-in, G163 aim on, authentic G73 sky view fixed and original scale unchanged, G161 aim facing ground/hover fix, original road source CSR indexed, 60k old-vs-new C11 native support parity, G75 source/gameplay and G156 walls preserved, no runtime Vita fps measurements yet, NO VPK"
+          '
