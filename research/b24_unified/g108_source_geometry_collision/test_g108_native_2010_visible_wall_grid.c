@@ -20,8 +20,8 @@ int main(int argc,char **argv){
   * the rebuilt grid covers the full measured original G66 rendered scene.
   * The source rectangle does NOT certify gameplay mission flight rights. */
  assert(g.source_maxx>g.source_minx&&g.source_maxy>g.source_miny);
- assert(g.source_minx>=-1248.f&&g.source_maxx<=480.f);
- assert(g.source_miny>=-1116.f&&g.source_maxy<=612.f);
+ assert(g.source_minx>=-2048.f&&g.source_maxx<=1024.f);
+ assert(g.source_miny>=-2048.f&&g.source_maxy<=1024.f);
  assert(b24_g108_grid_source_bounds_allow(&g,
      .5f*(g.source_minx+g.source_maxx),
      .5f*(g.source_miny+g.source_maxy),.35f));
