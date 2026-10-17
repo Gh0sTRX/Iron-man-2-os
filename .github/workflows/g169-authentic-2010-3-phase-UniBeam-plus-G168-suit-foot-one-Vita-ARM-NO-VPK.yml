@@ -624,6 +624,18 @@ jobs:
           assert not list(Path('work').rglob('*.vpk'))
           print('G168 proved genuine original IM2T bind source rest foot alignment is render-only, original G75 B14 gameplay intact')
           PY
+      - name: G170 identify exact original 2010 G66C WALL versus visible opaque G66M candidate at blocked walk origin
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g170_original_scene_initial_collision_authority/test_g170_original_boot_actor_native_and_visual_wall_provenance.c \
+            -lm -o /tmp/g170_original_source_wall_authority_boot
+          /tmp/g170_original_source_wall_authority_boot work/assets/G66_city.g66m work/assets/G66_original_collision.g66c
+          test -z "$(find work -name '*.vpk' -print -quit)"
       - name: G166 actual ORIGINAL 2010 G161 source city ground Z candidates vs airborne XY B14 G75 position reconciliation
         run: |
           set -euo pipefail
