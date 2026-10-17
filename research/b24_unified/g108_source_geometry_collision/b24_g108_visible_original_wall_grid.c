@@ -4,14 +4,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/* Absolute bounds independently traced by real C1L1 G75 original scene.
- * 12-unit uniform spatial cells, conservative adjacent candidate indexing.
- * 56x52=2912 cells; even 7k real-source faces have cheap per-cell queries. */
+/* G128 FIX: The previous -336..336 X and -360..264 Y grid silently
+ * discarded any sourced steep original Stark Expo source triangles outside
+ * its small central viewport. The ACTUAL 2010 BRES scene G19 ranges roughly
+ * x[-1219.11,+414.70], y[-1090.07,+531.98]; preserve full source extent.
+ * Keep the same 12-unit spatial index (144 x 144 = 20736 cells, ~83KB CSR).
+ * Original world/min-max are additionally extracted from actual G66M bytes,
+ * never infer mission's playable flight volume from that geometry AABB.
+ */
 #define G108_CELL 12.f
-#define G108_X0 (-336.f)
-#define G108_Y0 (-360.f)
-#define G108_NX 56
-#define G108_NY 52
+#define G108_X0 (-1248.f)
+#define G108_Y0 (-1116.f)
+#define G108_NX 144
+#define G108_NY 144
 #define G108_NCELLS (G108_NX*G108_NY)
 #define G108_MAX_CANDIDATES 18000u
 #define G108_MAX_CELL_REFERENCES 320000u
@@ -73,6 +78,21 @@ int b24_g108_grid_load(B24G108Grid *g,const char *path,
  fclose(f);
  if(!ok){free(v);return 0;}
  B24G108Grid tmp={0};
+ /* Original actual SOURCE rendered G66 city AABB; do not continue using
+  * -325..331 central view clipping while importing all original geometry. */
+ tmp.source_minx=tmp.source_maxx=v[0].xyz[0];
+ tmp.source_miny=tmp.source_maxy=v[0].xyz[1];
+ for(uint32_t j=0;j<h[1];j++){
+  float x=v[j].xyz[0],y=v[j].xyz[1],z=v[j].xyz[2];
+  if(!good(x)||!good(y)||!good(z))goto fail;
+  if(x<tmp.source_minx)tmp.source_minx=x;
+  if(x>tmp.source_maxx)tmp.source_maxx=x;
+  if(y<tmp.source_miny)tmp.source_miny=y;
+  if(y>tmp.source_maxy)tmp.source_maxy=y;
+ }
+ if(tmp.source_minx<G108_X0||tmp.source_maxx>G108_X0+G108_CELL*G108_NX||
+    tmp.source_miny<G108_Y0||tmp.source_maxy>G108_Y0+G108_CELL*G108_NY)
+  goto fail;
  uint32_t cursor=0;
  const uint8_t translucent[31]={
   0,1,0,0,0,0,1,1,0,1,0,0,0,0,0,1,
@@ -221,6 +241,15 @@ int b24_g108_grid_clear(const B24G108Grid *g,float x,float y,float footz,
   }
  }
  return 1;
+}
+/* G128 source-derived conservative scene envelope, not the original
+ * authored MissionPlayableArea or character flight-ability flag. */
+int b24_g108_grid_source_bounds_allow(const B24G108Grid *g,
+ float x,float y,float radius){
+ if(!g||!g->ready||!good(x)||!good(y)||!isfinite(radius)||
+    radius<.12f||radius>.9f)return 0;
+ return x>=g->source_minx+radius&&x<=g->source_maxx-radius&&
+        y>=g->source_miny+radius&&y<=g->source_maxy-radius;
 }
 int b24_g108_grid_probe(const B24G108Grid *g,float *x,float *y,float *footz){
  if(!g||!g->ready||!g->count||!x||!y||!footz)return 0;
