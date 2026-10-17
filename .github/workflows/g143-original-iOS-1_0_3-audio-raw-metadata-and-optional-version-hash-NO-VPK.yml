@@ -1,0 +1,43 @@
+name: G143 compare authentic iOS original 1.0.3 audio RIFF SHA to v1.0.0 if accessible NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g143-original-iOS-1_0_3-audio-raw-metadata-and-optional-version-hash-NO-VPK.yml"
+      - "research/b24_unified/g143_version103_audio_research/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_103_RIFF_from_original_iOS:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source manifest decoder
+        run: |
+          python3 -m py_compile research/b24_unified/g143_version103_audio_research/g143_source_original_2010_103_sound_manifest.py
+          python3 -m pip install --quiet gdown
+      - name: Try original 1.0.3 shared Google Drive file via public download; 256MiB tool limit doesn't affect GH runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g143_private
+          gdown '1qfwa0qm23l1KNAPgk0VW3A47kC8ZYrJB' -O /tmp/g143_private/owner1.0.3.ipa
+          test "$(wc -c </tmp/g143_private/owner1.0.3.ipa)" -eq 275580565
+      - name: Real 1.0.3 owner archive audio SHA/codec audit only
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g143_version103_audio_research/g143_source_original_2010_103_sound_manifest.py \
+            --v103 /tmp/g143_private/owner1.0.3.ipa \
+            --out /tmp/g143_metadata/G143_REAL_2010_OWNER_v103_WWW_audio_track_SHA256_source_ONLY.json
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original game bytes regardless of success
+        if: always()
+        run: rm -rf /tmp/g143_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G143_REAL_OWNER_2010_iOS_1_0_3_RIFF_WWW_OriginalAudio_SHA_Source_NO_VPK
+          path: /tmp/g143_metadata/G143_REAL_2010_OWNER_v103_WWW_audio_track_SHA256_source_ONLY.json
+          retention-days: 14
+          if-no-files-found: error
