@@ -1,0 +1,243 @@
+name: G162 original merged Vita camera scale and animation runtime inspection NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g162-original-runtime-camera-scale-diagnosis-NO-VPK.yml"
+      - "research/b24_unified/g160_original_road_spatial_perf/**"
+      - "research/b24_unified/g159_first_playable_authentic_road_floor_candidate/**"
+      - "research/b24_unified/g156_exact_source_sweep/**"
+      - "research/b24_unified/g149_original_L1_PC72_typed_lua_return/**"
+      - "research/b24_unified/g152_source_original_tutorial_condition_runtime/**"
+      - "research/b24_unified/g153_source_original_mission_resume_retry_one_vita/**"
+      - "research/b24_unified/g91_offline_integrated_preview/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g111_original_game_combat_gates/**"
+      - "research/b24_unified/g124_2010_real_NPC_source_predicates/**"
+      - "research/b24_unified/g127_native_owner_StateMgr/**"
+      - "research/b24_unified/g134_true_original_collision_sweep/**"
+      - "research/b24_unified/g136_fix_source_B14_scene_bounds/**"
+      - "research/b24_unified/g137_original_Mission000_native_boot/**"
+      - "research/b24_unified/g139_vita_native_audio_music/**"
+      - "research/b24_unified/g141_original_vita_pcm_stream/**"
+      - "research/b24_unified/g142_original_2010_native_sound_id_semantics/**"
+      - "research/b24_unified/g144_original_level1_real_pcm_channels/**"
+      - "research/b24_unified/g145_full_B24_source_audio_g137/**"
+      - "research/b24_unified/g146_QTE_original_level1_scene/**"
+      - "research/b24_unified/g147_genuine_2010_tutorial_ui_gate/**"
+      - "research/b24_unified/g108_source_geometry_collision/**"
+      - "research/b24_unified/g82_original_combat/**"
+      - "research/b24_unified/g106_visual_repair/**"
+      - "research/b24_unified/b24_g10_practice_target.c"
+      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_original_arm_strcasecmp_memcpy_actor_categories_g82_and_g108_real_world_vita_elf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g88_original_combat_source/test_g88_interleaved_original_event_dedup.c \
+            -lm -o /tmp/g88_native_combat_guard
+          /tmp/g88_native_combat_guard
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g82_original_combat/test_g82_original_combat_source_gate.c \
+            -lm -o /tmp/g88_old_g82_no_regression
+          /tmp/g88_old_g82_no_regression
+          test -z "$(find research/b24_unified -name "*.vpk" -print -quit)"
+      - name: Original 2010 G83 movement, flight, aim and combo priority regressions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_authentic_timed_router.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
+            -lm -o /tmp/g88_g83_router
+          /tmp/g88_g83_router
+      - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/b24_g10_practice_target.c \
+            research/b24_unified/b24_g11_practice_melee_feedback.c \
+            research/b24_unified/g91_offline_integrated_preview/test_g92_authored_world_static_dummy_no_damage.c \
+            -lm -o /tmp/g92_real_g10_g11_immortal_dummy
+          /tmp/g92_real_g10_g11_immortal_dummy
+      - name: Restore authentic G8 all armor native animation stream source evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_397_Sourced_Player_Motion_Files_Not_VPK
+          run-id: 38607065765
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_owner_motion
+      - name: Restore original 2010 War Machine Gun01 to Gun04 motion
+        uses: actions/download-artifact@v4
+        with:
+          name: G8_WM_2010_Source_Gun01_04_Keyframes_And_Original_Scene_Parent_Proof
+          run-id: 38612044624
+          github-token: ${{ github.token }}
+          path: /tmp/g9_verified_wm_gun
+      - name: Restore native original Stark Expo 2010 city and collision source
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g70_verified_g68_world
+      - name: Restore all 248 original Mark V 629 vertex skin animation streams
+        uses: actions/download-artifact@v4
+        with:
+          name: G85_2010_ORIGINAL_SUITCASE_MARKV_248_FULL_SOURCE_IM2V_NO_VPK
+          run-id: 38949763439
+          github-token: ${{ github.token }}
+          path: /tmp/g85_original_248_src
+      - name: Restore original G27 source verified 2010 Level1 71 Lua callback native CALLs
+        uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g137_real_Level1_Lua
+      - name: Restore authenticated original 2010 six BRES sky meshes two PVRTC atlas files
+        uses: actions/download-artifact@v4
+        with:
+          name: G73_Original_2010_C1L1_Sky_Mesh_And_Two_Owner_PVR_Reference_Assets
+          run-id: 38902510114
+          github-token: ${{ github.token }}
+          path: /tmp/g108_original_sky
+      - name: Restore prior successful original 2010 G9 Vita real source vehicle atlas snapshot, avoid redundant 248MB owner IPA Drive quota
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_GPU_B24_G9_BETA_Original_C1L1_363_SourceMotion_6_WMGun_Test
+          run-id: 38623462548
+          github-token: ${{ github.token }}
+          path: /tmp/g145_authenticated_previous_G9
+      - name: Confirm ORIGINAL G9 native 2010 Vehicles C1TX source from successful prior build, not a placeholder or reconstructed painting
+        run: |
+          set -euo pipefail
+          test -s /tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,struct,hashlib
+          path=Path('/tmp/g145_authenticated_previous_G9/IronMan2_GPU_B24_G9_BETA.vpk')
+          with zipfile.ZipFile(path) as z:
+            assert z.testzip() is None
+            data=z.read('maps/C1L1_Vehicles.c1tx')
+          assert len(data)==1048596 and struct.unpack_from('<4sIIII',data)==(b'C1TX',1,512,512,0)
+          print('G145 VERIFIED original prebuilt G9 real iOS vehicle PNG-derived C1TX 512x512 original source reused',hashlib.sha256(data).hexdigest())
+          PY
+      - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q pyyaml
+          python3 -m py_compile research/b24_unified/g145_full_B24_source_audio_g137/g145_g75_reassemble_from_prior_verified_G9_VPK_without_duplicated_Drive_IPA_NO_VPK.py
+          python3 research/b24_unified/g145_full_B24_source_audio_g137/g145_g75_reassemble_from_prior_verified_G9_VPK_without_duplicated_Drive_IPA_NO_VPK.py
+          python3 research/b24_unified/g84_main_loop_integration/g84_apply_original_g83_to_G75_G9_MAIN_NO_VPK.py
+          python3 research/b24_unified/g85_markv_full_moveset/g85_patch_G84_single_main_for_real_MarkV_629_source_NO_VPK.py
+          cp /tmp/g85_original_248_src/g85_real_markv_animations/*.im2v work/animations/
+          python3 research/b24_unified/g87_source_transition_events/g87_apply_authored_collision_gated_events_to_G85_main_NO_VPK.py
+          python3 research/b24_unified/g91_offline_integrated_preview/g92_patch_single_real_vita_main_static_dummy_NO_VPK.py
+          python3 research/b24_unified/g106_visual_repair/g106_apply_original_stage2_rush_fire_source_only.py
+          python3 research/b24_unified/g108_source_geometry_collision/g108_enable_original_visible_wall_grid_in_single_G75_main_NO_VPK.py
+          python3 research/b24_unified/g111_original_game_combat_gates/g111_apply_authentic_2010_entitydata_actor_melee_to_single_B24_SOURCE_ONLY.py
+          python3 research/b24_unified/g124_2010_real_NPC_source_predicates/g124_add_native_original_2010_npc_state_to_real_Vita_game_ELF_ONLY.py
+          python3 research/b24_unified/g127_native_owner_StateMgr/g127_integrate_original_2010_states_mgr_get_state_into_ONE_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g134_true_original_collision_sweep/g134_patch_2010_source_world_substeps_NO_VPK.py
+          python3 research/b24_unified/g136_fix_source_B14_scene_bounds/g136_patch_B14_original_render_source_bounds_NO_VPK.py
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_emit_original_Mission000_lua_prefix_from_G27.py \
+            --g27 /tmp/g137_real_Level1_Lua/original_lua_calls.json \
+            --out work/b24/b24_unified/b24_g137_mission000_owner_original_generated.c
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_patch_authentic_Mission000_source_live_to_one_game_NO_VPK.py
+          python3 -m py_compile research/b24_unified/g145_full_B24_source_audio_g137/g145_patch_original_L1_dual_audio_to_one_real_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g145_full_B24_source_audio_g137/g145_patch_original_L1_dual_audio_to_one_real_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g146_QTE_original_level1_scene/g146_link_real_2010_QTE1456_source_scene_gate_into_G145_one_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g147_genuine_2010_tutorial_ui_gate/g147_attach_original_ShowTut_And_IsTutConfirmed_to_G146_single_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g149_original_L1_PC72_typed_lua_return/g149_integrate_typed_lua_boolean_PC72_to_G147_one_main_NO_VPK.py
+          python3 research/b24_unified/g153_source_original_mission_resume_retry_one_vita/g153_integrate_G149_G152_PC73_and_retry_into_one_G147_Vita_main_NO_VPK.py
+          python3 research/b24_unified/g156_exact_source_sweep/g156_patch_exact_wall_contact_into_G153_single_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g159_first_playable_authentic_road_floor_candidate/g159_integrate_authentic_road_source_into_one_G156_Vita_NO_VPK.py
+          python3 research/b24_unified/g160_original_road_spatial_perf/g160_integrate_CSR_into_G159_one_real_Vita_game_NO_VPK.py
+          cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
+          cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
+          test -s work/assets/G73_original_sky_mesh.g73m
+          grep -q 'G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN' work/src/main.c
+          grep -q 'b24_g10_practice_target_draw' work/b24/b24_unified/b24_gpu_runtime.c
+          test "$(find work/animations -maxdepth 1 -name 'suitcase_ironman_*.im2v' | wc -l)" -eq 248
+          grep -q 'g88_verified_contact_count' work/b24/b24_unified/b24_g82_original_combat_coordinator.c
+          test -z "$(find work -type f -name '*.vpk' -print -quit)"
+      - name: G162 diagnose actual source B14/camera/visual owner/sky/material and original motion routing
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json
+          root=Path('work')
+          sources=['src/b14_world.c','src/b14_world.h','src/main.c',
+                   'b24/b24_unified/b24_gpu_g68_city.c',
+                   'b24/b24_unified/b24_gpu_g73_sky_vitagl.c',
+                   'b24/b24_unified/b24_g8_live_original_motion.c']
+          lines=[]
+          patterns=re.compile(
+           r'(yaw|heading|orbit|fov|look|aim|rotat|scale|model\\.nv|model\\.vertices|'
+           r'pose|clip|glScalef|glTranslatef|glRotatef|G73|light|suitcase|'
+           r'float cx|c1_follow|world\\.x|world\\.y|world\\.z|w->x|w->y|w->z)',
+           re.I)
+          for name in sources:
+           p=root/name
+           if not p.exists():
+            lines.append('MISSING '+name)
+            continue
+           data=p.read_text()
+           content=data.splitlines()
+           lines.append('SOURCE '+name+' total lines '+str(len(content)))
+           for i,line in enumerate(content):
+            if patterns.search(line):
+             lo=max(0,i-2);hi=min(len(content),i+3)
+             for j in range(lo,hi):
+              val=f'{j+1:04}: {content[j][:200]}'
+              if val not in lines[-12:]:lines.append(val)
+             if len(lines)>600:break
+          out=Path('/tmp/g162_runtime_cam_spawn_pose_diagnostic.log')
+          out.write_text('\n'.join(lines)+'\n')
+          print('G162 DIAGNOSTIC SOURCE B14:',(root/'src/b14_world.c').read_text()[:15000])
+          print('G162 DIAGNOSTIC CAMERA/HERO:')
+          for source in ('src/main.c','b24/b24_unified/b24_gpu_g68_city.c'):
+           p=root/source
+           if p.exists():
+            z=p.read_text().splitlines()
+            for idx,line in enumerate(z):
+             if any(v in line for v in ('glScalef','glRotatef','glTranslatef',
+                   'glDraw','model.nv','world.yaw','world.heading','world.orbit',
+                   'b24_g73_sky_draw','float c1_follow','g84_input.aim')):
+              print(source,str(idx+1)+': '+' '.join(z[max(idx-3,0):idx+4])[:950])
+          print('G162 REAL SOURCE INSPECTION COMPLETE: can now fix exact existing game loop without fabricated source spawn or model scale')
+          PY
+      - name: G162 publish only source-context diagnostic (not proprietary original IPA/assets)
+        uses: actions/upload-artifact@v4
+        with:
+          name: G162_OneNativeGame_Camera_Yaw_Scale_Motion_SourceOnly_Inspection_NO_VPK
+          path: /tmp/g162_runtime_cam_spawn_pose_diagnostic.log
+          retention-days: 7
