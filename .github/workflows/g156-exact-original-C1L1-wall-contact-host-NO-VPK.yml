@@ -1,0 +1,29 @@
+name: G156 continuous authored original wall capsule geometry NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g156-exact-original-C1L1-wall-contact-host-NO-VPK.yml"
+      - "research/b24_unified/g156_exact_source_sweep/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_C1L1_wall_contact_continuous_geometry:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: G156 verify authentic G75 G108 3-height sampling gap, exact vertical original-format triangle
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g156_exact_source_sweep \
+            research/b24_unified/g156_exact_source_sweep/test_g156_continuous_original_wall_height.c \
+            -lm -o /tmp/g156_continuous_source_wall
+          /tmp/g156_continuous_source_wall
+      - name: Check only single B14 game owner and opt-in full game patch Python syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g156_exact_source_sweep/g156_patch_exact_wall_contact_into_G153_single_Vita_game_NO_VPK.py
+          test -z "$(find research/b24_unified/g156_exact_source_sweep -name '*.vpk' -print -quit)"
+          echo 'G156 source continuous wall geometry host PASS; real Vita full engine still requires main integration and physical testing'
