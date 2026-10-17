@@ -15,9 +15,24 @@ int b24_g142_owner_source_music_call(
    * from native Game+0xEC; we do NOT yet know that runtime value.
    * Only acknowledge when a track from original current game state
    * has really been mapped and backend stop operation accepted. */
-  if(!m->original_current_music_id_from_actual_game_state_verified||
-      !m->backend.stop_current_music||
-      m->original_current_music_zero_based_id<0)return 0;
+  if(!m->original_current_music_id_from_actual_game_state_verified)
+   return 0;
+  /* G145 2010 original Game::Game native 0x99564 writes -1 to
+   * Game+0xEC. For our newly created source-equivalent game, -1
+   * means NO CURRENT MUSIC has ever been started. No Vita emitter
+   * exists and there is nothing to fade out; ACK a source-empty
+   * stop request without muting a port or fabricating SoundManager
+   * playback. This is an explicit portable no-active-track equivalent;
+   * exact 2010 VoxEngine GetEmitterHandles(-1) effects aren't proven. */
+  if(m->original_current_music_zero_based_id==-1){
+   if(m->original_current_music_track_is_playing)return 0;
+   m->source_music_stop_command_acknowledged=1;
+   return 1;
+  }
+  /* Actual playing track: original StopCrtBGM takes ID+fade=2000.
+   * Fail closed if real indexed emitter/fade-stop backend is absent. */
+  if(!m->backend.stop_current_music||
+     m->original_current_music_zero_based_id<0)return 0;
   if(!m->backend.stop_current_music(m->backend.ctx,
       m->original_current_music_zero_based_id,2000.0f))return 0;
   m->source_music_stop_command_acknowledged=1;
