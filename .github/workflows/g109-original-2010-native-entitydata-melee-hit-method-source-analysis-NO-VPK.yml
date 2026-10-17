@@ -1,0 +1,45 @@
+name: G109 2010 ORIGINAL EntityData GET INT BOOL and TestMeleeHit real native ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g109-original-2010-native-entitydata-melee-hit-method-source-analysis-NO-VPK.yml"
+      - "research/b24_unified/g109_original_native_mechanics/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  authentic_2010_gameplay_method_gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore original source 2010 ARM code metadata from prior user owned IPA G97, not new game binary
+        uses: actions/download-artifact@v4
+        with:
+          name: G97_ORIGINAL_2010_ATTACKENTITY_PROJECTILE_HIT_DAMAGE_REAL_ARM_METADATA_ONLY_NO_VPK
+          run-id: 38974357653
+          github-token: ${{ github.token }}
+          path: /tmp/g109_original_native
+      - name: Extract original actual source C++ EntityData getter and contact/hit/13-state native ARM methods
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g109_original_native_mechanics/g109_extract_original_entitydata_getparamvalue_arm_control_flow.py \
+            --metadata /tmp/g109_original_native/G97_AUTHENTIC_2010_ATTACK_ENTITY_PROJECTILE_HIT_DAMAGE_ARM_PROVENANCE.json \
+            --out /tmp/g109_source_read/G109_AUTHENTIC_2010_NATIVE_ENTITYDATA_GET_INT_BOOL_MELEE_HIT_ARM_SOURCE_GRAPH.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g109_source_read/G109_AUTHENTIC_2010_NATIVE_ENTITYDATA_GET_INT_BOOL_MELEE_HIT_ARM_SOURCE_GRAPH.json').read_text())
+          assert j['real_cpp_entitydata_int_bool_getters_found']==2
+          assert not j['original_clara_Attack_26_Damage_numeric_values_recovered']
+          assert j['NO_VPK']
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G109_TRUE_2010_SOURCE_EntityData_GetParamValue_Typed_Actor_TestMeleeHit_ARM_NOT_GAME_VPK
+          path: /tmp/g109_source_read/G109_AUTHENTIC_2010_NATIVE_ENTITYDATA_GET_INT_BOOL_MELEE_HIT_ARM_SOURCE_GRAPH.json
+          retention-days: 14
+          if-no-files-found: error
