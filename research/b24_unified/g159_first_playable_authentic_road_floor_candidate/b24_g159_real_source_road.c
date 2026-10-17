@@ -6,7 +6,7 @@
 /* G159 REAL road-only original G66M geometry. Source batch 12 is 2010
  * c1l1_road.tga by exact decoded original RGBA byte identity.
  * It is intentionally NOT a source iOS physics-solidness proof. */
-static int g159_good_float(float x){return isg159_good_float(x)&&fabsf(x)<100000.f;}
+static int g159_good_float(float x){return isfinite(x)&&fabsf(x)<100000.f;}
 static int tri_z(const B24G159RoadFace *t,float x,float y,float *z){
  if(x<t->minx-.0001f||x>t->maxx+.0001f||
     y<t->miny-.0001f||y>t->maxy+.0001f)return 0;
