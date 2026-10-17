@@ -27,3 +27,10 @@ G172'nin 10 War Machine Aim_M Ground kaynak animasyonu G83 seçiciye eklendi; me
 G171 orijinal G66C 1910 collider korunur; heykel görünürlükten kanıtsız solid çıkarımı geri alınmıştır. G168 Mark V kaynak ayak hizası düzeltilmiştir ama world parent ölçeği ve gerçek cihaz doğrulanmamıştır. Skybox, ışık/gölge, QTE/cutscene, native melee hit windows, gerçek düşman AI/ses ve oynanabilir tam görev **açık** kalır.
 
 **CI sonuçları ayrı değerlendirilmelidir.** Önceki ilk G173 workflow hata `G85 live sole G8 clip priority exact owner drift` (Python metin eşleşmesi 3 boşluk/4 boşluk), test başlamadan geri döndü; `3f5d871b` commit'inde gerçek G85 patch çıktısından literal anchor düzeltildi. İkinci koşunun başarı/başarısızlık sonucu GitHub Actions üzerinde doğrulanmadan PASS ilan edilmez.
+
+## 18 Ekim CI doğrulaması
+
+- G173 gerçek özgün `.im2v` dosyalarıyla dört MarkV/VI × ground/hover üç aşamalı G169→G8/G85 bütünleşik host oynatıcı testinde **PASS**.
+- G171 asli collider teması, G172 on gerçek WM M-ground klibi seçicisi ve G173 host animasyon öncelik testi **PASS**.
+- Aynı tek oyunun `-DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=ON` VitaSDK ARM **`im2_beta` ELF-only** derlemesi **PASS**; VPK üretilmedi. Tek koşu: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39075029040 .
+- Bu PC kaynak/binary derleme kanıtıdır; yeni bir PS Vita kurulum/görüntü testinin sonucu değildir. Doğrulanmayan orijinal silah ve görev semantiği önceki bölümdeki gibi açık kalır.
