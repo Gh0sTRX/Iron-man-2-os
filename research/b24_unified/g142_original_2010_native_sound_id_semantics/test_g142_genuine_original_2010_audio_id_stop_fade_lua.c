@@ -35,6 +35,19 @@ int main(void){
   * recovered from source playback state; mute-port != StopCrtBGM. */
  assert(!b24_g142_owner_source_music_call(&m,&pc3));
  assert(mock.stop_count==0);
+ /* G145 real native 2010 Game initial +0xEC == -1: no track has
+  * started and no output emitter exists; portable empty-stop can
+  * acknowledge without claiming a VoxEngine Stop(-1) native trace. */
+ m.original_current_music_zero_based_id=-1;
+ m.original_current_music_id_from_actual_game_state_verified=1;
+ m.original_current_music_track_is_playing=0;
+ assert(b24_g142_owner_source_music_call(&m,&pc3));
+ assert(m.source_music_stop_command_acknowledged);
+ assert(mock.stop_count==0);
+ /* Never allow fake stop when state says playing but id remains -1 */
+ m.original_current_music_track_is_playing=1;
+ assert(!b24_g142_owner_source_music_call(&m,&pc3));
+ m.original_current_music_track_is_playing=0;
  m.original_current_music_zero_based_id=87;
  m.original_current_music_id_from_actual_game_state_verified=1;
  assert(!b24_g142_owner_source_music_call(&m,&pc3));
