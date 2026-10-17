@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "project": "Iron Man 2 2010 iOS -> PS Vita",
+  "objective": "First source-faithful C1L1 Stark Expo playable mission, on real Vita",
+  "active_workstream": "world_render_collision_hardware_parity",
+  "wip_limit": 1,
+  "last_reviewed": "2026-10-17",
+  "policy": {
+    "do_not_expand_until_first_slice": "Defer other missions, additional armors, co-op, secondary combat and extra assets until this slice passes device tests.",
+    "require_real_device_evidence": true,
+    "source_build_is_not_device_proof": true,
+    "test_vpk_policy": "No automatic candidate VPK merely because ELF CI passes; request one deliberate hardware test when an integrated build has measurable purpose."
+  },
+  "criteria": [
+    {
+      "id": "world_visual",
+      "name": "Original first-level map, sky, alpha, lighting, materials",
+      "state": "device_regression_open",
+      "source_evidence": "G153 full Vita ARM ELF run 39040191350; G106 source sky/alpha repairs",
+      "device_evidence": "G104 hardware feedback in G106_G107 report: black sky / black cutouts / no visible lighting; G106 replacement not verified on physical Vita",
+      "acceptance": "Real Vita screenshots match touchHLE source scene for sky, alpha and geometry from fixed camera points",
+      "owner": "world",
+      "mandatory": true
+    },
+    {
+      "id": "solid_collision",
+      "name": "Floor, buildings, wall and ceiling player capsule",
+      "state": "device_regression_open",
+      "source_evidence": "G134 swept collision, G136B source map bounds, G153 native ELF compile",
+      "device_evidence": "G104 user observed character entering building geometry; corrections not physically retested",
+      "acceptance": "On-device repeatable collision test at recorded coordinates and stress movement; no gross building/floor penetration",
+      "owner": "physics",
+      "mandatory": true
+    },
+    {
+      "id": "movement_combat",
+      "name": "Mark V walking, hover, launch, rush, firing and contact",
+      "state": "device_regression_open",
+      "source_evidence": "G85 248 original Mark V IM2V; G106 source fly_att_s; G153 whole game ARM",
+      "device_evidence": "G104 user: walk/hover acceptable, Stage2/Rush repulsor attack visually broken; G106 not physically retested",
+      "acceptance": "Physical Vita locomotion and basic repulsor test in all relevant modes with authentic animation; recorded result",
+      "owner": "gameplay",
+      "mandatory": true
+    },
+    {
+      "id": "qte_ui",
+      "name": "Original Intro QTE1456, tutorial339 original HUD and touch input",
+      "state": "source_blocked",
+      "source_evidence": "G146 class94 ID1456, G147 source tutorial339 text ID0x1053, G149 typed Bool",
+      "device_evidence": "None; source renderer callback NULL and Lua Show PC6 blocked",
+      "acceptance": "Authentic QTE visible and controllable on Vita; PC6 and PC67 real callback ACK with user touch, no fake progression",
+      "owner": "mission",
+      "mandatory": true
+    },
+    {
+      "id": "audio_and_events",
+      "name": "Original Level1 BGM/JARVIS voice, StopVoice and first event/cutscene sequence",
+      "state": "source_blocked",
+      "source_evidence": "G142 803 original audio IDs; G145 dual audio + G153 ELF success",
+      "device_evidence": "Original Mission000 stops at QTE PC6; G145 source tracks not audibly verified in actual mission",
+      "acceptance": "Recorded original intro audio and events run on physical Vita in script order, without substituting simulated acknowledgements",
+      "owner": "mission",
+      "mandatory": true
+    },
+    {
+      "id": "mission_complete",
+      "name": "Mission000 original Lua branches and first chapter mission interaction to a verifiable end",
+      "state": "source_blocked",
+      "source_evidence": "G137 prefix24, G151 PC73 Wait10, G152 loop and G153 source-linked",
+      "device_evidence": "Original full mission not played on Vita; original Lua PC86+ and MissionResume PC935 unimplemented",
+      "acceptance": "Original mission start to finish on real Vita, actual enemy/trigger/control scene transitions verified",
+      "owner": "mission",
+      "mandatory": true
+    },
+    {
+      "id": "device_performance",
+      "name": "Measured PS Vita frame timing, crash-free traversal and resource use",
+      "state": "not_measured",
+      "source_evidence": "No G153 measured physical device benchmark; ELF linking is not frame measurement",
+      "device_evidence": "G104 qualitative device report, no G153 representative frame-time log",
+      "acceptance": "Actual Vita recorded target 30 fps with frame-time spread, stability and memory headroom across repeatable scenes",
+      "owner": "performance",
+      "mandatory": true
+    }
+  ],
+  "release": {
+    "current_status": "BLOCKED",
+    "ready": false,
+    "device_validation_passed": false,
+    "first_level_playable_claim_allowed": false,
+    "candidate_vpk_auto_allowed": false
+  },
+  "next_action": "Resolve world rendering and collision on one reproducible hardware comparison, then PC6 original QTE1456, then full mission flow."
+}
