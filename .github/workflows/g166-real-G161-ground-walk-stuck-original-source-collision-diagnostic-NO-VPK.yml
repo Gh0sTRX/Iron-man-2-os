@@ -583,6 +583,27 @@ jobs:
           rm -f 'app0:assets/G66_city.g66m'
           rmdir 'app0:assets'
           test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G167 actual B14 joystick ground first-spawn ticks through original G75 city collision diagnosis
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -I work/src -I work/b24/b24_unified \
+            work/src/b14_world.c \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g167_grounded_actual_start_input/replay_g167_real_B14_G75_from_initial_spawn.c \
+            -lm -o /tmp/g167_actual_B14_original_G75
+          /tmp/g167_actual_B14_original_G75 work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
       - name: G165 actual original 2010 WM ground/source flight clip G83 fallback regression
         run: |
           set -euo pipefail
