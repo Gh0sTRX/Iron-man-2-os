@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
+      - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -193,6 +194,7 @@ jobs:
           python3 research/b24_unified/g168_original_model_origin_source_physics/g168_patch_true_original_IM2T_foot_bind_into_G165_suit_renderer_NO_VPK.py
           python3 research/b24_unified/g169_authentic_2010_unibeam_actor/g169_integrate_accepted_B16_to_original_2010_three_phase_beam_G168_one_game_NO_VPK.py
           python3 research/b24_unified/g171_authored_vs_visual_sculpture_walls/g171_retract_G108_unauthored_sculpture_colliders_NO_VPK.py
+          python3 research/b24_unified/g172_native_warmachine_ground_m/g172_add_true_wm_m_ground_source_to_single_g83_NO_VPK.py
           cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
@@ -758,6 +760,33 @@ jobs:
           assert not list(Path('work').rglob('*.vpk'))
           print('G165 one original G8/G83 source WM 5 real directional ground and Rush makes no fake keyframes')
           PY
+      - name: G172 check source-authority ten original 2010 WM Aim M grounded animation clips and timings through the ONE G83 route NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g172_native_warmachine_ground_m/g172_add_true_wm_m_ground_source_to_single_g83_NO_VPK.py
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=1 -DB24_G172_WM_NATIVE_M_GROUND_BANK=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g76_original_native_damage_math.c \
+            work/b24/b24_unified/b24_g77_melee_source_radius.c \
+            work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g172_native_warmachine_ground_m/test_g172_real_2010_WM_M_ground_10_clips.c \
+            -lm -o /tmp/g172_original_wm_M_ground_bank
+          /tmp/g172_original_wm_M_ground_bank
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path('work')
+          src=(root/'b24/b24_unified/b24_g83_unified_movement_aim.c').read_text()
+          cm=(root/'CMakeLists.txt').read_text()
+          main=(root/'src/main.c').read_text()
+          assert 'B24_G172_WM_NATIVE_M_GROUND_BANK' in src and 'B24_G172_WM_NATIVE_M_GROUND_BANK' in cm
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert not list(root.rglob('*.vpk'))
+          print('G172 ten genuine War Machine 2010 M-ground animation clips + exact B18 timings, zero source movement or damage changes, source-only no VPK')
+          PY
       - name: G159 actual unified G75 capsule integrates road source without overriding original native ground
         run: |
           set -euo pipefail
@@ -836,6 +865,7 @@ jobs:
               -DB24_G168_ORIGINAL_SUIT_RENDER_FOOT=ON \
               -DB24_G169_AUTHENTIC_BEAM_3_PHASE=ON \
               -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=ON \
+              -DB24_G172_WM_NATIVE_M_GROUND_BANK=ON \
               -DB24_G111_NATIVE_SOURCE_GATES=ON \
               -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
               -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
