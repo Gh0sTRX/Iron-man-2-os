@@ -782,6 +782,21 @@ jobs:
           cm=(root/'CMakeLists.txt').read_text()
           main=(root/'src/main.c').read_text()
           assert 'B24_G172_WM_NATIVE_M_GROUND_BANK' in src and 'B24_G172_WM_NATIVE_M_GROUND_BANK' in cm
+          # An authored catalog name alone is insufficient: verify all ten
+          # baked original IM2V files actually reach the ONE Vita work tree.
+          import struct, re
+          bank=(root/'b24/b24_unified/b24_g172_wm_ground_m_source.h').read_text()
+          stems=set(re.findall(r'"(warmachine_warmachine_aim_m_ground_[a-z_]+)"',bank))
+          assert len(stems)==10, ('G172 original bank incomplete',stems)
+          for stem in sorted(stems):
+            path=root/'animations'/(stem+'.im2v')
+            assert path.is_file(), 'Missing ORIGINAL 2010 WM clip: '+str(path)
+            data=path.read_bytes()
+            assert len(data)>=20 and data[:4]==b'IM2V', 'Invalid WM original IM2V '+str(path)
+            _,nv,frames,fps,duration=struct.unpack_from('<4sIIII',data,0)
+            assert 2<=nv<=16000 and 1<=frames<=4000 and fps==20
+            assert len(data)==20+nv*frames*12
+            assert duration in (866,1399,1600), (stem,duration)
           assert main.count('b24_g83_timeline_tick(')==1
           assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
           assert not list(root.rglob('*.vpk'))
