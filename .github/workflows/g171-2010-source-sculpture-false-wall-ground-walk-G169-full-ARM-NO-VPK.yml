@@ -6,6 +6,7 @@ on:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
+      - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -195,6 +196,7 @@ jobs:
           python3 research/b24_unified/g169_authentic_2010_unibeam_actor/g169_integrate_accepted_B16_to_original_2010_three_phase_beam_G168_one_game_NO_VPK.py
           python3 research/b24_unified/g171_authored_vs_visual_sculpture_walls/g171_retract_G108_unauthored_sculpture_colliders_NO_VPK.py
           python3 research/b24_unified/g172_native_warmachine_ground_m/g172_add_true_wm_m_ground_source_to_single_g83_NO_VPK.py
+          python3 research/b24_unified/g173_unibeam_single_animator_priority/g173_fix_real_G169_G85_beam_source_priority_NO_VPK.py
           cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
@@ -802,6 +804,43 @@ jobs:
           assert not list(root.rglob('*.vpk'))
           print('G172 ten genuine War Machine 2010 M-ground animation clips + exact B18 timings, zero source movement or damage changes, source-only no VPK')
           PY
+      - name: G173 verify exactly original G169 MarkV VI ground hover Beam1 2 3 now actually LOADS through one corrected G8/G85 source streamer NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g173_unibeam_single_animator_priority/g173_fix_real_G169_G85_beam_source_priority_NO_VPK.py
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g173_unibeam_single_animator_priority \
+            research/b24_unified/g173_unibeam_single_animator_priority/test_g173_exact_g169_beam_priority_gate.c \
+            -o /tmp/g173_12_strict_2010_beam_clip_name_gate
+          /tmp/g173_12_strict_2010_beam_clip_name_gate
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            work/b24/b24_unified/b24_g169_native_source_unibeam.c \
+            work/b24/b24_unified/b24_g11_original_unibeam_sequence.c \
+            research/b24_unified/g173_unibeam_single_animator_priority/test_g173_REAL_2010_IM2V_G169_G8_G85_full_host_owner.c \
+            -lm -o /tmp/g173_REAL_original_2010_G169_G8_G85_one_animator
+          /tmp/g173_REAL_original_2010_G169_G8_G85_one_animator work/animations
+          python3 - <<'PY'
+          from pathlib import Path
+          work=Path('work')
+          main=(work/'src/main.c').read_text()
+          source=(work/'b24/b24_unified/b24_g8_live_original_motion.c').read_text()
+          cm=(work/'CMakeLists.txt').read_text()
+          assert main.count('b24_g8_motion_tick_g84(')==1
+          assert main.count('b24_g83_timeline_tick(')==1
+          assert main.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert main.count('b24_g169_native_beam_clip(')==1
+          assert source.count('b24_g173_authored_beam_pose_priority(')==1
+          assert source.count('b24_g173_is_authored_beam(4,desired)')==1
+          assert 'B24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY' in cm
+          assert not list(work.rglob('*.vpk'))
+          print('G173 exact authored native 2010 UniBeam G169 -> single genuine G8/G85 IM2V load real animation names; stage2/rush damage, B16 and original native event semantics unchanged')
+          PY
       - name: G159 actual unified G75 capsule integrates road source without overriding original native ground
         run: |
           set -euo pipefail
@@ -881,6 +920,7 @@ jobs:
               -DB24_G169_AUTHENTIC_BEAM_3_PHASE=ON \
               -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=ON \
               -DB24_G172_WM_NATIVE_M_GROUND_BANK=ON \
+              -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=ON \
               -DB24_G111_NATIVE_SOURCE_GATES=ON \
               -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
               -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
