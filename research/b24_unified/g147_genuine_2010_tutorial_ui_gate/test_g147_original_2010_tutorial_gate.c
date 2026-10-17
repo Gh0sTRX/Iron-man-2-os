@@ -1,6 +1,7 @@
 #include "b24_g147_authentic_tutorial_actor.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 typedef struct {int queries,draws,allow,id,mode,third;} Mock;
 static int translate(void *p,int original,int *out){
  Mock *m=(Mock*)p;m->queries++;
@@ -14,6 +15,15 @@ static int draw(void *p,int id,int mode,int third){
  return m->allow;
 }
 int main(void){
+ int real=-1;
+ assert(b24_g147_source_native_StringMgr_translate(NULL,339,&real));
+ assert(real==0x1053);
+ assert(!b24_g147_source_native_StringMgr_translate(NULL,338,&real));
+ assert(!b24_g147_source_native_StringMgr_translate(NULL,339,NULL));
+ assert(b24_g147_source_english_real_tutorial_text(0x1053)!=NULL);
+ assert(strcmp(b24_g147_source_english_real_tutorial_text(0x1053),
+   "Are you ready to face the crowd, sir?")==0);
+ assert(b24_g147_source_english_real_tutorial_text(0x1054)==NULL);
  B24G147Tutorial a={0};b24_g147_tutorial_init(&a);
  /* Real original game HUD IsTutConfirmed checks whether active
   * translated tutorial ID is -1 OR native override byte is set. */
@@ -33,6 +43,15 @@ int main(void){
  assert(a.current_original_game_ui_mode==12&&a.native_third_argument==0);
  assert(m.id==1275&&m.mode==12&&m.third==0);
  assert(b24_g147_lua_IsTutConfirmed_native(&a)==0);
+ /* Same actual original QTE text with real original native source
+  * StringMgr ID, not the test-only synthetic 1275 callback above. */
+ B24G147Tutorial realTutorial={0};
+ b24_g147_tutorial_init(&realTutorial);
+ assert(b24_g147_lua_ShowTut_PC67(&realTutorial,&e,
+   b24_g147_source_native_StringMgr_translate,draw,&m));
+ assert(realTutorial.current_original_game_ui_text_id==0x1053);
+ assert(realTutorial.current_original_game_ui_mode==12);
+ assert(!b24_g147_lua_IsTutConfirmed_native(&realTutorial));
  a.global_ui_override=1;
  assert(b24_g147_lua_IsTutConfirmed_native(&a)==1);
  a.global_ui_override=0;
