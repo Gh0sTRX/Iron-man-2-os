@@ -26,9 +26,9 @@
       "id": "solid_collision",
       "name": "Floor, buildings, wall and ceiling player capsule",
       "state": "device_regression_open",
-      "source_evidence": "G156 full single-game Vita ARM ELF SUCCESS #39045921585 plus authentic G134/G108 collision regression; G157 G104 original 1910 native G66C = 1690 steep+220 nonwall, central 6561 XY samples reveal height-specific native vs visual candidate mismatch at z0.0725 (2892 native-only, 3669 both) and z2.82955 (628 visual-only, 203 both, 5730 neither), source analysis only.",
-      "device_evidence": "G104 physical Vita observed building penetration; G156/G157 no physical Vita retest and G157 visualization cannot establish authored solidity. Remains OPEN.",
-      "acceptance": "On real PS Vita retest at reproducible original G104 wall coordinates, including steep slanted wall, building front, corners, long-frame rush and normal flight; no gross wall tunneling, no false blocking of open scenery; document FPS impact.",
+      "source_evidence": "G156 full one-game Vita ARM ELF succeeds #39045921585 (exact wall contact). G157 height-source collision/visual survey G66M 22441 vs G66C native 1910 source. G158 verified real iOS named PVR pixel match: G66 atlas12=c1l1_road.tga, atlas17=c1l1_flower_bed.tga. At middle-Z 628 visible/no-native sample XY, 548 are road and 54 flower bed. All 548 sampled road Z2.6937, nearest current port source G75 G66C nonwall Z0.0725, gap +2.6212; real existing gameplay C function b24_g74_near_original_floor returns unsupported at road visual height in authentic XY(-160,-160), supported at native Z0.0725; host source CI SUCCESS #39049316919. Original iOS runtime solidness or parent transform not proven.",
+      "device_evidence": "G104 physical Vita showed building penetration and black sky; no G156-G158 Vita retest. G158 host actual G75 C function confirms road display-vs-floor support at one authentic source coordinate, NOT complete Vita gameplay test. Remains OPEN.",
+      "acceptance": "Prove native original iOS 2010 world parent transforms and road/floor collision material ownership; repair road Z support using source evidence not arbitrary solidity, verify current G75 native gameplay ground across original road XY and roofs; physical Vita regression wall/building/road/Stage2-flight tests and frame-time evidence.",
       "owner": "physics",
       "mandatory": true
     },
@@ -90,5 +90,5 @@
     "first_level_playable_claim_allowed": false,
     "candidate_vpk_auto_allowed": false
   },
-  "next_action": "G157 ruled out simple missing baseline-native-nonwall ground at sampled central z0.0725 XY, but not upper structures. Prioritize verifying source building-solid-vs-visual candidate identities and actual G156 hardware collision plus G106 sky/alpha in one meaningful Vita test only when authorized; no invented floor/wall and no new VPK."
+  "next_action": "Stop additional Lua/audio/QTE detail: original road surface atlas12 548 source sample XY at Z2.6937 vs native G75 nonwall Z0.0725 gap 2.6212, actual source C floor callback unsupported at road level (G158). Next prove C1L1_ground_001/ floor_001 / col_01 / building_col BRES/CLARA world transform and authored floor ownership, then repair one B14 owner and run one deliberate physical Vita QA; keep release BLOCKED and no auto VPK."
 }
