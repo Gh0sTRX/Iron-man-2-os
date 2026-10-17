@@ -110,8 +110,8 @@ def run(ipa,out):
                     # exclude string/data pointers; require address in actual
                     # executable __TEXT file-backed range, label only as
                     # candidate until independently verified.
-                    if addr is not None and textseg['vmaddr']<=addr<
-                        textseg['vmaddr']+textseg['filesize']:
+                    if (addr is not None and
+                        textseg['vmaddr']<=addr<textseg['vmaddr']+textseg['filesize']):
                         near.append({"delta":delta,"candidate_code_vm":addr})
                 values.append({"ascii_file_offset":loc,"ascii_vm":vm,
                                "name_pointer_file_offset":ref,
