@@ -1,0 +1,53 @@
+name: G132 2010 native ARM special SetInputEnabled 14 flight/maincharacter branch no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g132-original-2010-SetInputEnabled-code14-native-Cplusplus-special-branch-NO-VPK.yml"
+      - "research/b24_unified/g132_original_input14_native/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify_real_original_iOS_SetInputEnabled14_unique_branch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native actual ARM owner original C++ strict source parser
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q capstone gdown
+          python3 -m py_compile research/b24_unified/g132_original_input14_native/g132_2010_Special14_SetInputEnabled_True_Controller_Operands.py
+      - name: Original source 2010 owner IPA transient read only, never published
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g132_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g132_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g132_private/owner.ipa
+          test "$(wc -c </tmp/g132_private/owner.ipa)" -eq 248613763
+      - name: Read ORIGINAL iOS first mission Lua SetInputEnabled 14 special target and generic 2 6 target full authentic native ARM
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g132_original_input14_native/g132_2010_Special14_SetInputEnabled_True_Controller_Operands.py \
+            --ipa /tmp/g132_private/owner.ipa --out /tmp/g132_native
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g132_native/G132_2010_NATIVE_SetInputEnabled_SPECIAL_14_AND_GENERIC_2_6_REAL_CALL_TARGETS.json').read_text())
+          assert d['verified_special_Input_14_branch_ARM_0x184CC']
+          assert len(d['actual_original_iOS_native_symbols_for_special_14_generic_2_6'])==14
+          assert d['NO_VPK'] and not d['original_iOS_raw_arm_bytes_distributed']
+          PY
+      - name: Remove private owner original iOS executable and input archive even if failed
+        if: always()
+        run: |
+          rm -rf /tmp/g132_private
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G132_REAL_ORIGINAL_IOS_2010_SetInputEnabled_SPECIAL14_Generic2_6_ARM_SOURCE_NO_VPK
+          path: /tmp/g132_native/G132_2010_NATIVE_SetInputEnabled_SPECIAL_14_AND_GENERIC_2_6_REAL_CALL_TARGETS.json
+          retention-days: 14
+          if-no-files-found: error
