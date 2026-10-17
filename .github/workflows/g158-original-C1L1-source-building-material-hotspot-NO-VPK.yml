@@ -1,0 +1,54 @@
+name: G158 original C1L1 source visual-only building material provenance NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g158-original-C1L1-source-building-material-hotspot-NO-VPK.yml"
+      - "research/b24_unified/g158_original_source_building_material_gap/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_original_2010_material_provenance_hotspot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore owner original previously test-verified G104 asset read only
+        uses: actions/download-artifact@v4
+        with:
+          name: IronMan2_B24_G104_G95_Source_OriginalStarkExpo_MarkV248_Dummy_TestVPK
+          run-id: 38974292901
+          github-token: ${{ github.token }}
+          path: /tmp/g158_g104_owner_original
+      - name: G158 trace 628 Z2.82955 source visual-only samples back to 32 authentic original city render groups
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g158_original_source_building_material_gap/g158_group_real_C1L1_visual_only_by_original_material_NO_VPK.py
+          original=$(find /tmp/g158_g104_owner_original -name '*.vpk' -print -quit)
+          test -n "$original"
+          test "$(stat -c%s "$original")" -eq 94566476
+          python3 research/b24_unified/g158_original_source_building_material_gap/g158_group_real_C1L1_visual_only_by_original_material_NO_VPK.py --preexisting-source-vpk "$original" --outdir /tmp/g158_real_group_hotspots
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/g158_real_group_hotspots')
+          j=json.loads((root/'G158_real_C1L1_building_surface_attribution.json').read_text())
+          assert j['original_native_nonwall_face_count']==220
+          assert j['original_opaque_nonsteep_visual_faces']==8768
+          assert j['visual_only_middle_z_count']==628
+          assert j['observed_source_parity']['middle']=={'visual_only':628,'neither':5730,'both':203}
+          assert sum(x['grid_sample_count'] for x in j['clusters'])<=628
+          assert sum(x['sample_xy_count'] for x in j['visual_only_original_G66_draw_group_attribution'])>=628
+          assert j['does_not_modify_native_collision'] and j['new_vpk'] is False
+          assert (root/'G158_original_source_material_hotspot_visual_only.svg').stat().st_size>10000
+          print('G158 PASS exact original authored source visual-only 628 sample attribution, source material/solidity NOT invented')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G158_Genuine_2010_C1L1_Original_DrawGroup_Hotspot_Metadata_NO_VPK
+          path: /tmp/g158_real_group_hotspots/
+          retention-days: 14
+          if-no-files-found: error
