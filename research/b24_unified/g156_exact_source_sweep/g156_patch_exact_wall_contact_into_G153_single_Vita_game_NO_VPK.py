@@ -67,8 +67,7 @@ def apply():
     j=a.index(end)
     if j<=i or "static int slice(" not in a[i:j]:
         raise ValueError("G156 G75 removed helper is not original 3-slice")
-    a=a[:i]+"""static float fmin2(float a,float b){return a<b?a:b;}
-static float fmax2(float a,float b){return a>b?a:b;}
+    a=a[:i]+"""static float fmax2(float a,float b){return a>b?a:b;}
 static int finite3(float x,float y,float z){
  return isfinite(x)&&isfinite(y)&&isfinite(z)&&
   fabsf(x)<100000.f&&fabsf(y)<100000.f&&fabsf(z)<100000.f;
