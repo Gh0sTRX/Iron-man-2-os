@@ -15,6 +15,29 @@ int main(int argc,char **argv){
  assert(b24_g108_grid_load(&g,argv[1],&native));
  assert(g.ready&&g.count>1000&&g.count<18001);
  assert(g.cell_index_count>=g.count);
+ /* G128 regression: original 2010 level1 SOURCE world is much wider than
+  * the arbitrary old central -336..336/-360..264 collision grid. Verify
+  * the rebuilt grid covers the full measured original G66 rendered scene.
+  * The source rectangle does NOT certify gameplay mission flight rights. */
+ assert(g.source_maxx>g.source_minx&&g.source_maxy>g.source_miny);
+ assert(g.source_minx>=-1248.f&&g.source_maxx<=480.f);
+ assert(g.source_miny>=-1116.f&&g.source_maxy<=612.f);
+ assert(b24_g108_grid_source_bounds_allow(&g,
+     .5f*(g.source_minx+g.source_maxx),
+     .5f*(g.source_miny+g.source_maxy),.35f));
+ assert(!b24_g108_grid_source_bounds_allow(&g,g.source_minx-.5f,
+     .5f*(g.source_miny+g.source_maxy),.35f));
+ unsigned outside_previous_beta_viewport=0;
+ for(uint32_t i=0;i<g.count;i++){
+  const B24G108Wall *w=&g.walls[i];
+  const float xx=(w->p[0]+w->p[3]+w->p[6])/3.f;
+  const float yy=(w->p[1]+w->p[4]+w->p[7])/3.f;
+  if(xx< -336.f||xx>336.f||yy< -360.f||yy>264.f)
+    outside_previous_beta_viewport++;
+ }
+ printf("G128 ORIGINAL 2010 source city measured AABB x:[%.3f,%.3f] y:[%.3f,%.3f], %u original opaque steep triangles previously LOST beyond hardcoded B14/G108 beta viewport\\n",
+   g.source_minx,g.source_maxx,g.source_miny,g.source_maxy,
+   outside_previous_beta_viewport);
  uint32_t hits=0,clear=0;
  /* Probe source-REAL triangle interiors, not invented stress vertices. */
  for(uint32_t i=0;i<g.count;i++){
