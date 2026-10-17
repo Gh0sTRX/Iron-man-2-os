@@ -54,12 +54,14 @@ def run(app, exe, out, sec):
   online=False
   while time.monotonic()-start<min(26,sec//2):
    if proc.poll() is not None:break
+   # Read kernel listener status instead of connecting and stealing GDB slot.
    try:
-    conn=socket.create_connection(("127.0.0.1",9001),timeout=.4)
-    conn.close()
-    online=True
-    break
-   except OSError:time.sleep(.5)
+    rows=pathlib.Path("/proc/net/tcp").read_text().splitlines()[1:]
+    online=any(row.split()[1].endswith(":2329") and
+           row.split()[3]=="0A" for row in rows)
+   except (OSError,IndexError):online=False
+   if online:break
+   time.sleep(.5)
   if online:
    # One actual GDB remote client. Remote GDB execution and app UI are
    # independent. gdb exits only after input stop/app closure.
