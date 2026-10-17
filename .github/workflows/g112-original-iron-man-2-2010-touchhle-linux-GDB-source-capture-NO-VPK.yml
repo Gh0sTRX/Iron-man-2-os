@@ -18,6 +18,11 @@ jobs:
       APPIMAGE_EXTRACT_AND_RUN: "1"
     steps:
       - uses: actions/checkout@v4
+      - name: Preflight original touchHLE tracing Python syntax and pure script source BEFORE huge owner IPA or emulator downloads
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g112_real_touchhle_gameplay_trace/g112_run_2010_real_game_touchhle_gdb.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
       - name: Install actual ARM-v6 GDB remote debugger, virtual screen and screenshot tools
         run: |
           set -euo pipefail
