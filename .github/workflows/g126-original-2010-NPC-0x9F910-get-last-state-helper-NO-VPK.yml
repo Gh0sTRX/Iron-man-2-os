@@ -1,0 +1,55 @@
+name: G126 source original 2010 CNPC last-state accessor 0x9F910 native ARM getter NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g126-original-2010-NPC-0x9F910-get-last-state-helper-NO-VPK.yml"
+      - "research/b24_unified/g123_native_NPC_real_state/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_ARM_NPC_native_predicates_and_mission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preflight actual original 2010 ARM opcode source probe
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g123_native_NPC_real_state/g126_original_2010_CNPC_state_helper_0x9f910_pointer_semantics.py
+          python3 -m pip install -q capstone gdown
+      - name: Original owner 2010 IPA read ephemerally, no proprietary executable persisted
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g126_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g126_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g126_private/owner.ipa
+          test "$(wc -c </tmp/g126_private/owner.ipa)" -eq 248613763
+      - name: Extract original native 2010 ARM branch logic for NPC attack states kill mission and skybox
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g123_native_NPC_real_state/g126_original_2010_CNPC_state_helper_0x9f910_pointer_semantics.py \
+            --ipa /tmp/g126_private/owner.ipa --out /tmp/g126_source
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j=json.loads(Path('/tmp/g126_source/G126_CNPC_LAST_NODE_0x9F910_NATIVE_ORIGINAL_ARM_POINTER_HELPER_SOURCE.json').read_text())
+          assert j['source_user_2010_iOS_own_Arm_MachO']
+          assert j['target_native_owner_address']=='0x9f910'
+          assert len(j['native_original_helper_assembly'])>=3
+          assert not j['new_vpk_created']
+          print('PASS original owner 2010 native ARM method CFG metadata and real branch operands')
+          PY
+      - name: Always delete original 2010 IPA before publishing metadata
+        if: always()
+        run: |
+          rm -rf /tmp/g126_private
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G126_2010_ORIGINAL_NPC_PLUS_0x2BC_NATIVE_STATE_NODE_LOOKUP_ARM_NO_VPK
+          path: /tmp/g126_source/G126_CNPC_LAST_NODE_0x9F910_NATIVE_ORIGINAL_ARM_POINTER_HELPER_SOURCE.json
+          retention-days: 14
+          if-no-files-found: error
