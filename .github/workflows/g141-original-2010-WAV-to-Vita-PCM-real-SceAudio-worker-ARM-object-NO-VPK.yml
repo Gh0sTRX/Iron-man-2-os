@@ -1,0 +1,53 @@
+name: G141 original IronMan2 2010 PCM48 stereo stream real Vita sceAudioOutOutput ARM object NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g141-original-2010-WAV-to-Vita-PCM-real-SceAudio-worker-ARM-object-NO-VPK.yml"
+      - "research/b24_unified/g141_original_vita_pcm_stream/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual_original_audio_pcm_source_native_Vita_bridge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native host original 2010 RIFF decoded PCM read/pause/EOF/loop 512 frame tests
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g141_original_vita_pcm_stream \
+            research/b24_unified/g141_original_vita_pcm_stream/b24_g141_owner_pcm_stream.c \
+            research/b24_unified/g141_original_vita_pcm_stream/test_g141_pcm_stream_original_format.c \
+            -o /tmp/g141_owner_2010_pcm_stream_host
+          /tmp/g141_owner_2010_pcm_stream_host
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Compile original WAV48 PCM streaming native SceAudioOutOutput + kernel thread on real VitaSDK ARM (no IPA needed)
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            mkdir -p /tmp/g141_native_arm
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -DB24_G139_REAL_VITA_AUDIO_OUT=1 \
+              -DB24_G141_VITA_NATIVE=1 \
+              -Iresearch/b24_unified/g137_original_Mission000_native_boot \
+              -Iresearch/b24_unified/g139_vita_native_audio_music \
+              -Iresearch/b24_unified/g141_original_vita_pcm_stream \
+              -c research/b24_unified/g141_original_vita_pcm_stream/b24_g141_owner_pcm_stream.c \
+              -o /tmp/g141_native_arm/g141_pcm_source.o
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -DB24_G139_REAL_VITA_AUDIO_OUT=1 \
+              -DB24_G141_VITA_NATIVE=1 \
+              -Iresearch/b24_unified/g137_original_Mission000_native_boot \
+              -Iresearch/b24_unified/g139_vita_native_audio_music \
+              -Iresearch/b24_unified/g141_original_vita_pcm_stream \
+              -c research/b24_unified/g141_original_vita_pcm_stream/b24_g141_vita_stream_worker.c \
+              -o /tmp/g141_native_arm/g141_stream_worker.o
+            arm-vita-eabi-nm /tmp/g141_native_arm/g141_stream_worker.o | grep -q sceAudioOutOutput
+            arm-vita-eabi-nm /tmp/g141_native_arm/g141_stream_worker.o | grep -q sceKernelCreateThread
+            arm-vita-eabi-nm /tmp/g141_native_arm/g141_stream_worker.o | grep -q sceKernelStartThread
+            echo "PASS G141 original 2010 WAV derived PCM stream native Vita real SceAudioOutOutput kernel thread ARM object and host pause/loop QA, NO VPK"
+          '
