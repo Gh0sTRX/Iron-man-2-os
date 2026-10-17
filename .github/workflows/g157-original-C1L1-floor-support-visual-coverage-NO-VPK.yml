@@ -42,6 +42,14 @@ jobs:
           assert d['source_stats']['original_collision_nonwall_faces']==220
           assert d['source_stats']['original_collision_wall_faces']==1690
           assert sum(d['classification_counts'].values())==6561
+          assert d['xy_projected_all_z_misleading_due_to_stacked_platforms']
+          slices=d['height_slice_counts']
+          assert len(slices)==5
+          assert all(sum(v['classification_counts'].values())==6561 for v in slices.values())
+          assert slices['z0_0725']['classification_counts']=={'native_only':2892,'both':3669}
+          assert slices['z2_82955']['classification_counts']=={'visual_only':628,'neither':5730,'both':203}
+          assert slices['z6_67306']['classification_counts']=={'neither':6521,'visual_only':40}
+          assert len(list(Path('/tmp/g157_original_floor_coverage').glob('G157_z*_floor_support_overlay.svg')))==5
           assert any(abs(z-2.82955)<.005 for z in d['known_G75_exact_source_stacked_support_heights'])
           assert not d['source_floor_coverage_proven_for_entire_world']
           assert not d['native_vita_visual_hardware_test_passed']
