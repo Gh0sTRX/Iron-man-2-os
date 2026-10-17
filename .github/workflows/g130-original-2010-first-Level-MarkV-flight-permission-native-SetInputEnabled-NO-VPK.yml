@@ -1,0 +1,64 @@
+name: G130 ORIGINAL 2010 MarkV Level1 flight permission and SetInputEnabled ARM engine NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g130-original-2010-first-Level-MarkV-flight-permission-native-SetInputEnabled-NO-VPK.yml"
+      - "research/b24_unified/g130_original_suitcase_flight_permission/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_original_iOS_suitcase_flight_maincharacter_native_method_dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect existing AUTHENTIC 2010 first mission 71 LUA callbacks no original private app required for this
+        uses: actions/download-artifact@v4
+        with:
+          name: G129_ORIGINAL_2010_LEVEL1_SUITCASE_MISSION_ACTOR_INTRO_MARKV_FLIGHT_GATES_NOT_GUESSED_NO_VPK
+          run-id: 39024283631
+          github-token: ${{ github.token }}
+          path: /tmp/g130_source
+      - name: Native real ARM 2010 owner executable function inventory tools
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q capstone gdown
+          python3 -m py_compile research/b24_unified/g130_original_suitcase_flight_permission/g130_original_2010_arm_MarkV_flight_and_SetInputEnabled_source.py
+      - name: User-owned 2010 original ARM source IPA EPHEMERAL retrieve for methods
+        run: |
+          mkdir -p /tmp/g130_PRIVATE
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g130_PRIVATE/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g130_PRIVATE/owner.ipa
+          test "$(wc -c </tmp/g130_PRIVATE/owner.ipa)" -eq 248613763
+      - name: Resolve actual original 2010 iOS flight/input native CPP methods and bounded ARM, against authentic level1 script
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g130_original_suitcase_flight_permission/g130_original_2010_arm_MarkV_flight_and_SetInputEnabled_source.py \
+            --ipa /tmp/g130_PRIVATE/owner.ipa \
+            --mission /tmp/g130_source/G129_2010_ORIGINAL_LEVEL1_MISSION_SUITCASE_FLIGHT_RIGHTS_TYPED_CALLS_SOURCE_NOT_EXECUTED.json \
+            --out /tmp/g130_public/G130_ORIGINAL_2010_LEVEL1_MARKV_SUITCASE_FLIGHT_GATING_INPUT_MISSION_NATIVE_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g130_public/G130_ORIGINAL_2010_LEVEL1_MARKV_SUITCASE_FLIGHT_GATING_INPUT_MISSION_NATIVE_ARM.json').read_text())
+          assert len(x['native_original_suit_and_flight_CPP_method_inventory'])>10
+          assert not x['original_suitcase_MarkV_level1_CanFly_permitted_proven']
+          assert not x['original_suitcase_MarkV_level1_CanFly_prohibited_proven']
+          assert x['NO_VPK'] and not x['binary_in_artifacts']
+          print('G130 original 2010 iOS first mission flight permission remains unproven, do not guess forced ground-only.')
+          PY
+      - name: Always erase original user iOS game bytes
+        if: always()
+        run: |
+          rm -rf /tmp/g130_PRIVATE
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G130_OWNER_2010_iOS_MARKV_Level1_Flight_Ability_InputBit14_ARM_Methods_NO_VPK
+          path: /tmp/g130_public/G130_ORIGINAL_2010_LEVEL1_MARKV_SUITCASE_FLIGHT_GATING_INPUT_MISSION_NATIVE_ARM.json
+          retention-days: 14
+          if-no-files-found: error
