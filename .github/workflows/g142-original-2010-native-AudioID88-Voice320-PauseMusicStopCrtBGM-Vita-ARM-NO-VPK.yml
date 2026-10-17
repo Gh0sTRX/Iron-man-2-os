@@ -1,0 +1,66 @@
+name: G142 genuine 2010 source iOS Music88 Voice320 PauseMusic StopCrtBGM native Vita ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g142-original-2010-native-AudioID88-Voice320-PauseMusicStopCrtBGM-Vita-ARM-NO-VPK.yml"
+      - "research/b24_unified/g142_original_2010_native_sound_id_semantics/**"
+      - "research/b24_unified/g139_vita_native_audio_music/**"
+      - "research/b24_unified/g140_owner_wav_audio/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual_2010_sound_machO_semantic_corrections:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G27_ORIGINAL_C1L1_71_LUA_1035_CALLS_MC_CAMERA_NODE_ID_STATIC_SOURCE_NO_VPK
+          run-id: 38750892057
+          github-token: ${{ github.token }}
+          path: /tmp/g142_original_mission_lua
+      - name: Original Level1 source exactly 24 callbacks C from iOS owner verified G27 metadata no IPA download
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g140_owner_wav_audio/g140_extract_owner_original_2010_V100_audio_and_optional_103_difference_NO_VPK.py
+          python3 research/b24_unified/g137_original_Mission000_native_boot/g137_emit_original_Mission000_lua_prefix_from_G27.py \
+            --g27 /tmp/g142_original_mission_lua/original_lua_calls.json \
+            --out /tmp/g142_original_Mission000_generated.c
+      - name: 2010 original SoundManager PauseMusic really StopCrtBGM Game+0xEC fade2000, real native 803 sound-table IDs
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g142_original_2010_native_sound_id_semantics \
+            research/b24_unified/g142_original_2010_native_sound_id_semantics/b24_g142_native_sound_source_truth.c \
+            research/b24_unified/g142_original_2010_native_sound_id_semantics/test_g142_genuine_original_2010_audio_id_stop_fade_lua.c \
+            -o /tmp/g142_authentic_sound_manager_original_semantics
+          /tmp/g142_authentic_sound_manager_original_semantics
+      - name: Original Mission000 source MUSIC PC3 MUST NOT auto advance on mere audio port mute G139 correction host C regression
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g137_original_Mission000_native_boot \
+            -I research/b24_unified/g139_vita_native_audio_music \
+            research/b24_unified/g137_original_Mission000_native_boot/b24_g137_source_mission000_intro.c \
+            /tmp/g142_original_Mission000_generated.c \
+            research/b24_unified/g139_vita_native_audio_music/b24_g139_original_mission_music_bridge.c \
+            research/b24_unified/g139_vita_native_audio_music/test_g139_real_source_Mission000_native_music_group.c \
+            -o /tmp/g142_corrected_sound_source_native_pc3
+          /tmp/g142_corrected_sound_source_native_pc3
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Native Vita ARM owner audio ID and exact original stop current track code
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/workspace" -w /workspace vitasdk/vitasdk:2026.08 sh -lc '
+            set -eu
+            arm-vita-eabi-gcc -std=c11 -O2 -Wall -Wextra -Werror \
+              -Iresearch/b24_unified/g142_original_2010_native_sound_id_semantics \
+              -c research/b24_unified/g142_original_2010_native_sound_id_semantics/b24_g142_native_sound_source_truth.c \
+              -o /tmp/g142_original_source_music_arm.o
+            test -s /tmp/g142_original_source_music_arm.o
+            arm-vita-eabi-nm /tmp/g142_original_source_music_arm.o | grep -q b24_g142_owner_source_music_call
+            echo PASS true 2010 iOS Music ID88 and Voice320 source C and StopCrtBGM fade2000 exact/native Vita ARM, PC3 unbound remains blocked and audio mute not fake original, NO VPK
+          '
