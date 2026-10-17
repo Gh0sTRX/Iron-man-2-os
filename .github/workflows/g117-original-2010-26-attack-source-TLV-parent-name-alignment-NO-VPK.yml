@@ -1,0 +1,47 @@
+name: G117 Original 2010 26 Attack Data 54 Fields Native Damage Inheritance Typed Source QA NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g117-original-2010-26-attack-source-TLV-parent-name-alignment-NO-VPK.yml"
+      - "research/b24_unified/g117_clara_native_26_attack_named_damage/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_iOS_26_attack_54_real_TLV_type_sequences:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore AUTHENTIC original 2010 26 x 54 source-owned decoded CLARA metadata no executable
+        uses: actions/download-artifact@v4
+        with:
+          name: G98_ORIGINAL_2010_ATTACKENTITY_14_GETPARAMVALUE_REAL_TYPED_PROPERTY_SOURCE_META_NO_VPK
+          run-id: 38971308172
+          github-token: ${{ github.token }}
+          path: /tmp/g117_owner
+      - name: Confirm native class110/Object typed parent property order vs 26 Attack class108 actual size-prefixed fields
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g117_clara_native_26_attack_named_damage/g117_2010_attack_54_slots_parent_typed_subsequence_analysis.py \
+            --g101 /tmp/g117_owner/G101_2010_NATIVE_ATTACK_INSTANCE_COUNTED_LENGTH_FIELDS_AND_SCHEMA_PROOF.json \
+            --out /tmp/g117_result/G117_2010_REAL_26_ATTACK_OBJECT110_PROPERTY_TYPED_SUBSEQUENCE_DAMAGE_CANDIDATES_UNPROVEN.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g117_result/G117_2010_REAL_26_ATTACK_OBJECT110_PROPERTY_TYPED_SUBSEQUENCE_DAMAGE_CANDIDATES_UNPROVEN.json').read_text())
+          assert d['original_owner_2010_class108_Attack_records']==26
+          assert d['source_2010_declared_Object110_local_props']==23
+          assert d['authentic_2010_26_per_attack_damage_numeric_values_PROVEN'] is False
+          assert d['safe_enable_per_attack_damage'] is False
+          assert d['VPK_generated'] is False
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G117_REAL_ORIGINAL_ATTACK_26x54_TYPED_CLARA_PARENT_DAMAGE_SUBSEQUENCE_CANDIDATE_NO_VPK
+          path: /tmp/g117_result/G117_2010_REAL_26_ATTACK_OBJECT110_PROPERTY_TYPED_SUBSEQUENCE_DAMAGE_CANDIDATES_UNPROVEN.json
+          retention-days: 14
+          if-no-files-found: error
