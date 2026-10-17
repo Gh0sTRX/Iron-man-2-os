@@ -14,7 +14,7 @@ def riff_fmt(raw):
   raise ValueError('original WWW is not RIFF WAVE')
  if int.from_bytes(raw[4:8],'little')+8>len(raw):
   raise ValueError('original WAVE raw RIFF length corrupted')
- pos=12;fmt=None,data=None
+ pos=12;fmt=None;data=None
  while pos+8<=len(raw):
   key=raw[pos:pos+4];n=struct.unpack_from('<I',raw,pos+4)[0];pos+=8
   if pos+n>len(raw):raise ValueError('original WAVE chunk overflow')
