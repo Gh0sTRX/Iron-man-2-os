@@ -1,0 +1,49 @@
+name: G122 Confirm precise original 2010 AIHover AILand Kill Mission Sky Material Source Methods NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: [".github/workflows/g122-extract-2010-exact-hover-AI-mission-kill-and-render-methods-NO-VPK.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  2010_original_native_methods:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G121_ORIGINAL_2010_REAL_NPC_MISSION_SKY_MATERIAL_RENDER_NATIVE_METHODS_NO_VPK
+          run-id: 39017406712
+          github-token: ${{ github.token }}
+          path: /tmp/g122_original_native
+      - name: Verify real C++ native AIHover AILand AIBigMachine MissionConditionKill SpawnPoint and renderer methods
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g122_original_native/G121_REAL_2010_NATIVE_NPC_MISSION_RENDER_CPLUSPLUS_SOURCE_SYMBOLS_ONLY.json').read_text())
+          rows=[]
+          for group in ('NPC_AI_original_named_source_methods','MISSION_SPAWN_original_named_source_methods','VISUAL_GLES_original_named_source_methods'):
+           for q in x[group]:
+            name=q['original_2010_cpp_symbol']
+            if re.search(r'^(AIHover|AILand|AIBigMachine|CNPC|BigMachineNPC|MissionConditionKill|MissionConditionProtect|MissionMgr|SpawnPoint|TriggerEntity|RenderManager|Material|Sky|Sun|Lighting|LightManager|GS_GamePlay)::',name):
+             rows.append((name,q['source_native_ARM_or_thumb_address']))
+          rows=sorted(set(rows),key=lambda x:(x[0],x[1]))
+          print('G122 EXACT ACTUAL owner iOS 2010 NPC AI and mission function names',len(rows))
+          for name,addr in rows[:280]:print('G122_SOURCE',addr,name)
+          Path('/tmp/g122_selected').mkdir(exist_ok=True)
+          Path('/tmp/g122_selected/G122_VERIFIED_2010_AI_MISSION_GL_NATIVE_SOURCE_METHODS.json').write_text(json.dumps([
+            {'2010_actual_method':n,'original_arm_address':a,'algorithm_fully_ported':False}
+            for n,a in rows],ensure_ascii=False,indent=2)+'\n')
+          assert len(rows)>30
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G122_Original_2010_NPC_AI_Hover_Land_Mission_Render_Class_Native_Method_Names_NO_VPK
+          path: /tmp/g122_selected/G122_VERIFIED_2010_AI_MISSION_GL_NATIVE_SOURCE_METHODS.json
+          retention-days: 14
