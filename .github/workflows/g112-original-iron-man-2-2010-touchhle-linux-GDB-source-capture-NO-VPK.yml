@@ -1,4 +1,4 @@
-name: G112 REAL ORIGINAL Iron Man 2 2010 iOS touchHLE GDB Native Combat Runtime NO VPK
+name: G112B OFFICIAL touchHLE source built original 2010 Iron Man 2 live ARM GDB NO VPK
 on:
   push:
     branches: [feature/b24-unified-gameplay]
@@ -30,16 +30,21 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq gdb-multiarch xvfb scrot libgl1-mesa-dri libasound2t64 libfuse2t64
           python3 -m pip install -q gdown
-      - name: Fetch external OPEN SOURCE touchHLE v0.3.0 Linux 64 bit AppImage
+      - name: Build OFFICIAL touchHLE v0.3.0 OPEN-SOURCE on Linux (avoid third-party broken AppImage /tmp/CQK forced dylib)
+        timeout-minutes: 18
         run: |
           set -euo pipefail
-          mkdir -p /tmp/g112_real_tools
-          curl --fail --location --retry 4 \
-            'https://github.com/pkgforge-dev/TouchHLE-AppImage/releases/download/v0.3.0%402026-10-01_1790876273/touchHLE-v0.3.0-anylinux-x86_64.AppImage' \
-            -o /tmp/g112_real_tools/touchHLE.AppImage
-          test "$(wc -c </tmp/g112_real_tools/touchHLE.AppImage)" -eq 32703718
-          chmod +x /tmp/g112_real_tools/touchHLE.AppImage
-          file /tmp/g112_real_tools/touchHLE.AppImage
+          sudo apt-get install -y -qq libboost-dev libopenal-dev libsdl2-dev libgl1-mesa-dev libx11-dev
+          git clone --depth 1 --branch v0.3.0 --recurse-submodules \
+            https://github.com/touchHLE/touchHLE.git /tmp/g112_official_touchhle
+          cd /tmp/g112_official_touchhle
+          git submodule update --init --recursive
+          cargo build --release --locked --no-default-features --jobs 3
+          test -x target/release/touchHLE
+          ln -sfn /tmp/g112_official_touchhle/touchHLE_dylibs target/release/touchHLE_dylibs
+          ln -sfn /tmp/g112_official_touchhle/touchHLE_fonts target/release/touchHLE_fonts
+          cp touchHLE_default_options.txt target/release/ || true
+          echo "Official upstream touchHLE v0.3.0 compiled from source: no patched CQK AppImage, for owner 2010 iOS original ARM function runtime trace"
       - name: Download user-provided decrypted original 2010 Iron Man 2 IPA into EPHEMERAL runner only
         run: |
           set -euo pipefail
@@ -65,7 +70,7 @@ jobs:
           timeout 115s xvfb-run -a -s '-screen 0 1280x768x24' \
             python3 research/b24_unified/g112_real_touchhle_gameplay_trace/g112_run_2010_real_game_touchhle_gdb.py \
             --app /tmp/g112_original_PRIVATE/real_app/Payload/IronMan2.app \
-            --touchhle /tmp/g112_real_tools/touchHLE.AppImage \
+            --touchhle /tmp/g112_official_touchhle/target/release/touchHLE \
             --out /tmp/g112_public_report --seconds 45
           python3 - <<'PY'
           import json
