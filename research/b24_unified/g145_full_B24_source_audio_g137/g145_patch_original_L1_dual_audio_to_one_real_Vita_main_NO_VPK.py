@@ -154,7 +154,10 @@ if(B24_G145_SOURCE_MISSION_AUDIO)
   B24_G139_REAL_VITA_AUDIO_OUT=1
   B24_G141_VITA_NATIVE=1
   B24_G144_VITA_NATIVE=1)
- target_link_libraries(im2_beta PRIVATE SceAudio_stub SceKernelThreadMgr_stub)
+ # G9 original CMake already uses the plain target_link_libraries form,
+ # with real SceLibKernel_stub for threads and SceAudio_stub for BGM.
+ # NEVER mix PRIVATE and plain signatures for the same im2_beta target.
+ target_link_libraries(im2_beta SceAudio_stub)
 endif()
 '''
  M.write_text(main);CM.write_text(cm)
