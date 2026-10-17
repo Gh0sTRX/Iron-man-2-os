@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g169-authentic-2010-3-phase-UniBeam-plus-G168-suit-foot-one-Vita-ARM-NO-VPK.yml"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
+      - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
       - "research/b24_unified/g166_original_ground_stuck_source_diagnostics/**"
       - "research/b24_unified/g165_warmachine_source_directional_motion/**"
