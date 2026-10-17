@@ -50,10 +50,10 @@ static int g137_real_scene_MissionPause_only(void *ctx,const B24G137Event *e){
 }
 #endif
 '''
-# Put include after header includes before functions using stable anchor.
-anchor='#include "../b24/b24_unified/b24_g75_source_capsule.h"'
-main=one(main,anchor,anchor+'\n#ifdef B24_G137_MISSION000_REAL_SOURCE_EVENTS\n'+include+'#endif')
-action='''        b24_unified_tick(&b24_game,&b24_obs);
+ # Put include after header includes before functions using stable anchor. 
+ anchor='#include "../b24/b24_unified/b24_g75_source_capsule.h"' 
+ main=one(main,anchor,anchor+'\n#ifdef B24_G137_MISSION000_REAL_SOURCE_EVENTS\n'+include+'#endif') 
+ action='''        b24_unified_tick(&b24_game,&b24_obs);
 #ifdef B24_G137_MISSION000_REAL_SOURCE_EVENTS
         if(!g137_real_source_initialized){
           g137_real_source_initialized=1;
@@ -66,9 +66,9 @@ action='''        b24_unified_tick(&b24_game,&b24_obs);
          * do not fabricate camera/Deco visibility, MarkV flight rights,
          * PC914/927 UI unlock or MissionResume PC935. */
 #endif
-'''
-main=one(main,'        b24_unified_tick(&b24_game,&b24_obs);',action)
-cm+='''
+''' 
+ main=one(main,'        b24_unified_tick(&b24_game,&b24_obs);',action) 
+ cm+='''
 
 # G137 first actual original 2010 native Mission000 source intro events
 # for PC<73 linked into EXISTING player/physics main. OFF by default.
