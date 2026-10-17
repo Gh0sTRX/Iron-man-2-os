@@ -33,6 +33,21 @@ def install():
 static B24G108Grid g108_source_steep_walls={0};
 static int g108_attempted_load=0;
 #endif''')
+ code=one(code,
+  ' if(x<-325.f+r||x>331.f-r||y<-352.f+r||y>255.f-r)return 0;',
+  '''#ifdef B24_G108_SOURCE_VISUAL_WALLS
+ /* G128: the old G75 constant rectangle was only the beta camera viewport.
+  * It clipped real 2010 source C1L1 buildings outside central X/Y, despite
+  * their triangles being loaded. Derive conservative WORLD bounds from
+  * actual original G66 city source once the G108 indexed scene is ready. */
+ if(g108_source_steep_walls.ready){
+  if(!b24_g108_grid_source_bounds_allow(&g108_source_steep_walls,x,y,r))
+   return 0;
+ }else if(x<-325.f+r||x>331.f-r||y<-352.f+r||y>255.f-r)
+  return 0;
+#else
+ if(x<-325.f+r||x>331.f-r||y<-352.f+r||y>255.f-r)return 0;
+#endif''')
  code=one(code,''' }
  return 1;
 }
