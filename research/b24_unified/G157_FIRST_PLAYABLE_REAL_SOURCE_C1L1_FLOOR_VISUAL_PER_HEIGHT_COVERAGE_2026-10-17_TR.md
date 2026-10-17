@@ -10,7 +10,7 @@ G156 native source duvar temasını üç kesitten bütün dikey kapsül yüksekl
 
 Önceden gerçek Vita'da kullanıcı tarafından çalıştırılan G104 gerçek kaynak VPK artifact run `38974292901`, **yalnız salt-okunur** CI runner'da açıldı. `assets/G66_city.g66m`: orijinal 2010 sahnesinde **22.441** drawn triangle/32 batch/31 atlas. `assets/G66_original_collision.g66c`: **1.910** özgün native collision triangle; G75'in kaynak eğim sınıflandırmasına göre **1.690 steep-wall** ve **220 nonwall**. 220 nonwall'ın hepsinin orijinal oyun senaryosunda güvenli yürünebilir zemin olduğu **kanıtlanmış değildir**. `G66M` içinde orijinal opaque/steep olmayan **8.768** görsel triangle (alpha veya textureless dışarıda). Kaynak tekstür/transparency sınıfları oyunun G71/G106 denemelerine dayanır; tüm doğrudan iOS solidity bayrakları henüz kanıtlanmadı.
 
-**[G157 son GitHub Actions PASS #39047519031](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39047519031)**. [G157 SVG/CSV/JSON özeti artifact](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39047519031/artifacts/12106732535) bağlantısındaki ID son G157 run'ının gerçek artifact kimliği ile uyuşmuyorsa Actions sayfasında `G157_Original_2010_C1L1_Floor_Visual_Coverage_Metadata_SVG_NO_VPK` artefaktını aç.
+**[G157 son GitHub Actions PASS #39047519031](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39047519031)**. [G157 doğrulanmış SVG/CSV/JSON artefaktı](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39047519031/artifacts/12106615988).
 
 ### 6.561 örnek, XY bölgesi −160..+160, adım 4 kaynak birim
 
