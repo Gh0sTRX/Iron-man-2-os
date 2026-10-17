@@ -42,7 +42,7 @@ def patch():
    * not import this one unproven draw group as physics. Other groups
    * and all native-source G66C remain unchanged. */
   if(group==21u&&tex==21u)continue;
-  if(group==21u&&tex!=21u)return 0; /* fail-closed changed G66 original group */
+  if(group==21u&&tex!=21u)goto fail; /* asset drift cleanup, fail-closed */
 #endif
   if(tex==UINT32_MAX||translucent[tex]){tmp.skipped_alpha+=count/3;continue;}''')
  cm+="""
