@@ -41,7 +41,6 @@ void b24_g139_music_close(B24G139Music *m){
 int b24_g139_original_Mission000_audio_dispatch(void *ctx,
  const B24G137Event *event){
  if(!ctx||!event)return 0;
- B24G139Music *m=(B24G139Music*)ctx;
  if(event->original_lua_pc==1&&
     event->opcode==B24_G137_CALL_MISSION_PAUSE)return 1;
  /* G142 REAL 2010 iOS ARM CORRECTION: PauseMusic(lua_State*)
