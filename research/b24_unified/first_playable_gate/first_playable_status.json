@@ -16,7 +16,7 @@
       "id": "world_visual",
       "name": "Original first-level map, sky, alpha, lighting, materials",
       "state": "device_regression_open",
-      "source_evidence": "G153 full Vita ARM ELF run 39040191350; G106 source sky/alpha repairs",
+      "source_evidence": "G153 full Vita ARM ELF run 39040191350; G106 source sky/alpha repairs; G157 original private G104 scene source audit 8768 opaque non-steep visual source faces and per-height z0.0725/2.82955/6.67306 SVG coverage, Actions SUCCESS #39047519031; no GPU screenshot",
       "device_evidence": "G104 hardware feedback in G106_G107 report: black sky / black cutouts / no visible lighting; G106 replacement not verified on physical Vita",
       "acceptance": "Real Vita screenshots match touchHLE source scene for sky, alpha and geometry from fixed camera points",
       "owner": "world",
@@ -26,8 +26,8 @@
       "id": "solid_collision",
       "name": "Floor, buildings, wall and ceiling player capsule",
       "state": "device_regression_open",
-      "source_evidence": "G134 sweep limits per-step teleport; G108 supplemental original opaque visual candidates; G156 source-mode exact continuous vertical cylinder contact removes a verified geometric three-Z-sample miss (C11 host SUCCESS, full ARM/retest tracked separately). Source 1910 native faces are not a proof that every visible building is solid.",
-      "device_evidence": "G104 physical PS Vita user saw building penetration; the G156 source correction has not been tested on physical PS Vita. Remains open.",
+      "source_evidence": "G156 full single-game Vita ARM ELF SUCCESS #39045921585 plus authentic G134/G108 collision regression; G157 G104 original 1910 native G66C = 1690 steep+220 nonwall, central 6561 XY samples reveal height-specific native vs visual candidate mismatch at z0.0725 (2892 native-only, 3669 both) and z2.82955 (628 visual-only, 203 both, 5730 neither), source analysis only.",
+      "device_evidence": "G104 physical Vita observed building penetration; G156/G157 no physical Vita retest and G157 visualization cannot establish authored solidity. Remains OPEN.",
       "acceptance": "On real PS Vita retest at reproducible original G104 wall coordinates, including steep slanted wall, building front, corners, long-frame rush and normal flight; no gross wall tunneling, no false blocking of open scenery; document FPS impact.",
       "owner": "physics",
       "mandatory": true
@@ -90,5 +90,5 @@
     "first_level_playable_claim_allowed": false,
     "candidate_vpk_auto_allowed": false
   },
-  "next_action": "First verify integrated G156 single Vita ARM ELF and native source 1910-collider/G108 geometry regressions; obtain one meaningful real-Vita test for source map/collision/sky, rather than expanding audio/QTE feature scope."
+  "next_action": "G157 ruled out simple missing baseline-native-nonwall ground at sampled central z0.0725 XY, but not upper structures. Prioritize verifying source building-solid-vs-visual candidate identities and actual G156 hardware collision plus G106 sky/alpha in one meaningful Vita test only when authorized; no invented floor/wall and no new VPK."
 }
