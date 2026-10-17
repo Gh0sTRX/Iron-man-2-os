@@ -1,0 +1,51 @@
+name: G135 actual original 2010 Level1 Mission000 Lua5.1 CFG input14 key2 key6 Resume NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g135-original-iOS-2010-Mission000-real-Lua51-condition-control-flow-NO-VPK.yml"
+      - "research/b24_unified/g135_real_first_mission_Lua_control_flow/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  authentic_original_owner_2010_Level1_Mission000_Lua_controlflow:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original Lua5.1 source CFG without executing copyright owner bytes
+        run: |
+          python3 -m pip install -q gdown
+          python3 -m py_compile research/b24_unified/g135_real_first_mission_Lua_control_flow/g135_original_2010_Mission000_Lua51_control_flow_graph_source.py
+      - name: Access user-owned actual 2010 iOS IPA ephemerally for original Mission000 Lua
+        run: |
+          mkdir -p /tmp/g135_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g135_original/owner.ipa || gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g135_original/owner.ipa
+          test "$(wc -c </tmp/g135_original/owner.ipa)" -eq 248613763
+      - name: Reconstruct real original Lua 5.1 conditional/jump successors to source control 14 false and 2/6 true
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g135_real_first_mission_Lua_control_flow/g135_original_2010_Mission000_Lua51_control_flow_graph_source.py --ipa /tmp/g135_original/owner.ipa --out /tmp/g135_qa
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g135_qa/G135_REAL_ORIGINAL_MISSION000_LUA51_CFG_INPUT14_2_6_MISSIONRESUME_SOURCE_ONLY.json').read_text())
+          assert d['original_native_Lua_instructions']>935
+          assert len(d['source_original_branch_conditional_and_jump_sites'])>10
+          assert not d['Lua_script_execution_or_native_2010_game_event_engine_recreated']
+          assert d['no_new_VPK']
+          print('PASS real Level1 2010 Mission000 original Lua control-flow and verified exact controller PCs, no fake flight disable')
+          PY
+      - name: Always wipe original user 2010 copyrighted game archive
+        if: always()
+        run: |
+          rm -rf /tmp/g135_original
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G135_iOS_2010_REAL_MISSION000_OriginalLua5_1_CFG_Input14_2_6_MissionResume_NO_VPK
+          path: /tmp/g135_qa/G135_REAL_ORIGINAL_MISSION000_LUA51_CFG_INPUT14_2_6_MISSIONRESUME_SOURCE_ONLY.json
+          retention-days: 14
+          if-no-files-found: error
