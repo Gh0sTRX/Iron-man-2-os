@@ -1,0 +1,55 @@
+name: G121 REAL original iOS 2010 NPC Mission AI and GLES lighting symbol source inventory NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g121-real-original-2010-native-NPC-mission-GLES-symbol-source-inventory-NO-VPK.yml"
+      - "research/b24_unified/g121_native_original_NPC_AI_mission_GL/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_2010_NPC_mission_GLES_native_cpp_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static original 2010 private ARM native method scanner dependencies
+        run: |
+          python3 -m pip install -q capstone gdown
+          python3 -m py_compile research/b24_unified/g121_native_original_NPC_AI_mission_GL/g121_2010_original_native_cpp_NPC_mission_GL_symbol_inventory.py
+      - name: Fetch original owner's 2010 IPA ephemeral original program for native source introspection
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g121_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g121_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g121_private/owner.ipa
+          test "$(wc -c </tmp/g121_private/owner.ipa)" -eq 248613763
+      - name: Decode source-original 2010 NPC AI mission spawner renderer sky material and original call edges
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g121_native_original_NPC_AI_mission_GL/g121_2010_original_native_cpp_NPC_mission_GL_symbol_inventory.py \
+            --ipa /tmp/g121_private/owner.ipa --out /tmp/g121_source_only
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          f=Path('/tmp/g121_source_only/G121_REAL_2010_NATIVE_NPC_MISSION_RENDER_CPLUSPLUS_SOURCE_SYMBOLS_ONLY.json')
+          d=json.loads(f.read_text())
+          assert len(d['NPC_AI_original_named_source_methods'])>=5
+          assert len(d['VISUAL_GLES_original_named_source_methods'])>=10
+          assert d['VPK_generated'] is False
+          assert d['ORIGINAL_ARM_IPA_binary_committed'] is False
+          print('G121 actual 2010 original NPC code method inventory ready; no bogus mission AI runtime')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Scrub private user 2010 original app binary
+        if: always()
+        run: rm -rf /tmp/g121_private
+      - name: Export source method names original ARM function addresses and bounded call map ONLY
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G121_ORIGINAL_2010_REAL_NPC_MISSION_SKY_MATERIAL_RENDER_NATIVE_METHODS_NO_VPK
+          path: /tmp/g121_source_only/G121_REAL_2010_NATIVE_NPC_MISSION_RENDER_CPLUSPLUS_SOURCE_SYMBOLS_ONLY.json
+          retention-days: 14
+          if-no-files-found: error
