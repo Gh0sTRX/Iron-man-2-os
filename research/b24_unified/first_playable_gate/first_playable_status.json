@@ -76,9 +76,9 @@
       "id": "device_performance",
       "name": "Measured PS Vita frame timing, crash-free traversal and resource use",
       "state": "not_measured",
-      "source_evidence": "No G153 measured physical device benchmark; ELF linking is not frame measurement",
-      "device_evidence": "G104 qualitative device report, no G153 representative frame-time log",
-      "acceptance": "Actual Vita recorded target 30 fps with frame-time spread, stability and memory headroom across repeatable scenes",
+      "source_evidence": "G160 verified on authenticated original G66M 753 real c1l1_road triangles: 39x31 source-unit CSR cells /2361 refs; 62065 old-vs-indexed C11 G159 native near/crossed support queries identical; source candidate-face evaluations 4940433 -> 22180 (99.55% fewer candidates in fixed 6561 XY grid QA); full single-game PS Vita ARM im2_beta ELF SUCCESS run #39053003870. NOT measured hardware CPU time, fps, memory use, power or frame drops.",
+      "device_evidence": "G104 qualitative physical Vita gameplay from 2026-10-17, but no G160 hardware FPS/frametime/collision runtime test. Device performance remains NOT MEASURED.",
+      "acceptance": "On real PS Vita measure per-frame CPU timing, frame-time distribution, memory headroom and stability across G159/G160 road ground, G156 building walls, G106 rendering and Stage2/RUSH; compare with controlled baseline; verify 30fps target only from repeated device data.",
       "owner": "performance",
       "mandatory": true
     }
@@ -90,5 +90,5 @@
     "first_level_playable_claim_allowed": false,
     "candidate_vpk_auto_allowed": false
   },
-  "next_action": "G159 direct source-road gameplay candidate now integrated and ARM built #39050573076; next one purposeful real Vita QA (road support vs old native base, real G156 walls, G106 sky/alpha, flight attack and FPS) with user authorization for a single tester VPK when appropriate. Do not repeat Z-report digging, do not claim true original road solidity/mission playable. Gate remains BLOCKED."
+  "next_action": "G160 removed 99.55% candidate scan work in actual original G66 road 62065 parity source tests; real full Vita ARM ELF SUCCESS #39053003870, BUT no physical Vita timing. G155 WIP=1 remains first C1L1 world/collision/hardware parity. Next meaningful authorized ONE on-device QA must cover G156 walls/G159 road/G160 performance/G106 sky&alpha/G83 MarkV; QTE/Lua audio mission extensions remain parked, no VPK automatically."
 }
