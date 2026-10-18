@@ -77,6 +77,24 @@ def main(ipa:Path,out:Path):
  for vm,expected in known.items():
   if actual.get(vm)!=expected:
    raise ValueError("G219 real 2010 native StateTrack GetEvent known source drift "+hex(vm))
+ # Confirm native GetEvent returns the INDEX of overlapping 12-byte
+ # EVENT record (r6), not the third u32 payload! It returns -1 otherwise.
+ # Any real event payload/hit classification must be read elsewhere.
+ for vm,expected in {
+   0xa1508:("ldr","r0, [r0, #8]"),
+   0xa156c:("add","r6, r6, #1"),
+   0xa15a0:("add","r4, r0, #0xc"),
+   0xa15f8:("mov","r0, r6"),
+   0xa1638:("mvn","r0, #0")
+ }.items():
+  if actual.get(vm)!=expected:raise ValueError("G219 original native GetEvent result INDEX evidence drift "+hex(vm))
+ event_third_payload_reads=[
+    op for op in source_event
+    if int(op["VM"],16)>0xa1508 and op["opcode"].startswith("ldr")
+    and ("[r0, #8]" in op["operands"] or "[r0, #0x8]" in op["operands"])
+ ]
+ if event_third_payload_reads:
+  raise ValueError("G219 native GetEvent appears to touch third-field record payload; inspect "+str(event_third_payload_reads))
  third=[
   op for op in source_event
   if ("#8]" in op["operands"] or "#0x8]" in op["operands"]) and
@@ -87,6 +105,9 @@ def main(ipa:Path,out:Path):
   "real_native_original_methods_source":table,
   "genuine_source_register_ops_candidate_event_u32_field_plus8":third,
   "original_event_timeline_record_stride_12_bytes_proven":True,
+  "source_native_StateTrack_GetEvent_returns_overlapping_original_12byte_EVENT_INDEX_or_minus1_PROVEN":True,
+  "source_native_StateTrack_GetEvent_does_NOT_decode_3rd_u32_event_payload":True,
+  "source_native_original_third_u32_payload_remains_UNCLASSIFIED":True,
   "source_native_returned_Event_id_semantics_PROVEN":False,
   "original_attack_event_time_unit_ms_PROVEN":False,
   "original_native_weapon_or_melee_damage_use_of_event_id_proven":False,
@@ -94,6 +115,7 @@ def main(ipa:Path,out:Path):
   "NO_VPK":True,
  }
  out.parent.mkdir(parents=True,exist_ok=True);out.write_text(json.dumps(result,indent=2)+"\n")
+ print("G219 PROVEN actual 2010 GetEvent returns overlapping EVENT INDEX r6 (or -1); native function does NOT read third-u32 payload")
  print("G219 true original 2010 Event GetEvent +8 potential third field source ops",third)
  print("G219 G218 passive live source bridge unchanged; any hit/event weapon interpretation needs original native consumer call graph, NO VPK")
 if __name__=="__main__":
