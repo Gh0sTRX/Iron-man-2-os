@@ -1,0 +1,63 @@
+name: G212 genuine 2010 states named Attack source authored StateTrack 12B event windows NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g212-original-2010-source-Attack-StateTrack-12byte-event-candidates-NO-VPK.yml"
+      - "research/b24_unified/g212_original_attack_event_track_records/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_2010_authored_Attack_StateTrack_candidate_events:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate G212 2010 source-state event records parser
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g212_original_attack_event_track_records/g212_true_2010_states_attack_named_StateTrack_12byte_original_event_candidates.py
+          python3 -m pip install -q gdown
+      - name: Read owner's original 2010 iOS game source temporarily in a private CI runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g212_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g212_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g212_original_private/owner.ipa
+          test "$(wc -c </tmp/g212_original_private/owner.ipa)" -eq 248613763
+      - name: Read authentic 2010 StateTrack Attack and attack named 12 byte source interval candidates no guessed hit windows
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g212_original_attack_event_track_records/g212_true_2010_states_attack_named_StateTrack_12byte_original_event_candidates.py \
+            --ipa /tmp/g212_original_private/owner.ipa \
+            --out /tmp/g212_source/G212_REAL_2010_ATTACK_STATETRACK_ORIGINAL_EVENT_CANDIDATES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g212_source/G212_REAL_2010_ATTACK_STATETRACK_ORIGINAL_EVENT_CANDIDATES.json').read_text())
+          assert d['source_original_2010_states_bytes']==361393
+          assert d['original_native_StateTrack_ctor_source_VM']=='0xa167c'
+          assert d['original_native_source_event_record_is_12bytes']
+          assert not d['source_original_2010_file_reader_control_flow_all_candidate_records_confirmed']
+          assert not d['source_original_2010_any_combat_hit_window_time_proven']
+          assert not d['source_original_attacktrack_integer_ticks_are_milliseconds_PROVEN']
+          for t in d['source_original_native_Attack_named_12byte_event_candidates']:
+            assert t['source_original_track_name'] in ('Attack','attack')
+            assert t['original_event_record_count_candidate']==len(t['source_original_2010_12byte_event_candidate_records'])
+            for e in t['source_original_2010_12byte_event_candidate_records']:
+              assert e['source_real_2010_end_start_plus_duration']==e['source_real_2010_start_raw_tick']+e['source_real_2010_duration_raw_tick']
+          assert d['NO_VPK']
+          print('PASS G212 original 2010 authored named Attack track raw event candidates; no synthetic hit frame, control or VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase owned 2010 original IPA in all job outcomes
+        if: always()
+        run: rm -rf /tmp/g212_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G212_ORIGINAL_2010_AUTHORED_ATTACK_TRACK_RAW_12BYTE_EVENT_CANDIDATES_NO_VPK
+          path: /tmp/g212_source/
+          retention-days: 21
+          if-no-files-found: error
