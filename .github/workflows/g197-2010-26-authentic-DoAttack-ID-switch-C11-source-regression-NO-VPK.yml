@@ -1,0 +1,62 @@
+name: G197 native original 2010 26 attack ID switch and UniBeam 14 33 reference C11 NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g197-2010-26-authentic-DoAttack-ID-switch-C11-source-regression-NO-VPK.yml"
+      - "research/b24_unified/g197_source2010_attack_dispatch/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_2010_source_C11_dispatch_reference_host_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g197_actual_2010_ARM_source
+      - name: GCC host compile original source 26-ID dispatch reference and fail-closed socket C test
+        run: |
+          set -euo pipefail
+          gcc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            research/b24_unified/g197_source2010_attack_dispatch/test_g197_original_iOS2010_ARM_switch_no_fake_weapon_semantics.c \
+            -o /tmp/g197_source_C11
+          /tmp/g197_source_C11 > /tmp/g197_source_C11.log
+          cat /tmp/g197_source_C11.log
+      - name: Compare every C reference ID + all three UniBeam native sites to original ARM 2010 source metadata, never guessed
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re
+          from pathlib import Path
+          p=Path('/tmp/g197_actual_2010_ARM_source/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json')
+          d=json.loads(p.read_text())
+          assert d['source_2010_original_native_dispatch_cmp_r5_25_jump_table_proven']
+          assert d['source_original_2010_default_arm_b_VM']=='0xf652c'
+          expected=d['source_original_2010_attack_id_switch_0_to_25']
+          assert len(expected)==26
+          output=Path('/tmp/g197_source_C11.log').read_text()
+          entries=re.findall(r'^G197_ATTACK (\d+) ([0-9a-f]+) ([0-9a-f]+)$',output,re.M)
+          assert len(entries)==26
+          for idx,vm,target in entries:
+            proof=expected[idx]
+            assert int(idx)==len([x for x in entries if int(x[0])<int(idx)])
+            assert int(vm,16)==int(proof['native_ARM_2010_entry_VM'],16)
+            assert int(target,16)==int(proof['original_target_VM'],16)
+          crosswalk=[(int(a,16),int(b),c) for a,b,c in re.findall(
+              r'^G197_UNIBEAM ([0-9a-f]+) (\d+) (\w+)$',output,re.M)]
+          assert crosswalk==[(0xf6638,14,'Dummy_Chest'),
+                             (0xf6d8c,14,'Dummy_Chest'),
+                             (0xf6e04,33,'Dummy_Foot_L')]
+          assert [(int(x['source_uniBeam_direct_CALL_VM'],16),x['actual_source_native_integer_dummy_group'])
+                  for x in d['original_unibeam_callsite_14_14_33_in_source']]==[(x[0],x[1]) for x in crosswalk]
+          assert not d['native_real_original_suit_or_weapon_mode_binding_for_foot_L_proven']
+          print('G197 PASS exact 26-entry native original 2010 ARM DoAttack source C11 reference and 3 UniBeam group IDs, no invented controller bindings')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
