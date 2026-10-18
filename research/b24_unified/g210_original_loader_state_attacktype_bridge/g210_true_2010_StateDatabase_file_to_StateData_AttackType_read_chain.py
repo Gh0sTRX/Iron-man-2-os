@@ -48,9 +48,9 @@ EDGES=[
  ("actor_update","read_attack_type_named_state_param",0xdb65c,0x9c340,"StateData::GetParam(char const*, int)"),
 ]
 VIRTUAL_READS=[
- ("database",0x9e274,0x9e278,0xc),
- ("state_set",0x9d8f0,0x9d8f4,0xc),
- ("state_data",0x9c608,0x9c60c,0xc),
+ ("database",0x9e274,0x9e278,0xc,"r4"),
+ ("state_set",0x9d8f0,0x9d8f4,0xc,"r6"),
+ ("state_data",0x9c608,0x9c60c,0xc,"r3"),
 ]
 FIELD_GETPARAM={
  0x9c354:("ldr","fp, [r0, #0x24]"),    # original item count
@@ -130,10 +130,10 @@ def read(ipa:Path,source_json:Path,out:Path):
     "original_2010_native_CALL_SITE_PROVEN":True})
   print("G210 PASS REAL NATIVE EDGE",label,description,hex(vm),"->",name,flush=True)
  virtual_read_source=[]
- for label,mov_lr,call_site,offset in VIRTUAL_READS:
+ for label,mov_lr,call_site,offset,source_vtable_reg in VIRTUAL_READS:
   i=assembly[label].get(mov_lr);j=assembly[label].get(call_site)
   if (not i or i.mnemonic!="mov" or i.op_str!="lr, pc" or
-      not j or j.mnemonic!="ldr" or not j.op_str.endswith(f"[r3, #{hex(offset)}]")):
+      not j or j.mnemonic!="ldr" or j.op_str!=f"pc, [{source_vtable_reg}, #{hex(offset)}]"):
    # Different register used at different compiled callsite;
    # document instead of asserting false source equivalence.
    raise ValueError(f"G210 genuine 2010 BufferStream virtual read site changed {label} {hex(call_site)}")
