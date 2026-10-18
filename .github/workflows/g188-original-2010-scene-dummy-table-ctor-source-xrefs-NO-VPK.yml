@@ -1,0 +1,59 @@
+name: G188 2010 original SceneImpl static dummy table ctor zero fields plus source PIC xrefs NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g188-original-2010-scene-dummy-table-ctor-source-xrefs-NO-VPK.yml"
+      - "research/b24_unified/g188_genuine_dummy_table_runtime_writers/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_real_original_s_dummiesTable_runtime_xrefs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax native 2010 ARM source plus real decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g188_genuine_dummy_table_runtime_writers/g188_original_2010_SceneImpl_table_init_and_runtime_references.py
+          python3 -m pip install -q capstone gdown
+      - name: Download owned 2010 original game source into temporary private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g188_original_PRIVATE
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g188_original_PRIVATE/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g188_original_PRIVATE/owner.ipa
+          test "$(wc -c </tmp/g188_original_PRIVATE/owner.ipa)" -eq 248613763
+      - name: Prove real 2010 C++ original s_dummiesTable constructor initializes empty table and source class PIC xrefs
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g188_genuine_dummy_table_runtime_writers/g188_original_2010_SceneImpl_table_init_and_runtime_references.py \
+            --ipa /tmp/g188_original_PRIVATE/owner.ipa \
+            --out /tmp/g188_native_source/G188_ORIGINAL_2010_SCENE_DUMMYTABLE_ZERO_CTOR_PIC_XREFS_NO_VPK.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/g188_native_source/G188_ORIGINAL_2010_SCENE_DUMMYTABLE_ZERO_CTOR_PIC_XREFS_NO_VPK.json').read_text())
+          assert r['original_ctor_PIC_resolved_table_VM']=='0x4edca0'
+          assert r['original_ctor_table_fields_zero_initialized']
+          assert len(r['original_ctor_table_zero_fields_VM'])==3
+          assert r['source_original_SceneImpl_and_SceneMgr_methods_scanned']>=12
+          assert not r['source_dynamic_dummy_register_enum14_name_proven']
+          assert not r['source_dynamic_dummy_register_enum33_name_proven']
+          assert not r['old_G184_G185_unbacked_raw___common_byte_data_valid']
+          assert r['NO_VPK']
+          print('G188 PASS genuinely empty original 2010 SceneImpl s_dummiesTable ctor, source PIC native writers are audited')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Remove private original owner IPA irrespective of outcome
+        if: always()
+        run: rm -rf /tmp/g188_original_PRIVATE
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G188_SOURCE_2010_SCENE_DUMMY_TABLE_INIT_ZERO_AND_XREFS_NO_VPK
+          path: /tmp/g188_native_source/G188_ORIGINAL_2010_SCENE_DUMMYTABLE_ZERO_CTOR_PIC_XREFS_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
