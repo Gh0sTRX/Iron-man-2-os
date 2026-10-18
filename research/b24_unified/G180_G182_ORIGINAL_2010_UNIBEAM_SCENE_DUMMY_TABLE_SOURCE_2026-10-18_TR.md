@@ -60,3 +60,28 @@ Orijinal `SceneImpl::GetDummy(int, unsigned int)` **0x61724**, **tam 12 talimat*
 ## Devam hedefi
 
 Özgün `SceneImpl` constructor/scene-loader resource metadata'dan `+0x278` grup slotlarını oluşturan işlev ve `14/33` numaralarına bağlanan özgün authored dummy isimleri çıkart. Bunun ardından ilgili zırhın `BRES/BDAE` parent transformunu ve orijinal `G8` hareket örneklerini aynı koordinat sisteminde doğrula; **silah patlama/hasar oynanışını tahmin etme**. Yeni VPK hazırlama.
+
+## G182 CI — SceneImpl kaynak tablo doldurma adayları
+
+[G182 CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39112143754). `g182_original_2010_scene_dummy_registry_writers_arm.py`, özgün Mach-O içindeki geniş sembol taramasında `2683` isme uyan kaynak fonksiyon, `1987` çözümlenmiş bounded yöntem ve `56` ham `+0x278` bellek erişimi ortaya çıkardı. Bu 56'nın bir kısmı `pc/sp` veya Irrlicht CSceneManager gibi **başka C++ sınıflarına** ait; 56'sının tümü `SceneImpl` alanı değildir. Doğrudan ilgili native kaynaklar:
+
+- `SceneImpl::CollectDummies(irr::scene::ISceneNode*)` **0x62EA4**, `+0x278` alanına source erişimi `0x63230` ve `0x63714`.
+- `SceneImpl::SceneImpl(SceneMgr*, ISceneNode*)` **0x65374**, `0x655BC` konumunda constructor içinde `str r0, [r4,#0x278]`.
+- `SceneImpl::UpdateDummies` **0x61DA0**, `ResetDummies` **0x61F1C**, `Initialize` **0x67150** yöntemlerinde aynı member offset kaynak erişimleri.
+- `SceneImpl::GetDummyCount` **0x6177C**, orijinal bucket bilgisine erişiyor.
+
+**Henüz kayıt grubunun 14 veya 33. anahtarının hangi named authored node'a bağlandığı kanıtlanmadı.**
+
+## G183 CI — Orijinal isim sorgulayıcısı ve collector kod yolu
+
+[G183 CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39112344705). `Object3D::GetDummyName(int,int)` özgün native ARM **0x15894** fonksiyonu tam `22` talimat ve doğrudan `0x158A4 BL SceneImpl::GetDummy` çağrısı yapıyor. Dummy bulunan durumda vtable `+0x2C` yöntemini çağırıyor, bulunmazsa PIC kaynak fallback string kullanıyor; **run-time gerçek 14/33 isimleri okunmadı**.
+
+`SceneImpl::CollectDummies` (**0x62EA4**) **546** source native ARM talimatı, **18** gerçek doğrudan C++ fonksiyon çağrısı içeriyor, `0x62F60` konumunda kendi kendini rekürsif çağırıyor, sahne düğümü isimlerini `stristr` **0x73E84** ile birden çok kez karşılaştırıyor. GetDummy tablosu `+0x278` alanına referans veriyor. Ayrıca `GetUserPropAsFloat` **0x744C4** çağrısı özgün node özel verisiyle bir bağlantının olabileceğini gösteriyor; hangi property olduğunu kanıtlamadan değer uydurma.
+
+## G184 CI — Gerçek PIC isim desen tablosu incelemesi, henüz eşleşme değil
+
+[G184 CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39112549318). `SceneImpl::CollectDummies` içinde `0x62F8C` ve `0x62FA0` PIC literal'ları kaynakla doğrulandı. İkisi de matematiksel olarak **`0x4EDCA0`** statik adrese çözülüyor. Kaynak image belleğinin ilk 12 baytında `972, 5127504, 2` integer değerleri görüldü. `972` değeri geçerli bir kaynak `char*` dizisi işaretçisi olarak doğrulanmadığından, çalışırken initialize edilen işaretçiler/indirection olasılığı var. **Bu değerlerden grup 14 veya 33 adı çıkmış gibi davranmıyoruz.** `stristr` için kaynak tablo indeksli `[ip, r6, LSL#2]` okuması var fakat bunun native SceneImpl `+0x278` tablosuyla bir-bir aynı enum/sıra olup olmadığı için tam registration data-flow henüz açılmadı.
+
+## G185 devri — ilk hedef
+
+`SceneImpl::CollectDummies` `0x63108`–`0x63714` registration kodunda `r6` indeksinin `scene+0x278` bucket slotuna hangi C++ branch yoluyla yazıldığını tamamla; PIC descriptor runtime init/relocation düzeltmelerini araştır. Alternatif olarak özgün 2010 iOS oyunu touchHLE'de gerçekten C1L1 sahnesine giriyorsa **sadece gözlemlenmiş** `Object3D::GetDummyName(14,0)` ve `GetDummyName(33,0)` source runtime sonucu kaydet. Emulator sahneye ulaşmadan socket ismi ispatlanmış sayılamaz. Daha sonra authored rig dummy matrix ile skin stream coordinate convention çapraz doğrulaması ve *ancak* gerçek native semantic kanıtıyla Vita tek animatöre bağlama. **Yeni VPK hazırlama**.
