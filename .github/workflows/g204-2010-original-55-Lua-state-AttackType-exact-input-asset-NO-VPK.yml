@@ -1,0 +1,58 @@
+name: G204 original 2010 55 genuine Lua states AttackType source name numeric SETTABLE NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g204-2010-original-55-Lua-state-AttackType-exact-input-asset-NO-VPK.yml"
+      - "research/b24_unified/g204_original_attacktype_state_records/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_2010_Lua_state_AttackType_literal_exact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original 2010 Lua51 analysis from genuine owner records
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g204_original_attacktype_state_records/g204_source2010_real_states_AttackType_lua_settable_numeric_and_state_metadata.py
+          python3 -m pip install -q gdown
+      - name: Read original user owned Iron Man 2 iOS 2010 IPA transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g204_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g204_owner_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g204_owner_original/owner.ipa
+          test "$(wc -c </tmp/g204_owner_original/owner.ipa)" -eq 248613763
+      - name: Analyze all 55 native original Lua51 state programs actual AttackType keyed definitions and fail closed if absent
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g204_original_attacktype_state_records/g204_source2010_real_states_AttackType_lua_settable_numeric_and_state_metadata.py \
+            --ipa /tmp/g204_owner_original/owner.ipa \
+            --out /tmp/g204_source/G204_ORIGINAL_2010_ALL55_LUA_STATES_EXACT_ATTACKTYPE_FIELD_DEFINITIONS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g204_source/G204_ORIGINAL_2010_ALL55_LUA_STATES_EXACT_ATTACKTYPE_FIELD_DEFINITIONS.json').read_text())
+          assert d['source_original_states_Lua51_signatures']==55
+          assert d['original_complete_source_Lua_programs_parsed']==55
+          assert d['native_StateData_GetParam_original_key']=='AttackType'
+          assert not d['native_original_Actor_StateData_AttackType_values_PROVEN']
+          assert not d['original_touch_event_to_26_DoAttack_switchID_mapping_PROVEN']
+          assert d['No_original_Lua_program_executed']
+          assert d['NO_VPK']
+          print('PASS G204 55 authentic original iOS Lua states checked key-specific AttackType exact numeric assignment; unknown native state storage not mislabeled')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase user-owned licensed original IPA on success or failure
+        if: always()
+        run: rm -rf /tmp/g204_owner_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G204_ORIGINAL_2010_55_LUA_STATES_ATTACKTYPE_NATIVE_FIELD_PROVENANCE_NO_VPK
+          path: /tmp/g204_source/
+          retention-days: 21
+          if-no-files-found: error
