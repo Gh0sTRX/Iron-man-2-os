@@ -1,0 +1,53 @@
+name: G175B Original 2010 Lua AttackType1 missile tutorial versus true WeaponDB ARM edges NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g175b-original-2010-native-Lua-AttackType1-weapondb-AimM-proof-NO-VPK.yml"
+      - "research/b24_unified/g175_native_weapon_motion_graph/g175b_2010_lua_attack_permission_vs_native_weapon_edges.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_iOS_WeaponDB_and_MissionTutorial_missile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download G175 source-authoritative original 2010 ARM graph metadata, not private owner IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: G175_ORIGINAL_2010_WEAPONDB_MISSILE_UNIBEAM_ARM_SOURCE_CALLGRAPH_ONLY_NO_VPK
+          run-id: 39107687965
+          github-token: ${{ github.token }}
+          path: /tmp/g175_source_only_graph
+      - name: G175B match native missile UniBeam AttackType permission callsites against 2010 Level1 Lua source gates
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g175_native_weapon_motion_graph/g175b_2010_lua_attack_permission_vs_native_weapon_edges.py
+          python3 research/b24_unified/g175_native_weapon_motion_graph/g175b_2010_lua_attack_permission_vs_native_weapon_edges.py \
+            --g175 /tmp/g175_source_only_graph/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json \
+            --report research/b24_unified/G76_TRUE_ORIGINAL_2010_IOS_COMBAT_ANIM_HIT_DAMAGE_NATIVE_CXX_AUDIO_FORENSICS_2026-10-16_TR.md \
+            --out /tmp/g175b_public_source_only/G175B_2010_LUA_ATTACKTYPE1_WEAPONDB_CALLSITE_SEMANTICS_GATE_NO_VPK.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('/tmp/g175b_public_source_only/G175B_2010_LUA_ATTACKTYPE1_WEAPONDB_CALLSITE_SEMANTICS_GATE_NO_VPK.json')
+          d=json.loads(p.read_text())
+          assert d['native_2010_attack_type_permission_lua_call_VM']=='0x17b80'
+          assert d['source_direct_UniBeam_to_WeaponDB_GetAttackEntityByIndex']==1
+          assert d['source_direct_AttackEntity_DoAttack_to_DoProjectileAttack']==1
+          assert not d['automatic_2010_aim_m_missile_binding_allowed']
+          assert not d['original_ThrowMissile_to_WarMachineGun01_04_muzzle_binding_PROVEN']
+          assert not d['original_weapon_event_added_to_Vita']
+          assert d['NO_VPK']
+          print('G175B genuine 2010 two native weapon CALLs and tutorial Lua permission identity verified; do not invent Aim_M missile animation mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G175B_2010_REAL_NATIVE_LUA_ATTACKTYPE_WEAPON_CONTEXT_SEMANTICS_NO_VPK
+          path: /tmp/g175b_public_source_only/G175B_2010_LUA_ATTACKTYPE1_WEAPONDB_CALLSITE_SEMANTICS_GATE_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
