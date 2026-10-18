@@ -8,6 +8,7 @@ on:
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
+      - "research/b24_unified/g218_source_live_state_bridge/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -124,6 +125,13 @@ jobs:
           run-id: 38949763439
           github-token: ${{ github.token }}
           path: /tmp/g85_original_248_src
+      - name: Restore owner-authenticated G217 776 original 2010 player StateData and true StateTrack raw markers (source-only C11)
+        uses: actions/download-artifact@v4
+        with:
+          name: G217_ORIGINAL_2010_4_SUITS_776_MOVEMENT_ATTACK_STATES_C11_SOURCE_PNG_NO_VPK
+          run-id: 39135629451
+          github-token: ${{ github.token }}
+          path: /tmp/g218_original_authored_2010_G217
       - name: Restore original G27 source verified 2010 Level1 71 Lua callback native CALLs
         uses: actions/download-artifact@v4
         with:
@@ -198,6 +206,11 @@ jobs:
           python3 research/b24_unified/g171_authored_vs_visual_sculpture_walls/g171_retract_G108_unauthored_sculpture_colliders_NO_VPK.py
           python3 research/b24_unified/g172_native_warmachine_ground_m/g172_add_true_wm_m_ground_source_to_single_g83_NO_VPK.py
           python3 research/b24_unified/g173_unibeam_single_animator_priority/g173_fix_real_G169_G85_beam_source_priority_NO_VPK.py
+          python3 research/b24_unified/g218_source_live_state_bridge/g218_attach_G217_native_source_state_to_REAL_G8_animation_owner_NO_VPK.py \
+            --g217-header /tmp/g218_original_authored_2010_G217/b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h
+          grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/src/main.c
+          grep -q 'b24_g218_observe_actually_loaded_G8_clip' work/src/main.c
+          grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/CMakeLists.txt
           cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
@@ -842,6 +855,30 @@ jobs:
           assert not list(work.rglob('*.vpk'))
           print('G173 exact authored native 2010 UniBeam G169 -> single genuine G8/G85 IM2V load real animation names; stage2/rush damage, B16 and original native event semantics unchanged')
           PY
+      - name: G218 actual original 2010 owner source 776 state G8 clip load to G217 StateData LIVE Vita main observer host C11 NO VPK
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            research/b24_unified/g218_source_live_state_bridge/test_g218_exact_original_2010_loaded_G8_to_G217_StateData_host.c \
+            -o /tmp/g218_authentic_2010_live_game_state_bridge
+          /tmp/g218_authentic_2010_live_game_state_bridge
+          python3 - <<'PY'
+          from pathlib import Path
+          game=Path('work/src/main.c').read_text()
+          cm=Path('work/CMakeLists.txt').read_text()
+          assert game.count('b24_g218_observe_actually_loaded_G8_clip(')==1
+          assert game.count('b24_g8_motion_tick_g84(')==1
+          assert game.count('b24_g83_timeline_tick(')==1
+          assert game.count('b24_g169_native_beam_clip(')==1
+          assert game.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert game.count('b16_combat_fire(&combat,&world,muzzle)')==1
+          assert 'B24_G218_SOURCE_STATE_OBSERVER' in cm
+          assert 'b24_original_motion.active' in game
+          assert 'b24_original_motion.missing' in game
+          assert not list(Path('work').rglob('*.vpk'))
+          print('G218 PASS 776 AUTHENTIC original StateData connected to loaded real G8 source actor G84/G169 with NO second animator or movement B14, source telemetry ONLY, no VPK')
+          PY
       - name: G174 load all ten genuine 2010 1292 vertex War Machine M Ground IM2V poses through G172 G83 and sole G8 stream, native weapon semantics not guessed
         run: |
           set -euo pipefail
@@ -941,6 +978,7 @@ jobs:
               -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=ON \
               -DB24_G172_WM_NATIVE_M_GROUND_BANK=ON \
               -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=ON \
+              -DB24_G218_SOURCE_STATE_OBSERVER=ON \
               -DB24_G111_NATIVE_SOURCE_GATES=ON \
               -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
               -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
