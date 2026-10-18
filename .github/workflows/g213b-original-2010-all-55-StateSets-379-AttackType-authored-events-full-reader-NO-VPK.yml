@@ -1,0 +1,75 @@
+name: G213B original IronMan2 iOS 2010 all 55 StateSets 379 AttackType complete StateTrack source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g213b-original-2010-all-55-StateSets-379-AttackType-authored-events-full-reader-NO-VPK.yml"
+      - "research/b24_unified/g213_native_state_full_reader/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_2010_55_source_sets_and_all_Attack_events:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original user-owned iOS 2010 C++ native binary serializer port source reader
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g213_native_state_full_reader/g213b_exact_2010_original_55_StateSets_full_serialized_reader.py
+          python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          run-id: 39128015289
+          github-token: ${{ github.token }}
+          path: /tmp/g213_source_values
+      - uses: actions/download-artifact@v4
+        with:
+          name: G212_ORIGINAL_2010_AUTHORED_ATTACK_TRACK_RAW_12BYTE_EVENT_CANDIDATES_NO_VPK
+          run-id: 39130759380
+          github-token: ${{ github.token }}
+          path: /tmp/g213_source_track_candidates
+      - name: Load original 2010 user owned iOS game state data in ephemeral private CI runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g213_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g213_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g213_original_private/owner.ipa
+          test "$(wc -c </tmp/g213_original_private/owner.ipa)" -eq 248613763
+      - name: ORIGINAL 2010 authentic StateDatabase 55 StateSet, 379 keyed u32, full nested states and tracks, require strict EOF
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g213_native_state_full_reader/g213b_exact_2010_original_55_StateSets_full_serialized_reader.py \
+            --ipa /tmp/g213_original_private/owner.ipa \
+            --g207 /tmp/g213_source_values/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json \
+            --g212 /tmp/g213_source_track_candidates/G212_REAL_2010_ATTACK_STATETRACK_ORIGINAL_EVENT_CANDIDATES.json \
+            --out /tmp/g213_public/G213B_ORIGINAL_2010_55_STATESETS_FULL_ATTACKTYPE_STATETRACK_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g213_public/G213B_ORIGINAL_2010_55_STATESETS_FULL_ATTACKTYPE_STATETRACK_SOURCE.json').read_text())
+          assert d['source_original_states_binary_total_bytes']==361393
+          assert d['source_original_2010_StateSet_count']==55
+          assert d['source_original_AttackType_key_u32_value_count']==379
+          assert d['source_2010_attack_type_g207_ALL_379_offset_value_matches']
+          assert d['source_original_all_bytes_consumed_exactly']
+          assert not d['source_original_input_and_suit_controller_bindings_PROVEN']
+          assert not d['source_event_track_3rd_u32_melee_damage_semantics_proven']
+          assert not d['original_iOS_Vita_runtime_weapon_animation_event_wiring_changed']
+          assert d['NO_VPK']
+          print('PASS G213 original user-owned 2010 55 original actor StateSets full native serializer and all byte event source, no fake melee hit time/Vita VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original iOS 2010 owner data even if parser fails
+        if: always()
+        run: rm -rf /tmp/g213_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G213B_ORIGINAL_2010_55_STATESETS_379_ATTACKTYPE_FULL_NATIVE_STATE_READER_NO_VPK
+          path: /tmp/g213_public/
+          retention-days: 21
+          if-no-files-found: error
