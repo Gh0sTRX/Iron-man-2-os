@@ -18,7 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m py_compile research/b24_unified/g180_original_dummy_lookup_rig/g180_original_ios_GetDummyAbsolutePosition_bdae_native_crosswalk.py
-          python3 -m pip install -q capstone numpy gdown
+          python3 -m pip install -q capstone numpy scipy gdown
       - name: Retrieve original owner 2010 exact IPA into EPHEMERAL job temp only
         run: |
           set -euo pipefail
