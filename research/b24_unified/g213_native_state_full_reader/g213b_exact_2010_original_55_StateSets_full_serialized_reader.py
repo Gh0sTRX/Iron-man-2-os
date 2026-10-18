@@ -82,47 +82,43 @@ def parse_state(p:Reader,group_index:int):
    attack.append({"key_offset":off,"value":value})
  if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"AFTER param",p.pos,"first",params[:10],flush=True)
  extra_n=p.array_count(256,"StateData 44-byte actor movement/action metadata")
- if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"extra_n",extra_n,"at",p.pos,flush=True)
+ # Native original 0x9CBA8 B 0x9CBF4 skips ReadString for FIRST
+ # unnamed record in the extra actor state transition pool. It reads
+ # 5*u32 + u8, then branch to 0x9CBAC reads the named entries.
+ # G213's original IronMan::Idle raw source confirms unnamed 21-byte
+ # entry preceding exactly eight named transitions.
  extras=[]
+ if extra_n:
+  source_offset=p.pos
+  unnamed_vals=[p.u32() for _ in range(5)]
+  unnamed_flag=p.u8()
+  extras.append({"original_entry_off":source_offset,
+      "original_name":None,"native_2010_5x_u32_unclassified":unnamed_vals,
+      "native_2010_u8_unclassified":unnamed_flag,
+      "source_2010_native_constructor_preheader_skips_initial_ReadString_PROVEN":True,
+      "is_original_2010_unnamed_initial_transition":True})
+  if unnamed_flag==0:
+   # Source native may have optional trailing 4 byte/readstring branch,
+   # its exact rare behavior remains a required C++ guard.
+   raise ValueError("native original transition initial unnamed flag zero needs separate ARM branch proof")
  for k in range(extra_n):
   off=p.pos
-  if group_index==24 and start<66000:
-   print("G213 AUTHENTIC IronMan EXTRA",k,"start",off,
-     "near_original_source80",p.data[off:off+80].hex(),flush=True)
   source_name,_=p.string()
-  # Real original 2010 IronMan StateData::Idle contains an
-  # empty-named extra record with a two-byte shorter encoded payload.
-  # Experimental source-file alignment only: this variation is NOT
-  # verified as native C++ constructor branch semantics.
-  if source_name=="" and group_index==24 and start==65422 and k==0:
-   raw5=[p.u32() for i in range(3)]+[p.u16(),p.u32()]
-   source_encoding_needs_native_branch_proof=True
-  else:
-   raw5=[p.u32() for i in range(5)]
-   source_encoding_needs_native_branch_proof=False
+  raw5=[p.u32() for i in range(5)]
   native_bool=p.u8()
-  if group_index==24 and start<66000:
-   print("G213 AUTHENTIC IronMan EXTRA",k,"name",source_name,
-     "five",raw5,"flag",native_bool,"after-byte",p.pos,flush=True)
-  # Original ARM 0x9CCB8..0x9CCC0: LDRB record+0x14, CMP #0,
-  # BNE 0x9CBAC (next record) if NONZERO. Only zero means
-  # additional u32 + optional ReadString are present.
   if native_bool==0:
    additional=p.u32()
    extra_name,_=p.string()
   else:
    additional=None
    extra_name=None
-  if group_index==24 and start<66000:
-   print("G213 AUTHENTIC IronMan EXTRA",k,"additional",additional,
-     "extra_name",extra_name,"END",p.pos,flush=True)
   extras.append({"original_entry_off":off,"original_name":source_name,
    "native_2010_5x_u32_unclassified":raw5,
-   "source_original_empty_named_record_2_byte_alignment_EXCEPTION_not_native_cpp_proven":source_encoding_needs_native_branch_proof,
    "native_2010_u8_unclassified":native_bool,
    "native_2010_u32_unclassified":additional,
-   "native_2010_additional_string":extra_name})
- if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"AFTER extras",p.pos,"first_extra",extras[:2],flush=True)
+   "native_2010_additional_string":extra_name,
+   "is_original_2010_unnamed_initial_transition":False,
+   "source_2010_native_constructor_preheader_skips_initial_ReadString_PROVEN":True})
  channel_n=p.array_count(256,"StateData source event track channels")
  if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"channel_n",channel_n,"at",p.pos,flush=True)
  channels=[];ntracks=0
@@ -148,7 +144,8 @@ def parse_state(p:Reader,group_index:int):
   "source_original_state_name":name,
   "source_original_state_params":params,
   "source_original_attacktype_exact_definitions":attack,
-  "source_original_extra_metadata_count":len(extras),
+  "source_original_extra_metadata_count":extra_n,
+  "source_original_preheader_unnamed_transition_exists":bool(extra_n),
   "source_original_extra_metadata_records":extras,
   "source_original_event_channel_count":len(channels),
   "source_original_tracks_in_event_channels":ntracks,
