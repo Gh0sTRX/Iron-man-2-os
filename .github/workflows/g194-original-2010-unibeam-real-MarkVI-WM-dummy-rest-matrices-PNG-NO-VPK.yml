@@ -1,0 +1,68 @@
+name: G194 original Iron Man 2 2010 BDAE Mark VI WM Dummy Chest Foot_L Rest World PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g194-original-2010-unibeam-real-MarkVI-WM-dummy-rest-matrices-PNG-NO-VPK.yml"
+      - "research/b24_unified/g194_real_original_unibeam_rig_binding/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_4_real_armors_rest_socket_proof:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install genuine 2010 owner BDAE decoder and static PNG dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g194_real_original_unibeam_rig_binding/g194_true_2010_MarkVI_WM_Suitcase_dummyChest_FootL_rest_pose.py
+          python3 -m pip install -q numpy scipy matplotlib gdown
+      - name: Restore verified original source native dummy14 Chest and dummy33 Foot_L table
+        uses: actions/download-artifact@v4
+        with:
+          name: G193_GENUINE_2010_UNIBEAM_DUMMY14_CHEST_33_FOOT_NATIVE_ARM_NO_VPK
+          run-id: 39119194834
+          github-token: ${{ github.token }}
+          path: /tmp/g194_source_proof
+      - name: Original user-owned 2010 iOS 1.0.0 IPA loaded into temporary runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g194_owner_PRIVATE
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g194_owner_PRIVATE/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g194_owner_PRIVATE/owner.ipa
+          test "$(wc -c </tmp/g194_owner_PRIVATE/owner.ipa)" -eq 248613763
+      - name: Decode original 2010 four authored source armor rigs and actual local rest chest/left foot dummy nodes produce static PNG no HTML
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g194_real_original_unibeam_rig_binding/g194_true_2010_MarkVI_WM_Suitcase_dummyChest_FootL_rest_pose.py \
+            --ipa /tmp/g194_owner_PRIVATE/owner.ipa \
+            --g193 /tmp/g194_source_proof/G193_ORIGINAL_2010_UNIBEAM_NATIVE_DUMMY14_CHEST_33_FOOT_L_ARM_PROOF.json \
+            --out /tmp/g194_public/G194_SOURCE_2010_CHEST_FOOT_L_REST_RIG_NODES.json \
+            --png /tmp/g194_public/G194_ORIGINAL_2010_MARKVI_CHEST_FOOT_L_REAL_RIG_SOURCE_3D.png
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g194_public/G194_SOURCE_2010_CHEST_FOOT_L_REST_RIG_NODES.json').read_text())
+          assert d['original_proven_native_group_label_names']=={'14':'Dummy_Chest','33':'Dummy_Foot_L'}
+          assert d['models']['Iron_man_mark6.bdae']['original_source_rig_node_count']==96
+          assert d['models']['warmachine.bdae']['original_source_rig_node_count']==112
+          assert not d['Vita_game_particle_or_damage_integration_changed']
+          assert d['static_source_figure_is_not_a_render_of_last_Vita_build']
+          assert d['NO_VPK']
+          assert Path('/tmp/g194_public/G194_ORIGINAL_2010_MARKVI_CHEST_FOOT_L_REAL_RIG_SOURCE_3D.png').stat().st_size>10000
+          print('G194 source 2010 Mark VI chest/foot actual authored rest BDAE axes PNG and four real armor rig matrices decoded no fabricated beam emitter')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Delete user proprietary original game IPA in every terminal condition
+        if: always()
+        run: rm -rf /tmp/g194_owner_PRIVATE
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G194_ORIGINAL_2010_BDAE_CHEST_FOOT_L_REST_RIG_3D_PNG_SOURCE_ONLY
+          path: /tmp/g194_public/
+          retention-days: 21
+          if-no-files-found: error
