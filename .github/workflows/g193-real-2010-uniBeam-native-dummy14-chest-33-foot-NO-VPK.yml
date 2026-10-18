@@ -1,0 +1,88 @@
+name: G193 source 2010 UniBeam native group14 chest group33 foot exact ARM proof NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g193-real-2010-uniBeam-native-dummy14-chest-33-foot-NO-VPK.yml"
+      - "research/b24_unified/g193_proven_2010_unibeam_socket_names/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_2010_real_unibeam_dummy_group_names:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve G179 genuine original DoAttack UniBeam native ARM integer arguments 14/33
+        uses: actions/download-artifact@v4
+        with:
+          name: G179_ORIGINAL_2010_UNIBEAM_INDEX4_14_33_ARM_NATIVE_ARG_PROVEN_NO_VPK
+          run-id: 39108638079
+          github-token: ${{ github.token }}
+          path: /tmp/g193_inputs/g179
+      - name: Retrieve G191 original C++ startup Create34 Add34 native name pointers
+        uses: actions/download-artifact@v4
+        with:
+          name: G191_ORIGINAL_2010_34_REAL_DUMMY_SOURCE_NAME_ARGUMENTS_NO_VPK
+          run-id: 39118751027
+          github-token: ${{ github.token }}
+          path: /tmp/g193_inputs/g191
+      - name: Retrieve G192 original DummiesTableAdd/Create/GetDummy ARM instructions
+        uses: actions/download-artifact@v4
+        with:
+          name: G192_ORIGINAL_2010_DUMMY_ADD_CREATE_LOOKUP_ARM_SOURCE_NO_VPK
+          run-id: 39118909028
+          github-token: ${{ github.token }}
+          path: /tmp/g193_inputs/g192
+      - name: Retrieve G184 original native collector loop r6 name table source
+        uses: actions/download-artifact@v4
+        with:
+          name: G184_2010_ORIGINAL_DUMMY_PIC_PATTERN_TABLE_NATIVE_ARM_NO_VPK
+          run-id: 39112549318
+          github-token: ${{ github.token }}
+          path: /tmp/g193_inputs/g184
+      - name: Retrieve G185 original native collector scene+0x278 registry write source
+        uses: actions/download-artifact@v4
+        with:
+          name: G185_ORIGINAL_2010_SCENE_DUMMY_REGISTER_ARM_GROUPS_NO_VPK
+          run-id: 39114341693
+          github-token: ${{ github.token }}
+          path: /tmp/g193_inputs/g185
+      - name: PROVE exact 2010 source native UniBeam dummy14 = Chest and dummy33 = Foot_L from five independent owner ARM sources
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g193_proven_2010_unibeam_socket_names/g193_source_native_dummy14_33_name_equivalence.py
+          python3 research/b24_unified/g193_proven_2010_unibeam_socket_names/g193_source_native_dummy14_33_name_equivalence.py \
+            --g179 /tmp/g193_inputs/g179/G179_ORIGINAL_2010_UNIBEAM_WeaponDB4_DUMMY14_14_33_NATIVE_PROOF.json \
+            --g191 /tmp/g193_inputs/g191/G191_2010_GAME_STARTUP_TRUE_34_DUMMY_NAMES_SOURCE_ONLY.json \
+            --g192 /tmp/g193_inputs/g192/G192_NATIVE_2010_DUMMY_REGISTER_ADD_CREATE_GETDUMMY_ARM.json \
+            --g184 /tmp/g193_inputs/g184/G184_2010_ORIGINAL_COLLECTDUMMIES_NATIVE_PIC_STRING_TABLE_CANDIDATES.json \
+            --g185 /tmp/g193_inputs/g185/G185_ORIGINAL_2010_SCENE_DUMMY_REGISTRATION_ARM_NO_VPK.json \
+            --out /tmp/g193_source/G193_ORIGINAL_2010_UNIBEAM_NATIVE_DUMMY14_CHEST_33_FOOT_L_ARM_PROOF.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g193_source/G193_ORIGINAL_2010_UNIBEAM_NATIVE_DUMMY14_CHEST_33_FOOT_L_ARM_PROOF.json').read_text())
+          assert d['native_original_source_name_mapping_PROVEN']
+          assert d['verified_native_2010_Unibeam_WeaponDB_attack_index']==4
+          assert d['original_DoAttack_to_UniBeam_dummy_args']==[14,14,33]
+          assert d['original_native_scene_group14_named_source_key']=='Dummy_Chest'
+          assert d['original_native_scene_group33_named_source_key']=='Dummy_Foot_L'
+          assert len(d['authored_original_34_named_dummy_groups_order'])==34
+          assert d['original_DummiesTableAdd_preserves_order_and_returns_old_index_proven']
+          assert d['original_CollectDummies_uses_same_group_idx_as_GetDummy_proven']
+          assert not d['Vita_port_3D_dummy_transform_mapped_and_active']
+          assert not d['Vita_actual_muzzle_firing_from_chest_or_foot_proven']
+          assert d['NO_VPK']
+          print('G193 PASS TRUE 2010 iOS original UniBeam WeaponDB index4 named source dummy 14 chest and 33 left foot; no Vita VFX port is falsely claimed')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G193_GENUINE_2010_UNIBEAM_DUMMY14_CHEST_33_FOOT_NATIVE_ARM_NO_VPK
+          path: /tmp/g193_source/G193_ORIGINAL_2010_UNIBEAM_NATIVE_DUMMY14_CHEST_33_FOOT_L_ARM_PROOF.json
+          retention-days: 30
+          if-no-files-found: error
