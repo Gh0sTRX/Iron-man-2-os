@@ -53,29 +53,55 @@ def run(ipa:Path,out:Path):
  callers=[]
  decoded_real=0
  text_sections=[]
+ valid_text_method_sources=0
+ thumb_text_functions=0
+ arm_text_functions=0
+ # Original owner 2010 iOS binary is mixed ARM + Thumb interworking.
+ # Disassembling all __text as ARM misses REAL Thumb BL callsites and
+ # may mistakenly call data instructions. Partition by SYMTAB method
+ # start and original ARM/Thumb mode (symbol low bit).
  for sec in secs:
   vmsize=sec[1]
   data=image[sec[2]:sec[2]+vmsize]
   if len(data)!=vmsize:raise ValueError("source original MachO __text section bounds changed")
   text_sections.append({"source_vm_start":hex(sec[0]),"source_text_bytes":len(data)})
-  # Decode real original ARM __text only, not __data, pointers or strings.
-  ops=list(arm.disasm(data,sec[0]))
-  decoded_real+=len(ops)
-  for k,ins in enumerate(ops):
-   if ins.mnemonic not in ("bl","blx") or not ins.operands:
+  funcstarts=[a for a in starts if sec[0]<=a<sec[0]+sec[1]]
+  for mi,start in enumerate(funcstarts):
+   if mi+1<len(funcstarts):end=funcstarts[mi+1]
+   else:end=sec[0]+sec[1]
+   maxlen=min(end-start,16384)
+   if maxlen<4:continue
+   m=modes[start]
+   if m=={1}:engine=thumb;thumb_text_functions+=1
+   elif m=={0}:engine=arm;arm_text_functions+=1
+   else:
+    # Potential same virtual address has mixed alias symbol low bit;
+    # ambiguous begins are fail-closed, never decode guessed mode.
     continue
-   if ins.operands[0].type!=ARM_OP_IMM:
-    continue
-   dest=ins.operands[0].imm&~1
-   if dest!=GETEVENT_VM:continue
-   name,base=callable_name(ins.address)
-   ctx=[{"vm":hex(i.address),"asm":i.mnemonic+" "+i.op_str}
-         for i in ops[max(0,k-14):min(len(ops),k+14)]]
-   callers.append({"original_source_callsite":hex(ins.address),
-      "owner_cpp_method":name,"nearest_symbol_method_start":base,
-      "native_original_GetEvent_target":hex(dest),
-      "original_source_window_ARM_28_instructions":ctx,
-      "original_instructions_guarantee_event_is_damage_or_weapon_spawn":False})
+   begin=start-sec[0]
+   ops=list(engine.disasm(data[begin:begin+maxlen],start))
+   if not ops:continue
+   valid_text_method_sources+=1
+   decoded_real+=len(ops)
+   for k,ins in enumerate(ops):
+    if ins.mnemonic not in ("bl","blx") or not ins.operands:
+     continue
+    if ins.operands[0].type!=ARM_OP_IMM:
+     continue
+    dest=ins.operands[0].imm&~1
+    if dest!=GETEVENT_VM:continue
+    ctx=[{"vm":hex(i.address),"asm":i.mnemonic+" "+i.op_str}
+          for i in ops[max(0,k-14):min(len(ops),k+14)]]
+    callers.append({"original_source_callsite":hex(ins.address),
+       "owner_cpp_method":" | ".join(sorted(names[start])[:3]),
+       "nearest_symbol_method_start":hex(start),
+       "original_source_owner_opcode_mode":"THUMB" if m=={1} else "ARM",
+       "native_original_GetEvent_target":hex(dest),
+       "original_source_window_ARM_28_instructions":ctx,
+       "original_instructions_guarantee_event_is_damage_or_weapon_spawn":False})
+ print("G220 REAL owner source correct split native ARM methods",arm_text_functions,
+       "THUMB methods",thumb_text_functions,"decoded C++ funcs",valid_text_method_sources,
+       "instruction count",decoded_real,flush=True)
  original_accessors=[
   {"vm":hex(a),"source_owner_cpp_names":sorted(ns)[:5]}
   for a,ns in sorted(names.items())
@@ -97,11 +123,15 @@ def run(ipa:Path,out:Path):
   "genuine_native_original_StateTrack_GetEvent_VM":hex(GETEVENT_VM),
   "original_ARM_text_sections":text_sections,
   "source_real_2010_ARM_instructions_decoded":decoded_real,
+  "source_native_2010_ARM_method_count":arm_text_functions,
+  "source_native_2010_THUMB_method_count":thumb_text_functions,
+  "source_native_original_function_sources_decoded":valid_text_method_sources,
   "source_direct_ARM_GetEvent_BL_BLX_callsite_count":len(callers),
   "source_real_2010_direct_GetEvent_callsite_windows":callers,
   "source_real_2010_GetEvent_caller_Cpp_name_distribution":dict(summary),
   "source_original_StateTrack_Event_named_cpp_methods":original_accessors,
   "original_indirect_virtual_GetEvent_consumers_fully_analyzed":False,
+  "source_real_2010_direct_callsite_zero_means_event_unused":False,
   "original_2010_event_payload_third_field_semantics_PROVEN":False,
   "original_iOS_AttackType_Event_to_WarMachine_rocket_repulsor_or_damage_PROVEN":False,
   "native_2010_Event_time_values_as_milliseconds_PROVEN":False,
