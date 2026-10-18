@@ -137,12 +137,7 @@ def render_samples(modes,faces,output:Path):
    "Orange = #14 Dummy_Chest  |  Green = #33 Dummy_Foot_L\n"
    "REAL source 2010 rig + animation (host) • NOT Vita gameplay",
    transform=ax.transAxes,va="bottom",fontsize=8,color="#ebecf2")
-  # Reduce frames with duplicate source phase endpoint for GIF smoothness.
-  display=[f for i,f in enumerate(frames) if i==0 or
-           (f["source_time_ms"]!=0 and not
-            (i+1<len(frames) and
-             frames[i+1]["phase"]!=f["phase" and False] if False else False))]
-  # Simplest: all source sample times used, distinct source clips remain distinct.
+  # Retain all original source-timeline samples; no invented in-between poses.
   display=frames
   def frame_update(f):
    polygon.set_verts(f["vertices"][faces[::3]])
