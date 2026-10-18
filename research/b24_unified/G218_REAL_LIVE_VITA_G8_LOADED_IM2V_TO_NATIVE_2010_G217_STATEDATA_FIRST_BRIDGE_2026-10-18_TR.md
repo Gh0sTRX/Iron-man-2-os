@@ -43,3 +43,16 @@ WM `_M` dosyası için değer `25` gerçek kaynak kaydıdır, ancak `_M`'nin fü
 ## Takip G219
 
 Gerçek `StateTrack::GetEvent(int,int)` üçüncü u32 dönüt ve çağıran `Actor::UpdateStateAttack` tarafından nasıl tüketildiğini native ARM kaynağından çıkar. Eğer original source event `attack` gerçekten projectile/hit/ses yan etkisine dönüştürülüyorsa onu kaynak kanıtıyla sınıflandır; ancak gerçek 2010 tick zaman birimi/normalization doğrulanmadan VPK'da 'şu ms'de vur' hilesi oluşturma.
+## G218 güncelleme — gerçek StateData next_state/type/loop alanları da canlı gözlemciye bağlandı
+
+G217 source C11 header'daki orijinal `original_next_state_or_UNKNOWN`, `original_state_type_or_UNKNOWN`, `original_loop_or_UNKNOWN` artık `B24G218LiveObserver` üzerinden G8'in başarıyla açtığı klip adına karşılık gelen kaynak state'ten okunabiliyor. Bunları oyun hareketine zorla uygulatmıyoruz, sadece gerçek orijinal state bilgisi eşleştiriliyor:
+
+- Gerçek `Attack_Ground_COMBO1` (ID40) `next_state=41` → orijinal `Attack_Ground_COMBO1END`.
+- Gerçek `Attack_Ground_COMBO2` (ID42) `next_state=43` → orijinal `Attack_Ground_COMBO2END`.
+- Gerçek `Attack_Ground_COMBO3` (ID44) `next_state=118` → orijinal `Attack_Ground_COMBO3END`.
+- `Attack_Ground_Beam_prepare` (ID84) `next_state=85` → `Attack_Ground_Beam` (ID85), bu ana Beam state `loop=1`.
+- `Attack_Ground_Beam_out` (ID86) `next_state=0` → gerçek `Idle`.
+- `Attack_Float_Beam_prepare` (ID88) `next_state=90` → `Attack_Float_Beam`, ve `Attack_Float_Beam_out` (ID89) `next_state=11` → `Float`.
+- WM `Attack_M_Ground_idle` (ID66) özgün `AttackType=25`, `next_state=60` → `Aim_M_Ground_idle`; native suffix M füze olarak kanıtlanmadı.
+
+Bu kaynak transition ID'leri G213B tam parse/G217 gerçek owner JSON'dan geldi; yalnız **ad-benzerliğiyle G8 klip ↔ StateData** eşlemesi candidate olduğu ve iOS gerçek `StateMgr` runtime yürütme gözlemi bulunmadığı ayrımı korunuyor. `B24G218LiveObserver` kaynak gözlemci yükleme başarısızsa alanları `B24G217_UNKNOWN_U32` yapar, source state uydurmaz. G218 host C11 testleri kaynak combo/Beam/WM id, next_state, loop ve unknown fail-closed kurallarını doğruladı. Yeni B14/B16/G82/B24 physics, hitbox, damage, accepted shot, ya da native timing davranışı üretilmedi.
