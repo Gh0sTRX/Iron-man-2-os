@@ -26,7 +26,7 @@ class Reader:
  def __init__(self,data:bytes):
   self.data=data;self.pos=0
  def fail(self,message):
-  raise ValueError(f"2010 native StateDatabase source parse error at states offset {self.pos}: {message}")
+  raise ValueError(f"2010 native StateDatabase source parse error at states offset {self.pos}: {message}, source_next24_bytes_hex={self.data[self.pos:min(len(self.data),self.pos+24)].hex()}")
  def fetch(self,size):
   if size<0 or self.pos+size>len(self.data):self.fail("short read "+str(size))
   off=self.pos;self.pos+=size
@@ -142,7 +142,12 @@ def parse_set(p:Reader,k:int):
  n=p.array_count(512,"original StateSet included StateData records")
  states=[]
  for i in range(n):
-  st=parse_state(p,k);st["source_original_state_record_index"]=i
+  st_start=p.pos
+  try:
+   st=parse_state(p,k)
+  except Exception as exc:
+   raise ValueError(f"source StateSet {k}={name!r} / StateData record {i}/{n}, start={st_start}: {exc}") from exc
+  st["source_original_state_record_index"]=i
   states.append(st)
  return {"source_original_index":k,
   "original_2010_StateSet_name":name,
