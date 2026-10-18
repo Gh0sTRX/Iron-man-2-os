@@ -1,0 +1,61 @@
+name: G202 original iOS Actor attack state source selector helper 1 18 source ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g202-original-2010-Actor-state-attack-selector-helper-ARM-NO-VPK.yml"
+      - "research/b24_unified/g202_original_2010_actor_attack_input_source/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_ACTOR_DoAttack_state_helper:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check authentic 2010 iOS owner ARM attack selector data source and native decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g202_original_2010_actor_attack_input_source/g202_2010_Actor_attack_state_selector_helper_source.py
+          python3 -m pip install -q capstone gdown
+      - name: Read owner authentic original 2010 IPA temporarily on private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g202_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g202_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g202_original_owner/owner.ipa
+          test "$(wc -c </tmp/g202_original_owner/owner.ipa)" -eq 248613763
+      - name: Decode original iOS native Actor::UpdateStateAttack selected state input register and 0x9C340 helper true C++ symbols
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g202_original_2010_actor_attack_input_source/g202_2010_Actor_attack_state_selector_helper_source.py \
+            --ipa /tmp/g202_original_owner/owner.ipa \
+            --out /tmp/g202_source/G202_2010_ACTOR_ATTACK_STATE_INPUT_SELECTOR_HELPER_CPP_PROVENANCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g202_source/G202_2010_ACTOR_ATTACK_STATE_INPUT_SELECTOR_HELPER_CPP_PROVENANCE.json').read_text())
+          assert d['source_native_actor_update_attack_function_VM']=='0xdb610'
+          assert d['original_native_attack_selector_helper_VM']=='0x9c340'
+          assert d['original_real_attack_state_slot_Source_from_State_plus_4']
+          assert d['native_original_actor_attack_control_comparisons']==[1,18]
+          assert d['source_original_helper_r0_move_to_SL_before_virtual_attack_proven']
+          assert d['source_original_r1_passes_SL_to_virtual_DoAttack_0x110']
+          assert not d['original_2010_iOS_Aim_M_animation_exact_binding_proven']
+          assert not d['source_original_weapon_enum_or_touch_mapping_proven']
+          assert d['No_Vita_2010_gameplay_patch_applied']
+          assert d['NO_VPK']
+          print('PASS G202 original 2010 Actor attack State+4 / native helper r0 virtual DoAttack r1 guard source; no synthetic controller mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Remove original owner iOS IPA on every job outcome
+        if: always()
+        run: rm -rf /tmp/g202_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G202_ORIGINAL_2010_ACTOR_ATTACK_STATE_INPUT_SELECTOR_CPP_SOURCE_NO_VPK
+          path: /tmp/g202_source/
+          retention-days: 21
+          if-no-files-found: error
