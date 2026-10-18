@@ -10,7 +10,7 @@ permissions:
   contents: read
   actions: read
 jobs:
-  2010_real_original_DoAttack_UniBeam_source_three_calls:
+  original_2010_DoAttack_UniBeam_source_three_calls:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
