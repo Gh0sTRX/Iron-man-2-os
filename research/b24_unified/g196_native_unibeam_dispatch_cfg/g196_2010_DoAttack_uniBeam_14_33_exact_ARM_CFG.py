@@ -132,6 +132,39 @@ def main(ipa:Path,out:Path,png:Path):
    "source_direct_reverse_cfg_conditional_edges_reaching_CALL":valid_preds[:90],
    "original_game_state_or_weapon_enum_predicate_semantics_proven":False,
   })
+ # Original ARM dispatch is conditional ADDLS PC,PC,R5 LSL 2 after CMP R5,#25.
+ # ARM PC at ADDLS is addr+8; hence R5=0 enters 0xF6530.
+ # 0xF652C is fallthrough/out-of-range default, not case zero.
+ if not (table[0xf6524].mnemonic=="cmp" and table[0xf6524].op_str=="r5, #0x19" and
+         table[0xf6528].mnemonic=="addls" and table[0xf6528].op_str=="pc, pc, r5, lsl #2" and
+         table[0xf652c].mnemonic=="b"):
+  raise ValueError("Original 2010 DoAttack jump-table dispatch proof drift")
+ switch={}
+ for source_id in range(26):
+  entry=0xf6530+4*source_id
+  op=table.get(entry)
+  if not op or op.mnemonic!="b" or not op.operands or op.operands[0].type!=ARM_OP_IMM:
+   raise ValueError("Authentic 2010 DoAttack source switch entry failed "+hex(entry))
+  switch[str(source_id)]={"native_ARM_2010_entry_VM":hex(entry),
+      "original_target_VM":hex(op.operands[0].imm&~1)}
+ # Follow only locally visible straight-line/direct-branch native paths.
+ # Calls outside function return in place, but virtual/indirect jumps
+ # are unresolved and do not count as semantic proof.
+ graph=collections.defaultdict(list)
+ for src,dst,kind in edges:graph[src].append(dst)
+ def reachable(entry,goal):
+  todo=collections.deque([entry]);seen=set()
+  while todo:
+   vm=todo.popleft()
+   if vm==goal:return True
+   if vm in seen:continue
+   seen.add(vm)
+   todo.extend(x for x in graph[vm] if x not in seen)
+  return False
+ static_case_paths={
+  str(k):{hex(call):reachable(int(v["original_target_VM"],16),call)
+          for call in CASES}
+  for k,v in ((int(k),v) for k,v in switch.items())}
  report={
   "source":"G196 owner original iOS 2010 MainCharacter DoAttack real ARM control flow and authenticated 14/33 call arguments",
   "native_source_method_VM":hex(FN),
@@ -140,6 +173,13 @@ def main(ipa:Path,out:Path,png:Path):
   "source_original_named_direct_CALL_count":len(calls),
   "source_original_branch_instructions_total":len(branches),
   "source_original_return_sites_total":len(returns),
+  "source_2010_original_native_dispatch_cmp_r5_25_jump_table_proven":True,
+  "source_original_2010_attack_id_switch_0_to_25":switch,
+  "source_original_2010_default_arm_b_VM":"0xf652c",
+  "source_native_switch_CASE_static_edges_reach_UniBeam_call_only_in_analyzed_direct_CFG":static_case_paths,
+  "source_indirect_vtable_dispatch_or_runtime_state_proven":False,
+  "source_original_entire_DoAttack_646_ARM_opcode_metadata":[
+    {"vm":hex(x.address),"mnemonic":x.mnemonic,"args":x.op_str} for x in ins],
   "original_unibeam_callsite_14_14_33_in_source":originals,
   "source_real_original_CALL_128_opcode_CFG_context":outputs,
   "source_reachable_start_vs_14_33_runtime_game_state_proven":False,
@@ -176,6 +216,7 @@ def main(ipa:Path,out:Path,png:Path):
  png.parent.mkdir(parents=True,exist_ok=True);fig.savefig(png,facecolor=fig.get_facecolor())
  plt.close(fig)
  print("G196 REAL 2010 native DoAttack",len(ins),"ARM instructions",len(branches),"branch instructions")
+ for index,entry in switch.items():print("G196 REAL ORIGINAL DoAttack attack-switch",index,"->",entry["original_target_VM"],"static path",static_case_paths[index])
  for row in outputs:
   print("G196 source native original call",row["actual_original_direct_CALL_VM"],
       "dummy key",row["actual_original_dummy_key"],
