@@ -65,10 +65,16 @@ def run():
   " b24_g227_probe.recorded=1;\n"
   "#endif",
   "actual B14 tick and temporary world original XY proposals")
- s='''          if(!b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)){
-             running=0;break;
-          }'''
- new=s+'''
+ # The assembled G9/G171 main has historically varied one-space
+ # indentation around the same real GPU rendering call. Match precisely
+ # its B24 single render statement and failure branch by syntax, never
+ # depend on a particular whitespace convention. Fail closed on >1.
+ import re
+ pattern=r'if\(!b24_gpu_runtime_draw\(&b24_gpu_rt,&model,&camera,&b24_game,idx\)\)\{\s*running=0;break;\s*\}'
+ matches=list(re.finditer(pattern,m))
+ if len(matches)!=1:
+  raise ValueError("G227 original game GPU frame source anchor needs exactly 1 actual successful frame path, found "+str(len(matches)))
+ new=matches[0].group(0)+'''
 #ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
           /* TRUE GPU root AFTER render, vs resolved original 2010 G66C
            * collision/world, vs follow camera target. This does not
@@ -106,7 +112,7 @@ def run():
                b24_original_motion.selected);
           }
 #endif'''
- m=one(m,s,new,"original GPU ARM source one draw operation")
+ m=m[:matches[0].start()]+new+m[matches[0].end():]
  cm+='''
 # G227 optional source-only actual Vita grounded-motion root telemetry:
 # one B14 physics proposal vs original authored G66C collision accepted
