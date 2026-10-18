@@ -1,0 +1,60 @@
+name: G207 original 2010 379 exact StateData AttackType u16 key raw u32 source values NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g207-2010-original-379-AttackType-typed-u32-values-NO-VPK.yml"
+      - "research/b24_unified/g207_original_attacktype_u32_source_values/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_379_state_attack_type_u32_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate 2010 original owner binary state AttackType key/value source decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g207_original_attacktype_u32_source_values/g207_2010_real_states_keyed_AttackType_u32_author_values.py
+          python3 -m pip install -q gdown
+      - name: Load original user owned 2010 game IPA into private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g207_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g207_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g207_original/owner.ipa
+          test "$(wc -c </tmp/g207_original/owner.ipa)" -eq 248613763
+      - name: Extract genuine 379 original AttackType length-prefixed uint32 values and report out of 26 native switch cases
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g207_original_attacktype_u32_source_values/g207_2010_real_states_keyed_AttackType_u32_author_values.py \
+            --ipa /tmp/g207_original/owner.ipa \
+            --out /tmp/g207_source/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g207_source/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json').read_text())
+          assert d['original_raw_exact_AttackType_record_count']==379
+          assert d['original_all_379_u16_attacktype_key_fields_are_exact_length10']
+          assert sum(d['original_source_attacktype_keyed_u32_value_distribution'].values())==379
+          assert (d['original_2010_values_in_G197_native_switch_0_to_25']
+                  +d['original_2010_values_OUTSIDE_G197_native_switch_0_to_25'])==379
+          assert not d['original_native_StateData_GetParam_real_parser_that_reads_this_file_PROVEN']
+          assert not d['original_attacktype_u32_value_equals_native_source_DoAttack_selector_directly_PROVEN']
+          assert d['source_numeric_values_are_NOT_touch_input_codes']
+          assert d['NO_VPK']
+          print('PASS G207 379/379 owner 2010 state data length-prefixed raw u32 AttackType bytes; out of range to 26 switch preserved, no fake input mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original user-owned licensed IPA on all exits
+        if: always()
+        run: rm -rf /tmp/g207_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          path: /tmp/g207_source/
+          retention-days: 21
+          if-no-files-found: error
