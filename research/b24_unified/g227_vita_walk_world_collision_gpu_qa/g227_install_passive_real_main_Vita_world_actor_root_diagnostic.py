@@ -85,6 +85,7 @@ def run():
           b24_g227_probe.resolved_world_y=world.y;
           b24_g227_probe.gpu_actor_world_x=b24_gpu_rt.frame_pose.x;
           b24_g227_probe.gpu_actor_world_y=b24_gpu_rt.frame_pose.y;
+          /* Camera cam_x/y is a position, not the look-at target. */
           b24_g227_probe.camera_target_x=camera.cam_x;
           b24_g227_probe.camera_target_y=camera.cam_y;
           b24_g227_probe.original_G8_clip_loaded=
@@ -98,7 +99,7 @@ def run():
              SDL_Log("G227_WALK_ROOT source-only verdict=%s "
                  "stick=(%.3f,%.3f) world_pre=(%.4f,%.4f) "
                  "B14_proposal=(%.4f,%.4f) native_collision_resolved=(%.4f,%.4f) "
-                 "GPU_ACTOR=(%.4f,%.4f) camera_TARGET=(%.4f,%.4f) "
+                 "GPU_ACTOR=(%.4f,%.4f) camera_POSITION=(%.4f,%.4f) "
                  "G8_original_loaded=%u G8_missing=%u original_clip=%s",
                b24_g227_walk_verdict_name(verdict),
                b24_g227_probe.stick_x,b24_g227_probe.stick_y,
