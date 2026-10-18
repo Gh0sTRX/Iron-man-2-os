@@ -1,0 +1,68 @@
+name: G192 2010 native SceneImpl DummiesTableCreate Add GetDummy real ARM insertion semantics NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g192-original-2010-dummyTableCreateAdd-ARM-insertion-provenance-NO-VPK.yml"
+      - "research/b24_unified/g192_original_scene_dummy_registry_semantics/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_34_names_to_native_dummy_indices:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load G191 owner source verified 34 argument labels and ARM decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g192_original_scene_dummy_registry_semantics/g192_2010_DummiesTableAdd_Create_source_insertion_semantics.py
+          python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G191_ORIGINAL_2010_34_REAL_DUMMY_SOURCE_NAME_ARGUMENTS_NO_VPK
+          run-id: 39118751027
+          github-token: ${{ github.token }}
+          path: /tmp/g192_proven_34_names
+      - name: Read user owned original game executable only inside temporary runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g192_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g192_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g192_original_private/owner.ipa
+          test "$(wc -c </tmp/g192_original_private/owner.ipa)" -eq 248613763
+      - name: Disassemble original native source DummiesTableAdd Create and GetDummy to prove real registration index instead of guessed bone names
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g192_original_scene_dummy_registry_semantics/g192_2010_DummiesTableAdd_Create_source_insertion_semantics.py \
+            --ipa /tmp/g192_original_private/owner.ipa \
+            --g191 /tmp/g192_proven_34_names/G191_2010_GAME_STARTUP_TRUE_34_DUMMY_NAMES_SOURCE_ONLY.json \
+            --out /tmp/g192_source_only/G192_NATIVE_2010_DUMMY_REGISTER_ADD_CREATE_GETDUMMY_ARM.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g192_source_only/G192_NATIVE_2010_DUMMY_REGISTER_ADD_CREATE_GETDUMMY_ARM.json').read_text())
+          assert d['original_startup_table_size_argument']==34
+          assert len(d['original_true_startup_34_source_names'])==34
+          assert d['authored_startup_entry14']=='Dummy_Chest'
+          assert d['authored_startup_entry33']=='Dummy_Foot_L'
+          for k in ('DummiesTableAdd','DummiesTableCreate','SceneImpl_GetDummy'):
+            assert d['native_real_methods'][k]['source_original_instruction_count']>=5
+          assert not d['original_scene_GetDummy_registry14_actual_name_PROVEN']
+          assert not d['original_scene_GetDummy_registry33_actual_name_PROVEN']
+          assert d['NO_VPK']
+          print('G192 genuine 2010 original static initialization strings and native insertion instructions decoded, mapping still gated until source append analysis')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Erase original user-owned licensed IPA after inspection
+        if: always()
+        run: rm -rf /tmp/g192_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G192_ORIGINAL_2010_DUMMY_ADD_CREATE_LOOKUP_ARM_SOURCE_NO_VPK
+          path: /tmp/g192_source_only/G192_NATIVE_2010_DUMMY_REGISTER_ADD_CREATE_GETDUMMY_ARM.json
+          retention-days: 14
+          if-no-files-found: error
