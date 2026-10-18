@@ -40,6 +40,12 @@ jobs:
           assert d['original_native_function_VM']=='0x61724'
           assert d['original_source_native_instruction_count']>=5
           assert d['known_original_UniBeam_argument_id_candidates']==[14,33]
+          assert d['source_native_scene_dummy_bucket_offset_hex']=='0x278'
+          assert d['source_native_scene_first_index_from_UniBeam_14_33_PROVEN']
+          assert d['source_native_second_index_zero_first_entry_PROVEN']
+          assert d['source_original_GETDUMMY_CPP_direct_function_call_count']==0
+          assert len(d['native_real_CPP_calls'])==0
+          assert d['source_conditional_BLS_is_NOT_ARM_BL_function_call']
           assert not d['native_dummy_key_to_original_BDAE_named_node_id_PROVEN']
           assert not d['original_UniBeam_world_chest_or_hand_socket_PROVEN']
           assert d['NO_VPK'] and d['ORIGINAL_IPA_AND_MACHO_NOT_PUBLISHED']
