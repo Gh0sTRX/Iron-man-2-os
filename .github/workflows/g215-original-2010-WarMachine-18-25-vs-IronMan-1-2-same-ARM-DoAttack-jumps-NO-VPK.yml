@@ -1,0 +1,64 @@
+name: G215 genuine iOS IronMan1-2 WarMachine18-25 same original ARM DoAttack native targets NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g215-original-2010-WarMachine-18-25-vs-IronMan-1-2-same-ARM-DoAttack-jumps-NO-VPK.yml"
+      - "research/b24_unified/g215_exact2010_attacktype_to_ARM_selector_bridge/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_2010_native_armor_attack_dispatch_state_to_ARM:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check G215 original 2010 source ASM and native state key crosswalk
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g215_exact2010_attacktype_to_ARM_selector_bridge/g215_true_original_2010_armor_attacktype_dispatch_branch_equivalence.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g215_true_native_2010_ARM
+      - uses: actions/download-artifact@v4
+        with:
+          name: G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_SOURCE_COMPARE_PNG_NO_VPK
+          run-id: 39133010389
+          github-token: ${{ github.token }}
+          path: /tmp/g215_true_native_2010_StateData
+      - name: Prove real 2010 authored all 56 player suit AttackType native ARM branch identity and WarMachine original distinct keys
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g215_exact2010_attacktype_to_ARM_selector_bridge/g215_true_original_2010_armor_attacktype_dispatch_branch_equivalence.py \
+            --g196 /tmp/g215_true_native_2010_ARM/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --g214 /tmp/g215_true_native_2010_StateData/G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_SOURCE_COMPARISON.json \
+            --out /tmp/g215_public/G215_TRUE_2010_4_SUITS_STATE_ATTACKTYPE_TO_ORIGINAL_ARM_SWITCH.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g215_public/G215_TRUE_2010_4_SUITS_STATE_ATTACKTYPE_TO_ORIGINAL_ARM_SWITCH.json').read_text())
+          assert d['source_2010_canonical_original_26_attack_ARM_switch_proven']
+          assert len(d['source_original_WarMachine_distinct_ID_same_ARM_branch_pairs'])==2
+          pairs=d['source_original_IronMan_to_other_suit_comparison']
+          w=next(p for p in pairs if p['source_native_armor_B']=='Warmachine')
+          assert w['source_56_original_AttackType_byte_value_different_count']==26
+          assert w['source_original_native_56_ARM_switch_target_sequence_IDENTICAL']
+          assert not d['source_2010_WeaponDB_UniBeam_Missile_Repulsor_type_semantics_PROVEN']
+          assert not d['source_iOS_touchscreen_attack_button_or_joystick_full_mapping_PROVEN']
+          assert not d['G83_G169_live_Vita_input_animator_combat_patched']
+          assert d['NO_VPK']
+          print('PASS G215 original owner 2010 IM1/2 vs WM18/25 switch branch equivalence all56 actual source; do not rename native weapon IDs or claim Vita input')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G215_REAL_2010_IRONMAN_WARMACHINE_ATTACKTYPE_TO_ARM_BRANCH_SOURCE_NO_VPK
+          path: /tmp/g215_public/
+          retention-days: 21
+          if-no-files-found: error
