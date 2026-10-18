@@ -1,0 +1,59 @@
+name: G191 ORIGINAL 2010 Game DoInitInLogo actual 34 dummy names source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g191-2010-original-34-dummy-name-args-NO-VPK.yml"
+      - "research/b24_unified/g191_original_dummy_34_names/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_2010_native_34_names:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source only ARM startup decoder and dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g191_original_dummy_34_names/g191_2010_DoInitInLogo_34_dummy_registered_names.py
+          python3 -m pip install -q capstone gdown
+      - name: Download user owned original 2010 IPA only to runner temporary files
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g191_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g191_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g191_original_private/owner.ipa
+          test "$(wc -c </tmp/g191_original_private/owner.ipa)" -eq 248613763
+      - name: Extract original 2010 real 34 static named dummy register call arguments and prove ARM source literal pointer
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g191_original_dummy_34_names/g191_2010_DoInitInLogo_34_dummy_registered_names.py \
+            --ipa /tmp/g191_original_private/owner.ipa \
+            --out /tmp/g191_source/G191_2010_GAME_STARTUP_TRUE_34_DUMMY_NAMES_SOURCE_ONLY.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g191_source/G191_2010_GAME_STARTUP_TRUE_34_DUMMY_NAMES_SOURCE_ONLY.json').read_text())
+          assert d['native_original_startup_method_VM']=='0x97e6c'
+          assert d['source_original_Add_native_call_count']==34
+          assert d['native_original_DummiesTableAdd_VM']=='0x641b4'
+          assert d['native_original_DummiesTableCreate_VM']=='0x64684'
+          assert not d['native_original_scene_registry14_name_PROVEN']
+          assert not d['native_original_scene_registry33_name_PROVEN']
+          assert d['NO_VPK']
+          print('G191 PASS 34 original 2010 named dummy Add callsites; exact 14 and 33 registry binding awaits original DummiesTableAdd native implementation proof')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Erase owner's game IPA in every terminal condition
+        if: always()
+        run: rm -rf /tmp/g191_original_private
+      - name: Upload only original ASM source callsite and string names, no owner game executable
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G191_ORIGINAL_2010_34_REAL_DUMMY_SOURCE_NAME_ARGUMENTS_NO_VPK
+          path: /tmp/g191_source/G191_2010_GAME_STARTUP_TRUE_34_DUMMY_NAMES_SOURCE_ONLY.json
+          retention-days: 14
+          if-no-files-found: error
