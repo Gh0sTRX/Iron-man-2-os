@@ -1,0 +1,35 @@
+name: G195 inspect authentic 2010 B13 anim keyframe world pose interpolation source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g195-b13-original-anim-pose-world-api-smoke-NO-VPK.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_2010_b13_api_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load exact owned B13 original 2010 baked skin source and examine its true pose/world anim API
+        run: |
+          set -euo pipefail
+          python3 -m pip install -q numpy scipy
+          python3 - <<'PY'
+          import inspect,tempfile
+          from pathlib import Path
+          from research.b24_unified.b24_underwater_source_34_im2v_bake import load_original_b13
+          with tempfile.TemporaryDirectory(prefix='g195_original_decoder_') as root:
+            b=load_original_b13(Path(root))
+            for name in ('worlds','bake_pose','decode_anim','parse_rig'):
+              fn=getattr(b,name)
+              s=inspect.getsource(fn)
+              print('G195 REAL B13 SOURCE START',name)
+              print(s[:24000])
+              print('G195 REAL B13 SOURCE END',name)
+            print('G195 TRUE 2010 B13 module typed fields', [k for k in dir(b) if any(t in k.lower() for t in ('anim','pose','world','inter','quaternion','matrix'))][:90])
+          print('G195 PASS original source 2010 animation baker API recovered, no Vita patch or VPK')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
