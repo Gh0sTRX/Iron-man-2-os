@@ -1,0 +1,94 @@
+name: G217 original iOS 2010 4 suits 776 StateData authentic AttackType and event C11 source PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g217-original-2010-4suit-776-StateData-C11-native-event-preview-NO-VPK.yml"
+      - "research/b24_unified/g217_real_2010_native_states_to_port_data/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_4suit_native_states_source_header_C11:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict native owner 2010 iOS source database adapter syntax and dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g217_real_2010_native_states_to_port_data/g217_make_authentic_original_2010_suit_motion_attack_event_source_header.py
+          python3 -m pip install -q matplotlib
+      - uses: actions/download-artifact@v4
+        with:
+          name: G213B_ORIGINAL_2010_55_STATESETS_379_ATTACKTYPE_FULL_NATIVE_STATE_READER_NO_VPK
+          run-id: 39135273483
+          github-token: ${{ github.token }}
+          path: /tmp/g217_original_iOS_2010_authenticated_G213B
+      - name: Build source authentic 4 Armor x 194 original 2010 state C11 header and original animation event PNG, no Vita VPK
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g217_real_2010_native_states_to_port_data/g217_make_authentic_original_2010_suit_motion_attack_event_source_header.py \
+            --g213 /tmp/g217_original_iOS_2010_authenticated_G213B/G213B_ORIGINAL_2010_55_STATESETS_FULL_ATTACKTYPE_STATETRACK_SOURCE.json \
+            --outdir /tmp/g217_source
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g217_source/G217_ORIGINAL_2010_4_SUITS_776_NATIVE_STATES_AND_ATTACK_EVENTS.json').read_text())
+          assert d['source_original_suit_state_count']==776
+          assert len(d['source_2010_true_armor_counts'])==4
+          assert all(x['original_native_attacks_with_AttackType']==56 and
+               x['original_full_StateTrack_count']==612 for x in d['source_2010_true_armor_counts'].values())
+          assert not d['raw_event_time_unit_is_milliseconds_PROVEN']
+          assert not d['source_named_original_attack_track_record_proves_HIT_DAMAGE_or_AIM_M_fire']
+          assert not d['source_original_touch_joystick_control_binding_proven']
+          assert not d['G83_G169_live_Vita_animation_or_weapon_input_CHANGED']
+          assert d['NO_VPK']
+          png=Path('/tmp/g217_source/G217_ORIGINAL_2010_REAL_MOVEMENT_COMBO_BEAM_ATTACK_MARKERS_STATIC.png').read_bytes()
+          assert len(png)>12000 and png[:8]==bytes.fromhex('89504e470d0a1a0a')
+          print('PASS G217 original source 2010 armored states JSON and statically rendered source PNG, no fictional hit/damage/input')
+          PY
+      - name: Validate actual original iOS source values in C11 compiled generated state library no new game mechanics
+        run: |
+          set -euo pipefail
+          cat >/tmp/g217_source/test_g217_original_authored_state_data.c <<'C'
+          #include <stdint.h>
+          #include <stdio.h>
+          #include <string.h>
+          #include "b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h"
+          int main(void) {
+            if (B24G217_ARMOR_COUNT!=4 || B24G217_SOURCE_STATES_PER_ARMOR!=194) return 1;
+            for (int a=0;a<4;++a) {
+              const B24G217_SourceState *x=b24g217_true_2010_owner_states[a];
+              if(strcmp(x[0].original_source_state_name,"Idle")) return 2;
+              if(strcmp(x[1].original_source_state_name,"Jump")) return 3;
+              if(strcmp(x[2].original_source_state_name,"Move_Walk")) return 4;
+              if(strcmp(x[3].original_source_state_name,"Move_Run")) return 5;
+              if(strcmp(x[14].original_source_state_name,"Fly")) return 6;
+              if(strcmp(x[40].original_source_state_name,"Attack_Ground_COMBO1")) return 7;
+              if(x[40].original_AttackType_or_UNKNOWN!=0u) return 8;
+              if(x[65].original_AttackType_or_UNKNOWN!=(a==2?25u:2u)) return 9;
+              if(x[66].original_AttackType_or_UNKNOWN!=(a==2?25u:2u)) return 10;
+              if(x[24].original_AttackType_or_UNKNOWN!=(a==2?18u:1u)) return 11;
+              if(x[84].original_AttackType_or_UNKNOWN!=4u) return 12;
+              if(x[85].original_AttackType_or_UNKNOWN!=4u) return 13;
+              if(x[86].original_AttackType_or_UNKNOWN!=4u) return 14;
+              if(x[89].original_AttackType_or_UNKNOWN!=4u) return 15;
+            }
+            if(B24G217_TRUE_SOURCE_ATTACK_TRAIL_EVENT_COUNT<70) return 16;
+            printf("G217 source 4 armors x194 states and original attack event ticks C11 checks pass; NO VPK\n");
+            return 0;
+          }
+          C
+          gcc -std=c11 -O2 -Wall -Wextra -Werror -I/tmp/g217_source /tmp/g217_source/test_g217_original_authored_state_data.c -o /tmp/g217_source/test_g217
+          /tmp/g217_source/test_g217
+          rm -f /tmp/g217_source/test_g217 /tmp/g217_source/test_g217_original_authored_state_data.c
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G217_ORIGINAL_2010_4_SUITS_776_MOVEMENT_ATTACK_STATES_C11_SOURCE_PNG_NO_VPK
+          path: /tmp/g217_source/
+          retention-days: 21
+          if-no-files-found: error
