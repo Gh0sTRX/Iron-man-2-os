@@ -1,0 +1,64 @@
+name: G200 original iOS 2010 MainCharacter DoAttack native virtual slot110 all callers source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g200-2010-DoAttack-all-native-vtable-110-indirect-call-sites-NO-VPK.yml"
+      - "research/b24_unified/g200_original_2010_virtual_attack_callers/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_CPP_virtual_DoAttack_indirect_call_patterns:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exact native 2010 G200 virtual CALL source parser syntax and dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g200_original_2010_virtual_attack_callers/g200_2010_original_DoAttack_vtable_offset_110_indirect_Cpp_calls.py
+          python3 -m pip install -q capstone gdown
+      - name: Read original 2010 owned iOS MachO within private ephemeral runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g200_original_owner_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g200_original_owner_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g200_original_owner_private/owner.ipa
+          test "$(wc -c </tmp/g200_original_owner_private/owner.ipa)" -eq 248613763
+      - name: Verify ALL source original ARM Thumb C++ 0x110 virtual dispatch call patterns, no false MainCharacter receiver
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g200_original_2010_virtual_attack_callers/g200_2010_original_DoAttack_vtable_offset_110_indirect_Cpp_calls.py \
+            --ipa /tmp/g200_original_owner_private/owner.ipa \
+            --out /tmp/g200_source_output/G200_ORIGINAL_2010_DOATTACK_VTABLE_SLOT68_SOURCE_0x110_CALLS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g200_source_output/G200_ORIGINAL_2010_DOATTACK_VTABLE_SLOT68_SOURCE_0x110_CALLS.json').read_text())
+          assert d['original_vtable_cpp']=='vtable for MainCharacter'
+          assert d['source_MainCharacter_original_vtable_symbol_vm']=='0x4bd85c'
+          assert d['original_DoAttack_source_vtable_pointer_VM']=='0x4bd974'
+          assert d['source_original_DoAttack_vtable_slot_zero_based']==68
+          assert d['source_original_DoAttack_vtable_slot_BYTE_offset']==272
+          assert d['source_ALL_original_native_CPP_methods_scanned']>1000
+          assert not d['exact_G200_real_DoAttack_runtime_receiver_proven']
+          assert not d['exact_G200_touch_control_to_native_attackID_mapping_proven']
+          assert not d['original_world_Vita_renderer_or_combat_modified']
+          assert d['NO_VPK']
+          for item in d['source_Cpp_virtual_dispatch_candidate_patterns']:
+            assert item['source_offset_loaded_in_bytes']==0x110
+            assert item['source_real_receiver_vtable_is_MainCharacter_PROVEN'] is False
+          print('G200 PASS genuine all native 2010 method slot68 byte+0x110 source indirect calls with strict no-false-runtime receiver and NO VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original licensed source file on every exit path
+        if: always()
+        run: rm -rf /tmp/g200_original_owner_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G200_ORIGINAL_2010_NATIVE_CPP_VTABLE_SLOT68_INDIRECT_CALL_SOURCE_NO_VPK
+          path: /tmp/g200_source_output/
+          retention-days: 21
+          if-no-files-found: error
