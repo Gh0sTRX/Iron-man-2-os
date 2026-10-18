@@ -257,7 +257,7 @@ def main(ipa:Path,g207:Path,g212:Path,out:Path):
  verified_named=[t for t in parsed_track if t["native_original_track_name"] in ("Attack","attack")]
  candidate_offs={a["original_authored_source_name_prefixed_offset"]
                  for a in d212["source_original_native_Attack_named_12byte_event_candidates"]}
- verified_offs={t["native_source_track_start"]+2 for t in verified_named}
+ verified_offs={t["native_source_track_start"] for t in verified_named}
  # G212 intentionally sampled ONLY possible name patterns with 1..64
  # events and raw seconds/ticks < 10million; the COMPLETE native
  # StateData reader may contain original source tracks with ZERO
@@ -279,7 +279,7 @@ def main(ipa:Path,g207:Path,g212:Path,out:Path):
   "source_original_StateTrack_count":len(parsed_track),
   "source_original_track_name_distribution":dict(hist),
   "source_original_named_Attack_attack_track_count":len(verified_named),
-  "source_original_2010_real_Attack_named_track_byte_offsets_all":[t["native_source_track_start"]+2 for t in verified_named],
+  "source_original_2010_real_Attack_named_track_byte_offsets_all":[t["native_source_track_start"] for t in verified_named],
   "source_G212_named_Attack_candidates":len(candidate_offs),
   "source_G212_named_Attack_candidates_confirmed_by_full_StateData_native_Cpp_schema":len(verified_offs&candidate_offs),
   "source_actual_native_StateTrack_named_Attack_missing_from_prior_raw_heuristic":len(verified_offs-candidate_offs),
