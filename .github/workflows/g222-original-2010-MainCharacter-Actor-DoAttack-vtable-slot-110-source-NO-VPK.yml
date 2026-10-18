@@ -18,7 +18,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m py_compile research/b24_unified/g222_source_2010_actor_virtual_attack_vtable/g222_true_owner_2010_Actor_virtual_0x110_MainCharacter_DoAttack_vtable_source.py
-          python3 -m pip install -q gdown
+          python3 -m pip install -q gdown capstone
       - name: Authentic user-owned iOS 2010 Iron Man 2 IPA in ephemeral private runner only
         run: |
           set -euo pipefail
