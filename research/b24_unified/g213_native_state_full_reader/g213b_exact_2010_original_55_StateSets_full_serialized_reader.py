@@ -101,7 +101,11 @@ def parse_state(p:Reader,group_index:int):
    # Source native may have optional trailing 4 byte/readstring branch,
    # its exact rare behavior remains a required C++ guard.
    raise ValueError("native original transition initial unnamed flag zero needs separate ARM branch proof")
- for k in range(extra_n):
+ # The serialized extra count includes the first unnamed 21-byte
+ # entry. C++ 0x9CBF4 consumes that first entry, 0x9CBAC
+ # preloads a next name, and the loop reads the remaining n-1
+ # payload entries before leaving the last name without 5-u32 body.
+ for k in range(extra_n-1):
   off=p.pos
   source_name,_=p.string()
   raw5=[p.u32() for i in range(5)]
