@@ -45,12 +45,27 @@ def analyze(ipa,out):
  cs=capstone.Cs(capstone.CS_ARCH_ARM,isa);cs.detail=True
  decoded=list(cs.disasm(exe[off:off+size],METHOD_ADDR))
  if not decoded:raise ValueError("original SceneImpl native decode produced no instructions")
+ needed={
+    0x61724:("ldr","r3, [r0, #0x278]"),
+    0x61728:("ldr","r3, [r3, r1, lsl #2]"),
+    0x6173c:("ldr","r1, [r3, #8]"),
+    0x61740:("cmp","r1, r2"),
+    0x61744:("bls","#0x61734"),
+    0x61748:("ldr","r0, [r3]"),
+    0x6174c:("ldr","r0, [r0, r2, lsl #2]"),
+ }
+ bypc={op.address:op for op in decoded}
+ for addr,(mn,args) in needed.items():
+  op=bypc.get(addr)
+  if op is None or op.mnemonic!=mn or op.op_str!=args:
+   raise ValueError("G181 original SceneImpl dummy-bucket ARM exact instruction mismatch "+hex(addr))
+
  ops=[];calls=[];loads=[];compares=[];conditional=[]
  for op in decoded:
   rec={"vm":hex(op.address),"offset":hex(op.address-METHOD_ADDR),
         "opcode":op.mnemonic,"arguments":op.op_str}
   ops.append(rec)
-  if op.mnemonic.startswith(("bl","blx")):
+  if op.mnemonic in ("bl","blx"):
    imm=op.operands[0].imm&~1 if op.operands and op.operands[0].type==ARM_OP_IMM else None
    calls.append({"native_ARM_callsite_VM":rec["vm"],
      "callee_VM":hex(imm) if imm is not None else None,
@@ -83,7 +98,12 @@ def analyze(ipa,out):
   "Object3D_G180_get_dummy_calls_this_method_PROVEN":True,
   "known_original_UniBeam_argument_id_candidates":[14,33],
   "native_2010_second_unsigned_int_arg_at_lookups":0,
-  "native_dummy_key_to_original_BDAE_named_node_id_PROVEN":False,
+  "source_native_scene_dummy_bucket_offset_hex":"0x278",
+ "source_native_scene_first_index_from_UniBeam_14_33_PROVEN":True,
+ "source_native_second_index_zero_first_entry_PROVEN":True,
+ "source_original_GETDUMMY_CPP_direct_function_call_count":0,
+ "source_conditional_BLS_is_NOT_ARM_BL_function_call":True,
+ "native_dummy_key_to_original_BDAE_named_node_id_PROVEN":False,
   "native_dummy_key_index_vs_scene_object_instance_id_PROVEN":False,
   "original_UniBeam_world_chest_or_hand_socket_PROVEN":False,
   "source_works_without_adding_Vita_dummy_weapon_or_pos":True,
