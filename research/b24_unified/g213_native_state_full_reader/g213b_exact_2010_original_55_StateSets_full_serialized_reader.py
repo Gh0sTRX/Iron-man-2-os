@@ -90,7 +90,16 @@ def parse_state(p:Reader,group_index:int):
    print("G213 AUTHENTIC IronMan EXTRA",k,"start",off,
      "near_original_source80",p.data[off:off+80].hex(),flush=True)
   source_name,_=p.string()
-  raw5=[p.u32() for i in range(5)]
+  # Real original 2010 IronMan StateData::Idle contains an
+  # empty-named extra record with a two-byte shorter encoded payload.
+  # Experimental source-file alignment only: this variation is NOT
+  # verified as native C++ constructor branch semantics.
+  if source_name=="" and group_index==24 and start==65422 and k==0:
+   raw5=[p.u32() for i in range(3)]+[p.u16(),p.u32()]
+   source_encoding_needs_native_branch_proof=True
+  else:
+   raw5=[p.u32() for i in range(5)]
+   source_encoding_needs_native_branch_proof=False
   native_bool=p.u8()
   if group_index==24 and start<66000:
    print("G213 AUTHENTIC IronMan EXTRA",k,"name",source_name,
@@ -109,6 +118,7 @@ def parse_state(p:Reader,group_index:int):
      "extra_name",extra_name,"END",p.pos,flush=True)
   extras.append({"original_entry_off":off,"original_name":source_name,
    "native_2010_5x_u32_unclassified":raw5,
+   "source_original_empty_named_record_2_byte_alignment_EXCEPTION_not_native_cpp_proven":source_encoding_needs_native_branch_proof,
    "native_2010_u8_unclassified":native_bool,
    "native_2010_u32_unclassified":additional,
    "native_2010_additional_string":extra_name})
