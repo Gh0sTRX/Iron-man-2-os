@@ -90,7 +90,8 @@ def main(ipa:Path,out:Path):
    branch.append({**rec,"target_VM":hex(op.operands[-1].imm&~1)})
   if op.mnemonic.startswith("ldr") and op.operands and any(p.type==ARM_OP_MEM and p.mem.base==capstone.arm.ARM_REG_PC for p in op.operands):
    pc_mem=[p for p in op.operands if p.type==ARM_OP_MEM and p.mem.base==capstone.arm.ARM_REG_PC]
-   if len(pc_mem)!=1:continue
+   # Register-indexed [pc,rX] is NOT a literal PC-relative immediate.
+   if len(pc_mem)!=1 or pc_mem[0].mem.index!=0:continue
    ea=op.address+8+pc_mem[0].mem.disp
    value=u32(ea)
    literal.append({**rec,"original_literal_VM":hex(ea),
