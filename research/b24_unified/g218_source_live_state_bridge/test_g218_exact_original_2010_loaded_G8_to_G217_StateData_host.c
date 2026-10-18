@@ -67,6 +67,29 @@ int main(void){
  REQ(w.unmapped_source_clip_frames==4u);
  REQ(!w.actual_2010_melee_hit_or_projectile_event_PROVEN);
  REQ(!w.actual_2010_StateMgr_runtime_state_PROVEN);
+ B24G218LiveObserver native={0};
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,0,"ironman_ironman_ground_combo_1",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==41u);
+ REQ(native.source_authored_type_or_UNKNOWN==4u);
+ REQ(native.source_authored_loop_or_UNKNOWN==0u);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,0,"ironman_ironman_aim_ground_beam1",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==85u); /* original prepare->Beam source */
+ REQ(native.source_authored_type_or_UNKNOWN==24u);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,0,"ironman_ironman_aim_ground_beam2",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==B24G217_UNKNOWN_U32); /* looping */
+ REQ(native.source_authored_loop_or_UNKNOWN==1u);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,0,"ironman_ironman_aim_ground_beam3",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==0u); /* source original Beam out to Idle */
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,4,"suitcase_ironman_aim_float_beam3",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==11u); /* original return Float */
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,2,"warmachine_warmachine_aim_m_ground_idle",1,0));
+ REQ(native.source_authored_next_state_or_UNKNOWN==60u); /* source WM Aim_M Ground idle */
+ REQ(native.source_authored_AttackType_or_UNKNOWN==25u);
+ REQ(!native.actual_2010_StateMgr_runtime_state_PROVEN);
+ REQ(!native.actual_2010_melee_hit_or_projectile_event_PROVEN);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(&native,2,"not_an_original_2010_clip",1,0)==0);
+ REQ(native.source_authored_next_state_or_UNKNOWN==B24G217_UNKNOWN_U32);
+ REQ(native.source_authored_loop_or_UNKNOWN==B24G217_UNKNOWN_U32);
  b24_g218_observer_reset(&w);
  REQ(w.source_animation_frames_observed==0u);
  puts("G218 PASS actual 2010 G8 original IM2V filename -> 4 source armor 194 StateData/AttackType + raw true StateTrack event telemetry, 0 damage, no guesses and NO VPK");
