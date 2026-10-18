@@ -14,7 +14,7 @@ bounded original native method call graph, without assuming helper result
 is a weapon category or on-screen control type.
 """
 from __future__ import annotations
-import argparse,bisect,collections,json,subprocess,sys,zipfile
+import argparse,bisect,collections,json,struct,subprocess,sys,zipfile
 from pathlib import Path
 import capstone
 from capstone.arm import ARM_OP_IMM
@@ -81,6 +81,42 @@ def run(ipa:Path,out:Path):
   instruction=m.get(a)
   if not instruction or instruction.mnemonic!=opcode or instruction.op_str!=args:
    raise ValueError("native Actor::UpdateStateAttack argument-to-vtable source drift "+hex(a))
+ # Actual PIC string supplied to original StateData::GetParam:
+ # at 0xdb654 LDR r1,[PC,#0x120], 0xdb658 ADD r1,PC,r1.
+ # 0xdb77c is literal pool DATA, not an ARM instruction; G201's
+ # unbounded disassembler would render it as an arbitrary opcode.
+ if not (m[0xdb654].mnemonic=="ldr" and m[0xdb654].op_str=="r1, [pc, #0x120]" and
+         m[0xdb658].mnemonic=="add" and m[0xdb658].op_str=="r1, pc, r1" and
+         m[0xdb65c].mnemonic=="bl" and m[0xdb65c].op_str=="#0x9c340"):
+  raise ValueError("G203 original Actor StateData::GetParam PIC source drift")
+ pool_vm=0xdb654+8+0x120
+ source_sec=next((s for s in native["sections"] if s[3]=="__text"
+             and s[0]<=pool_vm< s[0]+s[1]),None)
+ if source_sec is None:raise ValueError("original state source PIC pool not mapped")
+ location=source_sec[2]+pool_vm-source_sec[0]
+ delta=struct.unpack_from("<i",exe,location)[0]
+ original_key_vm=(0xdb658+8+delta)&0xffffffff
+ def original_string(ptr):
+  sec=next((s for s in native["sections"] if s[3] not in ("__bss","__common")
+            and s[0]<=ptr<s[0]+s[1]),None)
+  if sec is None:return None
+  o=sec[2]+ptr-sec[0];b=bytearray()
+  for t in range(96):
+   if o+t>=len(exe):return None
+   value=exe[o+t]
+   if value==0:
+    if not 1<=len(b)<=95:return None
+    try:return b.decode("ascii")
+    except UnicodeDecodeError:return None
+   if value<32 or value>126:return None
+   b.append(value)
+  return None
+ attack_param=original_string(original_key_vm)
+ if attack_param is None:
+  raise ValueError("Source original 2010 StateData::GetParam attack selector string unresolved")
+ print("G203 ORIGINAL 2010 StateData::GetParam name source PIC",
+       hex(pool_vm),"signed delta",delta,
+       "key VM",hex(original_key_vm),"key",attack_param)
  result={}
  for label,where in HELPERS.items():
   s=decode(where,3000)
@@ -107,6 +143,11 @@ def run(ipa:Path,out:Path):
    "source_native_actor_update_attack_function_VM":hex(UPDATE),
    "original_native_real_direct_helper_CALL_VM":"0xdb65c",
    "original_native_attack_selector_helper_VM":"0x9c340",
+   "original_native_StateData_GetParam_key_literal_VM":hex(pool_vm),
+   "original_native_StateData_GetParam_key_VM":hex(original_key_vm),
+   "original_native_StateData_GetParam_actual_string_key":attack_param,
+   "original_real_ARM_2010_StateData_GetParam_param2_default_minus_one":True,
+   "source_native_string_key_proven_from_owner_ARM_PIC":True,
    "original_real_attack_state_slot_Source_from_State_plus_4":True,
    "native_original_actor_attack_control_comparisons":[1,18],
    "source_original_helper_r0_move_to_SL_before_virtual_attack_proven":True,
