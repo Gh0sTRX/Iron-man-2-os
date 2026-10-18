@@ -38,6 +38,9 @@ jobs:
           d=json.loads(Path('/tmp/g202_source/G202_2010_ACTOR_ATTACK_STATE_INPUT_SELECTOR_HELPER_CPP_PROVENANCE.json').read_text())
           assert d['source_native_actor_update_attack_function_VM']=='0xdb610'
           assert d['original_native_attack_selector_helper_VM']=='0x9c340'
+          assert d['source_native_string_key_proven_from_owner_ARM_PIC']
+          assert d['original_native_StateData_GetParam_actual_string_key']
+          assert d['original_real_ARM_2010_StateData_GetParam_param2_default_minus_one']
           assert d['original_real_attack_state_slot_Source_from_State_plus_4']
           assert d['native_original_actor_attack_control_comparisons']==[1,18]
           assert d['source_original_helper_r0_move_to_SL_before_virtual_attack_proven']
