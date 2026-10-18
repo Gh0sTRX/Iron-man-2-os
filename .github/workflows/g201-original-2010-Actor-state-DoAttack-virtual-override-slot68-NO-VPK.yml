@@ -1,0 +1,64 @@
+name: G201 original 2010 Actor UpdateStateAttack MainCharacter virtual DoAttack slot68 source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g201-original-2010-Actor-state-DoAttack-virtual-override-slot68-NO-VPK.yml"
+      - "research/b24_unified/g201_actual2010_actor_attack_virtual_bridge/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_2010_real_Actor_to_MainCharacter_attack_virtual_bridge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original native 2010 Actor UpdateStateAttack state-machine vtable source
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g201_actual2010_actor_attack_virtual_bridge/g201_original_Actor_UpdateStateAttack_uses_MainCharacter_DoAttack_virtual_slot68.py
+          python3 -m pip install -q capstone gdown
+      - name: Load original user owned 2010 iOS IPA in private transient runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g201_original_owner_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g201_original_owner_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g201_original_owner_private/owner.ipa
+          test "$(wc -c </tmp/g201_original_owner_private/owner.ipa)" -eq 248613763
+      - name: Prove source ARM Actor virtual dispatch through C++ base/derived slot68 0x110 with original source weapon argument register provenance
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g201_actual2010_actor_attack_virtual_bridge/g201_original_Actor_UpdateStateAttack_uses_MainCharacter_DoAttack_virtual_slot68.py \
+            --ipa /tmp/g201_original_owner_private/owner.ipa \
+            --out /tmp/g201_source/G201_ORIGINAL_2010_ACTOR_TO_MAINCHARACTER_DOATTACK_VIRTUAL_OVERRIDE_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g201_source/G201_ORIGINAL_2010_ACTOR_TO_MAINCHARACTER_DOATTACK_VIRTUAL_OVERRIDE_SOURCE.json').read_text())
+          assert d['source_original_Actor_UpdateStateAttack_VM']=='0xdb610'
+          assert d['MainCharacter_derived_original_vtable_symbol_VM']=='0x4bd85c'
+          assert d['native_Cpp_zero_based_virtual_slot']==68
+          assert d['source_virtual_CALL_byte_offset']==272
+          assert d['source_MainCharacter_vtable_slot68_method_VM']=='0xf64f8'
+          assert d['source_actual_Actor_UpdateStateAttack_indirect_CALL_VM']=='0xdb6d8'
+          assert d['native_2010_Actor_this_vtable_load_r5_proven']
+          assert d['native_2010_virtual_dispatch_through_slot68_proven']
+          assert d['native_2010_actual_param1_r1_from_sl_register_proven']
+          assert not d['source_which_of_26_attack_input_values_loaded_into_SL_PROVEN']
+          assert not d['source_Actor_receiver_is_MainCharacter_during_real_2010_gameplay_PROVEN']
+          assert not d['new_Vita_actor_or_weapon_logic_applied']
+          assert d['NO_VPK']
+          print('PASS G201 original 2010 native Actor UpdateStateAttack + MainCharacter DoAttack C++ virtual override slot68 r1 selector register source, no fake touch/weapon mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Remove original owned licensed game data on success and errors
+        if: always()
+        run: rm -rf /tmp/g201_original_owner_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G201_ORIGINAL_2010_ACTOR_STATE_ATTACK_MAINCHARACTER_DOATTACK_VTABLE_SLOT68_NO_VPK
+          path: /tmp/g201_source/
+          retention-days: 21
+          if-no-files-found: error
