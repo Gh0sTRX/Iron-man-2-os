@@ -1,0 +1,69 @@
+name: G178 ORIGINAL 2010 MainCharacter DoAttack 3 UniBeam ARM callsite source capture NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g178-original-iOS-DoAttack-three-UniBeam-native-ARM-callsite-No-VPK.yml"
+      - "research/b24_unified/g178_original_doattack_unibeam_input/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  2010_real_original_DoAttack_UniBeam_source_three_calls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source Python syntax and decoder dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g178_original_doattack_unibeam_input/g178_real_2010_maincharacter_doattack_callsite_branches.py
+          python3 -m pip install -q capstone gdown
+      - name: Recover original G175 symbol native calls metadata only
+        uses: actions/download-artifact@v4
+        with:
+          name: G175_ORIGINAL_2010_WEAPONDB_MISSILE_UNIBEAM_ARM_SOURCE_CALLGRAPH_ONLY_NO_VPK
+          run-id: 39107687965
+          github-token: ${{ github.token }}
+          path: /tmp/g178_arm_provenance
+      - name: Read owner's authenticated 2010 iOS IPA in ephemeral runner (NEVER GitHub output)
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g178_PRIVATE_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g178_PRIVATE_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g178_PRIVATE_owner/owner.ipa
+          test "$(wc -c </tmp/g178_PRIVATE_owner/owner.ipa)" -eq 248613763
+      - name: Source original 2010 native DoAttack 3 real UniBeam callsites and bounded ARM control-flow evidence
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g178_original_doattack_unibeam_input/g178_real_2010_maincharacter_doattack_callsite_branches.py \
+            --ipa /tmp/g178_PRIVATE_owner/owner.ipa \
+            --g175 /tmp/g178_arm_provenance/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json \
+            --out /tmp/g178_source_only/G178_ORIGINAL_2010_MAINCHARACTER_DOATTACK_THREE_UNIBEAM_CALLSITE_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g178_source_only/G178_ORIGINAL_2010_MAINCHARACTER_DOATTACK_THREE_UNIBEAM_CALLSITE_ARM.json')
+          d=json.loads(p.read_text())
+          assert d['source_native_method_VM']=='0xf64f8'
+          assert d['native_three_original_direct_UniBeam_calls_PROVEN']
+          assert d['actual_original_UniBeam_callsite_VMs']==['0xf6638','0xf6d8c','0xf6e04']
+          assert len(d['native_callsite_source_context_no_bytes'])==3
+          assert d['source_correct_G83_Aim_M_animation_weapon_mapping_PROVEN'] is False
+          assert d['original_User_touch_controller_button_or_weapon_enum_proven'] is False
+          assert d['NO_VPK'] is True
+          print('G178 original native 3-way UniBeam dispatch source evidence recovered, not retrofitted to unverified Vita input')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original user's private IPA even when tests fail
+        if: always()
+        run: rm -rf /tmp/g178_PRIVATE_owner
+      - name: Upload only native original bounded ARM source opcode context and callsite addresses NOT IPA
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G178_2010_OWNER_DOATTACK_UNIBEAM_3_SOURCE_ARM_CALLS_NO_VPK
+          path: /tmp/g178_source_only/G178_ORIGINAL_2010_MAINCHARACTER_DOATTACK_THREE_UNIBEAM_CALLSITE_ARM.json
+          retention-days: 14
+          if-no-files-found: error
