@@ -1,0 +1,61 @@
+name: G220 original iOS 2010 all StateTrack GetEvent BL callers genuine ARM symbols source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g220-real-original-2010-all-StateTrack-GetEvent-ARM-caller-sites-NO-VPK.yml"
+      - "research/b24_unified/g220_original_2010_statetrack_GetEvent_callers/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact_original_2010_cpp_state_event_direct_ARM_callers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate genuine 2010 ARM StateTrack source callgraph parser
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g220_original_2010_statetrack_GetEvent_callers/g220_owner_2010_native_ARM_all_GetEvent_callers_and_event_accessors.py
+          python3 -m pip install -q capstone gdown
+      - name: Owner 2010 original game IPA read in ephemeral CI only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g220_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g220_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g220_original_private/owner.ipa
+          test "$(wc -c </tmp/g220_original_private/owner.ipa)" -eq 248613763
+      - name: Extract full original __text real ARM direct GetEvent callers and native C++ context, no guess input weapon hit events
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g220_original_2010_statetrack_GetEvent_callers/g220_owner_2010_native_ARM_all_GetEvent_callers_and_event_accessors.py \
+            --ipa /tmp/g220_original_private/owner.ipa \
+            --out /tmp/g220_public/G220_OWNER_ORIGINAL_2010_REAL_STATE_TRACK_GETEVENT_ALL_NATIVE_ARM_CALLERS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g220_public/G220_OWNER_ORIGINAL_2010_REAL_STATE_TRACK_GETEVENT_ALL_NATIVE_ARM_CALLERS.json').read_text())
+          assert d['genuine_native_original_StateTrack_GetEvent_VM']=='0xa14f0'
+          assert d['source_real_2010_ARM_instructions_decoded']>=300000
+          assert len(d['source_real_2010_direct_GetEvent_callsite_windows'])==d['source_direct_ARM_GetEvent_BL_BLX_callsite_count']
+          assert len(d['source_original_StateTrack_Event_named_cpp_methods'])>=1
+          assert not d['original_indirect_virtual_GetEvent_consumers_fully_analyzed']
+          assert not d['original_2010_event_payload_third_field_semantics_PROVEN']
+          assert not d['original_iOS_AttackType_Event_to_WarMachine_rocket_repulsor_or_damage_PROVEN']
+          assert not d['native_2010_Event_time_values_as_milliseconds_PROVEN']
+          assert not d['G218_live_original_Vita_state_observer_changed']
+          assert d['NO_VPK']
+          print('PASS G220 actual native original 2010 StateTrack::GetEvent callsite provenance, no fabricated damage/weapon/time')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Wipe owner 2010 game IPA whether run succeeds or fails
+        if: always()
+        run: rm -rf /tmp/g220_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G220_ORIGINAL_2010_OWNED_ARM_STATETRACK_GETEVENT_CPP_CALLSITE_GRAPH_NO_VPK
+          path: /tmp/g220_public/
+          retention-days: 21
+          if-no-files-found: error
