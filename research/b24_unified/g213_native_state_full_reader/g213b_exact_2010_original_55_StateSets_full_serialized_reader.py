@@ -158,8 +158,8 @@ def parse_state(p:Reader,group_index:int):
  if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"flags_n",flags_n,"at",p.pos,flush=True)
  flags=[]
  for i in range(flags_n):
-  name,_=p.string();a=p.u16();b=p.u16()
-  flags.append({"name":name,"source_u16_flag1":a,"source_u16_flag2":b})
+  flag_name,_=p.string();a=p.u16();b=p.u16()
+  flags.append({"name":flag_name,"source_u16_flag1":a,"source_u16_flag2":b})
  return {"source_original_state_record_index":None,
   "source_original_group_index":group_index,
   "source_native_binary_record_start":start,
