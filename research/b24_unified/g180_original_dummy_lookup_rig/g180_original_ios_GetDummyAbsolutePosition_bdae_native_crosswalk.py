@@ -11,6 +11,7 @@ No new original game binary, image asset, Vita patch, projectile, or VPK.
 from __future__ import annotations
 import argparse,bisect,collections,json,hashlib,re,subprocess,sys,tempfile,zipfile
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import capstone
 from capstone.arm import ARM_OP_IMM,ARM_OP_MEM
 from b24_owner_pack_extract import decode,get_exact
