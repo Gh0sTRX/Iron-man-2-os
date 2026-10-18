@@ -1,0 +1,69 @@
+name: G210 2010 FileStream BufferStream StateDatabase StateData 379 AttackType native chain NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g210-authentic-2010-FileStream-BufferStream-StateData-379-AttackType-source-NO-VPK.yml"
+      - "research/b24_unified/g210_original_loader_state_attacktype_bridge/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_2010_native_loader_to_379_attacktype_values:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict G210 source native 2010 ARM parser syntax check
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g210_original_loader_state_attacktype_bridge/g210_true_2010_StateDatabase_file_to_StateData_AttackType_read_chain.py
+          python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          run-id: 39128015289
+          github-token: ${{ github.token }}
+          path: /tmp/g210_authenticated_G207
+      - name: Load original 2010 user owned iOS IPA in private transient runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g210_private_2010
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g210_private_2010/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g210_private_2010/owner.ipa
+          test "$(wc -c </tmp/g210_private_2010/owner.ipa)" -eq 248613763
+      - name: Prove exact original 2010 native 15 loader calls and genuine 379 AttackType source pairs again NO guessed input
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g210_original_loader_state_attacktype_bridge/g210_true_2010_StateDatabase_file_to_StateData_AttackType_read_chain.py \
+            --ipa /tmp/g210_private_2010/owner.ipa \
+            --g207 /tmp/g210_authenticated_G207/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json \
+            --out /tmp/g210_public/G210_ORIGINAL_2010_NATIVE_379_ATTACKTYPE_FILE_TO_STATEDATA_LOADER_CHAIN.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g210_public/G210_ORIGINAL_2010_NATIVE_379_ATTACKTYPE_FILE_TO_STATEDATA_LOADER_CHAIN.json').read_text())
+          assert d['source_original_StateData_numeric_379_AttackType_values_revalidated_against_original_bytes']==379
+          assert d['source_actual_state_key_value_pairs_equal_G207_source_by_byte_offsets']
+          assert d['original_Native_FileStream_to_BufferStream_to_StateSetData_to_StateData_method_chain_PROVEN']
+          assert len(d['source_original_2010_exact_named_ARM_cpp_loader_edges'])==15
+          assert len(d['source_original_2010_virtual_BufferStream_reads_at_code_offsets'])==3
+          assert d['source_original_native_GetParam_8_byte_items_and_offset_plus4_proven']
+          assert not d['2010_exact_StateData_deserializer_379_owner_bin_record_per_object_boundary_PROVEN']
+          assert not d['2010_real_active_MainCharacter_original_IOS_WeaponType_and_AnimMapped_PROVEN']
+          assert not d['new_Vita_combat_or_InputSystem_patch_applied']
+          assert d['NO_VPK']
+          print('PASS G210 all original loader ARM calls and 379 source raw values; no fake touch/Vita input or VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase proprietary original owner iOS game IPA on success and failure
+        if: always()
+        run: rm -rf /tmp/g210_private_2010
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G210_ORIGINAL_2010_NATIVE_STATE_LOADER_379_ATTACKTYPE_SOURCE_NO_VPK
+          path: /tmp/g210_public/
+          retention-days: 21
+          if-no-files-found: error
