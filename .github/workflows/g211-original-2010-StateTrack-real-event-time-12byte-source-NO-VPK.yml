@@ -1,0 +1,63 @@
+name: G211 true original iOS 2010 StateTrack 12 byte event duration read native timing NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g211-original-2010-StateTrack-real-event-time-12byte-source-NO-VPK.yml"
+      - "research/b24_unified/g211_original_statetrack_timing/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_source_2010_state_track_events:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict G211 original ARM source parser syntax validation
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g211_original_statetrack_timing/g211_original_2010_StateTrack_12byte_event_window_native_ARM.py
+          python3 -m pip install -q capstone gdown
+      - name: Acquire original user's owned iOS 2010 source game IPA privately in ephemeral CI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g211_original_source_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g211_original_source_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g211_original_source_private/owner.ipa
+          test "$(wc -c </tmp/g211_original_source_private/owner.ipa)" -eq 248613763
+      - name: Verify actual original StateTrack time-event reader, event stride12 and register-level start duration comparisons
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g211_original_statetrack_timing/g211_original_2010_StateTrack_12byte_event_window_native_ARM.py \
+            --ipa /tmp/g211_original_source_private/owner.ipa \
+            --out /tmp/g211_public/G211_ORIGINAL_2010_STATETRACK_EVENT_12BYTE_NATIVE_TIMING_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g211_public/G211_ORIGINAL_2010_STATETRACK_EVENT_12BYTE_NATIVE_TIMING_SOURCE.json').read_text())
+          assert d['actual_original_StateTrack_constructor_VM']=='0xa167c'
+          assert d['actual_original_StateTrack_GetEvent_VM']=='0xa14f0'
+          assert d['source_real_2010_StateTrack_entry_stride_bytes']==12
+          assert d['source_original_StateTrack_entry_start_at_offset_0']
+          assert d['source_original_StateTrack_entry_duration_at_offset_4']
+          assert d['original_native_StateTrack_event_end_equals_start_plus_duration_PROVEN']
+          assert d['source_original_StateTrack_no_event_returns_negative_one']
+          assert d['source_original_StateTrack_constructor_event_count_reads_u16']
+          assert not d['native_2010_original_per_attack_hit_frame_timing_inferred']
+          assert not d['source_2010_WeaponDB_AttackType_input_and_anim_bindings_PROVEN']
+          assert not d['Vita_actual_one_animator_G83_wired_to_this_source']
+          assert d['NO_VPK']
+          print('PASS G211 source-authentic original 2010 StateTrack event 12B interval start+duration, no invented damage frame or weapon controls')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original 2010 proprietary source file on every exit
+        if: always()
+        run: rm -rf /tmp/g211_original_source_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G211_2010_GENUINE_STATE_TRACK_12BYTE_EVENT_DURATION_SOURCE_NO_VPK
+          path: /tmp/g211_public/
+          retention-days: 21
+          if-no-files-found: error
