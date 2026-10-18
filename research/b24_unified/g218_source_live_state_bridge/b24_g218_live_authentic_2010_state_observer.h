@@ -22,6 +22,9 @@ typedef struct {
   uint16_t source_suit_group;
   uint16_t source_native_state_index;
   uint32_t source_authored_AttackType_or_UNKNOWN;
+  uint32_t source_authored_next_state_or_UNKNOWN; /* exact original StateData next_state, not auto-executed */
+  uint32_t source_authored_type_or_UNKNOWN;       /* original type, weapon semantics unproven */
+  uint32_t source_authored_loop_or_UNKNOWN;       /* original loop flag, no new G8 timing */
   uint32_t source_attack_event_start_raw_UNCLASSIFIED;
   const char *source_state_name_correspondence_ONLY;
   const char *selected_actual_G8_IM2V_clip;
@@ -89,6 +92,9 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->source_state_name_correspondence_ONLY=NULL;
   obs->selected_actual_G8_IM2V_clip=NULL;
   obs->source_authored_AttackType_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_authored_next_state_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_authored_type_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_authored_loop_or_UNKNOWN=B24G217_UNKNOWN_U32;
   obs->source_attack_event_start_raw_UNCLASSIFIED=B24G217_UNKNOWN_U32;
   obs->actual_2010_StateMgr_runtime_state_PROVEN=0;
   obs->actual_2010_melee_hit_or_projectile_event_PROVEN=0;
@@ -122,6 +128,9 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->source_suit_group=(uint16_t)group;
   obs->source_native_state_index=src->native_source_state_index;
   obs->source_authored_AttackType_or_UNKNOWN=src->original_AttackType_or_UNKNOWN;
+  obs->source_authored_next_state_or_UNKNOWN=src->original_next_state_or_UNKNOWN;
+  obs->source_authored_type_or_UNKNOWN=src->original_state_type_or_UNKNOWN;
+  obs->source_authored_loop_or_UNKNOWN=src->original_loop_or_UNKNOWN;
   obs->selected_actual_G8_IM2V_clip=actual_G8_clip;
   obs->source_state_name_correspondence_ONLY=src->original_source_state_name;
   obs->source_state_index_correlated_by_filename_ONLY=1;
