@@ -1,0 +1,62 @@
+name: G196 true original iOS 2010 UniBeam 14 33 native DoAttack CFG source PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g196-original-2010-native-DoAttack-14-33-guard-source-CFG-PNG-NO-VPK.yml"
+      - "research/b24_unified/g196_native_unibeam_dispatch_cfg/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  true_2010_original_DoAttack_native_branch_CFG:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify original 2010 DoAttack code parser syntax and native ARM dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g196_native_unibeam_dispatch_cfg/g196_2010_DoAttack_uniBeam_14_33_exact_ARM_CFG.py
+          python3 -m pip install -q capstone matplotlib gdown
+      - name: Load user original 2010 iOS source binary in PRIVATE ephemeral Actions runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g196_private_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g196_private_original/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g196_private_original/owner.ipa
+          test "$(wc -c </tmp/g196_private_original/owner.ipa)" -eq 248613763
+      - name: Decode exact ORIGINAL 2010 iOS native DoAttack branch CFG predecessors of UniBeam dummy14 and dummy33 and create source-only PNG
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g196_native_unibeam_dispatch_cfg/g196_2010_DoAttack_uniBeam_14_33_exact_ARM_CFG.py \
+            --ipa /tmp/g196_private_original/owner.ipa \
+            --out /tmp/g196_public/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --png /tmp/g196_public/G196_ORIGINAL_2010_UNIBEAM_14_14_33_SOURCE_CALLGRAPH.png
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g196_public/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json').read_text())
+          assert d['native_source_method_VM']=='0xf64f8'
+          assert d['original_native_source_instruction_count']>600
+          a=d['original_unibeam_callsite_14_14_33_in_source']
+          assert [(x['source_uniBeam_direct_CALL_VM'],x['actual_source_native_integer_dummy_group']) for x in a] == [
+            ('0xf6638',14),('0xf6d8c',14),('0xf6e04',33)]
+          assert len(d['source_real_original_CALL_128_opcode_CFG_context'])==3
+          assert not d['native_real_original_suit_or_weapon_mode_binding_for_foot_L_proven']
+          assert d['NO_VPK']
+          img=Path('/tmp/g196_public/G196_ORIGINAL_2010_UNIBEAM_14_14_33_SOURCE_CALLGRAPH.png').read_bytes()
+          assert len(img)>12000 and img.startswith(bytes.fromhex('89504e470d0a1a0a'))
+          print('PASS G196 2010 native 3 unibeam 14/14/33 calls original CFG contextual evidence, NO invented 33 gameplay meaning')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original licensed 2010 iOS private executable and owned IPA after use
+        if: always()
+        run: rm -rf /tmp/g196_private_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          path: /tmp/g196_public/
+          retention-days: 21
+          if-no-files-found: error
