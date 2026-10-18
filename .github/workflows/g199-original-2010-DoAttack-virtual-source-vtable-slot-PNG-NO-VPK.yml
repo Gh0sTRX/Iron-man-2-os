@@ -1,0 +1,64 @@
+name: G199 genuine 2010 DoAttack source native vtable pointer 0x4BD974 slot origin PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g199-original-2010-DoAttack-virtual-source-vtable-slot-PNG-NO-VPK.yml"
+      - "research/b24_unified/g199_original_2010_attack_vtable/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  genuine_2010_DoAttack_vtable_named_Cpp_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate G199 original 2010 native ARM and C++ vtable source analysis
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g199_original_2010_attack_vtable/g199_2010_MainCharacter_DoAttack_vtable_slot_and_dispatch_provenance.py
+          python3 -m pip install -q capstone matplotlib gdown
+      - name: Read exact original 2010 owned iOS IPA only in ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g199_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g199_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g199_original_private/owner.ipa
+          test "$(wc -c </tmp/g199_original_private/owner.ipa)" -eq 248613763
+      - name: Find real native 2010 C++ vtable symbol/offset and authentic sibling methods around DoAttack pointer no false input claim
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g199_original_2010_attack_vtable/g199_2010_MainCharacter_DoAttack_vtable_slot_and_dispatch_provenance.py \
+            --ipa /tmp/g199_original_private/owner.ipa \
+            --out /tmp/g199_public/G199_SOURCE_2010_MAINCHARACTER_DOATTACK_REAL_VTABLE_SLOT_AND_NEIGHBORS.json \
+            --png /tmp/g199_public/G199_2010_MAINCHARACTER_SOURCE_VTABLE_NEIGHBORS.png
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          folder=Path('/tmp/g199_public')
+          d=json.loads((folder/'G199_SOURCE_2010_MAINCHARACTER_DOATTACK_REAL_VTABLE_SLOT_AND_NEIGHBORS.json').read_text())
+          assert d['source_original_DoAttack_VM']=='0xf64f8'
+          assert d['source_initialized_function_pointer_VM']=='0x4bd974'
+          assert d['source_original_initialized_pointer_target_VM']=='0xf64f8'
+          assert d['source_real_segment']=='__DATA'
+          assert d['source_real_section']=='__const'
+          assert not d['source_original_touchscreen_input_attack_ID_mapping_PROVEN']
+          assert not d['source_original_DoAttack_runtime_vtable_dispatch_caller_exact_PROVEN']
+          assert not d['original_MainCharacter_DoAttack_loaded_Vita_gameplay']
+          assert d['NO_VPK']
+          f=(folder/'G199_2010_MAINCHARACTER_SOURCE_VTABLE_NEIGHBORS.png').read_bytes()
+          assert len(f)>10000 and f.startswith(bytes.fromhex('89504e470d0a1a0a'))
+          print('PASS G199 authentic 2010 source direct DoAttack initialized native method pointer, vtable origin from source symbols and rigorous unknown input condition')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Erase original user-owned licensed iOS IPA regardless of exit status
+        if: always()
+        run: rm -rf /tmp/g199_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G199_ORIGINAL_2010_SOURCE_DOATTACK_NAMED_VTABLE_SLOT_PNG_NO_VPK
+          path: /tmp/g199_public/
+          retention-days: 21
+          if-no-files-found: error
