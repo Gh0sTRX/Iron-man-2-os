@@ -1,0 +1,74 @@
+name: G214 authentic IronMan Suitcase WarMachine Stealth 2010 original 56 AttackType each profile PNG NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g214-authentic-2010-IronMan-Suitcase-Warmachine-Stealth-AttackType-profile-PNG-NO-VPK.yml"
+      - "research/b24_unified/g214_original_player_4_state_profiles/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_authored_4_player_group_profiles:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install static source metadata diagram renderer, strict original source parser syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g214_original_player_4_state_profiles/g214_compare_2010_IronMan_Suitcase_WM_Stealth_native_AttackType_and_track_candidate_signatures.py
+          python3 -m pip install -q matplotlib
+      - uses: actions/download-artifact@v4
+        with:
+          name: G213C_ORIGINAL_2010_55_STATESET_SOURCE_NAMES_379_ATTACKTYPE_GROUP_MAP_NO_VPK
+          run-id: 39132808939
+          github-token: ${{ github.token }}
+          path: /tmp/g214_real_G213
+      - uses: actions/download-artifact@v4
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          run-id: 39128015289
+          github-token: ${{ github.token }}
+          path: /tmp/g214_real_G207
+      - uses: actions/download-artifact@v4
+        with:
+          name: G212_ORIGINAL_2010_AUTHORED_ATTACK_TRACK_RAW_12BYTE_EVENT_CANDIDATES_NO_VPK
+          run-id: 39130759380
+          github-token: ${{ github.token }}
+          path: /tmp/g214_real_G212
+      - name: Compare exactly 56 original AttackType u32 values and 40 raw event candidates in 4 owner source player sets and render static PNG
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g214_original_player_4_state_profiles/g214_compare_2010_IronMan_Suitcase_WM_Stealth_native_AttackType_and_track_candidate_signatures.py \
+            --g213c /tmp/g214_real_G213/G213C_OWNER_2010_55_NAMED_STATESETS_379_ATTACKTYPE_RAW_EVENT_GROUP_MAP.json \
+            --g207 /tmp/g214_real_G207/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json \
+            --g212 /tmp/g214_real_G212/G212_REAL_2010_ATTACK_STATETRACK_ORIGINAL_EVENT_CANDIDATES.json \
+            --out /tmp/g214_public/G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_SOURCE_COMPARISON.json \
+            --png /tmp/g214_public/G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_VALUES_STATIC_SOURCE.png
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g214_public/G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_SOURCE_COMPARISON.json').read_text())
+          assert set(d['source_original_source_groups_compared'])=={'IronMan','IronMan_suitcase','Warmachine','stealth'}
+          assert all(p['original_source_native_AttackType_key_count']==56
+             for p in d['source_4_native_set_profiles'].values())
+          assert all(p['source_original_Attack_attack_event_candidates']==40
+             for p in d['source_4_native_set_profiles'].values())
+          assert not d['source_original_2010_ALL_player_StateData_cpp_parser_complete']
+          assert not d['original_native_weapon_to_26_DA_attack_selector_values_PROVEN']
+          assert not d['Vita_input_or_gameplay_changed']
+          assert d['NO_VPK']
+          f=Path('/tmp/g214_public/G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_VALUES_STATIC_SOURCE.png').read_bytes()
+          assert len(f)>12000 and f.startswith(bytes.fromhex('89504e470d0a1a0a'))
+          print('G214 PASS 4 original 2010 player source set 56/40 authored raw values, all pairwise comparison source-only, no fabricated animated motions or Vita VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G214_ORIGINAL_2010_4_PLAYER_SUIT_ATTACKTYPE_SOURCE_COMPARE_PNG_NO_VPK
+          path: /tmp/g214_public/
+          retention-days: 21
+          if-no-files-found: error
