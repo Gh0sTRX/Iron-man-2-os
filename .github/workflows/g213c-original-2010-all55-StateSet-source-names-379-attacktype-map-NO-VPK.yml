@@ -1,0 +1,74 @@
+name: G213C original 2010 55 exact StateSet names 379 AttackType 365 raw Attack candidates NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g213c-original-2010-all55-StateSet-source-names-379-attacktype-map-NO-VPK.yml"
+      - "research/b24_unified/g213_native_state_full_reader/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_55_real_groups_key_source_mapping:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict source genuine owner G213C StateSet names and key interval reader syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g213_native_state_full_reader/g213c_source_original_55_StateSet_names_379_AttackType_group_crosswalk.py
+          python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          run-id: 39128015289
+          github-token: ${{ github.token }}
+          path: /tmp/g213c_G207
+      - uses: actions/download-artifact@v4
+        with:
+          name: G212_ORIGINAL_2010_AUTHORED_ATTACK_TRACK_RAW_12BYTE_EVENT_CANDIDATES_NO_VPK
+          run-id: 39130759380
+          github-token: ${{ github.token }}
+          path: /tmp/g213c_G212
+      - name: Load original user owned iOS 2010 1.0.0 game privately on temporary CI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g213c_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g213c_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g213c_original_private/owner.ipa
+          test "$(wc -c </tmp/g213c_original_private/owner.ipa)" -eq 248613763
+      - name: All 55 ORIGINAL 2010 source named StateSet headers and owner 379 AttackType/365 raw named Attack source group assignment
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g213_native_state_full_reader/g213c_source_original_55_StateSet_names_379_AttackType_group_crosswalk.py \
+            --ipa /tmp/g213c_original_private/owner.ipa \
+            --g207 /tmp/g213c_G207/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json \
+            --g212 /tmp/g213c_G212/G212_REAL_2010_ATTACK_STATETRACK_ORIGINAL_EVENT_CANDIDATES.json \
+            --out /tmp/g213c_public/G213C_OWNER_2010_55_NAMED_STATESETS_379_ATTACKTYPE_RAW_EVENT_GROUP_MAP.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g213c_public/G213C_OWNER_2010_55_NAMED_STATESETS_379_ATTACKTYPE_RAW_EVENT_GROUP_MAP.json').read_text())
+          assert d['original_StateDatabase_true_source_set_count']==55
+          assert d['original_exact_AttackType_u32_records_mapped_to_a_source_StateSet_interval']==379
+          assert d['original_named_Attack_attack_raw_candidate_records_mapped_to_a_source_StateSet_interval']==365
+          assert d['source_55_group_names_exact_original_StateSetData_header_read_PROVEN']
+          assert d['source_all_55_original_embedded_Lua51_chunks_exact_lengths_PROVEN']
+          assert not d['source_native_all_55_StateData_nested_records_and_tracks_parser_PROVEN']
+          assert not d['source_AttackType_value_to_actual_original_current_armor_attack_INPUT_PROVEN']
+          assert d['NO_VPK']
+          print('G213C PASSED original 55 sets names and authored attack-type/track offsets source-only, nested C++ StateData loader still unresolved')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original proprietary game source on every CI outcome
+        if: always()
+        run: rm -rf /tmp/g213c_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G213C_ORIGINAL_2010_55_STATESET_SOURCE_NAMES_379_ATTACKTYPE_GROUP_MAP_NO_VPK
+          path: /tmp/g213c_public/
+          retention-days: 21
+          if-no-files-found: error
