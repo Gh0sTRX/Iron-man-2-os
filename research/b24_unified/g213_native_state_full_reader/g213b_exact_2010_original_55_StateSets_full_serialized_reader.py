@@ -119,6 +119,15 @@ def parse_state(p:Reader,group_index:int):
    "native_2010_additional_string":extra_name,
    "is_original_2010_unnamed_initial_transition":False,
    "source_2010_native_constructor_preheader_skips_initial_ReadString_PROVEN":True})
+ # Native ARM 0x9CBAC/0x9CD2C reads the NEXT transition name
+ # before 0x9CD3C compares current r6 index to the original count.
+ # This last trailing source name belongs to the pool and has no
+ # attached five-u32/flag body inside this StateData record. The
+ # IronMan::Idle case yields exact original "Falling" here;
+ # without consuming it channel count wrongly becomes 7.
+ trailing_extra_name=None
+ if extra_n:
+  trailing_extra_name,_=p.string()
  channel_n=p.array_count(256,"StateData source event track channels")
  if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"channel_n",channel_n,"at",p.pos,flush=True)
  channels=[];ntracks=0
@@ -146,6 +155,7 @@ def parse_state(p:Reader,group_index:int):
   "source_original_attacktype_exact_definitions":attack,
   "source_original_extra_metadata_count":extra_n,
   "source_original_preheader_unnamed_transition_exists":bool(extra_n),
+  "source_original_last_transition_trailing_name_without_body":trailing_extra_name,
   "source_original_extra_metadata_records":extras,
   "source_original_event_channel_count":len(channels),
   "source_original_tracks_in_event_channels":ntracks,
