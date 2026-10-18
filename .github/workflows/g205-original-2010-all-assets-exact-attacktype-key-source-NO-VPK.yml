@@ -1,0 +1,58 @@
+name: G205 original 2010 all IPA asset members exact AttackType key-source provenance NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g205-original-2010-all-assets-exact-attacktype-key-source-NO-VPK.yml"
+      - "research/b24_unified/g205_owner_source_attacktype_asset_locator/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scan_original_2010_2010_AttackType_native_asset_member:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strict syntax and download helper for original game owner-only state provenance
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g205_owner_source_attacktype_asset_locator/g205_2010_original_ipa_attacktype_string_asset_pack_fingerprint.py
+          python3 -m pip install -q gdown
+      - name: Original user-owned 2010 IPA to transient isolated runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g205_owner_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g205_owner_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g205_owner_private/owner.ipa
+          test "$(wc -c </tmp/g205_owner_private/owner.ipa)" -eq 248613763
+      - name: Exact AttackType 2010 bytes in ALL native 2010 IPA asset members / no guessed weapon values
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g205_owner_source_attacktype_asset_locator/g205_2010_original_ipa_attacktype_string_asset_pack_fingerprint.py \
+            --ipa /tmp/g205_owner_private/owner.ipa \
+            --out /tmp/g205_source/G205_REAL_2010_IPA_EXACT_ATTACKTYPE_ORIGINAL_ASSET_PACK_PROVENANCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g205_source/G205_REAL_2010_IPA_EXACT_ATTACKTYPE_ORIGINAL_ASSET_PACK_PROVENANCE.json').read_text())
+          assert d['original_IPA_member_files_scanned']>100
+          assert d['source_AttackType_exact_key_hit_count']>=1
+          assert d['original_CPP_Actor_GetParam_key_is_AttackType']
+          assert not d['source_native_Actor_StateData_file_loading_path_proven']
+          assert not d['original_attack_type_id_to_weapon_damage_animation_proven']
+          assert not d['original_touch_controls_ALL_recovered']
+          assert d['NO_VPK']
+          print('PASS G205 owner source exact AttackType key identified across native iOS IPA members, no invented source enum mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original owner iOS copyrighted game file in all outcomes
+        if: always()
+        run: rm -rf /tmp/g205_owner_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G205_ORIGINAL_2010_IPA_EXACT_ATTACKTYPE_ASSET_FILE_PROVENANCE_NO_VPK
+          path: /tmp/g205_source/
+          retention-days: 21
+          if-no-files-found: error
