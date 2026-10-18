@@ -18,8 +18,9 @@ jobs:
           set -euo pipefail
           python3 -m pip install -q numpy scipy
           python3 - <<'PY'
-          import inspect,tempfile
+          import inspect,tempfile,sys
           from pathlib import Path
+          sys.path.insert(0,str(Path('research/b24_unified').resolve()))
           from research.b24_unified.b24_underwater_source_34_im2v_bake import load_original_b13
           with tempfile.TemporaryDirectory(prefix='g195_original_decoder_') as root:
             b=load_original_b13(Path(root))
