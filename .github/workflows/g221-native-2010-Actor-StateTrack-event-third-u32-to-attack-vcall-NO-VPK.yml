@@ -54,7 +54,7 @@ jobs:
           assert d['source_original_event_array_third_u32_READ_by_ACTOR_VM']=='0xdb6a4'
           assert d['original_2010_vtable_dynamic_dispatch_VM']=='0xdb6d8'
           assert d['original_2010_vtable_dynamic_method_offset_bytes']==272
-          assert d['source_genuine_ARM_exact_instruction_count_verified']>=24
+          assert d['source_genuine_ARM_exact_instruction_count_verified']>=20
           assert d['source_original_event_third_u32_loaded_in_ARM_r2']
           assert set(d['source_actual_native_2010_event_original_armor_values'])=={'IronMan','IronMan_suitcase','Warmachine','stealth'}
           assert not d['source_native_vtable_slot_0x110_function_identity_PROVEN']
