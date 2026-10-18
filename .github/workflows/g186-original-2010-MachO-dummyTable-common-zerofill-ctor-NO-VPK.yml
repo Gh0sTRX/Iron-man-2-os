@@ -1,0 +1,60 @@
+name: G186 owner 2010 true MachO SceneImpl dummy table zero-fill and ctor verification NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g186-original-2010-MachO-dummyTable-common-zerofill-ctor-NO-VPK.yml"
+      - "research/b24_unified/g186_real_macho_bss_dummy_init/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_real_dummy_table_binary_section_truth:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source and install genuine 2010 native ARM parser
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g186_real_macho_bss_dummy_init/g186_original_2010_dummy_table_zerofill_global_ctor.py
+          python3 -m pip install -q capstone gdown
+      - name: Use original 2010 owned iOS IPA in private ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g186_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g186_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g186_private/owner.ipa
+          test "$(wc -c </tmp/g186_private/owner.ipa)" -eq 248613763
+      - name: Authenticate SceneImpl s_dummiesTable actual 2010 MachO __common section flags and named original global ctors
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g186_real_macho_bss_dummy_init/g186_original_2010_dummy_table_zerofill_global_ctor.py \
+            --ipa /tmp/g186_private/owner.ipa \
+            --out /tmp/g186_public_source/G186_REAL_2010_DUMMY_TABLE_ZERO_FILL_INIT_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g186_public_source/G186_REAL_2010_DUMMY_TABLE_ZERO_FILL_INIT_SOURCE.json').read_text())
+          assert d['native_real_data_VM']=='0x4edca0'
+          assert d['genuine_dummies_symbol']=='SceneImpl::s_dummiesTable'
+          assert d['source_actual_native_macho_section']['original_MachO_S_ZEROFILL']
+          assert not d['source_actual_native_macho_section']['macho_file_bytes_at_offset_are_initialized_data']
+          assert d['old_G184_G185_unbacked_section_file_word_decoding_INVALID']
+          assert not d['G184_claim_initial_972_5127504_2_are_real_s_dummiesTable_runtime_fields']
+          assert not d['native_dummy_scene_group_14_33_to_model_node_names_PROVEN']
+          assert d['NO_VPK']
+          print('G186 original 2010 scene dummy table is zerofill, disallows treating arbitrary disk file bytes as group names')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Erase original owner source IPA regardless of job state
+        if: always()
+        run: rm -rf /tmp/g186_private
+      - name: Upload source section and original global constructor metadata only NO game executables
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G186_REAL_2010_DUMMY_TABLE_ZEROFILL_CONSTRUCTOR_PROVENANCE_NO_VPK
+          path: /tmp/g186_public_source/G186_REAL_2010_DUMMY_TABLE_ZERO_FILL_INIT_SOURCE.json
+          retention-days: 14
+          if-no-files-found: error
