@@ -1,0 +1,59 @@
+name: G206 authentic 2010 states 379 AttackType non-Lua typed binary key records NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g206-original-2010-states-AttackType-nonLua-binary-record-NO-VPK.yml"
+      - "research/b24_unified/g206_original_state_nonlua_attacktype/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_StateData_non_Lua_AttackType_key_structure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original BRES state serialized key boundary forensic syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g206_original_state_nonlua_attacktype/g206_original_2010_states_nonlua_AttackType_record_borders_and_hex_proof.py
+          python3 -m pip install -q gdown
+      - name: Read original 2010 iOS user owned IPA transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g206_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g206_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g206_original/owner.ipa
+          test "$(wc -c </tmp/g206_original/owner.ipa)" -eq 248613763
+      - name: Prove original source AttackType 379 bytes are in state records versus embedded 55 Lua stub blocks, bounded hex source samples only
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g206_original_state_nonlua_attacktype/g206_original_2010_states_nonlua_AttackType_record_borders_and_hex_proof.py \
+            --ipa /tmp/g206_original/owner.ipa \
+            --out /tmp/g206_source/G206_ORIGINAL_2010_STATES_379_NONLUA_ATTACKTYPE_RECORD_BORDERS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g206_source/G206_ORIGINAL_2010_STATES_379_NONLUA_ATTACKTYPE_RECORD_BORDERS.json').read_text())
+          assert d['states_native_file_size']==361393
+          assert d['original_Lua51_stub_count']==55
+          assert d['original_2010_AttackType_exact_state_raw_occurrences']==379
+          assert d['original_AttackType_key_source_storage_outside_Lua_51_program_is_real']
+          assert d['original_AttackType_Lua_proto_vs_nonLua_bytes']=={'OUTSIDE_LUA_PROTO':379}
+          assert not d['source_native_StateData_serialization_key_type_and_value_proven']
+          assert not d['original_2010_file_format_numeric_attack_types_proven']
+          assert d['NO_VPK']
+          print('G206 PASS genuine original 2010 AttackType 379 nonlua serialized state keys, original native numeric type still requires real data serializer confirmation')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase owner's source IPA in all outcomes
+        if: always()
+        run: rm -rf /tmp/g206_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G206_ORIGINAL_2010_STATES_ATTACKTYPE_379_NONLUA_RECORD_SOURCE_NO_VPK
+          path: /tmp/g206_source/
+          retention-days: 21
+          if-no-files-found: error
