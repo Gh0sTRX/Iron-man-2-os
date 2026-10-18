@@ -1,0 +1,60 @@
+name: G184 source original 2010 iOS CollectDummies native pattern list group14 33 NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g184-2010-original-CollectDummies-PIC-name-patterns-14-33-NO-VPK.yml"
+      - "research/b24_unified/g184_native_dummy_pattern_table/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_2010_dummy_name_pic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source-only 2010 PIC metadata code syntax and ARM decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g184_native_dummy_pattern_table/g184_2010_SceneImpl_CollectDummies_original_PIC_pattern_table.py
+          python3 -m pip install -q capstone gdown
+      - name: Fetch user's original 2010 iOS IPA in private ephemeral runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g184_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g184_original_private/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g184_original_private/owner.ipa
+          test "$(wc -c </tmp/g184_original_private/owner.ipa)" -eq 248613763
+      - name: Source genuine original 2010 collector PIC dummy pattern metadata with strict no-false-name guard
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g184_native_dummy_pattern_table/g184_2010_SceneImpl_CollectDummies_original_PIC_pattern_table.py \
+            --ipa /tmp/g184_original_private/owner.ipa \
+            --out /tmp/g184_public_source/G184_2010_ORIGINAL_COLLECTDUMMIES_NATIVE_PIC_STRING_TABLE_CANDIDATES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g184_public_source/G184_2010_ORIGINAL_COLLECTDUMMIES_NATIVE_PIC_STRING_TABLE_CANDIDATES.json')
+          d=json.loads(p.read_text())
+          assert d['method_VM']=='0x62ea4'
+          assert d['original_UniBeam_dummy_group_14_and_33_input_proven']==[14,33]
+          assert d['original_scene_dummy_registry_plus_0x278_group_index_proven']
+          assert not d['original_PIC_substring_pattern_ordinal_equals_native_scene_index_PROVEN']
+          assert not d['original_scene_dummy_group14_name_PROVEN']
+          assert not d['original_scene_dummy_group33_name_PROVEN']
+          assert d['NO_VPK']
+          print('G184 original 2010 SceneImpl dummy substring pattern table PIC metadata verified, 14/33 name binding remains fail-closed')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Destroy original user's private IPA always
+        if: always()
+        run: rm -rf /tmp/g184_original_private
+      - name: Publish only bounded original native source PIC virtual address/name metadata not game executable
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G184_2010_ORIGINAL_DUMMY_PIC_PATTERN_TABLE_NATIVE_ARM_NO_VPK
+          path: /tmp/g184_public_source/G184_2010_ORIGINAL_COLLECTDUMMIES_NATIVE_PIC_STRING_TABLE_CANDIDATES.json
+          retention-days: 14
+          if-no-files-found: error
