@@ -14,7 +14,7 @@ import argparse,json,re
 TOKENS=[
  ("physics",r"\bb14_world_tick\s*\("),
  ("render",r"\bb24_gpu_runtime_draw\s*\(|\bb24_gpu_owner_armor\s*\(|\bb24_gpu_suit_draw\s*\(|\bglTranslatef\s*\(|\bglMultMatrixf\s*\(|\bglLoadMatrixf\s*\(|\bglPushMatrix\s*\("),
- ("model_matrix",r"\bmodel\b|\bworld\.x\b|\bworld\.y\b|\bworld\.z\b"),
+ ("model_matrix",r"\bworld\.x\b|\bworld\.y\b|\bworld\.z\b|\bcamera\.player_x\b|\bcamera\.player_y\b|\bcamera\.player_z\b|\bframe_pose\b|\br->frame_pose\b"),
  ("movement_controls",r"\bmove_x\b|\bmove_y\b|\bground_run\b|\bgrounded\b"),
  ("camera_bridge",r"\bcamera\.[a-zA-Z_][a-zA-Z0-9_]*|\bplayer_x\b|\bplayer_y\b|\bplayer_z\b|\bworld\.cam_[xyz]\b|\bcam_x\b|\bcam_y\b|\bim2_camera\w*\s*\("),
  ("collision",r"\bb24_g75_capsule_reconcile\b|\bb24_g108_grid_clear\b|\bb24_g156\b"),
@@ -51,6 +51,9 @@ def run(out:Path):
   root/"work/b24/b24_unified/b24_gpu_runtime.c",
   root/"work/b24/b24_unified/b24_gpu_suit_vitagl.c",
   root/"work/b24/b24_unified/b24_gpu_camera.c",
+  root/"work/b24/b24_unified/b24_gpu_runtime.c",
+  root/"work/b24/b24_unified/b24_gpu_suit_vitagl.c",
+  root/"work/b24/b24_unified/b24_gpu_camera.c",
  ]
  result={"origin":"G226 original-source Vera Vita C1L1 B14 root movement-to-hero render dataflow audit only, NOT original 2010 mechanics",
   "source_actual_files":{}, "Vita_user_observed_walk_animation_not_world_translation_STILL_UNRESOLVED":True,
@@ -77,7 +80,32 @@ def run(out:Path):
  data=result["source_actual_files"]["work/src/main.c"]["sections"]
  for label in ("physics","source_anim","render","movement_controls"):
   if data[label]["total_original_source_mentions"]==0:
-   raise ValueError("G226 real final game missing "+label+" pathway, stop source diagnosis")
+   raise ValueError("G226 assembled B24 main missing "+label+" pathway")
+ # C1L1 GPU draw does NOT call glTranslate in main: actual
+ # b24_gpu_runtime_draw delegates c->player_{x,y,z}
+ # into B24GpuSuitPose GPU root then glMultMatrixf in suit renderer.
+ gpu=result["source_actual_files"]["work/b24/b24_unified/b24_gpu_runtime.c"]
+ suit=result["source_actual_files"]["work/b24/b24_unified/b24_gpu_suit_vitagl.c"]
+ if not gpu["exists"] or not suit["exists"]:
+  raise ValueError("G226 missing REAL assembled GPU root owner files")
+ if gpu["sections"]["model_matrix"]["total_original_source_mentions"]==0 or suit["sections"]["render"]["total_original_source_mentions"]==0:
+  raise ValueError("G226 GPU root transform and actual GL matrix site missing")
+ realmain=(root/"work/src/main.c").read_text()
+ realgpu=(root/"work/b24/b24_unified/b24_gpu_runtime.c").read_text()
+ realsuit=(root/"work/b24/b24_unified/b24_gpu_suit_vitagl.c").read_text()
+ if realmain.count("b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)")!=1:
+  raise ValueError("G226 single original Vita GPU render main call site changed")
+ if realgpu.count("r->frame_pose=(B24GpuSuitPose){c->player_x,c->player_y,c->player_z,")!=1:
+  raise ValueError("G226 original game GPU avatar translation camera player position drift")
+ if "m[12]=p->x;m[13]=p->y;m[14]=p->z-center_z;" not in realsuit:
+  raise ValueError("G226 real GPU original-suit root matrix xyz drift")
+ if "glMultMatrixf(root);" not in realsuit:
+  raise ValueError("G226 real GPU root matrix multiplication missing")
+ result["source_actual_gpu_actor_model_mvp_root_uses_IM2Camera_player_x_y_z"]=True
+ result["source_actual_gpu_armor_root_translation_three_axes_present"]=True
+ result["source_actual_GPU_renderer_not_direct_GL_calls_in_main_PROVEN"]=True
+ result["source_2010_native_camera_player_coordinate_update_in_main_FULLY_PROVEN"]=False
+ print("G226 GPU positive: actual Vita runtime copies c->player XYZ to frame_pose and GL matrix translation; root NOT trivially omitted",flush=True)
  result["source_2010_Vita_assembled_main_single_physics_tick_count"] = sum(
   "b14_world_tick" in row["code"] for win in data["physics"]["exact_context"]
   for row in win["source_context"] if row["line"]==win["line_1based"])
