@@ -89,8 +89,15 @@ def parse_state(p:Reader,group_index:int):
   source_name,_=p.string()
   raw5=[p.u32() for i in range(5)]
   native_bool=p.u8()
-  additional=p.u32()
-  extra_name,_=p.string()
+  # Original ARM 0x9CCB8..0x9CCC0: LDRB record+0x14, CMP #0,
+  # BNE 0x9CBAC (next record) if NONZERO. Only zero means
+  # additional u32 + optional ReadString are present.
+  if native_bool==0:
+   additional=p.u32()
+   extra_name,_=p.string()
+  else:
+   additional=None
+   extra_name=None
   extras.append({"original_entry_off":off,"original_name":source_name,
    "native_2010_5x_u32_unclassified":raw5,
    "native_2010_u8_unclassified":native_bool,
