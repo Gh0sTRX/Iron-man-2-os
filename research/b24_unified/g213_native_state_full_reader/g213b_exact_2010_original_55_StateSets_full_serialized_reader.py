@@ -132,9 +132,18 @@ def parse_state(p:Reader,group_index:int):
  if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"channel_n",channel_n,"at",p.pos,flush=True)
  channels=[];ntracks=0
  for c in range(channel_n):
-  off=p.pos;native_id=p.u32();kind=p.u16();n=p.i16()
+  off=p.pos
+  if group_index==24 and start<66000:
+   print("G213 SOURCE DEBUG channel",c,"original_file_offset",off,"raw64",p.data[off:off+64].hex(),flush=True)
+  native_id=p.u32();kind=p.u16();n=p.i16()
+  if group_index==24 and start<66000:
+   print("G213 SOURCE DEBUG channel",c,"native_id",native_id,"kind",kind,"n",n,"next_pos",p.pos,flush=True)
   if n<0 or n>128:p.fail("invalid signed original track count "+str(n))
-  tracks=[parse_track(p) for i in range(n)]
+  tracks=[]
+  for i in range(n):
+   if group_index==24 and start<66000:
+    print("G213 SOURCE DEBUG track",c,i,"offset",p.pos,"raw40",p.data[p.pos:p.pos+40].hex(),flush=True)
+   tracks.append(parse_track(p))
   channels.append({"source_record_offset":off,"native_u32_anim_or_event_id_unclassified":native_id,
    "native_source_u16_channel_type_unclassified":kind,
    "source_original_track_count":n,
