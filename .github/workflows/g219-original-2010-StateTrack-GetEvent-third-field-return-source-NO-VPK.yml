@@ -38,6 +38,9 @@ jobs:
           d=json.loads(Path('/tmp/g219_source/G219_ORIGINAL_2010_STATETRACK_GETEVENT_THIRD_FIELD_NATIVE_ARM.json').read_text())
           assert d['original_StateTrack_GetEvent_VM']=='0xa14f0'
           assert d['original_event_timeline_record_stride_12_bytes_proven']
+          assert d['source_native_StateTrack_GetEvent_returns_overlapping_original_12byte_EVENT_INDEX_or_minus1_PROVEN']
+          assert d['source_native_StateTrack_GetEvent_does_NOT_decode_3rd_u32_event_payload']
+          assert d['source_native_original_third_u32_payload_remains_UNCLASSIFIED']
           assert d['real_native_original_methods_source']['event']['original_native_instruction_count']>=45
           assert not d['source_native_returned_Event_id_semantics_PROVEN']
           assert not d['original_attack_event_time_unit_ms_PROVEN']
