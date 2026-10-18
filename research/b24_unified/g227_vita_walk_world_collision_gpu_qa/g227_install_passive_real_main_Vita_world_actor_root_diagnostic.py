@@ -120,7 +120,7 @@ def run():
 # Never write physical world transform, add 2nd physics owner, VPK.
 option(B24_G227_WALK_ROOT_DIAGNOSTIC "Read-only original C1L1 grounded walking input B14 collision GPU camera QA logger" OFF)
 if(B24_G227_WALK_ROOT_DIAGNOSTIC)
- if(NOT B24_GPU_ENGINE OR NOT B24_G218_SOURCE_STATE_OBSERVER)
+ if(NOT B24_ENABLE_GPU OR NOT B24_G218_SOURCE_STATE_OBSERVER)
   message(FATAL_ERROR "G227 requires single existing VitaGL G218/G83/G8 original actor and native world")
  endif()
  target_compile_definitions(im2_beta PRIVATE B24_G227_WALK_ROOT_DIAGNOSTIC=1)
