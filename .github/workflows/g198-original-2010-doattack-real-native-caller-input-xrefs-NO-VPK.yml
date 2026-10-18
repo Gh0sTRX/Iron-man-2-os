@@ -1,0 +1,63 @@
+name: G198 real original 2010 DoAttack native C++ caller ARM Thumb selector provenance NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g198-original-2010-doattack-real-native-caller-input-xrefs-NO-VPK.yml"
+      - "research/b24_unified/g198_original_doattack_callers/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_2010_DoAttack_callers_input_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate native original ARM and Thumb source scanner
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g198_original_doattack_callers/g198_original_2010_DoAttack_real_callers_and_input_provenance.py
+          python3 -m pip install -q capstone gdown
+      - name: Original user owned 2010 iOS MachO IPA read ONLY in temporary runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g198_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g198_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g198_private/owner.ipa
+          test "$(wc -c </tmp/g198_private/owner.ipa)" -eq 248613763
+      - name: Locate genuine native DoAttack ARM Thumb callers and only evidence grounded r1 immediate input / initialized function pointers
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g198_original_doattack_callers/g198_original_2010_DoAttack_real_callers_and_input_provenance.py \
+            --ipa /tmp/g198_private/owner.ipa \
+            --out /tmp/g198_public/G198_OWNER_2010_DOATTACK_NATIVE_CALLERS_ARM_THUMB_INPUT_PROVENANCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g198_public/G198_OWNER_2010_DOATTACK_NATIVE_CALLERS_ARM_THUMB_INPUT_PROVENANCE.json').read_text())
+          assert d['target_native_VM']=='0xf64f8'
+          assert d['target_original_CPP_method']=='MainCharacter::DoAttack(int, int)'
+          assert d['source_named_text_methods_decoded']>100
+          assert d['original_ARM_functions_decoded']>100
+          assert d['original_attack_switch_26_values_0_to_25_PROVEN']
+          assert not d['source_2010_cpp_DoAttack_attackID_to_touch_control_or_animation_PROVEN']
+          assert not d['source_virtual_indirect_calls_other_than_absolute_target_resolved']
+          assert d['no_source_attack_name_to_Vita_weapon_bindings_inferred']
+          assert d['NO_VPK']
+          for row in d['source_original_direct_calls']:
+            assert row['source_original_direct_target_VM']=='0xf64f8'
+            assert row['touch_controller_mapping_PROVEN'] is False
+          print('PASS G198 real source DoAttack caller Xrefs plus failclosed r1 source argument, NO fake Aim_M weapon/controller binding')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Destroy original owner IPA and executable on every job outcome
+        if: always()
+        run: rm -rf /tmp/g198_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G198_ORIGINAL_2010_DOATTACK_NATIVE_CALLERS_INPUT_XREF_SOURCE_NO_VPK
+          path: /tmp/g198_public/
+          retention-days: 21
+          if-no-files-found: error
