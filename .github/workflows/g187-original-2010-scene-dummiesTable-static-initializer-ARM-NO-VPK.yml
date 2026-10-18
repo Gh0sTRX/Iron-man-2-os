@@ -1,0 +1,60 @@
+name: G187 Original 2010 SceneImpl s_dummiesTable C++ initializer source ARM NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g187-original-2010-scene-dummiesTable-static-initializer-ARM-NO-VPK.yml"
+      - "research/b24_unified/g187_true_s_dummiesTable_ctor/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_dynamic_dummy_table_init:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate 2010 native owner source compiler and source-only syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g187_true_s_dummiesTable_ctor/g187_original_2010_SceneImpl_s_dummiesTable_initializer_ARM.py
+          python3 -m pip install -q capstone gdown
+      - name: Temporarily access original 2010 user-owned IPA in runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g187_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g187_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g187_private/owner.ipa
+          test "$(wc -c </tmp/g187_private/owner.ipa)" -eq 248613763
+      - name: Decode exact native 2010 SceneImpl global ctor target and original PIC data accesses for group 14 33
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g187_true_s_dummiesTable_ctor/g187_original_2010_SceneImpl_s_dummiesTable_initializer_ARM.py \
+            --ipa /tmp/g187_private/owner.ipa \
+            --out /tmp/g187_source/G187_REAL_2010_SCENE_DUMMY_TABLE_NATIVE_CTOR_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g187_source/G187_REAL_2010_SCENE_DUMMY_TABLE_NATIVE_CTOR_ARM.json').read_text())
+          assert d['source_original_ctor_symbol_VM']=='0x3c60'
+          assert d['source_original_ctor_branch_target_VM']=='0x3b80'
+          assert d['original_dummy_table_symbol_VM']=='0x4edca0'
+          assert len(d['native_ctor_and_init_ARM_source_instruction_rows_no_binary'])>=25
+          assert d['original_2010_data_symbol_is_macho_zerofill']
+          assert not d['original_2010_dynamic_scene_dummy_group_key_to_name14_PROVEN']
+          assert not d['original_2010_dynamic_scene_dummy_group_key_to_name33_PROVEN']
+          assert d['NO_VPK']
+          print('PASS G187 real 2010 native dummy table global C++ constructor source evidence only')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Delete user original IPA no matter failure/success
+        if: always()
+        run: rm -rf /tmp/g187_private
+      - name: Upload only original native source initializer metadata no game assets executable VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G187_ORIGINAL_2010_SCENE_DUMMIESTABLE_NATIVE_CTOR_ARM_NO_VPK
+          path: /tmp/g187_source/G187_REAL_2010_SCENE_DUMMY_TABLE_NATIVE_CTOR_ARM.json
+          retention-days: 14
+          if-no-files-found: error
