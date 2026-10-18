@@ -46,8 +46,8 @@ static inline const char *b24_g218_known_state_name_from_real_G8_stem(
     if(strncmp(stem,"suitcase_ironman_",17)!=0)return NULL;
     s=stem+17;
   }else if(suit==2){
-    if(strncmp(stem,"warmachine_warmachine_",23)!=0)return NULL;
-    s=stem+23;
+    if(strncmp(stem,"warmachine_warmachine_",22)!=0)return NULL;
+    s=stem+22;
   }else return NULL;
   /* Exact G8/G83/G169 source-author names only: fail CLOSED on everything
    * ambiguous (e.g. gun01, _att, missile, rush, fall, fly2run).
