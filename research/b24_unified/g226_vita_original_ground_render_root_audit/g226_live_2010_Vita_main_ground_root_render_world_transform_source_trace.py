@@ -16,6 +16,7 @@ TOKENS=[
  ("render",r"\bb24_gpu_runtime_draw\s*\(|\bb24_gpu_owner_armor\s*\(|\bb24_gpu_suit_draw\s*\(|\bglTranslatef\s*\(|\bglMultMatrixf\s*\(|\bglLoadMatrixf\s*\(|\bglPushMatrix\s*\("),
  ("model_matrix",r"\bmodel\b|\bworld\.x\b|\bworld\.y\b|\bworld\.z\b"),
  ("movement_controls",r"\bmove_x\b|\bmove_y\b|\bground_run\b|\bgrounded\b"),
+ ("camera_bridge",r"\bcamera\.[a-zA-Z_][a-zA-Z0-9_]*|\bplayer_x\b|\bplayer_y\b|\bplayer_z\b|\bworld\.cam_[xyz]\b|\bcam_x\b|\bcam_y\b|\bim2_camera\w*\s*\("),
  ("collision",r"\bb24_g75_capsule_reconcile\b|\bb24_g108_grid_clear\b|\bb24_g156\b"),
  ("source_anim",r"\bb24_g8_motion_tick_g84\b|\bb24_g218_observe_actually_loaded_G8_clip\b"),
  ("character",r"draw.*(armor|actor|character|model)|render.*(armor|hero|player)|\bglScalef\b")
@@ -29,7 +30,7 @@ def scan(path:Path):
   windows=[]
   # All 1-2 source render/movement windows; preserve enough context to
   # distinguish WORLD-B14 integration from VIEW matrix/actor local offset.
-  for i in found[:45 if label in ("physics","render","collision","character") else 28]:
+  for i in found[:65 if label in ("physics","render","collision","character","camera_bridge") else 28]:
    windows.append({"line_1based":i+1,"source_context":[
      {"line":j+1,"code":lines[j].strip()[:400]}
      for j in range(max(0,i-5),min(len(lines),i+6))]})
@@ -68,7 +69,7 @@ def run(out:Path):
    print("G226 source",key,"TOTAL LINES",d["line_count"],flush=True)
    for group,details in d["sections"].items():
     print("G226 source category",key,group,"matches",details["total_original_source_mentions"],flush=True)
-    for window in details["exact_context"][:12]:
+    for window in details["exact_context"][:50 if group=="camera_bridge" and key=="work/src/main.c" else 12]:
      print("G226 actual line",key,group,window["line_1based"],
        "context",json.dumps(window["source_context"],ensure_ascii=False),flush=True)
  if not result["source_actual_files"]["work/src/main.c"]["exists"]:
