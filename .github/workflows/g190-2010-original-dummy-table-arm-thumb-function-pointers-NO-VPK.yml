@@ -1,0 +1,59 @@
+name: G190 ORIGINAL 2010 SceneImpl dummy ARM Thumb indirect registrar source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g190-2010-original-dummy-table-arm-thumb-function-pointers-NO-VPK.yml"
+      - "research/b24_unified/g190_original_dummy_indirect_calls/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_registered_dummy_source_functions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate native original source scanner and install ARM decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g190_original_dummy_indirect_calls/g190_2010_dummy_registry_tail_thunk_pointer_xrefs.py
+          python3 -m pip install -q capstone gdown
+      - name: Fetch exact original user owned 2010 IPA only inside private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g190_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g190_owner_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g190_owner_original/owner.ipa
+          test "$(wc -c </tmp/g190_owner_original/owner.ipa)" -eq 248613763
+      - name: Scan source real original ARM and Thumb native branch CALL and initialized data targets of SceneImpl dummy registrar APIs
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g190_original_dummy_indirect_calls/g190_2010_dummy_registry_tail_thunk_pointer_xrefs.py \
+            --ipa /tmp/g190_owner_original/owner.ipa \
+            --out /tmp/g190_public_source/G190_REAL_2010_SCENE_DUMMY_REGISTRAR_ARM_THUMB_POINTER_EVIDENCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g190_public_source/G190_REAL_2010_SCENE_DUMMY_REGISTRAR_ARM_THUMB_POINTER_EVIDENCE.json').read_text())
+          assert d['source_original_CPP_registrar_targets']['0x641b4']=='SceneImpl::DummiesTableAdd(char const*)'
+          assert d['source_original_CPP_registrar_targets']['0x64684']=='SceneImpl::DummiesTableCreate(int)'
+          assert d['original_function_symbols_scanned']>100
+          assert not d['original_scene_dummy14_33_to_named_BDAE_socket_proven']
+          assert not d['original_bss_common_initialized_from_file']
+          assert not d['no_new_Vita_gameplay_changes']==False
+          assert d['NO_VPK']
+          print('G190 PASS source original direct/conditional branch Thumb and initialized callback data scan, no invented dummy 14/33 mapping')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Delete original user game IPA regardless of job status
+        if: always()
+        run: rm -rf /tmp/g190_owner_original
+      - name: Export only original native symbolic callsites and section pointer metadata
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G190_ORIGINAL_2010_DUMMY_ARM_THUMB_STATIC_POINTER_XREF_SOURCE_NO_VPK
+          path: /tmp/g190_public_source/G190_REAL_2010_SCENE_DUMMY_REGISTRAR_ARM_THUMB_POINTER_EVIDENCE.json
+          retention-days: 14
+          if-no-files-found: error
