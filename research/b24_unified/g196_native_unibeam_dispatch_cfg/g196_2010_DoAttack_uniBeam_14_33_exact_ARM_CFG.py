@@ -74,8 +74,6 @@ def main(ipa:Path,out:Path,png:Path):
      "target_cpp":sorted(symbol.get(target,()))[:3] if target is not None else []})
   # Conservatively ignore internal subroutine return classification except
   # recognized BX lr or POP {..., pc}.
-  is_return=(mn=="bx" and op.op_str.strip()=="lr") or
-    (mn=="pop" and "pc" in op.op_str) if False else False
   # ARM native return sequence often includes LDMxx sp!,{pc}.
   is_return=(mn=="bx" and op.op_str.strip()=="lr") or \
             (mn in ("pop","ldm","ldmia") and "pc" in op.op_str and "sp" in op.op_str) or \
