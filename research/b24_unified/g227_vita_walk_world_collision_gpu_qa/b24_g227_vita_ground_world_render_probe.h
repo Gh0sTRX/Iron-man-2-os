@@ -23,8 +23,8 @@ typedef enum {
  B24_G227_NO_VALID_MOVEMENT_INPUT = 2,
  B24_G227_B14_TICK_DID_NOT_MOVE = 3,
  B24_G227_COLLISION_REJECTED_B14_DELTA = 4,
- B24_G227_WORLD_MOVING_CAMERA_FOLLOWING = 5,
- B24_G227_WORLD_MOVING_CAMERA_LAGGING = 6,
+ B24_G227_WORLD_MOVING_GPU_ROOT_SYNCED = 5,
+ B24_G227_GPU_ROOT_TRANSFORM_MISMATCH = 6,
  B24_G227_NONFINITE_RUNTIME_STATE = 7
 } B24G227WalkVerdict;
 typedef struct {
@@ -33,6 +33,8 @@ typedef struct {
  float proposed_world_x,proposed_world_y;
  float resolved_world_x,resolved_world_y;
  float gpu_actor_world_x,gpu_actor_world_y;
+ /* Legacy field stores camera.cam_x/y = camera POSITION, not aim target.
+  * One-frame camera distance cannot diagnose third-person following. */
  float camera_target_x,camera_target_y;
  uint32_t frame_num;
  uint8_t original_G8_clip_loaded;
@@ -65,13 +67,11 @@ static inline B24G227WalkVerdict b24_g227_qa_classify(
   return B24_G227_COLLISION_REJECTED_B14_DELTA;
  const float root_err=hypotf(q->gpu_actor_world_x-q->resolved_world_x,
                              q->gpu_actor_world_y-q->resolved_world_y);
- const float chase_err=hypotf(q->camera_target_x-q->resolved_world_x,
-                             q->camera_target_y-q->resolved_world_y);
- /* Camera follow being close is normal THIRD PERSON behavior and
-  * can keep actor fixed on screen even when world position changes. */
- if(root_err<.00001f && chase_err<.5f)
-  return B24_G227_WORLD_MOVING_CAMERA_FOLLOWING;
- return B24_G227_WORLD_MOVING_CAMERA_LAGGING;
+ /* Third-person CAMERA POSITION is supposed to be metres away.
+  * In one frame, only world <-> GPU root agreement can be measured.
+  * A time series, not this snapshot, is needed to infer camera tracking. */
+ if(root_err>.005f)return B24_G227_GPU_ROOT_TRANSFORM_MISMATCH;
+ return B24_G227_WORLD_MOVING_GPU_ROOT_SYNCED;
 }
 static inline const char *b24_g227_walk_verdict_name(
   B24G227WalkVerdict verdict){
@@ -81,8 +81,8 @@ static inline const char *b24_g227_walk_verdict_name(
   case B24_G227_NO_VALID_MOVEMENT_INPUT:return "STICK_INPUT_UNDER_DEADZONE";
   case B24_G227_B14_TICK_DID_NOT_MOVE:return "B14_NO_DELTA_AFTER_TICK";
   case B24_G227_COLLISION_REJECTED_B14_DELTA:return "C1L1_COLLISION_REJECTED";
-  case B24_G227_WORLD_MOVING_CAMERA_FOLLOWING:return "WORLD_MOVES_CAMERA_FOLLOWS";
-  case B24_G227_WORLD_MOVING_CAMERA_LAGGING:return "WORLD_MOVES_CAMERA_DIFFERS";
+  case B24_G227_WORLD_MOVING_GPU_ROOT_SYNCED:return "WORLD_MOVES_GPU_ROOT_SYNCED_CAMERA_UNDETERMINED";
+  case B24_G227_GPU_ROOT_TRANSFORM_MISMATCH:return "GPU_ACTOR_ROOT_DIFFERS_FROM_COLLISION_RESOLVED_WORLD";
   case B24_G227_NONFINITE_RUNTIME_STATE:return "INVALID_NONFINITE_STATE";
   default:return "INVALID_DIAGNOSTIC_VERDICT";
  }
