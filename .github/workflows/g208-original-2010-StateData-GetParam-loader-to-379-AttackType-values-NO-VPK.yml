@@ -1,0 +1,66 @@
+name: G208 original iOS 2010 StateData native GetParam loader to 379 AttackType source values NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g208-original-2010-StateData-GetParam-loader-to-379-AttackType-values-NO-VPK.yml"
+      - "research/b24_unified/g208_original_2010_statedata_native_loader/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_source_2010_native_StateData_GetParam:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test native original 2010 source StateData parser and ARM decoding imports
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g208_original_2010_statedata_native_loader/g208_native_2010_StateData_GetParam_and_states_loader_method_source.py
+          python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G207_ORIGINAL_2010_379_ATTACKTYPE_RAW_U32_SOURCE_VALUES_NO_VPK
+          run-id: 39128015289
+          github-token: ${{ github.token }}
+          path: /tmp/g208_original_data_proof
+      - name: Read original user-owned 2010 iOS IPA in private ephemeral runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g208_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g208_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g208_original_owner/owner.ipa
+          test "$(wc -c </tmp/g208_original_owner/owner.ipa)" -eq 248613763
+      - name: Decode actual original native StateData GetParam source methods against 379 verified typed key raw bytes
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g208_original_2010_statedata_native_loader/g208_native_2010_StateData_GetParam_and_states_loader_method_source.py \
+            --ipa /tmp/g208_original_owner/owner.ipa \
+            --g207 /tmp/g208_original_data_proof/G207_ORIGINAL_2010_ATTACKTYPE_379_U32_SOURCE_VALUES.json \
+            --out /tmp/g208_source/G208_ORIGINAL_2010_STATEDATA_GETPARAM_METHODS_ATTACKTYPE_STATE_PROVENANCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g208_source/G208_ORIGINAL_2010_STATEDATA_GETPARAM_METHODS_ATTACKTYPE_STATE_PROVENANCE.json').read_text())
+          assert d['source_original_StateData_GetParam_VM']=='0x9c340'
+          assert d['source_original_AttackType_u32_state_record_count']==379
+          assert d['original_2010_all_source_numeric_key_value_u32_in_range_0_to25']
+          assert d['all_original_2010_State_class_named_Cpp_methods']>5
+          assert not d['source_statedata_2010_getparam_actually_loads_states_asset_proven']
+          assert not d['original_game_weaponID_attacktype_aim_m_binding_PROVEN']
+          assert d['NO_VPK']
+          print('PASS G208 real original native StateData GetParam ARM + state record source correlation, no invented file loader/weapon binding')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original licensed game source IPA on every outcome
+        if: always()
+        run: rm -rf /tmp/g208_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G208_ORIGINAL_2010_STATEDATA_GETPARAM_NATIVE_LOADER_METHODS_NO_VPK
+          path: /tmp/g208_source/
+          retention-days: 21
+          if-no-files-found: error
