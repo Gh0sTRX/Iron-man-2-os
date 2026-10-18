@@ -1,0 +1,59 @@
+name: G185 original 2010 SceneImpl dummy registration CFG native source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g185-original-2010-SceneImpl-dummy-registry-fill-source-NO-VPK.yml"
+      - "research/b24_unified/g185_native_collect_dummy_registration/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_native_2010_scene_registry_fill:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare exact 2010 native disassembler and syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g185_native_collect_dummy_registration/g185_original_2010_registry_registration_cfg.py
+          python3 -m pip install -q capstone gdown
+      - name: Use authentic user-owned 2010 original IPA privately inside ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g185_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g185_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g185_private/owner.ipa
+          test "$(wc -c </tmp/g185_private/owner.ipa)" -eq 248613763
+      - name: Decode actual SceneImpl CollectDummies +0x278 ARM bucket filling dataflow and PIC symbol table
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g185_native_collect_dummy_registration/g185_original_2010_registry_registration_cfg.py \
+            --ipa /tmp/g185_private/owner.ipa \
+            --out /tmp/g185_native_source/G185_ORIGINAL_2010_SCENE_DUMMY_REGISTRATION_ARM_NO_VPK.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g185_native_source/G185_ORIGINAL_2010_SCENE_DUMMY_REGISTRATION_ARM_NO_VPK.json').read_text())
+          assert d['original_scene_collect_method_VM']=='0x62ea4'
+          assert len(d['original_registration_opcode_rows_not_binary'])>=90
+          assert d['original_individual_UniBeam_group_selector_indices']==[14,33]
+          assert d['native_original_scene_group_array_offset']==0x278
+          assert not d['registered_scene_group14_true_named_dummy_proven']
+          assert not d['registered_scene_group33_true_named_dummy_proven']
+          assert d['NO_VPK']
+          print('G185 original native scene group 14 and 33 registration CFG captured; names unproven until initializer matched')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Remove owner's original licensed IPA on success or failure
+        if: always()
+        run: rm -rf /tmp/g185_private
+      - name: Publish only native opcodes and symbol-name metadata NOT owner's game asset binary
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G185_ORIGINAL_2010_SCENE_DUMMY_REGISTER_ARM_GROUPS_NO_VPK
+          path: /tmp/g185_native_source/G185_ORIGINAL_2010_SCENE_DUMMY_REGISTRATION_ARM_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
