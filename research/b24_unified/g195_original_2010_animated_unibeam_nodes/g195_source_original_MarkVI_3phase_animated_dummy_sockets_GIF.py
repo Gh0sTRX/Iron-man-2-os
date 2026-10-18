@@ -125,8 +125,8 @@ def render_samples(modes,faces,output:Path):
   ax.set_box_aspect((1,1,1))
   ax.view_init(elev=7,azim=-65)
   ax.set_axis_off()
-  # Every polygon uses original MarkVI BRES triangles and B13 original pose.
-  polygon=Poly3DCollection(frames[0]["vertices"][faces[::3]],
+  # Keep ALL original source BRES triangles (not a sparse perforated subset), original skinned frames.
+  polygon=Poly3DCollection(frames[0]["vertices"][faces],
    facecolor="#a1b6c8",edgecolors=(.11,.17,.26,.13),linewidths=.08)
   ax.add_collection3d(polygon)
   pts={k:ax.scatter([],[],[],s=65,marker="x",linewidths=3,
@@ -140,7 +140,7 @@ def render_samples(modes,faces,output:Path):
   # Retain all original source-timeline samples; no invented in-between poses.
   display=frames
   def frame_update(f):
-   polygon.set_verts(f["vertices"][faces[::3]])
+   polygon.set_verts(f["vertices"][faces])
    for k,scatter in pts.items():
     xyz=f["source_original_bres_socket_matrices"][k]["actual_2010_animated_rig_position_xyz"]
     scatter._offsets3d=([xyz[0]],[xyz[1]],[xyz[2]])
