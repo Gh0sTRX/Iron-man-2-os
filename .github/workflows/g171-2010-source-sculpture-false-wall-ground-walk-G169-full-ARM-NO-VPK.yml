@@ -9,6 +9,7 @@ on:
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
       - "research/b24_unified/g218_source_live_state_bridge/**"
+      - "research/b24_unified/g226_vita_original_ground_render_root_audit/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -879,6 +880,32 @@ jobs:
           assert not list(Path('work').rglob('*.vpk'))
           print('G218 PASS 776 AUTHENTIC original StateData connected to loaded real G8 source actor G84/G169 with NO second animator or movement B14, source telemetry ONLY, no VPK')
           PY
+      - name: G226 real assembled C1L1 walk world root to camera and actor render source diagnosis NO VPK
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g226_vita_original_ground_render_root_audit/g226_live_2010_Vita_main_ground_root_render_world_transform_source_trace.py
+          python3 research/b24_unified/g226_vita_original_ground_render_root_audit/g226_live_2010_Vita_main_ground_root_render_world_transform_source_trace.py \
+            --out /tmp/g226_source/G226_ACTUAL_GAME_MAIN_B14_WORLD_ROOT_RENDER_GROUND_MOTION_SOURCE_TRACE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g226_source/G226_ACTUAL_GAME_MAIN_B14_WORLD_ROOT_RENDER_GROUND_MOTION_SOURCE_TRACE.json').read_text())
+          assert d['source_actual_files']['work/src/main.c']['exists']
+          assert d['source_2010_Vita_assembled_main_single_physics_tick_count']==1
+          assert d['Vita_user_observed_walk_animation_not_world_translation_STILL_UNRESOLVED']
+          assert not d['real_world_root_to_GPU_MVP_2010_original_equivalence_PROVEN']
+          assert not d['runtime_culprit_identified_from_source_PROVEN']
+          assert not d['gameplay_physics_or_C1L1_renderer_CHANGED']
+          assert d['NO_VPK']
+          print('PASS G226 actual 2010 Vita main root B14->G66C/G108->GPU render C1L1 source locations, no guessing walk fixed')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G226_REAL_CURRENT_VITA_B14_ROOT_ACTOR_RENDER_WALK_STILL_SOURCE_TRACE_NO_VPK
+          path: /tmp/g226_source/
+          retention-days: 21
+          if-no-files-found: error
       - name: G174 load all ten genuine 2010 1292 vertex War Machine M Ground IM2V poses through G172 G83 and sole G8 stream, native weapon semantics not guessed
         run: |
           set -euo pipefail
