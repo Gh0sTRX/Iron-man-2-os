@@ -45,7 +45,10 @@ def main(ipa:Path,out:Path):
   raise ValueError("native original GetDummy symbol mismatch")
  secs=original["sections"]
  def vmread(addr,n):
-  section=next((s for s in secs if s[0]<=addr and addr+n<=s[0]+s[1]),None)
+  # Real Mach-O __common is S_ZEROFILL, not backed by owner executable.
+  # Never map its nominal offset 0 to Mach-O header bytes.
+  section=next((s for s in secs if s[3] not in ("__common","__bss") and
+               s[0]<=addr and addr+n<=s[0]+s[1]),None)
   if section is None:return None
   off=section[2]+addr-section[0]
   if off<0 or off+n>len(elf):return None
@@ -59,7 +62,10 @@ def main(ipa:Path,out:Path):
   for s in secs if s[0]<=GROUP_DATA<s[0]+s[1]],
   "raw_four_word_values":[u32(GROUP_DATA+i*4) for i in range(4)],
   "raw_words_are_live_runtime_initialized":False,
-  "raw_words_form_valid_group_14_33_pointer_list_PROVEN":False
+  "raw_words_form_valid_group_14_33_pointer_list_PROVEN":False,
+  "source_symbol":"SceneImpl::s_dummiesTable",
+  "source_macho___common_is_zerofill_and_unbacked":True,
+  "G185_prior_raw___common_words_invalid_as_owner_runtime_data":True
  }
  nearest=sorted((abs(a-GROUP_DATA),hex(a),sorted(ns)[:6]) for a,ns in sym.items())[:25]
  source["nearby_original_symbols"]=nearest
