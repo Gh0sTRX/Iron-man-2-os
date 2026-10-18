@@ -31,7 +31,10 @@ def main(ipa,out):
  if METHOD not in syms[ADDR]:raise ValueError("not real original SceneImpl native method")
  sections=n["sections"]
  def vread(a,length):
-  sec=next((s for s in sections if s[0]<=a and a+length<=s[0]+s[1]),None)
+  # S_ZEROFILL __common has NO initialized FILE bytes. Earlier G184
+  # accidentally read arbitrary executable data using file offset 0.
+  sec=next((s for s in sections if s[3] not in ("__common","__bss") and
+             s[0]<=a and a+length<=s[0]+s[1]),None)
   if sec is None:return None
   off=sec[2]+a-sec[0]
   if off<0 or off+length>len(exe):return None
@@ -127,6 +130,9 @@ def main(ipa,out):
    "native_source_original_verified_PIC_pattern_count_descriptor":dataA,
    "native_source_original_verified_PIC_pattern_ptr_descriptor":dataB,
    "pattern_count_source_descriptor_raw_integer_fields":descriptor,
+   "original_dynamic_table_symbol":"SceneImpl::s_dummiesTable",
+   "source_PIC_points_to_macho_S_ZEROFILL_not_initialized_file_data":True,
+   "old_G184_972_5127504_2_file_words_are_INVALID_as_table_contents":True,
    "pattern_list_first_source_virtual_address":hex(ptr) if ptr is not None else None,
    "source_PIC_potential_original_dummy_substring_keys":prefixes,
    "original_native_collect_loop_ARM_context_no_binary_bytes":armctx,
