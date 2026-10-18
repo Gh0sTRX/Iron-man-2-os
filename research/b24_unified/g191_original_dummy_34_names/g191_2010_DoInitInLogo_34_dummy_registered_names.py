@@ -93,9 +93,8 @@ def main(ipa:Path,out:Path):
    ldr,add=ins[i-2],ins[i-1]
    if (ldr.mnemonic.startswith("ldr") and add.mnemonic=="add" and
        ldr.operands and ldr.operands[0].type==ARM_OP_REG and
-       ldr.operands[0].reg==capstone.arm.ARM_REG_R0 and
        any(q.type==ARM_OP_MEM and q.mem.base==ARM_REG_PC and q.mem.index==0 for q in ldr.operands) and
-       add.op_str=="r0, pc, r0"):
+       add.op_str=="r0, pc, "+ldr.reg_name(ldr.operands[0].reg)):
     mem=next(q for q in ldr.operands if q.type==ARM_OP_MEM)
     lit=(ldr.address+8+mem.mem.disp)&0xffffffff
     delta=word(lit)
@@ -118,6 +117,19 @@ def main(ipa:Path,out:Path):
   else:adds.append(result)
  if len(adds)!=EXPECTED:raise ValueError("G191 count of original source named DummiesTableAdd is not 34: "+str(len(adds)))
  if len(starts)!=1:raise ValueError("original native DummiesTableCreate count not 1")
+ # Exact native call setup: MOV r0,#0x22 at 0x97fcc, only stores to
+ # separate r3/r4 memory afterwards, then BL Create at 0x97fd8.
+ init_context=starts[0]["source_2010_precall_ARM_not_machine_bytes"]
+ if not any(q["VM"]=="0x97fcc" and q["mnemonic"]=="mov" and
+            q["args"]=="r0, #0x22" for q in init_context):
+  raise ValueError("2010 owner original Create(34) native parameter drift")
+ if not any(q["VM"]=="0x97fd8" and q["mnemonic"]=="bl" and
+            q["args"]=="#0x64684" for q in init_context):
+  raise ValueError("2010 original Create(34) native function call missing")
+ # all 34 genuine source names have constant PIC strings. A missing
+ # mapped value is a QA failure, not grounds for guessing its name.
+ if sum(x["source_original_dummy_string"] is not None for x in adds)!=EXPECTED:
+  raise ValueError("G191 one or more of the authentic 34 static string ARGs is not decoded")
  # if missing names, retain explicit null rather than deduce guessed rig node IDs.
  observed=[]
  for index,row in enumerate(adds):
@@ -131,6 +143,7 @@ def main(ipa:Path,out:Path):
   "native_original_DummiesTableAdd_VM":hex(ADD),
   "native_original_startup_Create_context":starts,
   "source_original_Add_native_call_count":len(observed),
+  "native_original_DummiesTableCreate_integer_argument_proven":34,
   "source_original_names_proven_by_native_r0_literal_count":sum(x["source_original_dummy_string"] is not None for x in observed),
   "source_original_registration_order_and_strings":observed,
   "candidate_group14_startup_list_entry_not_yet_semantic_mapping":possible14["source_original_dummy_string"],
