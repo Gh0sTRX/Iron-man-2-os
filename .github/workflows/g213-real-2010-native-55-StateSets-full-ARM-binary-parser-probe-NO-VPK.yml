@@ -1,0 +1,58 @@
+name: G213 original iOS 2010 55 StateSets native ARM exact binary serializer structure NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g213-real-2010-native-55-StateSets-full-ARM-binary-parser-probe-NO-VPK.yml"
+      - "research/b24_unified/g213_native_state_full_reader/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_2010_statedata_binary_55sets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate genuine 2010 source StateData native reader probe
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g213_native_state_full_reader/g213a_2010_native_reader_and_state_binary_structure_probe.py
+          python3 -m pip install -q capstone gdown
+      - name: Read original iOS user-owned game IPA privately for authentic 2010 StateData bytes
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g213_user_owned_game
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g213_user_owned_game/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g213_user_owned_game/owner.ipa
+          test "$(wc -c </tmp/g213_user_owned_game/owner.ipa)" -eq 248613763
+      - name: Genuine 2010 native StateData / StateSetData / StateTrack ABI source and binary state record layout
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g213_native_state_full_reader/g213a_2010_native_reader_and_state_binary_structure_probe.py \
+            --ipa /tmp/g213_user_owned_game/owner.ipa \
+            --out /tmp/g213_source/G213A_ORIGINAL_2010_STATE_NATIVE_SERIALIZER_PRECISE_ARM_LAYOUT.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g213_source/G213A_ORIGINAL_2010_STATE_NATIVE_SERIALIZER_PRECISE_ARM_LAYOUT.json').read_text())
+          assert d['original_states_length']==361393
+          assert d['original_lua51_original_source_signature_count']==55
+          assert len(d['original_lua_original_positions'])==55
+          for name in ('state_data','state_set','track','database'):
+            assert len(d['original_selected_state_deserializer_ARM'][name])>20
+          assert not d['native_full_Binary_StateData_schema_end_to_end_proven']
+          assert d['NO_VPK']
+          print('PASS G213A actual original 2010 55 state serializer instruction source and real boundary metadata; no invented events or Vita VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Destroy original owner 2010 licensed IPA when job exits
+        if: always()
+        run: rm -rf /tmp/g213_user_owned_game
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G213A_ORIGINAL_2010_NATIVE_STATE_55_SETS_READER_ARM_LAYOUT_NO_VPK
+          path: /tmp/g213_source/
+          retention-days: 21
+          if-no-files-found: error
