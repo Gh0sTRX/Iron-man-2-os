@@ -55,7 +55,7 @@ def main(ipa:Path,g207:Path,g212:Path,out:Path):
   if len(possible)!=1:raise ValueError(f"StateSet#{k} header name not unique source {hex(source)} candidates {possible}")
   pos,name=possible[0]
   if k==0 and pos!=2:raise ValueError("first 2010 group must start after u16 count")
-  if k>0 and pos<=sets[-1]["source_StateSet_header_offset"]:
+  if k>0 and pos<=sets[-1]["source_original_StateSet_header_offset"]:
    raise ValueError("set source headers not monotonic")
   sets.append({
    "original_source_StateSet_index":k,
