@@ -1,0 +1,59 @@
+name: G181 original 2010 SceneImpl GetDummy native ARM 14 33 source lookup NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g181-real-2010-SceneImpl-GetDummy-14-33-native-index-NO-VPK.yml"
+      - "research/b24_unified/g181_sceneimpl_getdummy_native/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_native_scene_dummy_key_lookup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original iOS 2010 ARM Capstone source-only analysis dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g181_sceneimpl_getdummy_native/g181_original_2010_SceneImpl_GetDummy_native_index_resolution.py
+          python3 -m pip install -q capstone gdown
+      - name: Read user owned original 2010 iOS IPA in private GitHub temporary runner ONLY
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g181_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g181_original_private/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g181_original_private/owner.ipa
+          test "$(wc -c </tmp/g181_original_private/owner.ipa)" -eq 248613763
+      - name: Decode genuine original SceneImpl GetDummy int unsigned int implementation and keep rig source ID as unproven
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g181_sceneimpl_getdummy_native/g181_original_2010_SceneImpl_GetDummy_native_index_resolution.py \
+            --ipa /tmp/g181_original_private/owner.ipa \
+            --out /tmp/g181_public_source/G181_SOURCE_2010_SCENEIMPL_GETDUMMY_NATIVE_ARM_METHOD_METADATA.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g181_public_source/G181_SOURCE_2010_SCENEIMPL_GETDUMMY_NATIVE_ARM_METHOD_METADATA.json')
+          d=json.loads(p.read_text())
+          assert d['original_native_function_VM']=='0x61724'
+          assert d['original_source_native_instruction_count']>=5
+          assert d['known_original_UniBeam_argument_id_candidates']==[14,33]
+          assert not d['native_dummy_key_to_original_BDAE_named_node_id_PROVEN']
+          assert not d['original_UniBeam_world_chest_or_hand_socket_PROVEN']
+          assert d['NO_VPK'] and d['ORIGINAL_IPA_AND_MACHO_NOT_PUBLISHED']
+          print('G181 verified source original 2010 SceneImpl native dummy key implementation decoded; never invent BDAE ID mapping')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Delete original owner's private 2010 game binary
+        if: always()
+        run: rm -rf /tmp/g181_original_private
+      - name: Publish native method opcode metadata and actual C++ calls, NO IPA or VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G181_ORIGINAL_2010_SCENEIMPL_GETDUMMY_NATIVE_METHOD_SOURCE_NO_VPK
+          path: /tmp/g181_public_source/G181_SOURCE_2010_SCENEIMPL_GETDUMMY_NATIVE_ARM_METHOD_METADATA.json
+          retention-days: 14
+          if-no-files-found: error
