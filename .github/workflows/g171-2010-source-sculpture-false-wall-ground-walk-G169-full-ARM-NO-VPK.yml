@@ -10,6 +10,7 @@ on:
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
       - "research/b24_unified/g218_source_live_state_bridge/**"
       - "research/b24_unified/g226_vita_original_ground_render_root_audit/**"
+      - "research/b24_unified/g227_vita_walk_world_collision_gpu_qa/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -212,6 +213,10 @@ jobs:
           grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/src/main.c
           grep -q 'b24_g218_observe_actually_loaded_G8_clip' work/src/main.c
           grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/CMakeLists.txt
+          python3 research/b24_unified/g227_vita_walk_world_collision_gpu_qa/g227_install_passive_real_main_Vita_world_actor_root_diagnostic.py
+          grep -q 'B24_G227_WALK_ROOT_DIAGNOSTIC' work/src/main.c
+          grep -q 'b24_g227_qa_classify' work/src/main.c
+          grep -q 'B24_G227_WALK_ROOT_DIAGNOSTIC' work/CMakeLists.txt
           cp /tmp/g108_original_sky/G73_original_sky_mesh.g73m work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_00.g66t work/assets/
           cp /tmp/g108_original_sky/G73_original_sky_tex_01.g66t work/assets/
@@ -880,6 +885,29 @@ jobs:
           assert not list(Path('work').rglob('*.vpk'))
           print('G218 PASS 776 AUTHENTIC original StateData connected to loaded real G8 source actor G84/G169 with NO second animator or movement B14, source telemetry ONLY, no VPK')
           PY
+      - name: G227 actual Vita 2010 grounded walk QA classifier host C11 test no fabricated root fixes
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            research/b24_unified/g227_vita_walk_world_collision_gpu_qa/test_g227_ground_world_root_qa_C11.c \
+            -lm -o /tmp/g227_ground_root_source_test
+          /tmp/g227_ground_root_source_test
+          python3 - <<'PY'
+          from pathlib import Path
+          m=Path('work/src/main.c').read_text()
+          assert m.count('b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)')==1
+          assert m.count('b24_g8_motion_tick_g84(')==1
+          assert m.count('b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)')==1
+          assert m.count('b16_combat_fire(&combat,&world,muzzle)')==1
+          assert m.count('SDL_Log("G227_WALK_ROOT')==1
+          assert 'b24_gpu_rt.frame_pose.x' in m
+          assert 'b24_gpu_rt.frame_pose.y' in m
+          assert 'b24_g227_probe.old_world_x=old_c1x;' in m
+          assert 'b24_g227_probe.proposed_world_y=world.y;' in m
+          assert not list(Path('work').rglob('*.vpk'))
+          print('PASS G227 OPTIONAL source-only actual Vita C1L1 grounded root observation after GPU drawn, no added B14 physics')
+          PY
       - name: G226 real assembled C1L1 walk world root to camera and actor render source diagnosis NO VPK
         run: |
           set -euo pipefail
@@ -1006,6 +1034,7 @@ jobs:
               -DB24_G172_WM_NATIVE_M_GROUND_BANK=ON \
               -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=ON \
               -DB24_G218_SOURCE_STATE_OBSERVER=ON \
+              -DB24_G227_WALK_ROOT_DIAGNOSTIC=ON \
               -DB24_G111_NATIVE_SOURCE_GATES=ON \
               -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
               -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
