@@ -36,7 +36,7 @@ jobs:
           import json
           from pathlib import Path
           d=json.loads(Path('/tmp/g201_source/G201_ORIGINAL_2010_ACTOR_TO_MAINCHARACTER_DOATTACK_VIRTUAL_OVERRIDE_SOURCE.json').read_text())
-          assert d['source_original_Actor_UpdateStateAttack_VM']=='0xdb610'
+          assert d['original_source_Actor_UpdateStateAttack_VM']=='0xdb610'
           assert d['MainCharacter_derived_original_vtable_symbol_VM']=='0x4bd85c'
           assert d['native_Cpp_zero_based_virtual_slot']==68
           assert d['source_virtual_CALL_byte_offset']==272
