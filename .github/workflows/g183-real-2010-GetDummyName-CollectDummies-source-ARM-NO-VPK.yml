@@ -1,0 +1,59 @@
+name: G183 original 2010 native GetDummyName and CollectDummies scene ID rig source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g183-real-2010-GetDummyName-CollectDummies-source-ARM-NO-VPK.yml"
+      - "research/b24_unified/g183_original_scene_collect_getdummyname/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_named_dummy_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capstone real 2010 ARM owner original source and syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g183_original_scene_collect_getdummyname/g183_native_2010_CollectDummies_GetDummyName_method_bridge.py
+          python3 -m pip install -q capstone gdown
+      - name: Temporarily fetch owner original 2010 game inside isolated runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g183_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g183_original_private/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g183_original_private/owner.ipa
+          test "$(wc -c </tmp/g183_original_private/owner.ipa)" -eq 248613763
+      - name: Prove original named scene 2010 GetDummyName and real collector +0x278 source via actual ARM code
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g183_original_scene_collect_getdummyname/g183_native_2010_CollectDummies_GetDummyName_method_bridge.py \
+            --ipa /tmp/g183_original_private/owner.ipa \
+            --out /tmp/g183_public_source/G183_AUTHENTIC_2010_NATIVE_GETDUMMYNAME_COLLECTDUMMIES_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g183_public_source/G183_AUTHENTIC_2010_NATIVE_GETDUMMYNAME_COLLECTDUMMIES_ARM.json').read_text())
+          assert d['source_2010_GetDummyName_dynamically_calls_SceneImpl_GetDummy']
+          assert d['source_2010_SceneImpl_CollectDummies_references_registry_0x278']
+          assert d['original_class_methods']['Object3D_GetDummyName']['VM']=='0x15894'
+          assert d['original_class_methods']['SceneImpl_CollectDummies']['VM']=='0x62ea4'
+          assert not d['source_2010_Native_RegistryGroup14_or33_to_actual_dummy_name_PROVEN']
+          assert not d['source_2010_Vita_unibeam_emitter_or_Actor_modified']
+          assert d['NO_VPK']
+          print('G183 PASS true 2010 original ARM GetDummyName native resolver + true SceneImpl dummy collector; actual name 14/33 unproven no VPK')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Clean owner original IPA on all terminal states
+        if: always()
+        run: rm -rf /tmp/g183_original_private
+      - name: Export only original native ARM opcode metadata, not IPA or proprietary BDAE assets
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G183_REAL_2010_Original_GetDummyName_CollectDummies_native_source_NO_VPK
+          path: /tmp/g183_public_source/G183_AUTHENTIC_2010_NATIVE_GETDUMMYNAME_COLLECTDUMMIES_ARM.json
+          retention-days: 14
+          if-no-files-found: error
