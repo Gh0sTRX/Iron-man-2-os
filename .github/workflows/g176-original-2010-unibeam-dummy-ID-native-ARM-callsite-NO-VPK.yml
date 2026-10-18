@@ -1,0 +1,60 @@
+name: G176 real 2010 iOS UniBeam GetDummyAbsolutePosition native argument provenance NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g176-original-2010-unibeam-dummy-ID-native-ARM-callsite-NO-VPK.yml"
+      - "research/b24_unified/g176_authentic_unibeam_dummy_source/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_owner_original_UniBeam_native_dummy_socket:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download original source G97 ARM instructions METADATA no private IPA or original executable
+        uses: actions/download-artifact@v4
+        with:
+          name: G97_ORIGINAL_2010_ATTACKENTITY_PROJECTILE_HIT_DAMAGE_REAL_ARM_METADATA_ONLY_NO_VPK
+          run-id: 38970880539
+          github-token: ${{ github.token }}
+          path: /tmp/g176_original_native_arm
+      - name: Download original source G175 actual native CALL edges metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: G175_ORIGINAL_2010_WEAPONDB_MISSILE_UNIBEAM_ARM_SOURCE_CALLGRAPH_ONLY_NO_VPK
+          run-id: 39107687965
+          github-token: ${{ github.token }}
+          path: /tmp/g176_original_weapon_edges
+      - name: Authenticate exact original UniBeam dummy source native callsite and conservatively decode AAPCS r1 r2 provenance
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g176_authentic_unibeam_dummy_source/g176_original_unibeam_dummy_argument_native_source.py
+          python3 research/b24_unified/g176_authentic_unibeam_dummy_source/g176_original_unibeam_dummy_argument_native_source.py \
+            --g97 /tmp/g176_original_native_arm/G97_AUTHENTIC_2010_ATTACK_ENTITY_PROJECTILE_HIT_DAMAGE_ARM_PROVENANCE.json \
+            --g175 /tmp/g176_original_weapon_edges/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json \
+            --out /tmp/g176_source_authentic_report/G176_2010_ORIGINAL_UNIBEAM_DUMMY_NATIVE_ARGUMENT_PROVENANCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g176_source_authentic_report/G176_2010_ORIGINAL_UNIBEAM_DUMMY_NATIVE_ARGUMENT_PROVENANCE.json')
+          d=json.loads(p.read_text())
+          assert d['source_dummy_lookup_callsite_VM']=='0xf611c'
+          assert d['original_function_VM']=='0x159c4'
+          assert d['2010_native_original_source_member_function_direct_CALL_PROVEN']
+          assert len(d['arm_AAPCS_method_argument_r1_r2_last_write_provenance'])==2
+          assert not d['source_chest_dummy_node_binding_to_original_2010_rig_PROVEN']
+          assert not d['source_UniBeam_particle_muzzle_world_position_proven']
+          assert d['NO_VPK']
+          print('G176 PASS exact true 2010 iOS UniBeam native dummy socket lookup and AAPCS argument producer audit; NO fake chest socket')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G176_ORIGINAL_UNIBEAM_DUMMY_CALLSITE_ARM_REG_ARGUMENT_NO_VPK
+          path: /tmp/g176_source_authentic_report/G176_2010_ORIGINAL_UNIBEAM_DUMMY_NATIVE_ARGUMENT_PROVENANCE.json
+          retention-days: 14
+          if-no-files-found: error
