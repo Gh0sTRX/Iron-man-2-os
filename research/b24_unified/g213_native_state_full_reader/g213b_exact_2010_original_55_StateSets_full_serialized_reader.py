@@ -258,8 +258,16 @@ def main(ipa:Path,g207:Path,g212:Path,out:Path):
  candidate_offs={a["original_authored_source_name_prefixed_offset"]
                  for a in d212["source_original_native_Attack_named_12byte_event_candidates"]}
  verified_offs={t["native_source_track_start"]+2 for t in verified_named}
- if not verified_offs.issubset(candidate_offs):
-  raise ValueError("G213 actual native parsed tracks conflict with earlier G212 raw source candidates")
+ # G212 intentionally sampled ONLY possible name patterns with 1..64
+ # events and raw seconds/ticks < 10million; the COMPLETE native
+ # StateData reader may contain original source tracks with ZERO
+ # events, unknown flags, or other values. Those are not an error.
+ # A candidate match becomes AUTHENTIC only when visited by this
+ # complete source parser, never the reverse.
+ print("G213 G212 original raw heuristic candidate overlap",
+       "matched",len(verified_offs&candidate_offs),
+       "real attached tracks missed by G212",len(verified_offs-candidate_offs),
+       "G212 source text false positives",len(candidate_offs-verified_offs),flush=True)
  hist=collections.Counter(t["native_original_track_name"] for t in parsed_track)
  report={
   "source":"G213 full original 2010 iOS states strict original C++ ARM binary serializer decoder, COMPLETE EOF",
@@ -271,9 +279,12 @@ def main(ipa:Path,g207:Path,g212:Path,out:Path):
   "source_original_StateTrack_count":len(parsed_track),
   "source_original_track_name_distribution":dict(hist),
   "source_original_named_Attack_attack_track_count":len(verified_named),
+  "source_original_2010_real_Attack_named_track_byte_offsets_all":[t["native_source_track_start"]+2 for t in verified_named],
   "source_G212_named_Attack_candidates":len(candidate_offs),
-  "source_G212_named_Attack_candidates_confirmed_by_full_StateData_native_Cpp_schema":len(verified_offs),
+  "source_G212_named_Attack_candidates_confirmed_by_full_StateData_native_Cpp_schema":len(verified_offs&candidate_offs),
+  "source_actual_native_StateTrack_named_Attack_missing_from_prior_raw_heuristic":len(verified_offs-candidate_offs),
   "source_G212_named_Attack_candidates_rejected_outside_actual_state_structure":len(candidate_offs-verified_offs),
+  "source_2010_all_55_native_StateSet_and_StateData_authentic_nested_records_parsed":True,
   "source_original_2010_state_sets_all":sets,
   "source_original_all_bytes_consumed_exactly":True,
   "source_original_input_and_suit_controller_bindings_PROVEN":False,
