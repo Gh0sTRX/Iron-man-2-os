@@ -86,9 +86,15 @@ def parse_state(p:Reader,group_index:int):
  extras=[]
  for k in range(extra_n):
   off=p.pos
+  if group_index==24 and start<66000:
+   print("G213 AUTHENTIC IronMan EXTRA",k,"start",off,
+     "near_original_source80",p.data[off:off+80].hex(),flush=True)
   source_name,_=p.string()
   raw5=[p.u32() for i in range(5)]
   native_bool=p.u8()
+  if group_index==24 and start<66000:
+   print("G213 AUTHENTIC IronMan EXTRA",k,"name",source_name,
+     "five",raw5,"flag",native_bool,"after-byte",p.pos,flush=True)
   # Original ARM 0x9CCB8..0x9CCC0: LDRB record+0x14, CMP #0,
   # BNE 0x9CBAC (next record) if NONZERO. Only zero means
   # additional u32 + optional ReadString are present.
@@ -98,6 +104,9 @@ def parse_state(p:Reader,group_index:int):
   else:
    additional=None
    extra_name=None
+  if group_index==24 and start<66000:
+   print("G213 AUTHENTIC IronMan EXTRA",k,"additional",additional,
+     "extra_name",extra_name,"END",p.pos,flush=True)
   extras.append({"original_entry_off":off,"original_name":source_name,
    "native_2010_5x_u32_unclassified":raw5,
    "native_2010_u8_unclassified":native_bool,
