@@ -38,6 +38,18 @@ jobs:
           d=json.loads(Path('/tmp/g222_source/G222_SOURCE_2010_MAINCHARACTER_ACTOR_VTABLE_SLOT110_ORIGINAL_DOATTACK.json').read_text())
           assert d['source_native_owner_DoAttack_VM']=='0xf64f8'
           assert d['original_arm_Actor_UpdateStateAttack_virtual_offset_from_vptr']==272
+          assert d['source_2010_MainCharacter_vptr_0x110_exact_method_is_MainCharacter_DoAttack_PROVEN']
+          mc=next(x for x in d['source_2010_true_original_Itanium_Cpp_vtables']
+              if x['source_original_vtable_Cpp']=='vtable for MainCharacter')
+          slot=next(z for z in mc['source_original_table_window']
+              if z['original_vtable_byte_offset_from_symbol']==280)
+          assert slot['original_owner_2010_unrelocated_u32_pointer_VM']=='0xf64f8'
+          assert 'MainCharacter::DoAttack(int, int)' in slot['exact_original_cpp_target_at_pointer']
+          actor=next(x for x in d['source_2010_true_original_Itanium_Cpp_vtables']
+              if x['source_original_vtable_Cpp']=='vtable for Actor')
+          base=next(z for z in actor['source_original_table_window']
+              if z['original_vtable_byte_offset_from_symbol']==280)
+          assert 'Actor::DoAttack(int, int)' in base['exact_original_cpp_target_at_pointer']
           assert len(d['source_2010_true_original_Itanium_Cpp_vtables'])==4
           assert not d['source_original_virtual_method_attack_damage_hitframe_proven']
           assert not d['source_real_2010_StateTrack_third_u32_payload_meaning_WeaponDB_missile_or_hitframe_PROVEN']
