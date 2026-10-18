@@ -18,6 +18,27 @@ static int original(int suit,const char *real_im2v,const char *state,int native_
  REQ(!strcmp(g.source_state_name_correspondence_ONLY,state));
  REQ(g.source_authored_AttackType_or_UNKNOWN==source_attack_type);
  REQ(g.source_attack_event_start_raw_UNCLASSIFIED==original_attack_raw);
+ /* Validate exact owner-native StateTrack third-u32 actual source metadata.
+  * G221/G222 establish C++ argument provenance, NOT animation runtime
+  * event selection and NOT a hit/damage trigger in this port. */
+ if(original_attack_raw!=B24G217_UNKNOWN_U32){
+   unsigned matching=0;
+   for(unsigned i=0;i<B24G217_TRUE_SOURCE_ATTACK_TRAIL_EVENT_COUNT;++i){
+     const B24G217_SourceEvent *e=&b24g217_source_attack_trail_events[i];
+     if(e->native_suit_group_index==g.source_suit_group &&
+        e->native_original_state_index==g.source_native_state_index &&
+        (!strcmp(e->native_original_track_name,"attack")||
+         !strcmp(e->native_original_track_name,"Attack"))){
+       REQ(g.source_attack_event_third_u32_UNCLASSIFIED==
+           e->raw_original_2010_third_field_UNCLASSIFIED);
+       matching++;
+       break;
+     }
+   }
+   REQ(matching==1);
+ }else{
+   REQ(g.source_attack_event_third_u32_UNCLASSIFIED==B24G217_UNKNOWN_U32);
+ }
  REQ(g.selected_actual_G8_IM2V_clip==real_im2v);
  REQ(g.successfully_correlated==1u&&g.source_animation_frames_observed==1u);
  REQ(g.unmapped_source_clip_frames==0u);
@@ -90,6 +111,7 @@ int main(void){
  REQ(b24_g218_observe_actually_loaded_G8_clip(&native,2,"not_an_original_2010_clip",1,0)==0);
  REQ(native.source_authored_next_state_or_UNKNOWN==B24G217_UNKNOWN_U32);
  REQ(native.source_authored_loop_or_UNKNOWN==B24G217_UNKNOWN_U32);
+ REQ(native.source_attack_event_third_u32_UNCLASSIFIED==B24G217_UNKNOWN_U32);
  b24_g218_observer_reset(&w);
  REQ(w.source_animation_frames_observed==0u);
  puts("G218 PASS actual 2010 G8 original IM2V filename -> 4 source armor 194 StateData/AttackType + raw true StateTrack event telemetry, 0 damage, no guesses and NO VPK");
