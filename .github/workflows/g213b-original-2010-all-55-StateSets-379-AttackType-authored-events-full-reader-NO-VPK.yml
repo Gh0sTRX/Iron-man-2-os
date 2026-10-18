@@ -55,6 +55,20 @@ jobs:
           assert d['source_original_2010_StateSet_count']==55
           assert d['source_original_AttackType_key_u32_value_count']==379
           assert d['source_2010_attack_type_g207_ALL_379_offset_value_matches']
+          assert d['source_original_2010_StateData_count']==1487
+          assert d['source_original_StateTrack_count']==3658
+          assert d['source_original_named_Attack_attack_track_count']==369
+          assert d['source_G212_named_Attack_candidates_confirmed_by_full_StateData_native_Cpp_schema']==365
+          assert d['source_actual_native_StateTrack_named_Attack_missing_from_prior_raw_heuristic']==4
+          assert d['source_G212_named_Attack_candidates_rejected_outside_actual_state_structure']==0
+          player={g['original_2010_StateSet_name']:g for g in d['source_original_2010_state_sets_all']}
+          for armor in ('IronMan','IronMan_suitcase','Warmachine','stealth'):
+            states=player[armor]['source_authentic_2010_StateData']
+            assert len(states)==194
+            assert states[0]['source_original_state_name']=='Idle'
+            assert states[1]['source_original_state_name']=='Jump'
+            assert sum(st['source_original_tracks_in_event_channels'] for st in states)==612
+          assert d['source_2010_all_55_native_StateSet_and_StateData_authentic_nested_records_parsed']
           assert d['source_original_all_bytes_consumed_exactly']
           assert not d['source_original_input_and_suit_controller_bindings_PROVEN']
           assert not d['source_event_track_3rd_u32_melee_damage_semantics_proven']
