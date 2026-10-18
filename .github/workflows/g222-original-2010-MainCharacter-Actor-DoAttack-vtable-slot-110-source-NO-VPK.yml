@@ -1,0 +1,58 @@
+name: G222 original 2010 MainCharacter Actor DoAttack virtual slot 0x110 genuine vtable source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g222-original-2010-MainCharacter-Actor-DoAttack-vtable-slot-110-source-NO-VPK.yml"
+      - "research/b24_unified/g222_source_2010_actor_virtual_attack_vtable/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native_cpp_original_owner_maincharacter_vtable_attack_slot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original 2010 owner native virtual class source analyzer
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g222_source_2010_actor_virtual_attack_vtable/g222_true_owner_2010_Actor_virtual_0x110_MainCharacter_DoAttack_vtable_source.py
+          python3 -m pip install -q gdown
+      - name: Authentic user-owned iOS 2010 Iron Man 2 IPA in ephemeral private runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g222_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g222_owner_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g222_owner_original/owner.ipa
+          test "$(wc -c </tmp/g222_owner_original/owner.ipa)" -eq 248613763
+      - name: Discover genuine original 2010 MainCharacter vtable exact 0x110 slot reference to original DoAttack or unknown source
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g222_source_2010_actor_virtual_attack_vtable/g222_true_owner_2010_Actor_virtual_0x110_MainCharacter_DoAttack_vtable_source.py \
+            --ipa /tmp/g222_owner_original/owner.ipa \
+            --out /tmp/g222_source/G222_SOURCE_2010_MAINCHARACTER_ACTOR_VTABLE_SLOT110_ORIGINAL_DOATTACK.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g222_source/G222_SOURCE_2010_MAINCHARACTER_ACTOR_VTABLE_SLOT110_ORIGINAL_DOATTACK.json').read_text())
+          assert d['source_native_owner_DoAttack_VM']=='0xf64f8'
+          assert d['original_arm_Actor_UpdateStateAttack_virtual_offset_from_vptr']==272
+          assert len(d['source_2010_true_original_Itanium_Cpp_vtables'])==4
+          assert not d['source_original_virtual_method_attack_damage_hitframe_proven']
+          assert not d['source_real_2010_StateTrack_third_u32_payload_meaning_WeaponDB_missile_or_hitframe_PROVEN']
+          assert not d['G218_live_Vita_gameplay_or_B16_changed']
+          assert d['NO_VPK']
+          print('PASS G222 original owner MainCharacter vtable exact method source pointer identity proven only when binary points at 0xf64f8, no guessed damage')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete licensed 2010 owner IPA on every CI exit
+        if: always()
+        run: rm -rf /tmp/g222_owner_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G222_ORIGINAL_2010_MAINCHARACTER_DOATTACK_ACTOR_VTABLE_SLOT110_SOURCE_NO_VPK
+          path: /tmp/g222_source/
+          retention-days: 21
+          if-no-files-found: error
