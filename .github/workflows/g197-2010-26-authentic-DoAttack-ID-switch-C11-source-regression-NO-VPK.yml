@@ -59,4 +59,21 @@ jobs:
           assert not d['native_real_original_suit_or_weapon_mode_binding_for_foot_L_proven']
           print('G197 PASS exact 26-entry native original 2010 ARM DoAttack source C11 reference and 3 UniBeam group IDs, no invented controller bindings')
           PY
+          python3 -m pip install -q matplotlib
+          python3 research/b24_unified/g197_source2010_attack_dispatch/g197_render_original_2010_switch_source_PNG.py \
+            --source /tmp/g197_actual_2010_ARM_source/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --out /tmp/g197_source_only/G197_ORIGINAL_2010_DOATTACK_26_ENTRY_NATIVE_ARM_SOURCE_MAP.png
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/g197_source_only/G197_ORIGINAL_2010_DOATTACK_26_ENTRY_NATIVE_ARM_SOURCE_MAP.png')
+          b=p.read_bytes()
+          assert len(b)>14000 and b.startswith(bytes.fromhex('89504e470d0a1a0a'))
+          PY
           test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G197_ORIGINAL_2010_26_ATTACK_ID_NATIVE_SWITCH_SOURCE_PNG_NO_VPK
+          path: /tmp/g197_source_only/G197_ORIGINAL_2010_DOATTACK_26_ENTRY_NATIVE_ARM_SOURCE_MAP.png
+          retention-days: 21
+          if-no-files-found: error
