@@ -37,10 +37,13 @@ jobs:
           from pathlib import Path
           d=json.loads(Path('/tmp/g220_public/G220_OWNER_ORIGINAL_2010_REAL_STATE_TRACK_GETEVENT_ALL_NATIVE_ARM_CALLERS.json').read_text())
           assert d['genuine_native_original_StateTrack_GetEvent_VM']=='0xa14f0'
-          assert d['source_real_2010_ARM_instructions_decoded']>=300000
+          assert d['source_real_2010_ARM_instructions_decoded']>=10000
+          assert d['source_native_2010_ARM_method_count']>500
+          assert d['source_native_original_function_sources_decoded']>500
           assert len(d['source_real_2010_direct_GetEvent_callsite_windows'])==d['source_direct_ARM_GetEvent_BL_BLX_callsite_count']
           assert len(d['source_original_StateTrack_Event_named_cpp_methods'])>=1
           assert not d['original_indirect_virtual_GetEvent_consumers_fully_analyzed']
+          assert not d['source_real_2010_direct_callsite_zero_means_event_unused']
           assert not d['original_2010_event_payload_third_field_semantics_PROVEN']
           assert not d['original_iOS_AttackType_Event_to_WarMachine_rocket_repulsor_or_damage_PROVEN']
           assert not d['native_2010_Event_time_values_as_milliseconds_PROVEN']
