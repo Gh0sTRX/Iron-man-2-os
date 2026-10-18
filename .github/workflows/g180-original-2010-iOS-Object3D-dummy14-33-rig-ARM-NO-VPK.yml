@@ -1,0 +1,62 @@
+name: G180 original iOS Object3D dummy lookup native ARM and original source BDAE rig map NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g180-original-2010-iOS-Object3D-dummy14-33-rig-ARM-NO-VPK.yml"
+      - "research/b24_unified/g180_original_dummy_lookup_rig/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_original_2010_bdae_dummy_native_lookup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original ARM and verified B13 2010 BDAE resource decoder dependencies
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g180_original_dummy_lookup_rig/g180_original_ios_GetDummyAbsolutePosition_bdae_native_crosswalk.py
+          python3 -m pip install -q capstone numpy gdown
+      - name: Retrieve original owner 2010 exact IPA into EPHEMERAL job temp only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g180_private_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g180_private_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g180_private_original/owner.ipa
+          test "$(wc -c </tmp/g180_private_original/owner.ipa)" -eq 248613763
+      - name: Cross-check original 2010 GetDummyAbsolutePosition native ARM internals against actual source rig BDAE labels no invented muzzle
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g180_original_dummy_lookup_rig/g180_original_ios_GetDummyAbsolutePosition_bdae_native_crosswalk.py \
+            --ipa /tmp/g180_private_original/owner.ipa \
+            --out /tmp/g180_public_source/G180_SOURCE_ORIGINAL_2010_DUMMY_LOOKUP_ARM_BDAE_RIG_CROSSWALK.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g180_public_source/G180_SOURCE_ORIGINAL_2010_DUMMY_LOOKUP_ARM_BDAE_RIG_CROSSWALK.json')
+          d=json.loads(p.read_text())
+          assert d['original_native_VM']=='0x159c4'
+          assert d['source_original_instruction_count']>5
+          assert d['confirmed_UniBeam_DoAttack_passed_int_values']==[14,14,33]
+          rigs=d['original_2010_real_model_archive_candidates']
+          assert any(r['original_owner_resource']=='warmachine.bdae' and r.get('source_authored_node_count')==112 for r in rigs)
+          assert d['BRES_rig_array_order_is_actual_native_DummyId_mapping_PROVEN'] is False
+          assert d['source_14_33_actual_model_dummy_node_or_bone_name_PROVEN'] is False
+          assert d['native_Vita_2010_feature_auto_integrated'] is False
+          assert d['NO_VPK'] is True
+          print('PASS G180 original 2010 native dummy-lookup CALL and authentic BDAE rigs; 14/33 actual node mapping unverified until C++ lookup mechanism decoded')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Permanently discard user original IPA from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g180_private_original
+      - name: Upload ONLY source native instruction metadata and rig node names/parent links, never original licensed assets
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G180_ORIGINAL_IOS2010_DUMMY_LOOKUP_SOURCE_ARM_BDAE_NODES_NO_VPK
+          path: /tmp/g180_public_source/G180_SOURCE_ORIGINAL_2010_DUMMY_LOOKUP_ARM_BDAE_RIG_CROSSWALK.json
+          retention-days: 14
+          if-no-files-found: error
