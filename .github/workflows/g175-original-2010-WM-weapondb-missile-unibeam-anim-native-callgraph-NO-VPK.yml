@@ -1,0 +1,67 @@
+name: G175 ORIGINAL 2010 iOS WeaponDB Missile UniBeam animation native ARM call graph NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g175-original-2010-WM-weapondb-missile-unibeam-anim-native-callgraph-NO-VPK.yml"
+      - "research/b24_unified/g175_native_weapon_motion_graph/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_weapondb_missile_unibeam_native_call_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile-check authentic source graph Python before any owner IPA access
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            research/b24_unified/g175_native_weapon_motion_graph/g175_original_2010_weapon_animation_native_callgraph.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Install original ARM instruction decoder and owner Drive fetch
+        run: python3 -m pip install -q capstone gdown
+      - name: Download PRIVATE user provided 2010 original iOS 1.0.0 in ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g175_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g175_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g175_private_owner/owner.ipa
+          test "$(wc -c </tmp/g175_private_owner/owner.ipa)" -eq 248613763
+      - name: Probe original real 2010 native ARM MainCharacter ThrowMissile UniBeam WeaponDB and only actual animation method CALL edges
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g175_native_weapon_motion_graph/g175_original_2010_weapon_animation_native_callgraph.py \
+            --ipa /tmp/g175_private_owner/owner.ipa \
+            --out /tmp/g175_public_source_only
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('/tmp/g175_public_source_only/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json')
+          d=json.loads(p.read_text())
+          assert d['owner_iOS_arm_native_symbol_count']>=60000
+          assert d['scanned_selected_CPP_text_methods']>=70
+          assert d['verified_bounded_selected_CPP_text_methods']>=30
+          for k in ('throw_missile','unibeam','weapon_attack_lookup','weapon_attack_load'):
+            assert d['original_native_method_target_matches'][k]
+          assert d['original_2010_Aim_M_weapon_semantics_PROVEN'] is False
+          assert d['original_2010_weaponID_to_Aim_M_clip_exact_native_transition_PROVEN'] is False
+          assert d['original_2010_Unibeam_actual_native_B16_port_event_PROVEN'] is False
+          assert d['original_2010_weapon_muzzle_Gun01_Gun04_proven'] is False
+          assert d['direct_call_edges_are_not_runtime_branch_reachability_or_argument_mapping'] is True
+          assert d['no_proprietary_executable_or_raw_arm_machine_bytes_published'] is True
+          assert d['NO_VPK'] is True
+          print('G175 PASS genuine 2010 Gameloft native Missile/UniBeam/WeaponDB source method and direct call evidence only; no invented weapon-to-Aim_M mapping')
+          PY
+      - name: Erase user owned decrypted original 2010 IPA and executable
+        if: always()
+        run: rm -rf /tmp/g175_private_owner
+      - name: Upload ONLY original native method names addresses and actual direct CALL metadata no licensed assets VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G175_ORIGINAL_2010_WEAPONDB_MISSILE_UNIBEAM_ARM_SOURCE_CALLGRAPH_ONLY_NO_VPK
+          path: /tmp/g175_public_source_only/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
