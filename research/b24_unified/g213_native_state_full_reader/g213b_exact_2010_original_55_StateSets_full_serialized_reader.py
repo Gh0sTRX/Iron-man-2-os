@@ -72,6 +72,7 @@ def parse_state(p:Reader,group_index:int):
  start=p.pos
  name,_=p.string()
  params_n=p.array_count(256,"StateData ordinary param key-value records")
+ if group_index==24 and start<66000:print("G213 DIAG IronMan first state",start,name,"param_count",params_n,"param bytes start",p.pos,flush=True)
  params=[];attack=[]
  for i in range(params_n):
   key,off=p.string()
@@ -79,7 +80,9 @@ def parse_state(p:Reader,group_index:int):
   params.append({"name":key,"source_value_u32":value,"key_offset":off})
   if key=="AttackType":
    attack.append({"key_offset":off,"value":value})
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"AFTER param",p.pos,"first",params[:10],flush=True)
  extra_n=p.array_count(256,"StateData 44-byte actor movement/action metadata")
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"extra_n",extra_n,"at",p.pos,flush=True)
  extras=[]
  for k in range(extra_n):
   off=p.pos
@@ -93,7 +96,9 @@ def parse_state(p:Reader,group_index:int):
    "native_2010_u8_unclassified":native_bool,
    "native_2010_u32_unclassified":additional,
    "native_2010_additional_string":extra_name})
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"AFTER extras",p.pos,"first_extra",extras[:2],flush=True)
  channel_n=p.array_count(256,"StateData source event track channels")
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"channel_n",channel_n,"at",p.pos,flush=True)
  channels=[];ntracks=0
  for c in range(channel_n):
   off=p.pos;native_id=p.u32();kind=p.u16();n=p.i16()
@@ -104,7 +109,9 @@ def parse_state(p:Reader,group_index:int):
    "source_original_track_count":n,
    "source_2010_attached_track_records":tracks})
   ntracks+=n
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"AFTER channels",p.pos,"first_ch",channels[:2],flush=True)
  flags_n=p.array_count(256,"StateData named state flag entries")
+ if group_index==24 and start<66000:print("G213 DIAG IronMan",name,"flags_n",flags_n,"at",p.pos,flush=True)
  flags=[]
  for i in range(flags_n):
   name,_=p.string();a=p.u16();b=p.u16()
