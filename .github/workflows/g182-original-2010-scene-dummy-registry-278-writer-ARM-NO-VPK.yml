@@ -1,0 +1,60 @@
+name: G182 ORIGINAL iOS SceneImpl dummy registry source 0x278 writer ARM investigation NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g182-original-2010-scene-dummy-registry-278-writer-ARM-NO-VPK.yml"
+      - "research/b24_unified/g182_native_scene_dummy_registry/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_owner_dummy_scene_registry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python original ARM source disassembly dependency
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g182_native_scene_dummy_registry/g182_original_2010_scene_dummy_registry_writers_arm.py
+          python3 -m pip install -q capstone gdown
+      - name: User original 2010 source IPA in private temporary GitHub runner only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g182_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g182_private/owner.ipa ||
+             gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g182_private/owner.ipa
+          test "$(wc -c </tmp/g182_private/owner.ipa)" -eq 248613763
+      - name: Determine source native original SceneImpl real GetDummy registry and every directly visible candidate writer
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g182_native_scene_dummy_registry/g182_original_2010_scene_dummy_registry_writers_arm.py \
+            --ipa /tmp/g182_private/owner.ipa \
+            --out /tmp/g182_source_only/G182_REAL_2010_SCENE_DUMMY_REGISTRY_0x278_NATIVE_WRITERS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g182_source_only/G182_REAL_2010_SCENE_DUMMY_REGISTRY_0x278_NATIVE_WRITERS.json').read_text())
+          assert d['native_original_2010_symbol_table_total']==65500
+          assert d['source_original_named_scanned_method_count']>=15
+          assert d['native_scene_dummy_registry_pointer_source_offset_PROVEN']=='0x278'
+          assert d['native_scene_dummy_registry_index14_33_lookup_PROVEN']
+          assert not d['scene_dummy_registry_elements_14_33_to_BDAE_named_nodes_PROVEN']
+          assert not d['indirect_alias_write_and_constructor_initializer_fully_traced_PROVEN']
+          assert not d['native_Vita_gameplay_changes']
+          assert d['NO_VPK']
+          print('PASS G182 actual original iOS 2010 SceneImpl source-dummy registry referenced method analysis, not forged BDAE node ids')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Original user private IPA deleted even if source verification fails
+        if: always()
+        run: rm -rf /tmp/g182_private
+      - name: Publish only native source C++ name and ARM field offset proof, not private IPA/VPK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G182_ORIGINAL_2010_SCENE_DUMMY_REGISTRY_NATIVE_FIELD_278_SOURCE_ONLY_NO_VPK
+          path: /tmp/g182_source_only/G182_REAL_2010_SCENE_DUMMY_REGISTRY_0x278_NATIVE_WRITERS.json
+          retention-days: 14
+          if-no-files-found: error
