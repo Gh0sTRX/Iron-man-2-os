@@ -1,0 +1,60 @@
+name: G177 ORIGINAL 2010 UniBeam WeaponDB exact AttackIndex4 proven ARM source NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g177-real-2010-unibeam-WeaponDB-AttackIndex4-dummy-native-NO-VPK.yml"
+      - "research/b24_unified/g177_unibeam_native_attack_index/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  owner_native_original_unibeam_weapon_index4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore source-original G97 full bounded ARM opcode metadata no private IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: G97_ORIGINAL_2010_ATTACKENTITY_PROJECTILE_HIT_DAMAGE_REAL_ARM_METADATA_ONLY_NO_VPK
+          run-id: 38970880539
+          github-token: ${{ github.token }}
+          path: /tmp/g177_original_ARM
+      - name: Restore original G175 native ARM C++ symbol exact call edges
+        uses: actions/download-artifact@v4
+        with:
+          name: G175_ORIGINAL_2010_WEAPONDB_MISSILE_UNIBEAM_ARM_SOURCE_CALLGRAPH_ONLY_NO_VPK
+          run-id: 39107687965
+          github-token: ${{ github.token }}
+          path: /tmp/g177_weapon_calls
+      - name: Recover original 2010 source exact UniBeam WeaponDB attack index4 and dynamic dummy argument
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g177_unibeam_native_attack_index/g177_original_2010_unibeam_weaponDB_index4_and_dummy_argument.py
+          python3 research/b24_unified/g177_unibeam_native_attack_index/g177_original_2010_unibeam_weaponDB_index4_and_dummy_argument.py \
+            --g97 /tmp/g177_original_ARM/G97_AUTHENTIC_2010_ATTACK_ENTITY_PROJECTILE_HIT_DAMAGE_ARM_PROVENANCE.json \
+            --g175 /tmp/g177_weapon_calls/G175_OWNER_2010_WEAPONDB_MISSILE_UNIBEAM_ANIMATION_NATIVE_CALLGRAPH_NO_VPK.json \
+            --out /tmp/g177_source_only/G177_AUTHENTIC_2010_UNIBEAM_WEAPONDB_INDEX4_DUMMY_PARAM_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/g177_source_only/G177_AUTHENTIC_2010_UNIBEAM_WEAPONDB_INDEX4_DUMMY_PARAM_ARM.json').read_text())
+          assert r['authored_original_2010_UniBeam_WeaponDB_index_proven']
+          assert r['original_UniBeam_WeaponDB_attack_index_actual_int']==4
+          assert r['original_dummy_lookup_first_int_from_UniBeam_function_int_param']
+          assert r['original_dummy_lookup_second_int_argument_directly_derived_as_zero']
+          assert not r['original_dummy_lookup_final_rig_name_or_chest_socket_PROVEN']
+          assert not r['original_UniBeam_AttackEntity_index4_numeric_damage_PROVEN']
+          assert not r['original_UniBeam_attack_index4_maps_to_named_IM2V_Beam_clip_PROVEN']
+          assert r['NO_VPK']
+          print('G177 source AUTHENTIC original iOS UniBeam native attack table index 4 proven, no forged animation/fire/chest dummy mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: G177_REAL_ORIGINAL_2010_UNIBEAM_ATTACK_INDEX4_NATIVE_ARM_PROVEN_NO_VPK
+          path: /tmp/g177_source_only/G177_AUTHENTIC_2010_UNIBEAM_WEAPONDB_INDEX4_DUMMY_PARAM_ARM.json
+          retention-days: 14
+          if-no-files-found: error
