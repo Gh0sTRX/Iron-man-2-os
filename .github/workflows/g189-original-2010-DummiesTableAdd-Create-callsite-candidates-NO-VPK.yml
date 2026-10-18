@@ -1,0 +1,58 @@
+name: G189 2010 original DummiesTableAdd Create ARM source callsites NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g189-original-2010-DummiesTableAdd-Create-callsite-candidates-NO-VPK.yml"
+      - "research/b24_unified/g189_native_dummy_registration_calls/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_iOS2010_dummy_registration_names:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check 2010 original ARM code scanner syntax and decoder
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g189_native_dummy_registration_calls/g189_original_2010_DummiesTableAdd_Create_callers.py
+          python3 -m pip install -q capstone gdown
+      - name: User-owned original iOS 2010 IPA, ephemeral GitHub runner ONLY
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g189_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g189_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g189_private_owner/owner.ipa
+          test "$(wc -c </tmp/g189_private_owner/owner.ipa)" -eq 248613763
+      - name: Find genuine static original 2010 DummiesTable Create Add Destroy native direct calls and PIC name hints
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g189_native_dummy_registration_calls/g189_original_2010_DummiesTableAdd_Create_callers.py \
+            --ipa /tmp/g189_private_owner/owner.ipa \
+            --out /tmp/g189_public_source/G189_REAL_2010_DUMMIESTABLE_CREATE_ADD_DIRECT_ARM_CALLS_NO_VPK.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g189_public_source/G189_REAL_2010_DUMMIESTABLE_CREATE_ADD_DIRECT_ARM_CALLS_NO_VPK.json').read_text())
+          assert d['real_original_CPP_target_methods']['0x641b4']=='SceneImpl::DummiesTableAdd(char const*)'
+          assert d['real_original_CPP_target_methods']['0x64684']=='SceneImpl::DummiesTableCreate(int)'
+          assert d['original_text_sections_ARM_only_scanned_bytes']>=50000
+          assert not d['actual_dummy14_dummy33_source_names_proven']
+          assert not d['source_CALL_context_literal_candidate_is_verified_runtime_r1_input']
+          assert d['NO_VPK']
+          print('G189 source genuine 2010 scene dummy name registrar static callsites scanned. No fake source socket assignments')
+          PY
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Delete private original licensed user-owned game file
+        if: always()
+        run: rm -rf /tmp/g189_private_owner
+      - name: Publish only native original ARM direct call context and source CPP names
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G189_SOURCE_2010_DUMMYTABLE_CREATE_ADD_NATIVE_CALLS_NO_VPK
+          path: /tmp/g189_public_source/G189_REAL_2010_DUMMIESTABLE_CREATE_ADD_DIRECT_ARM_CALLS_NO_VPK.json
+          retention-days: 14
+          if-no-files-found: error
