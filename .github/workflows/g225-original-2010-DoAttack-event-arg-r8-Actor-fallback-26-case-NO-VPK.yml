@@ -1,0 +1,62 @@
+name: G225 original 2010 DoAttack StateTrack second int r8 genuine 26 ARM native cases Actor fallback NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g225-original-2010-DoAttack-event-arg-r8-Actor-fallback-26-case-NO-VPK.yml"
+      - "research/b24_unified/g225_true_iOS_attack_event_third_arg_proof/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  true_owner_2010_native_ARM_DoAttack_args_branch_fallback:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate genuine original 2010 owner native ARM second event arg source
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g225_true_iOS_attack_event_third_arg_proof/g225_owner_original_2010_EventValue_r8_DoAttack_Actor_fallback.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g225_orig_arm
+      - uses: actions/download-artifact@v4
+        with:
+          name: G221_ORIGINAL_2010_ATTACKTYPE_STATETRACK_THIRD_U32_ACTOR_VCALL_SOURCE_NO_VPK
+          run-id: 39141125765
+          github-token: ${{ github.token }}
+          path: /tmp/g225_orig_state
+      - name: Prove real ARM native code first second original 2010 event regs and fallback parent Actor DoAttack, all 26 authored IDs
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g225_true_iOS_attack_event_third_arg_proof/g225_owner_original_2010_EventValue_r8_DoAttack_Actor_fallback.py \
+            --g196 /tmp/g225_orig_arm/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --g221 /tmp/g225_orig_state/G221_TRUE_2010_ATTACKTYPE_NATIVE_EVENT_THIRD_U32_VIRTUAL_CALL_SOURCE.json \
+            --out /tmp/g225_verified_source/G225_ORIGINAL_2010_EVENT_U32_R8_ATTACKTYPE_R5_REAL_NATIVE_ARM.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g225_verified_source/G225_ORIGINAL_2010_EVENT_U32_R8_ATTACKTYPE_R5_REAL_NATIVE_ARM.json').read_text())
+          assert d['source_genuine_ARM_argument_register_and_fallback_opcode_match']==10
+          assert d['source_original_authored_AttackType_argument']=='r5 preserved from r1'
+          assert d['source_original_event_third_u32_argument']=='r8 preserved from r2'
+          assert d['source_real_second_event_u32_is_passed_UNMODIFIED_to_base_ActorDoAttack']
+          assert d['source_real_2010_default_base_CPP_Actor_DoAttack_target_VM']=='0xda5b8'
+          assert not d['native_2010_original_second_event_int_value_0_1_2_3_semantics_PROVEN']
+          assert not d['Vita_original_damage_hardware_walk_or_weapon_changed']
+          assert d['NO_VPK']
+          print('PASS G225 actual original owner 2010 event payload r8 and original authored AttackType r5 into 26-case/Actor::DoAttack, no false damage/VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G225_ORIGINAL_2010_ATTACKTYPE_EVENT_ARG_R8_NATIVE_FALLBACK_26_CASES_NO_VPK
+          path: /tmp/g225_verified_source/
+          retention-days: 21
+          if-no-files-found: error
