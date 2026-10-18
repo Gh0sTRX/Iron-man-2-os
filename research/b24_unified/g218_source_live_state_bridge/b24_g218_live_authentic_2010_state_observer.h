@@ -26,6 +26,7 @@ typedef struct {
   uint32_t source_authored_type_or_UNKNOWN;       /* original type, weapon semantics unproven */
   uint32_t source_authored_loop_or_UNKNOWN;       /* original loop flag, no new G8 timing */
   uint32_t source_attack_event_start_raw_UNCLASSIFIED;
+  uint32_t source_attack_event_third_u32_UNCLASSIFIED; /* native G221/G222 Actor consumes this in r2, not confirmed hit/damage */
   const char *source_state_name_correspondence_ONLY;
   const char *selected_actual_G8_IM2V_clip;
   uint8_t source_state_index_correlated_by_filename_ONLY;
@@ -96,6 +97,7 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->source_authored_type_or_UNKNOWN=B24G217_UNKNOWN_U32;
   obs->source_authored_loop_or_UNKNOWN=B24G217_UNKNOWN_U32;
   obs->source_attack_event_start_raw_UNCLASSIFIED=B24G217_UNKNOWN_U32;
+  obs->source_attack_event_third_u32_UNCLASSIFIED=B24G217_UNKNOWN_U32;
   obs->actual_2010_StateMgr_runtime_state_PROVEN=0;
   obs->actual_2010_melee_hit_or_projectile_event_PROVEN=0;
   if(!actual_G8_clip||!actual_G8_clip[0]||
@@ -142,6 +144,12 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
        (!strcmp(e->native_original_track_name,"attack")||
         !strcmp(e->native_original_track_name,"Attack"))){
       obs->source_attack_event_start_raw_UNCLASSIFIED=e->raw_original_2010_start;
+      /* G221 original Actor::UpdateStateAttack reads event[index]+8
+       * to C++ virtual DoAttack(AttackType, third); G222 proves MainCharacter.
+       * This is the first SOURCE event for a name-based matched StateData;
+       * it is NOT verified original runtime current-index selection, and
+       * must never spawn any attack or cause damage here. */
+      obs->source_attack_event_third_u32_UNCLASSIFIED=e->raw_original_2010_third_field_UNCLASSIFIED;
       ++obs->native_raw_attack_event_rows_observed;
       break;
     }
