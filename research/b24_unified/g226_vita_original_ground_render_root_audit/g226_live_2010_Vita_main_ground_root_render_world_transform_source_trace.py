@@ -13,7 +13,7 @@ from pathlib import Path
 import argparse,json,re
 TOKENS=[
  ("physics",r"\bb14_world_tick\s*\("),
- ("render",r"\bglTranslatef\s*\(|\bglMultMatrixf\s*\(|\bglLoadMatrixf\s*\(|\bglPushMatrix\s*\("),
+ ("render",r"\bb24_gpu_runtime_draw\s*\(|\bb24_gpu_owner_armor\s*\(|\bb24_gpu_suit_draw\s*\(|\bglTranslatef\s*\(|\bglMultMatrixf\s*\(|\bglLoadMatrixf\s*\(|\bglPushMatrix\s*\("),
  ("model_matrix",r"\bmodel\b|\bworld\.x\b|\bworld\.y\b|\bworld\.z\b"),
  ("movement_controls",r"\bmove_x\b|\bmove_y\b|\bground_run\b|\bgrounded\b"),
  ("collision",r"\bb24_g75_capsule_reconcile\b|\bb24_g108_grid_clear\b|\bb24_g156\b"),
@@ -47,6 +47,9 @@ def run(out:Path):
   root/"work/b24/b24_unified/b24_g8_live_original_motion.c",
   root/"work/b24/b24_unified/b24_g75_source_capsule.c",
   root/"work/b24/b24_unified/b24_g108_visible_original_wall_grid.c",
+  root/"work/b24/b24_unified/b24_gpu_runtime.c",
+  root/"work/b24/b24_unified/b24_gpu_suit_vitagl.c",
+  root/"work/b24/b24_unified/b24_gpu_camera.c",
  ]
  result={"origin":"G226 original-source Vera Vita C1L1 B14 root movement-to-hero render dataflow audit only, NOT original 2010 mechanics",
   "source_actual_files":{}, "Vita_user_observed_walk_animation_not_world_translation_STILL_UNRESOLVED":True,
@@ -54,6 +57,7 @@ def run(out:Path):
   "original_2010_iOS_world_to_actor_render_scale_PROVEN":False,
   "real_world_root_to_GPU_MVP_2010_original_equivalence_PROVEN":False,
   "runtime_culprit_identified_from_source_PROVEN":False,
+  "source_original_render_driver_uses_gpu_runtime_instead_of_legacy_main_opengl":True,
   "gameplay_physics_or_C1L1_renderer_CHANGED":False,
   "NO_VPK":True}
  for path in sources:
