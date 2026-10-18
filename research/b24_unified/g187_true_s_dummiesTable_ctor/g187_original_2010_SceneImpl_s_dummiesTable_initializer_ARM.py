@@ -44,8 +44,18 @@ def main(ipa:Path,out:Path):
  decoder=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM);decoder.detail=True
  allins=list(decoder.disasm(exe[off:off+0xe8],INIT_VM))
  if len(allins)<25:raise ValueError("g187 missing initializer instructions")
- if not any(x.address==CTOR_VM and x.mnemonic=="mov" for x in allins):
-  raise ValueError("initialization symbol not inside original method range")
+ # Init method may end before its global ctor trampoline, and a source
+ # literal pool between them should NOT be decoded as executable ARM.
+ # Verify the constructor trampoline independently at its exact symbol.
+ ctor_off=sec[2]+CTOR_VM-sec[0]
+ ctor_ins=list(decoder.disasm(exe[ctor_off:ctor_off+12],CTOR_VM))
+ if not any(x.address==CTOR_VM and x.mnemonic=="mov" for x in ctor_ins):
+  raise ValueError("2010 real table global ctor trampoline start invalid")
+ if not any(x.address==CTOR_VM+8 and x.mnemonic=="b" and
+            x.operands and x.operands[0].type==ARM_OP_IMM and
+            (x.operands[0].imm&~1)==INIT_VM for x in ctor_ins):
+  raise ValueError("2010 native table constructor jump to initializer mismatch")
+
  def vmread(vm,n):
   section=next((s for s in base["sections"] if s[0]<=vm and vm+n<=s[0]+s[1]
        and s[3] not in ("__common","__bss")),None)
