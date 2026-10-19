@@ -13,6 +13,8 @@ sys.path.insert(0,str(ROOT))
 from b24_owner_pack_extract import decode,get_exact
 from b24_g27_original_source_lua51_native_global_call_sites import report as orig_calls
 from b24_g25_original_clara_class_schema_and_actual_MC_maincharacter import summarize
+from b24_g24_original_clara_source_601_nodes_663_parent_links import audit
+import struct
 
 def run(ipa:Path,g265:Path,out:Path):
  if ipa.stat().st_size!=248613763:raise ValueError("not original 2010 owner source IPA")
@@ -59,6 +61,38 @@ def run(ipa:Path,g265:Path,out:Path):
  ]
  if len(mc_start_moves)!=1 or mc_start_moves[0]["native_Lua_CALL_PC"]!=170:
   raise ValueError("original 2010 Mission000 MC scripted move source PC drift")
+ source_move=mc_start_moves[0]
+ if source_move["original_2010_static_entire_CALL_arguments"]!=[1062.0,1892.0,3000.0]:
+  raise ValueError("G268 original Mission000 MC source first cinematic MoveEntityToEntity arguments drift")
+ if typed["PD_IM_jump_goal"]["original_numeric_name_id"]!=1892 or typed["PD_IM_jump_goal"]["original_class_name"]!="PositionDummy":
+  raise ValueError("G268 player initial scripted movement goal is not genuine original PositionDummy")
+ graph=audit(raw)
+ jump=[x for x in graph["all_663_source_rigid_transforms_with_native_parent_child_name_ID_chain"]
+   if x["original_named_parent"]=="PD_IM_jump_goal"]
+ if len(jump)!=1:raise ValueError("G268 source original scripted MoveEntityToEntity destination Position transform missing")
+ goal=jump[0]; pos_offset=goal["native_transform_source_offset"]
+ pre=raw[pos_offset-36:pos_offset]
+ if pre[8:12]!=b"\\x06\\x00\\x04\\x00" or pre[16:18]!=b"\\x04\\x00" or pre[22:24]!=b"\\x0c\\x00":
+  raise ValueError("G268 script actual PD_IM_jump_goal typed positional record format drift")
+ goal_mode=struct.unpack_from("<i",pre,12)[0]
+ goal_bind=struct.unpack_from("<i",pre,18)[0]
+ goal_offset=[round(z,6) for z in struct.unpack_from("<3f",pre,24)]
+ named_goal={
+   "genuine_original_Mission000_native_MoveEntityToEntity_VM_PC":170,
+   "original_2010_source_mc_actor_class112_ID":1062,
+   "original_2010_script_destination_name":"PD_IM_jump_goal",
+   "original_2010_script_destination_PositionDummy_ID":1892,
+   "source_native_child_PositionData_ID":goal["original_child_node_ID"],
+   "source_original_goal_XYZ_local":goal["native_vec3_position"],
+   "source_original_goal_quaternion":goal["native_quaternion_xyzw"],
+   "source_original_goal_scale":goal["native_vec3_scale"],
+   "source_original_goal_AttachType":goal_mode,
+   "source_original_goal_Bind_To_Entity":goal_bind,
+   "source_original_goal_AttachOffset":goal_offset,
+   "original_source_script_third_arg_raw_3000":3000,
+   "third_arg_duration_unit_in_real_iOS_runtime_proven":False,
+   "actual_original_iOS_MC_world_end_position_reached_or_correct_collision_proven":False
+ }
  freq=collections.Counter((m["original_native_Lua_global"],hit["original_node_name"])
   for m in matches for hit in m["authentic_2010_MC_or_PD_MC_entity_arg_nodes"])
  start=next(x for x in script["source_lua_static_CALLBACK_instructions_and_id_links"]
@@ -81,6 +115,7 @@ def run(ipa:Path,g265:Path,out:Path):
    "source_Mission000_total_original_Lua_global_CALLs":1035,
    "source_2010_all_MC_PD_MC_statically_identified_entity_argument_calls":matches,
    "source_true_original_Mission000_OnStart_MC_MoveEntityToEntity_PC170_target_source":mc_start_moves[0],
+   "source_true_original_Mission000_MC_initial_scripted_goal_PositionDummy_typed_transform_and_binding":named_goal,
    "source_Mission000_MoveEntityToEntity_source_target_name_if_typed":
       next((x["original_node_name"] for x in mc_start_moves[0]["other_typed_entity_argument_nodes_in_same_CALL"] if x["argument_index"]==1),None),
    "source_2010_MC_PD_MC_Lua_global_frequency":[
@@ -100,6 +135,7 @@ def run(ipa:Path,g265:Path,out:Path):
  print("G266 source real 2010 MC ID1062 Position no-bind; PD_MC ID1195 Bind MC AttachType1")
  print("G266 original Lua MC+PD_MC source-typed CALL count",len(matches))
  print("G266 TRUE ORIGINAL Mission000 OnStart MC MoveEntityToEntity PC170 ACTUAL TARGET",mc_start_moves[0])
+ print("G268 real original 2010 Mission000 scripted MC goal native PositionDummy typed transform",named_goal)
  for x in matches:print("G266 original Lua typed MC/PD_MC node source CALL",x)
  print("G266 Mission000 original native OnStart <=PC73 source CALL count",len(opening))
  for x in opening:print("G266 genuine pre-first-branch source CALL",x)
