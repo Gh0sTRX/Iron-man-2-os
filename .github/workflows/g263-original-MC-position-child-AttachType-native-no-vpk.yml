@@ -1,0 +1,75 @@
+name: G263 Original MC Position Child and AttachType Native Branch (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g263_MC_original_position_component_parent_and_attach_type/**"
+      - ".github/workflows/g263-original-MC-position-child-AttachType-native-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  exact_2010_MC_source_and_AttachType_branch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original 2010 MC source native ARM audit syntax
+        run: python3 -m py_compile research/b24_unified/g263_MC_original_position_component_parent_and_attach_type/g263_true_2010_MC_position_child_and_AttachType_ARM_path.py
+      - name: Install original owner IPA reader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G260_ORIGINAL_2010_POSITIONDATA_CPP_WORLD_MATRIX_METHODS_NO_VPK
+          run-id: 39262527719
+          github-token: ${{ github.token }}
+          path: /tmp/g263_true_native_cpp
+      - uses: actions/download-artifact@v4
+        with:
+          name: G261_GENUINE_2010_POSITIONDATA_SIX_LITERAL_PROPERTIES_NO_VPK
+          run-id: 39262916694
+          github-token: ${{ github.token }}
+          path: /tmp/g263_true_typed_fields
+      - name: Temporarily read exact original 2010 iOS owner IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g263_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g263_owner_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g263_owner_original/owner.ipa
+          test "$(wc -c </tmp/g263_owner_original/owner.ipa)" -eq 248613763
+      - name: Verify original 2010 player MC Position child/source AttachType branch
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g263_MC_original_position_component_parent_and_attach_type/g263_true_2010_MC_position_child_and_AttachType_ARM_path.py \
+            --g260 /tmp/g263_true_native_cpp/G260_TRUE_2010_POSITIONDATA_WORLD_MATRIX_CPP_METHODS.json \
+            --g261 /tmp/g263_true_typed_fields/G261_TRUE_ORIGINAL_2010_POSITIONDATA_SIX_NATIVE_PROPERTY_STRINGS.json \
+            --ipa /tmp/g263_owner_original/owner.ipa \
+            --out /tmp/g263_report/G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACH_TYPE_BRANCH_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g263_report/G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACH_TYPE_BRANCH_SOURCE.json').read_text())
+          assert d['genuine_original_MC_class112_ID']==1062
+          assert d['real_original_MC_Position_component_child_ID']==1064
+          assert d['real_original_MC_Position_parent_scene_node_ID']==1062
+          assert d['original_C1L1_field_92_child_parent_tag_structure_proven']
+          assert d['source_native_AttachType_one_branch_VM']=='0xc7f78'
+          assert d['source_native_AttachType_one_branch_target_VM']=='0xc8054'
+          assert not d['original_MC_Position_component_AttachType_value_from_scene_proven']
+          assert not d['original_MC_Position_component_Bind_To_Entity_value_from_scene_proven']
+          assert not d['actual_Vita_ground_walk_on_hardware_fixed']
+          assert d['NO_VPK']
+          print('G263 TRUE original scene MC node1062 Position child1064 and native AttachType source path PASS')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase copyrighted original game archive from ephemeral private runner
+        if: always()
+        run: rm -rf /tmp/g263_owner_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACHTYPE_SOURCE_ONLY_NO_VPK
+          path: /tmp/g263_report/
+          retention-days: 21
+          if-no-files-found: error
