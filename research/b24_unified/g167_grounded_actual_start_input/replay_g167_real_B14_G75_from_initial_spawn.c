@@ -50,6 +50,25 @@ int main(int argc,char**argv){
    b.accepted,b.proposed,hypotf(b.x1-b.x0,b.y1-b.y0),
    c.accepted,c.proposed,d.accepted,d.proposed,
    e.accepted,e.proposed);
+#ifdef B24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL
+ /* This compilation mode MATCHES the real Vita ARM ELF, not obsolete
+  * G108 opaque-texture inferred sculpture-as-solid collision tests.
+  * The previous host mismatch falsely showed ground walk blocked after
+  * 15/120 steps while the actual strict C1L1 Vita source permits
+  * uninterrupted movement. Keep this a HARD game regression gate.
+  *
+  * The "MC" input low-Z probe is authored LOCAL scene data, not
+  * the native 2010 MainCharacter world-foot boot and is expected
+  * to be blocked there: don't silently teleport actor to it.
+  */
+ assert(a.proposed==120u && a.accepted==120u);
+ assert(b.proposed==120u && b.accepted==120u);
+ assert(hypotf(a.x1-a.x0,a.y1-a.y0)>9.0f);
+ assert(hypotf(b.x1-b.x0,b.y1-b.y0)>20.0f);
+ assert(c.accepted==120u && d.accepted==120u);
+ assert(e.accepted==0u);
+ puts("WALK_120_FRAME_GAME_REGRESSION_PASS actual Vita G171 strict: original G66C G159 G160 grounded 120/120, flight 120/120, MC low LOCAL floor still invalid; hardware run untested");
+#endif
  b24_c1_original_collision_free(&w);
  puts("G167 actual B14 real input -> G75 original source city physics diagnostic complete; no fake story spawn/height, NO VPK");
  return 0;
