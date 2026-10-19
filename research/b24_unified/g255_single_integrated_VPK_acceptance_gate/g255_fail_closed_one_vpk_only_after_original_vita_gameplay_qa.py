@@ -27,6 +27,7 @@ HARDWARE_MUST_BE_EVIDENCED={
  "ground_hover_cruise_rush_direction_transitions_actually_playable",
  "original_Mark_V_suitcase_629v_full_move_family_playable",
  "G68_original_Expo_collision_camera_flight_lighting_issues_regressed",
+ "original_Mission000_QTE_cutscene_audio_and_mission_complete_playable",
 }
 def status(path:Path):
  d=json.loads(path.read_text())
