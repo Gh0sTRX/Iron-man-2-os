@@ -1,0 +1,63 @@
+name: Walk fix original Expo source G66C stable grounded boot C11, no VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/walk_fix/**"
+      - ".github/workflows/walk-focus-original-expo-native-floor-ground-fix-host.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_original_city_source_only_ground_start:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read past user-authenticated original G68 city asset (do NOT create any VPK)
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/walk_original_city
+      - name: Extract only existing verified 2010 G66C original source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile,struct
+          vals=[]
+          for p in Path('/tmp/walk_original_city').rglob('*'):
+            if not p.is_file():continue
+            if p.suffix.lower()=='.g66c':vals.append(p.read_bytes())
+            elif p.suffix.lower() in ('.zip','.vpk'):
+              with zipfile.ZipFile(p) as z:
+                for k in z.namelist():
+                  if k.lower().endswith('.g66c'):vals.append(z.read(k))
+          matches=[v for v in vals if len(v)==12+1910*36 and struct.unpack_from('<4sII',v)==(b'G66C',1,1910)]
+          assert len(matches)>=1,'No real original 2010 1910-face collision, abort instead of inventing'
+          Path('/tmp/walk_real_c1l1.g66c').write_bytes(matches[0])
+          PY
+      - name: Prove default B14 zero boot can be moved to closest ORIGINAL sourced stable collision floor with at least six valid grounded directions
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/walk_fix -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/walk_fix/test_real_2010_C1L1_ground_boot_candidate.c \
+            research/b24_unified/walk_fix/vita_source_walkable_boot_fix.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/walk_regression
+          /tmp/walk_regression /tmp/walk_real_c1l1.g66c | tee /tmp/walk_regression_out.txt
+          test -z "$(find research -name '*.vpk' -print -quit)"
+      - name: Preserve small test result only, not owner's game binaries
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: WALK_REAL_2010_C1L1_STABLE_SOURCE_BOOT_HOST_NO_VPK
+          path: /tmp/walk_regression_out.txt
+          retention-days: 21
+          if-no-files-found: error
