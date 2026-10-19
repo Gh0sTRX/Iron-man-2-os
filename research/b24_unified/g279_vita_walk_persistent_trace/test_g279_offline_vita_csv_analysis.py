@@ -24,7 +24,7 @@ def specimen(phase,frame,verdict):
 
 def make(path,rows,header=None):
  with path.open("w",newline="",encoding="utf-8") as f:
-  w=csv.DictWriter(f,fieldnames=header or a.COLUMNS)
+  w=csv.DictWriter(f,fieldnames=header or a.COLUMNS,extrasaction="ignore")
   w.writeheader()
   for row in rows:w.writerow(row)
 
