@@ -1,0 +1,42 @@
+{
+  "title": "Iron Man 2 PS Vita — one test VPK SOURCE integration gate (device QA happens AFTER this VPK)",
+  "updated": "2026-10-19",
+  "purpose": "Required source/host/Vita ARM build acceptance BEFORE producing exactly one integrated test VPK. These are NOT post-VPK on-hardware confirmations.",
+  "gates": {
+    "authentic_MC_initial_world_root_and_source_ground_collision_bound": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "Original class112 MC authored transform and parent/relative/world root to boot ground feet XYZ, original C1L1 G66C collision and G75 must agree; G254 original PositionData loader known but runtime parent root unresolved."
+    },
+    "ground_hover_flight_rush_one_integrator_source_QA_pass": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "Same B14 movement owner and genuine G75 collision, G8 animation, G229 telemetry compile; 8-way ground/flight regression across original spawn/scene and authentic gameplay-level transitions must pass without wall deletion."
+    },
+    "all_target_armor_authentic_animation_rig_state_input_event_routed": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "338 original player clip names and rig-compatible streams, actual G8/G83 selected with native 2010 StateData/StateMgr events, complete walking/hover/aim and War Machine pose family; no static route only."
+    },
+    "original_weaponDB_combat_melee_damage_WM_weapons_source_integrated": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "True 2010 native AttackType/WeaponDB[0,1,4] resolved, repulsor/walkfire, melee combo/hit frames/target damage, missile lock-on, War Machine gatling+missiles from original evidence, target dummy hurt."
+    },
+    "source_city_hero_vehicle_scale_sky_light_alpha_HUD_camera_integrated": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "Exact source C1L1 city road, buildings, car/body scaling with original scene transforms; 2010 night sky/lighting/moon, alpha/shadow, shoulder aim crosshair and flight centered camera as specified."
+    },
+    "original_Mission000_cutscene_QTE_sound_waves_and_success_host_integrated": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "Source original Mission000 intro QTE1456, true SetState ShowTut, original audio/cutscene, spawn enemy waves from class71 with health/hit, mission conditions/resume/end host integration and fail closed missing handlers."
+    },
+    "final_single_game_Vita_ARM_ELF_and_all_C11_QA_pass_same_commit": {
+      "source_ready": false,
+      "evidence_uri": null,
+      "test_details": "One source tree builds full vita im2_beta ARM ELF only (no VPK) with gameplay/mission/physics/audio/renderer original-source host QA, no editor placeholders, severe tests unblocked."
+    }
+  }
+}
