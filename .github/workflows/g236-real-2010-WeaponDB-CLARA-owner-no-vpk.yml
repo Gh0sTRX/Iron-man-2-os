@@ -1,0 +1,63 @@
+name: G236 Original 2010 WeaponDB Methods and C1L1 Attack Owners (No VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g236_true_2010_weaponDB_asset_owner/**"
+      - ".github/workflows/g236-real-2010-WeaponDB-CLARA-owner-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_iOS_Source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate genuine native and CLARA source decoder syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            research/b24_unified/g236_true_2010_weaponDB_asset_owner/g236_original_MachO_WeaponDB_loader_and_C1L1_attack_owner_audit.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Install native original 2010 iOS ARM and Drive dependencies
+        run: python3 -m pip install -q capstone gdown
+      - name: Retrieve original user 2010 iOS IPA privately and transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g236_private_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g236_private_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g236_private_original/owner.ipa
+          test "$(wc -c </tmp/g236_private_original/owner.ipa)" -eq 248613763
+      - name: Authenticate original WeaponDB native methods and C1L1 26 Attack 13 Weapon scene objects
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g236_true_2010_weaponDB_asset_owner/g236_original_MachO_WeaponDB_loader_and_C1L1_attack_owner_audit.py \
+            --ipa /tmp/g236_private_original/owner.ipa \
+            --out /tmp/g236_verified/G236_TRUE_2010_WEAPON_DB_LOADER_C1L1_TYPED_ATTACK_OWNER.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g236_verified/G236_TRUE_2010_WEAPON_DB_LOADER_C1L1_TYPED_ATTACK_OWNER.json').read_text())
+          assert d['original_native_Cpp_symbol_total']>=60000
+          assert d['original_C1L1_2010_typed_attack_count']==26
+          assert d['original_C1L1_2010_typed_weapon_count']==13
+          assert len(d['genuine_WeaponDB_WeaponMgr_AttackEntity_WeaponEntity_method_inventory']['WeaponDB'])>=2
+          assert not d['original_2010_WeaponDB_entry_0_is_Attack_type0_PROVEN']
+          assert not d['original_2010_WeaponDB_entry_1_is_Attack_type1_PROVEN']
+          assert not d['original_global_weaponDB_array_insertion_order_proven']
+          assert not d['Vita_gameplay_motion_weapon_damage_or_projectile_changed']
+          assert d['NO_VPK']
+          print('PASS G236 original iOS C++ WeaponDB loader/owner and actual typed level1 attack objects, UNKNOWN global index insertion order')
+          PY
+      - name: Erase owner's original licensed 2010 IPA and executable
+        if: always()
+        run: rm -rf /tmp/g236_private_original
+      - name: Upload only real source C++ method labels and typed object names
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G236_TRUE_ORIGINAL_2010_WEAPONDB_AND_C1L1_ATTACK_SOURCE_NO_VPK
+          path: /tmp/g236_verified/
+          retention-days: 21
+          if-no-files-found: error
