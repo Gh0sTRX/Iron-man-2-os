@@ -8,6 +8,7 @@
 #include "b14_world.h"
 #include "b24_g75_source_capsule.h"
 #include "b24_gpu_g68_collision.h"
+#include "b24_g156_exact_vertical_triangle_contact.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -60,10 +61,18 @@ int main(int argc,char **argv){
  B24C1OriginalCollision city={0};
  assert(b24_g70_g68_collision_load(&city,argv[1]));
  assert(city.ready&&city.count==1910u&&city.wall_count==1690u);
+ /* Keep the authored source wall: exact G171 native triangle, no deletion. */
+ assert(city.faces[715u].wall);
+ assert(b24_g156_exact_vertical_triangle_contact(city.faces[715u].xyz,
+     -1.319f,-6.747f,.0725f,.35f,2.24f));
+ puts("G249 ORIGINAL G66C wall face715 intersects MC local XY at low ground; actual mission spawn UNKNOWN");
  const G248Point positions[]={
   {0.f,0.f,0.f,"B14_HOME_SOURCE_BOOT_NOT_ORIGINAL_MISSION_SPAWN"},
   {-160.f,-160.f,2.6937f,"ORIGINAL_G66M_ROAD_SOURCE_TEST"},
-  {-1.319f,-6.747f,.0725f,"ORIGINAL_CLARA_MC_LOCAL_XY_NOT_RUNTIME_SPAWN"}
+  {-1.319f,-6.747f,.0725f,"MC_ORIGINAL_LOW_G66C_SUPPORT_NOT_RUNTIME_SPAWN"},
+  {-1.319f,-6.747f,2.82955f,"MC_ORIGINAL_MID_G66C_SUPPORT_NOT_RUNTIME_SPAWN"},
+  {-1.319f,-6.747f,6.673064f,"MC_ORIGINAL_HIGH_G66C_SUPPORT_NOT_RUNTIME_SPAWN"},
+  {-1.319f,-6.747f,25.054f,"MC_AUTHORED_TRANSFORM_Z_NOT_RUNTIME_SPAWN"}
  };
  const float dir[8][2]={
   {0.f,1.f},{0.f,-1.f},{1.f,0.f},{-1.f,0.f},
@@ -84,12 +93,12 @@ int main(int argc,char **argv){
    }
   }
  }
- assert(total==48u);
+ assert(total==96u);
  /* Our already source-verified first safe B14 boot move +Y MUST still
   * translate; a regression here is real and test MUST stop release. */
  const G248Result forward=replay(&city,positions[0],0,0.f,1.f);
  assert(forward.accepts>15u&&forward.fy>1.12f);
- printf("G248 HOST SOURCE SUMMARY real_geometry=1910 positive_ground_directions=%u/24 positive_flight_directions=%u/24 nonzero_ground_collision_rejections=%u/24; physical_Vita_test=NO; actual_2010_touch_ground_speed=UNKNOWN; NO_VPK\n",moving_ground,moving_flight,reject_ground);
+ printf("G249 EXTENDED ORIGINAL-SOURCE real_geometry=1910 wall715_MC_low_intersection=YES positive_ground_directions=%u/48 positive_flight_directions=%u/48 nonzero_ground_collision_rejections=%u/48; physical_Vita_test=NO; actual_2010_touch_ground_speed=UNKNOWN; NO_VPK\n",moving_ground,moving_flight,reject_ground);
  assert(moving_ground>=1u && moving_flight>=1u);
  b24_c1_original_collision_free(&city);
  return 0;
