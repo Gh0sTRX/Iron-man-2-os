@@ -97,7 +97,7 @@ def main(ipa:Path,out:Path,header:Path):
   typed_nodes=p["matching_native_typed_source_nodes"]
   node_id=typed_nodes[0]["native_scene_ID"] if len(typed_nodes)==1 else -1
   x,y,z=p["position_XYZ"]
-  code.append(' {"%s",%.9gf,%.9gf,%.9gf,%d},'%(p["node"],x,y,z,node_id))
+  code.append(' {"%s",%.9ff,%.9ff,%.9ff,%d},'%(p["node"],x,y,z,node_id))
  code.extend(["};","#endif",""])
  header.write_text("\n".join(code))
  print("G250 original 2010 source typed static Lua SpawnPoint direct mentions",sum(len(v) for v in links.values()))
