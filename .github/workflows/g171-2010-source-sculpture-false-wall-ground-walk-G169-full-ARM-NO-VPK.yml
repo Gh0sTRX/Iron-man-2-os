@@ -803,6 +803,9 @@ jobs:
       - name: G167 actual B14 joystick ground first-spawn ticks through original G75 city collision diagnosis
         run: |
           set -euo pipefail
+          echo 'WALK_FOCUS_ACTUAL_B14_MOVEMENT_SOURCE_BEGIN'
+          sed -n '1,70p' work/src/b14_world.c
+          echo 'WALK_FOCUS_ACTUAL_B14_MOVEMENT_SOURCE_END'
           mkdir -p 'app0:assets'
           ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
           cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
