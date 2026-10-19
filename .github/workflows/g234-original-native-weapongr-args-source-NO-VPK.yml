@@ -1,0 +1,59 @@
+name: G234 Verify original 2010 WeaponMgr GetWeapon vs Assistant ARM args NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g234_original_attack_weapon_argument_provenance/**"
+      - ".github/workflows/g234-original-native-weapongr-args-source-NO-VPK.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_arm_callee_args:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify source-only code syntax
+        run: python3 -m py_compile research/b24_unified/g234_original_attack_weapon_argument_provenance/g234_source_verified_original_ARM_WeaponMgr_argument_windows.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g234_arm
+      - uses: actions/download-artifact@v4
+        with:
+          name: G233_TRUE_2010_IOS_CPP_SYMBOLS_EVENT_0_1_2_3_SOURCE_ONLY_NO_VPK
+          run-id: 39216296529
+          github-token: ${{ github.token }}
+          path: /tmp/g234_symbols
+      - name: Compare original GetWeapon vs GetAssistantWeapon callsites and candidate input register writers
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g234_original_attack_weapon_argument_provenance/g234_source_verified_original_ARM_WeaponMgr_argument_windows.py \
+            --g196 /tmp/g234_arm/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --g233 /tmp/g234_symbols/G233_TRUE_ORIGINAL_2010_CPP_CALLEES_EVENT_0_1_2_3.json \
+            --out /tmp/g234_verified/G234_AUTHENTIC_WEAPONMGR_ARM_CALL_ARG_CONTEXT_NO_VPK.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/g234_verified/G234_AUTHENTIC_WEAPONMGR_ARM_CALL_ARG_CONTEXT_NO_VPK.json').read_text())
+          assert r['verified_original_native_callsite_and_Cpp_identity_count']==7
+          assert r['original_source_WeaponMgr_weapon_and_assistant_paths_distinct_functions']
+          assert r['original_source_GetAttackEntityByIndex_shared_by_both_paths']
+          assert not r['original_WeaponMgr_GetWeapon_int_runtime_value_PROVEN']
+          assert not r['original_WM_missile_gatling_which_Index_and_button_PROVEN']
+          assert not r['Vita_input_damage_melee_weapon_or_G8_engine_modified']
+          assert r['NO_VPK']
+          print('G234 PASS real original native 2010 source C++ call identities, no fake input or damage')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G234_2010_ORIGINAL_WEAPONMGR_REAL_CALLSITE_ARG_SOURCE_NO_VPK
+          path: /tmp/g234_verified/
+          retention-days: 21
+          if-no-files-found: error
