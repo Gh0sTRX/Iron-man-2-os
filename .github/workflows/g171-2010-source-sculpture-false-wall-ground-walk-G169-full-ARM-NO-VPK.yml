@@ -214,6 +214,9 @@ jobs:
           grep -q 'b24_g218_observe_actually_loaded_G8_clip' work/src/main.c
           grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/CMakeLists.txt
           python3 research/b24_unified/g227_vita_walk_world_collision_gpu_qa/g227_install_passive_real_main_Vita_world_actor_root_diagnostic.py
+          python3 research/b24_unified/g229_vita_ground_motion_window/g229_install_window_into_real_vita_main.py
+          grep -q 'b24_g229_window_push' work/src/main.c
+          grep -q 'B24G229WalkWindow' work/src/main.c
           grep -q 'B24_G227_WALK_ROOT_DIAGNOSTIC' work/src/main.c
           grep -q 'b24_g227_qa_classify' work/src/main.c
           grep -q 'B24_G227_WALK_ROOT_DIAGNOSTIC' work/CMakeLists.txt
@@ -893,6 +896,14 @@ jobs:
             research/b24_unified/g227_vita_walk_world_collision_gpu_qa/test_g227_ground_world_root_qa_C11.c \
             -lm -o /tmp/g227_ground_root_source_test
           /tmp/g227_ground_root_source_test
+          # G239: also exercise the exact original G227 header + G229 120-frame
+          # temporal root/collision input proof used by THIS compiled Vita main.
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I work/b24/b24_unified \
+            research/b24_unified/g229_vita_ground_motion_window/test_g229_ground_trajectory_window.c \
+            -lm -o /tmp/g239_actual_Vita_telemetry_C11
+          /tmp/g239_actual_Vita_telemetry_C11
+          python3 research/b24_unified/g229_vita_ground_motion_window/test_g229_installer.py
           python3 - <<'PY'
           from pathlib import Path
           m=Path('work/src/main.c').read_text()
@@ -901,6 +912,10 @@ jobs:
           assert m.count('b24_gpu_runtime_draw(&b24_gpu_rt,&model,&camera,&b24_game,idx)')==1
           assert m.count('b16_combat_fire(&combat,&world,muzzle)')==1
           assert m.count('SDL_Log("G227_WALK_ROOT')==1
+          assert m.count('b24_g229_window_push(&b24_g229_window,&b24_g227_probe,(uint32_t)now)')==1
+          assert m.count('SDL_Log("G229_WALK_WINDOW')==1
+          assert m.count('B24G229WalkWindow b24_g229_window={0}')==1
+          assert 'B24_G227_WALK_ROOT_DIAGNOSTIC' in Path('work/CMakeLists.txt').read_text()
           assert 'b24_gpu_rt.frame_pose.x' in m
           assert 'b24_gpu_rt.frame_pose.y' in m
           assert 'b24_g227_probe.old_world_x=old_c1x;' in m
