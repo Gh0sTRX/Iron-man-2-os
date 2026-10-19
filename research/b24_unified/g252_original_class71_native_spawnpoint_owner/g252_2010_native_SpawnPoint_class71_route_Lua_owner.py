@@ -32,7 +32,7 @@ def main(ipa:Path,g250:Path,out:Path):
  sym=macho["entries"]
  dem=subprocess.run(["c++filt"],input="\n".join(row[0] for row in sym)+"\n",
     text=True,capture_output=True,check=True).stdout.splitlines()
- if len(sym)!=65500 or len(dem)!=len(sym):raise ValueError("original native C++ names drift")
+ if macho["nsyms"]!=65500 or len(dem)!=len(sym):raise ValueError("original native C++ names drift")
  names=collections.defaultdict(set)
  for s,name in zip(sym,dem):
   names[s[1]&~1].add(name)
