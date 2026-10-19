@@ -1,0 +1,80 @@
+name: G274 Original 2010 PositionDummy Class36 Num to Native Position1 Loader No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g274_original_positiondummy_root_Num_and_native_mode1/**"
+      - ".github/workflows/g274-original-PD-Num-zero-native-mode1-source-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_PD_Num_source_and_native_loader:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile exact 2010 native mode1 PositionDummy Num parser
+        run: python3 -m py_compile research/b24_unified/g274_original_positiondummy_root_Num_and_native_mode1/g274_original_2010_Class36_Num_zero_one_position_native_loader.py
+      - name: Install original 2010 iOS private game archive downloader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G271_ORIGINAL_2010_POSITIONDUMMY_Cpp_RUNTIME_METHODS_NO_VPK
+          run-id: 39270715487
+          github-token: ${{ github.token }}
+          path: /tmp/g274_native_cpp
+      - uses: actions/download-artifact@v4
+        with:
+          name: G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_STRING_AND_FLOAT_NO_VPK
+          run-id: 39271120298
+          github-token: ${{ github.token }}
+          path: /tmp/g274_cpp_strings
+      - uses: actions/download-artifact@v4
+        with:
+          name: G273_ORIGINAL_2010_POSITIONDUMMY_SOURCE_NUM_PARENT_TLV_NO_VPK
+          run-id: 39271460153
+          github-token: ${{ github.token }}
+          path: /tmp/g274_original_source_field
+      - name: Fetch original user-owned iOS 2010 IPA only in temporary private GitHub CI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g274_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g274_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g274_original_owner/owner.ipa
+          test "$(wc -c </tmp/g274_original_owner/owner.ipa)" -eq 248613763
+      - name: Verify original class36 Num authored root + PositionDummyEntity C++ one-Position GetPosition select
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g274_original_positiondummy_root_Num_and_native_mode1/g274_original_2010_Class36_Num_zero_one_position_native_loader.py \
+            --ipa /tmp/g274_original_owner/owner.ipa \
+            --g271 /tmp/g274_native_cpp/G271_2010_ORIGINAL_PositionDummyEntity_CPP_LOAD_AND_MOVETO_NATIVE_ARM.json \
+            --g272 /tmp/g274_cpp_strings/G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_KEYS_AND_POSITION_F32.json \
+            --g273 /tmp/g274_original_source_field/G273_ORIGINAL_2010_PD_POSITIONDUMMY_NUM_ROOT_TLV_CANDIDATES.json \
+            --out /tmp/g274_report/G274_TRUE_ORIGINAL_2010_CLASS36_NUM_DEFAULT_MODE_POSITION1.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g274_report/G274_TRUE_ORIGINAL_2010_CLASS36_NUM_DEFAULT_MODE_POSITION1.json').read_text())
+          assert d['original_Mission000_goal_PD_IM_jump_goal_actual_root_Num_int']==0
+          assert d['original_Mission000_goal_PositionDummy_native_loaded_component_count']==1
+          assert d['original_control_PD_MC_actual_root_Num_int']==0
+          assert d['original_native_2010_PositionDummy_GetPosition_mode1_reads_Position1_XYZ']
+          assert not d['first_serialized_child_is_Runtime_Position1_via_original_class_schema_confirmed']
+          assert not d['real_original_runtime_Mission000_MC_move_target_absolute_world_XYZ_proven']
+          assert not d['Vita_ground_root_or_collision_changed']
+          assert d['NO_VPK']
+          print('G274 PASS source real PD Num0 and iOS runtime C++ mode1, full world position unproven NO VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete copyrighted game source from private CI runner
+        if: always()
+        run: rm -rf /tmp/g274_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G274_ORIGINAL_2010_POSITIONDUMMY_NUM_MODE_ONE_NO_VPK
+          path: /tmp/g274_report/
+          retention-days: 21
+          if-no-files-found: error
