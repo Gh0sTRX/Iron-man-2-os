@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 POST=ROOT/"g83_final_vpk_gate"/"READINESS_STATUS.json"
 PRE=ROOT/"g255_single_integrated_VPK_acceptance_gate"/"SOURCE_PRE_VPK_READINESS.json"
 OUT=Path("/tmp/g255_vpk_release_guard/G255_SINGLE_VPK_SOURCE_AND_HARDWARE_ACCEPTANCE_STATUS.json")
-PRE_REQUIRED={
+PRE_ORDER=(
  "authentic_MC_initial_world_root_and_source_ground_collision_bound",
  "ground_hover_flight_rush_one_integrator_source_QA_pass",
  "all_target_armor_authentic_animation_rig_state_input_event_routed",
@@ -19,7 +19,7 @@ PRE_REQUIRED={
  "source_city_hero_vehicle_scale_sky_light_alpha_HUD_camera_integrated",
  "original_Mission000_cutscene_QTE_sound_waves_and_success_host_integrated",
  "final_single_game_Vita_ARM_ELF_and_all_C11_QA_pass_same_commit",
-}
+)
 POST_REQUIRED={
  "original_2010_972_animation_source_record_indexed",
  "all_338_player_named_clips_implemented_as_rig_compatible_streams",
@@ -43,7 +43,7 @@ HARDWARE_REQUIRED={
 def checked(path:Path,expected:set[str],flag:str,requires_hardware:bool):
  doc=json.loads(path.read_text())
  gates=doc.get("gates")
- if not isinstance(gates,dict) or set(gates)!=expected:
+ if not isinstance(gates,dict) or set(gates)!=set(expected):
   raise ValueError(f"G255 original gate schema changed unexpectedly {path}")
  passed=[];blocked=[]
  for key,item in gates.items():
@@ -61,11 +61,21 @@ def checked(path:Path,expected:set[str],flag:str,requires_hardware:bool):
   else:blocked.append(key)
  return passed,blocked
 def status(post:Path,pre:Path):
- ready,open_source=checked(pre,PRE_REQUIRED,"source_ready",False)
+ pre_json=json.loads(pre.read_text())
+ pre_gates=pre_json.get("gates",{})
+ if list(pre_gates)!=list(PRE_ORDER):
+  raise ValueError("G259 original user-requested one-VPK work order changed: keep native MC boot, ground, animation, combat, visuals INCLUDING LIGHTING, mission, ELF")
+ visual=pre_gates["source_city_hero_vehicle_scale_sky_light_alpha_HUD_camera_integrated"]["test_details"].lower()
+ for word in ("lighting","sun001..004","ambient","shadow","alpha","armor","vehicle"):
+  if word not in visual:
+   raise ValueError(f"G259 original C1L1 lighting mandate silently removed from unchanged fifth visual gate: {word}")
+ ready,open_source=checked(pre,PRE_ORDER,"source_ready",False)
  passed,open_device=checked(post,POST_REQUIRED,"verified",True)
  return {
   "policy":"TWO STAGES: finish 7 authentic original source host and Vita ARM acceptance checks, produce exactly one test VPK; subsequently verify 12 physical/parity quality checks on that VPK. NEVER demand first-device QA before packaging.",
-  "source_preflight_gates_total":len(PRE_REQUIRED),
+  "source_preflight_gates_total":len(PRE_ORDER),
+  "original_seven_workstream_order_verified_unchanged":True,
+  "lighting_mandatory_in_unchanged_fifth_map_visuals_gate":True,
   "source_preflight_verified":ready,
   "source_preflight_blockers":open_source,
   "source_preflight_verified_count":len(ready),
