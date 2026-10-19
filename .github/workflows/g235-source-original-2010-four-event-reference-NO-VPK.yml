@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Source audit: G197 upper original 2010 ARM table and G235 native event 0..3 mapping
+      - name: "Source audit: G197 upper original 2010 ARM table and G235 native event 0..3 mapping"
         shell: bash
         run: |
           set -euo pipefail
