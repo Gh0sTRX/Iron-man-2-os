@@ -14,6 +14,7 @@ on:
       - "research/b24_unified/g226_vita_original_ground_render_root_audit/**"
       - "research/b24_unified/g227_vita_walk_world_collision_gpu_qa/**"
       - "research/b24_unified/g229_vita_ground_motion_window/**"
+      - "research/b24_unified/g277_vita_real_ground_collision_reason_counter/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -225,6 +226,9 @@ jobs:
           grep -q 'B24_G218_SOURCE_STATE_OBSERVER' work/CMakeLists.txt
           python3 research/b24_unified/g227_vita_walk_world_collision_gpu_qa/g227_install_passive_real_main_Vita_world_actor_root_diagnostic.py
           python3 research/b24_unified/g229_vita_ground_motion_window/g229_install_window_into_real_vita_main.py
+          python3 research/b24_unified/g277_vita_real_ground_collision_reason_counter/g277_install_original_G75_wall_floor_step_reject_probe_after_G229_NO_VPK.py
+          grep -q 'G277_GROUND_REJECTION_BREAKDOWN' work/src/main.c
+          grep -q 'g277_last.candidate_wall_reject' work/b24/b24_unified/b24_g75_source_capsule.c
           grep -q 'b24_g229_window_push' work/src/main.c
           grep -q 'B24G229WalkWindow' work/src/main.c
           grep -q 'B24_G227_WALK_ROOT_DIAGNOSTIC' work/src/main.c
