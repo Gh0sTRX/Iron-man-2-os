@@ -42,6 +42,34 @@ def run(ipa:Path,g244:Path,out:Path):
  cs=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM);cs.detail=True
  ops=list(cs.disasm(exe[off:off+size],VM))
  if not ops or ops[0].address!=VM:raise ValueError("2010 original ARM method not decoded")
+ source_ops={o.address:(o.mnemonic,o.op_str) for o in ops}
+ # Genuine source EntityData fields:
+ # member +0 original source name id; +4 optional source UTF name;
+ # +8 source flags/byte; +0x14 source class ID, used directly by
+ # GS_GamePlay::LoadEntities source upper native dispatch G241.
+ # These three are NOT WeaponDB attack array indices or AttackType.
+ for addr,pair in {
+   0xd3588:("bl","#0x76948"),
+   0xd358c:("str","r0, [fp]"),
+   0xd3594:("bl","#0x769a4"),
+   0xd359c:("bne","#0xd3798"),
+   0xd35b0:("bl","#0x76948"),
+   0xd35b4:("str","r0, [fp, #0x14]"),
+   0xd35c8:("bl","#0x768f8"),
+   0xd379c:("mov","r2, #0x200"),
+   0xd37a4:("bl","#0x76a90"),
+   0xd37b0:("str","r0, [fp, #4]"),
+   0xd37b8:("bl","#0x769bc"),
+   0xd37c0:("str","r0, [fp, #8]"),
+ }.items():
+  if source_ops.get(addr)!=pair:
+   raise ValueError(f"G245 original EntityData name/flags/class tag reader drift {addr:#x}: {source_ops.get(addr)}")
+ for addr,nm in ((0x76948,"DataStream::ReadInt()"),
+                 (0x769a4,"DataStream::ReadUnsignedByte()"),
+                 (0x76a90,"DataStream::ReadUTF(char*, int)"),
+                 (0x769bc,"DataStream::ReadByte()")):
+  if nm not in names.get(addr,()):
+   raise ValueError(f"G245 authentic DataStream C++ source name drift {nm}")
  rows=[];reads=[];member_ops=[]
  for op in ops:
   row={"VM":hex(op.address),"op":op.mnemonic,"args":op.op_str}
@@ -66,6 +94,12 @@ def run(ipa:Path,g244:Path,out:Path):
   "original_native_DataStream_and_EntityData_direct_calls":reads,
   "candidate_source_native_instance_object_member_loads_stores":member_ops[:160],
   "parent_EntitiesData_sequential_36byte_array_insert_proven":True,
+  "real_original_2010_EntityData_source_class_ID_native_field_offset_0x14_proven":True,
+  "real_original_2010_EntityData_source_ID_at_offset0_proven":True,
+  "real_original_optional_ReadUTF_name_ptr_offset_0x04_proven":True,
+  "real_original_optional_name_flag_and_byte_at_offset_0x08_proven":True,
+  "source_2010_EntityData_class_ID_and_WeaponDB_attack_index_are_distinct_fields":True,
+
   "source_native_EntityData_reader_full_serialization_grammar_proven":False,
   "actual_2010_WeaponDB_index_0_1_4_to_C1L1_Attack_source_objects_proven":False,
   "actual_device_Vita_ground_motion_fix_proven":False,
