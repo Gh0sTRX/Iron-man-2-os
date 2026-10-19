@@ -1,0 +1,66 @@
+name: G240 Original 2010 GS_GamePlay LoadEntities WeaponDB Type Branch No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g240_original_LoadEntities_native_type_dispatch/**"
+      - ".github/workflows/g240-original-2010-LoadEntities-three-AddNew-types-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_original_2010_native_entity_registration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source-native original load-entities audit syntax
+        run: python3 -m py_compile research/b24_unified/g240_original_LoadEntities_native_type_dispatch/g240_native_2010_GS_GamePlay_LoadEntities_AddNew_type_branch_dataflow.py
+      - name: Original owner native disassembler dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G238_TRUE_2010_WEAPONDB_NATIVE_CALLERS_VS_DISK_ORDER_SOURCE_NO_VPK
+          run-id: 39220623704
+          github-token: ${{ github.token }}
+          path: /tmp/g240_original_prior
+      - name: Read owner authentic iOS 2010 IPA in PRIVATE ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g240_private_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g240_private_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g240_private_original/owner.ipa
+          test "$(wc -c </tmp/g240_private_original/owner.ipa)" -eq 248613763
+      - name: Resolve authentic GS_GamePlay LoadEntities three native type branch callsites
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g240_original_LoadEntities_native_type_dispatch/g240_native_2010_GS_GamePlay_LoadEntities_AddNew_type_branch_dataflow.py \
+            --ipa /tmp/g240_private_original/owner.ipa \
+            --g238 /tmp/g240_original_prior/G238_2010_ORIGINAL_WEAPONDB_NATIVE_CALLER_VS_DISK_ORDER_NO_VPK.json \
+            --out /tmp/g240_verified/G240_ORIGINAL_2010_NATIVE_LOADENTITIES_THREE_TYPED_ADDS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g240_verified/G240_ORIGINAL_2010_NATIVE_LOADENTITIES_THREE_TYPED_ADDS.json').read_text())
+          assert d['true_original_native_method_VM']=='0xc2e8c'
+          assert len(d['real_original_three_weapon_registration_subbranches'])==3
+          assert d['real_original_native_method_CPP']=='GS_GamePlay::LoadEntities()'
+          assert not d['true_2010_scene_file_order_equal_registration_sequence_proven']
+          assert not d['real_original_runtime_GetEntityData_iteration_order_proven']
+          assert not d['original_2010_iOS_touch_missile_gatling_input_mapped']
+          assert not d['Vita_original_level1_gameplay_changed']
+          assert d['NO_VPK']
+          print('G240 TRUE original native source LoadEntities C++ branches PASS. WeaponDB actual runtime order not assumed.')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original licensed owner app from private temporary runner
+        if: always()
+        run: rm -rf /tmp/g240_private_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G240_SOURCE_TRUE_2010_NATIVE_LOADENTITIES_ATTACK_WEAPON_ACCESSORY_NO_VPK
+          path: /tmp/g240_verified/
+          retention-days: 21
+          if-no-files-found: error
