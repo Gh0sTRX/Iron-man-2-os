@@ -1,0 +1,74 @@
+name: G233 Verify 2010 DoAttack event 0-3 native BL symbols (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g233_original_2010_native_exact_callee_symbols/**"
+      - ".github/workflows/g233-2010-original-event-bl-callee-symbols-NO-VPK.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_source_symbols:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax and original licensed iOS MachO parser provenance
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            research/b24_unified/g233_original_2010_native_exact_callee_symbols/g233_map_G232_BL_sites_to_true_owner_MachO_cpp_methods.py \
+            research/b24_unified/g76_original_combat/g76_2010_native_arm_combat_method_provenance.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Install verified original MachO Python parser dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g233_genuine_opcode_audit
+      - name: Retrieve user's authentic original 2010 IPA into ephemeral PRIVATE CI only
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g233_original_source
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g233_original_source/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g233_original_source/owner.ipa
+          test "$(wc -c </tmp/g233_original_source/owner.ipa)" -eq 248613763
+      - name: Resolve actual four source event branch C++ functions with exact vs nearest MachO labels
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g233_original_2010_native_exact_callee_symbols/g233_map_G232_BL_sites_to_true_owner_MachO_cpp_methods.py \
+            --ipa /tmp/g233_original_source/owner.ipa \
+            --g196 /tmp/g233_genuine_opcode_audit/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --out /tmp/g233_verified_source/G233_TRUE_ORIGINAL_2010_CPP_CALLEES_EVENT_0_1_2_3.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          r=json.loads(Path("/tmp/g233_verified_source/G233_TRUE_ORIGINAL_2010_CPP_CALLEES_EVENT_0_1_2_3.json").read_text())
+          assert r["real_native_MachO_symbol_count"]>=60000
+          assert r["source_G196_independent_original_2010_BL_opcode_crosscheck_passed"]
+          assert len(r["original_per_0_1_2_3_event_static_BL_calls"])==4
+          sources={int(x["direct_BL_target_VM"],16):x for x in r["true_original_2010_direct_targets_resolution"]}
+          assert set(sources)=={0x7fd3c,0x7b36c,0xb1f14,0xab324,0xab3ec,0xc1078,0xc2528,0xb1d2c,0xf60ac}
+          assert sources[0xf60ac]["exact_original_native_symbol_entry"]
+          assert any("MainCharacter::DoUniBeamAttack(" in name for name in sources[0xf60ac]["exact_original_2010_cpp_names"])
+          assert not r["event_0_1_2_3_full_runtime_semantics_PROVEN"]
+          assert not r["WarMachine_AimM_gatling_missile_mapping_PROVEN"]
+          assert not r["actual_Vita_gameplay_controller_or_weapon_modified"]
+          assert r["NO_VPK"]
+          print("G233 original native 2010 exact symbol/callsite cross-check passed. No fake ARM input meaning.")
+          PY
+      - name: Erase original licensed IPA executable after analysis
+        if: always()
+        run: rm -rf /tmp/g233_original_source
+      - name: Publish only source-derived labels, addresses and uncertainty; never iOS binaries
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G233_TRUE_2010_IOS_CPP_SYMBOLS_EVENT_0_1_2_3_SOURCE_ONLY_NO_VPK
+          path: /tmp/g233_verified_source/
+          retention-days: 21
+          if-no-files-found: error
