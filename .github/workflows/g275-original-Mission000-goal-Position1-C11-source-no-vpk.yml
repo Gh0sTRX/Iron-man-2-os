@@ -1,0 +1,93 @@
+name: G275 Genuine 2010 Mission000 Position1 Source Host Reference One VPK Deferred
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g275_original_Mission000_PD_goal_readonly_host_reference/**"
+      - ".github/workflows/g275-original-Mission000-goal-Position1-C11-source-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_Mission000_authentic_position1_source_reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate G275 original iOS source mission actor/target C11 metadata builder syntax
+        run: python3 -m py_compile research/b24_unified/g275_original_Mission000_PD_goal_readonly_host_reference/g275_original_2010_Num0_Position1_goal_source_evidence_to_C11.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G269_ORIGINAL_2010_C1L1_THREE_GOAL_POSITIONDUMMY_ARM_NO_VPK
+          run-id: 39270034638
+          github-token: ${{ github.token }}
+          path: /tmp/g275_original_source_three
+      - uses: actions/download-artifact@v4
+        with:
+          name: G271_ORIGINAL_2010_POSITIONDUMMY_Cpp_RUNTIME_METHODS_NO_VPK
+          run-id: 39270715487
+          github-token: ${{ github.token }}
+          path: /tmp/g275_original_native_lua
+      - uses: actions/download-artifact@v4
+        with:
+          name: G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_STRING_AND_FLOAT_NO_VPK
+          run-id: 39271120298
+          github-token: ${{ github.token }}
+          path: /tmp/g275_true_field_names
+      - uses: actions/download-artifact@v4
+        with:
+          name: G274_ORIGINAL_2010_POSITIONDUMMY_NUM_MODE_ONE_NO_VPK
+          run-id: 39272328775
+          github-token: ${{ github.token }}
+          path: /tmp/g275_class36_num
+      - name: Build original 2010 script goal read-only C11 source reference from original native owner evidence
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g275_original_Mission000_PD_goal_readonly_host_reference/g275_original_2010_Num0_Position1_goal_source_evidence_to_C11.py \
+            --g269 /tmp/g275_original_source_three/G269_ORIGINAL_2010_MISSION000_JUMP_GOAL_THREE_NATIVE_TYPED_COMPONENTS.json \
+            --g271 /tmp/g275_original_native_lua/G271_2010_ORIGINAL_PositionDummyEntity_CPP_LOAD_AND_MOVETO_NATIVE_ARM.json \
+            --g272 /tmp/g275_true_field_names/G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_KEYS_AND_POSITION_F32.json \
+            --g274 /tmp/g275_class36_num/G274_TRUE_ORIGINAL_2010_CLASS36_NUM_DEFAULT_MODE_POSITION1.json \
+            --out /tmp/g275_verified_reference/G275_ORIGINAL_2010_MISSION000_NUM0_POSITION1_SOURCE_PROVENANCE.json \
+            --header /tmp/g275_verified_reference/b24_g275_original_2010_scripted_movement_goal_source.h
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g275_verified_reference/G275_ORIGINAL_2010_MISSION000_NUM0_POSITION1_SOURCE_PROVENANCE.json').read_text())
+          assert d['original_Lua_MoveEntityToEntity_source_args']==[1062,1892,3000]
+          assert d['original_source_PD_IM_jump_goal_Num']==0
+          assert d['authentic_native_LoadFromFile_Num_plus_1_component_count']==1
+          assert d['genuine_original_first_serialized_position_child_ID']==1893
+          assert d['source_original_first_serialized_child_local_XYZ']==[-0.493,-28.062,3.705]
+          assert not d['exact_original_2010_serialized_child_to_Component_2010_RAM_lookup_index_proven']
+          assert not d['actual_MC_cinematic_destination_in_world_coordinates_or_feet_ground_height_PROVEN']
+          assert d['NO_VPK']
+          print('G275 PASS original 2010 source first goal component local XYZ, not real player world boot')
+          PY
+          cat >/tmp/g275_original_C11_smoke.c <<'EOF'
+          #include "b24_g275_original_2010_scripted_movement_goal_source.h"
+          #include <assert.h>
+          #include <math.h>
+          int main(void) {
+            const IM2G275OriginalGoal *p=&im2_g275_original_mission000_move_source;
+            assert(p->source_actor_id==1062&&p->source_target_id==1892);
+            assert(p->original_lua_duration_arg==3000&&p->original_source_PositionDummy_Num==0);
+            assert(p->native_selected_component_count==1&&p->original_first_child_id==1893);
+            assert(fabsf(p->first_authored_local_x-(-0.493f))<0.00001f);
+            assert(fabsf(p->first_authored_local_y-(-28.062f))<0.00001f);
+            assert(fabsf(p->first_authored_local_z-3.705f)<0.00001f);
+            return 0;
+          }
+          EOF
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic -I /tmp/g275_verified_reference \
+            /tmp/g275_original_C11_smoke.c -lm -o /tmp/g275_original_C11_smoke
+          /tmp/g275_original_C11_smoke
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G275_TRUE_2010_MISSION000_NUM0_POSITION1_C11_QA_NO_VPK
+          path: /tmp/g275_verified_reference/
+          retention-days: 21
+          if-no-files-found: error
