@@ -676,6 +676,28 @@ jobs:
           rm -f 'app0:assets/G66_city.g66m'
           rmdir 'app0:assets'
           test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G248 C1L1 B14 G75 G159 G171 source-authored 8-direction ground flight replay NO VPK
+        run: |
+          set -euo pipefail
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=1 \
+            -I work/src -I work/b24/b24_unified \
+            work/src/b14_world.c \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g248_original_vita_ground_8dir_source_replay/test_g248_G171_real_grounded_8way_input_collision_Flight_source.c \
+            -lm -o /tmp/g248_original_2010_source_8way_ground_air
+          /tmp/g248_original_2010_source_8way_ground_air work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
       - name: G170 identify exact original 2010 G66C WALL versus visible opaque G66M candidate at blocked walk origin
         run: |
           set -euo pipefail
