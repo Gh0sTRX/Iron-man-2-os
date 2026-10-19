@@ -1,0 +1,64 @@
+name: G272 Original 2010 PositionDummy Three Component Keys and GetPosition Factors No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g272_original_PositionDummy_three_component_names_and_average/**"
+      - ".github/workflows/g272-original-PositionDummy-3component-string-and-average-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_true_original_PositionDummy_component_keys_and_factors:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate exact original ARM PC-relative PositionDummy component string parser
+        run: python3 -m py_compile research/b24_unified/g272_original_PositionDummy_three_component_names_and_average/g272_original_2010_PositionDummyEntity_property_Cstrings_and_GetPosition_floats.py
+      - name: Install original C++ native ARM source dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G271_ORIGINAL_2010_POSITIONDUMMY_Cpp_RUNTIME_METHODS_NO_VPK
+          run-id: 39270715487
+          github-token: ${{ github.token }}
+          path: /tmp/g272_orig_Cpp
+      - name: Read authentic original owner 2010 IPA only in private GitHub runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g272_orig_game
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g272_orig_game/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g272_orig_game/owner.ipa
+          test "$(wc -c </tmp/g272_orig_game/owner.ipa)" -eq 248613763
+      - name: Prove original PositionDummy typed component C strings and literal average/offset factors
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g272_original_PositionDummy_three_component_names_and_average/g272_original_2010_PositionDummyEntity_property_Cstrings_and_GetPosition_floats.py \
+            --ipa /tmp/g272_orig_game/owner.ipa \
+            --g271 /tmp/g272_orig_Cpp/G271_2010_ORIGINAL_PositionDummyEntity_CPP_LOAD_AND_MOVETO_NATIVE_ARM.json \
+            --out /tmp/g272_metadata/G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_KEYS_AND_POSITION_F32.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g272_metadata/G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_KEYS_AND_POSITION_F32.json').read_text())
+          assert d['original_PositionDummyEntity_Cpp_loader_VM']=='0xd2ed8'
+          assert len(d['actual_native_original_four_typed_positiondummy_property_names'])==4
+          assert len(d['actual_native_original_GetPosition_and_GetAbsolutePosition_f32_factors'])==4
+          assert d['original_PositionDummyEntity_one_two_three_position_count_branch_proven']
+          assert not d['original_Mission000_PD_IM_jump_goal_authored_count_integer_from_C1L1_proven']
+          assert d['NO_VPK']
+          print('G272 PASS original 2010 PositionDummy true native source C string/f32 constants; no false world goal')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original 2010 copyrighted IPA from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g272_orig_game
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_STRING_AND_FLOAT_NO_VPK
+          path: /tmp/g272_metadata/
+          retention-days: 21
+          if-no-files-found: error
