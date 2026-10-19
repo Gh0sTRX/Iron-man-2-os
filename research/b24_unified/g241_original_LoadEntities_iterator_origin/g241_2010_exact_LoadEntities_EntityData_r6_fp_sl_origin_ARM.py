@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse,bisect,hashlib,json,subprocess,sys,zipfile
 from pathlib import Path
 import capstone
-from capstone.arm import ARM_OP_IMM
+from capstone.arm import ARM_OP_IMM, ARM_INS_BL, ARM_INS_BLX
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"g76_original_combat"))
 from g76_2010_native_arm_combat_method_provenance import parse_macho
@@ -25,7 +25,7 @@ WINDOWS={
 }
 def opinfo(op,names):
  d={"vm":hex(op.address),"mnemonic":op.mnemonic,"args":op.op_str}
- if op.mnemonic.startswith(("bl","blx")) and op.operands and op.operands[0].type==ARM_OP_IMM:
+ if op.id in (ARM_INS_BL,ARM_INS_BLX) and op.operands and op.operands[0].type==ARM_OP_IMM:
   d["source_direct_BL_target_VM"]=hex(op.operands[0].imm&~1)
   d["source_exact_Cpp_labels"]=sorted(names.get(op.operands[0].imm&~1,()))[:3]
  return d
@@ -104,7 +104,7 @@ def run(ipa:Path,g240:Path,out:Path):
        "authentic_original_last_VM":hex(z),
        "original_native_ARM_opcode_metadata":sectionops,
        "source_instructions_are_static_NOT_observed_runtime":True})
- hits=[opinfo(op,labels) for op in ops if op.mnemonic.startswith(("bl","blx"))
+ hits=[opinfo(op,labels) for op in ops if op.id in (ARM_INS_BL,ARM_INS_BLX)
        and op.operands and op.operands[0].type==ARM_OP_IMM]
  result={
   "source":"G241 actual 2010 original owner MachO GS_GamePlay::LoadEntities exact ARM code source-only",
