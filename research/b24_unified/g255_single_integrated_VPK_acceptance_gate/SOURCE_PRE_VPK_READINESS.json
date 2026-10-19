@@ -26,7 +26,7 @@
     "source_city_hero_vehicle_scale_sky_light_alpha_HUD_camera_integrated": {
       "source_ready": false,
       "evidence_uri": null,
-      "test_details": "Exact source C1L1 city road, buildings, car/body scaling with original scene transforms; 2010 night sky/lighting/moon, alpha/shadow, shoulder aim crosshair and flight centered camera as specified."
+      "test_details": "Keep work order (1 native MC spawn/collision, 2 movement flight, 3 G8 animations, 4 original combat, 5 map/visuals INCLUDING LIGHTING, 6 Mission000, 7 same-commit Vita ARM ELF). At existing #5: source-authentic C1L1 scale for Iron Man/War Machine versus cars; original sky two night PVRTC atlas layers, moon and atmosphere; ORIGINAL FOUR Sun001..004 class Light placements/raw fields; prove per-light source color/type/intensity/shader/material semantics OR document remaining unknown, rather than passing experimental G72/G75 baked tint off as original; require environmental ambient, dynamic armor+vehicle illumination, material alpha/transparent depth, wall/ground/city light response, shadow/floor contact, camera/crosshair 3rd-person shoulder and centered flight, frame performance; source-host verification and actual GPU draw cross-compile. Lighting is MANDATORY at #5, not new or reordered workstream."
     },
     "original_Mission000_cutscene_QTE_sound_waves_and_success_host_integrated": {
       "source_ready": false,
