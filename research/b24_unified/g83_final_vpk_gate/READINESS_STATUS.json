@@ -1,7 +1,7 @@
 {
   "title": "Iron Man 2 B24 next test VPK source completion guard",
-  "updated": "2026-10-16",
-  "notes": "G89 truthfully approves ONLY the fully sourced 972/972 index gate; hardware gameplay and original hit/damage/AI remain unverified. Release readiness is not feature percentages.",
+  "updated": "2026-10-19",
+  "notes": "G255 original gameplay/ground/camera/mission and actual Vita hardware acceptance fail closed: G252-G254 source can explain C1L1 player boot, but source code analysis/host and ARM ELF compilation DO NOT prove Vita gameplay. Only original anim index gate verified. Single VPK test is deferred until all acceptance gates are justified; do not invent exact iOS runtime weapon values.",
   "gates": {
     "original_2010_972_animation_source_record_indexed": {
       "verified": true,
@@ -57,6 +57,11 @@
       "verified": false,
       "evidence_uri": null,
       "test_details": null
+    },
+    "original_Mission000_QTE_cutscene_audio_and_mission_complete_playable": {
+      "verified": false,
+      "evidence_uri": null,
+      "test_details": "Original user level1 Mission000 PC6 QTE1456, tutorial PC72/73, actor intro, audio, enemies, mission completion must all succeed in real integrated Vita gameplay; G137-G153 source callbacks and earlier Vita ARM ELF alone do not prove completion."
     }
   }
 }
