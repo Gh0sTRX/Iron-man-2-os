@@ -31,8 +31,12 @@ typedef struct {
  float stick_x,stick_y;
  float old_world_x,old_world_y;
  float proposed_world_x,proposed_world_y;
+ /* G256: original C1L1 Z-up stage height; source only, no physics changes. */
+ float proposed_world_z;
  float resolved_world_x,resolved_world_y;
+ float resolved_world_z;
  float gpu_actor_world_x,gpu_actor_world_y;
+ float gpu_actor_world_z;
  /* Legacy field stores camera.cam_x/y = camera POSITION, not aim target.
   * One-frame camera distance cannot diagnose third-person following. */
  float camera_target_x,camera_target_y;
@@ -46,9 +50,9 @@ static inline B24G227WalkVerdict b24_g227_qa_classify(
  const B24G227GroundProbe *q){
  if(!q||!q->recorded)return B24_G227_NOT_SAMPLED;
  const float v[]={q->stick_x,q->stick_y,q->old_world_x,q->old_world_y,
-   q->proposed_world_x,q->proposed_world_y,
-   q->resolved_world_x,q->resolved_world_y,
-   q->gpu_actor_world_x,q->gpu_actor_world_y,
+   q->proposed_world_x,q->proposed_world_y,q->proposed_world_z,
+   q->resolved_world_x,q->resolved_world_y,q->resolved_world_z,
+   q->gpu_actor_world_x,q->gpu_actor_world_y,q->gpu_actor_world_z,
    q->camera_target_x,q->camera_target_y};
  for(size_t i=0;i<sizeof(v)/sizeof(v[0]);i++)
   if(!isfinite(v[i]))return B24_G227_NONFINITE_RUNTIME_STATE;
