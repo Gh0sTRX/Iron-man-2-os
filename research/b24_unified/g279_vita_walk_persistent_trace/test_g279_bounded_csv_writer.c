@@ -24,10 +24,15 @@ int main(void) {
  assert(!b24_g279_trace_write(&boot)); /* No poison nonfinite */
  boot.gpu_y=.032f;
  B24G279Row walk=boot;
+ boot.verdict="BAD,CSV";
+ assert(!b24_g279_trace_write(&boot)); /* verdict injection blocked */
  walk.phase="WALK120";walk.frame=120u;walk.millis=2000u;
  walk.b14_path=10.0702f;walk.accepted_path=10.0702f;
  walk.active_stick=120u;walk.coll_reject=0u;walk.root_mismatch=0u;
  walk.wall_reject=0u;walk.missing_floor=0u;walk.step_reject=0u;
+ walk.net_world_dx=0.f;walk.net_world_dy=10.0702f;
+ walk.net_camera_dx=0.f;walk.net_camera_dy=10.0691f;
+ walk.verdict="WORLD_AND_CAMERA_POSITIONS_TRANSLATE_TOGETHER";
  walk.x=0.f;walk.y=10.0702f;walk.z=.0725f;
  walk.gpu_x=0.f;walk.gpu_y=10.0702f;walk.gpu_z=.0725f;
  assert(b24_g279_trace_write(&walk));
@@ -39,7 +44,7 @@ int main(void) {
  assert(strstr(row,"phase,frame,ms,initial_x,"));
  unsigned cols=1;
  for(const char *p=row;*p;p++) if(*p==',')cols++;
- assert(cols==26u);
+ assert(cols==31u);
  assert(fgets(row,sizeof(row),f));
  assert(strstr(row,"BOOT,1,16,") == row);
  unsigned bootcols=1;
@@ -48,12 +53,14 @@ int main(void) {
  assert(fgets(row,sizeof(row),f));
  assert(strstr(row,"WALK120,120,2000,") == row);
  assert(strstr(row,",10.07020,10.07020,"));
+ assert(strstr(row,"WORLD_AND_CAMERA_POSITIONS_TRANSLATE_TOGETHER"));
+ assert(strstr(row,",0.00000,10.07020,0.00000,10.06910,"));
  unsigned walkcols=1;
  for(const char *p=row;*p;p++)if(*p==',')walkcols++;
  assert(walkcols==cols);
  assert(!fgets(row,sizeof(row),f));
  assert(!fclose(f));
  assert(!remove(path));
- puts("G279 PASS optional Vita diagnostic csv: correct 26 columns, 3-frame boot and 120-frame walk layout, 120-input, original collision data, nonfinite/phase error rejection, no duplicate opener, NO VPK");
+ puts("G279 PASS optional Vita diagnostic csv: correct 31 columns, 3-frame boot and 120-frame walk layout, 120-input, original collision data, nonfinite/phase error rejection, no duplicate opener, NO VPK");
  return 0;
 }
