@@ -1,0 +1,51 @@
+name: G237 Original 2010 Three Native WeaponDB Arrays No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g237_original_native_three_WeaponDB_arrays/**"
+      - ".github/workflows/g237-2010-three-native-WeaponDB-array-provenance-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual_owner_2010_ARM_source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate read-only 2010 ARM source array-audit syntax
+        run: python3 -m py_compile research/b24_unified/g237_original_native_three_WeaponDB_arrays/g237_original_2010_WeaponDB_three_vector_offsets_and_dynamic_add_source.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G236_TRUE_ORIGINAL_2010_WEAPONDB_AND_C1L1_ATTACK_SOURCE_NO_VPK
+          run-id: 39217954495
+          github-token: ${{ github.token }}
+          path: /tmp/g237_true_source
+      - name: Verify exact native array pointer capacity count layouts from 2010 WeaponDB original code
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g237_original_native_three_WeaponDB_arrays/g237_original_2010_WeaponDB_three_vector_offsets_and_dynamic_add_source.py \
+            --g236 /tmp/g237_true_source/G236_TRUE_2010_WEAPON_DB_LOADER_C1L1_TYPED_ATTACK_OWNER.json \
+            --out /tmp/g237_verified/G237_TRUE_2010_SOURCE_WEAPONDB_3_NATIVE_ARRAYS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/g237_verified/G237_TRUE_2010_SOURCE_WEAPONDB_3_NATIVE_ARRAYS.json').read_text())
+          assert r['source_three_independent_native_arrays_proven']
+          assert len(r['separate_attack_weapon_accessory_native_memory_layout'])==3
+          assert not r['original_runtime_registered_attack_names_to_index_0_1_proven']
+          assert not r['original_WeaponDB_index_0_1_is_Attack_type0_1_proven']
+          assert not r['Vita_gameplay_modified']
+          assert r['NO_VPK']
+          print('G237 PASS 2010 three independent WeaponDB C++ native arrays, no false index/weapon assignment')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G237_TRUE_2010_WEAPONDB_THREE_ARRAYS_NATIVE_PROVENANCE_NO_VPK
+          path: /tmp/g237_verified/
+          retention-days: 21
+          if-no-files-found: error
