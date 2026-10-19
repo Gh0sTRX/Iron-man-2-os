@@ -1,0 +1,64 @@
+name: G258 Original 2010 Entity3D PositionData ModelData Literal Key Names NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g258_native_PositionData_ModelData_key_strings/**"
+      - ".github/workflows/g258-original-2010-Entity3D-component-label-literals-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  true_iOS2010_ARM_literal_original_components:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original 2010 ARM literal typed property scanner syntax
+        run: python3 -m py_compile research/b24_unified/g258_native_PositionData_ModelData_key_strings/g258_original_2010_Entity3D_ARM_pc_relative_typed_component_labels.py
+      - name: Install original iOS owner native source reader
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G257_ORIGINAL_2010_MC_POSITIONDATA_TWO_COMPONENTS_NO_VPK
+          run-id: 39240927287
+          github-token: ${{ github.token }}
+          path: /tmp/g258_original_previous
+      - name: Temporarily read authentic original 2010 iOS owner IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g258_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g258_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g258_owner/owner.ipa
+          test "$(wc -c </tmp/g258_owner/owner.ipa)" -eq 248613763
+      - name: Prove native 2010 C++ Entity3D original typed component keys from ARM literal pool
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g258_native_PositionData_ModelData_key_strings/g258_original_2010_Entity3D_ARM_pc_relative_typed_component_labels.py \
+            --ipa /tmp/g258_owner/owner.ipa \
+            --g257 /tmp/g258_original_previous/G257_ORIGINAL_2010_MC_TYPED_POSITIONDATA_DIRECT_ARM_SOURCE.json \
+            --out /tmp/g258_source/G258_TRUE_ORIGINAL_2010_ENTITY3D_TYPED_COMPONENT_NATIVE_ARM_LITERAL_KEYS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g258_source/G258_TRUE_ORIGINAL_2010_ENTITY3D_TYPED_COMPONENT_NATIVE_ARM_LITERAL_KEYS.json').read_text())
+          assert x['original_native_Entity3D_loader_VM']=='0x12c78'
+          assert len(x['original_native_source_typed_components'])==2
+          assert x['source_Verified_Member_Pointer_offsets_PositionData_and_ModelData']
+          assert not x['original_native_iOS_live_MainCharacter_player_initial_WORLD_XYZ_proven']
+          assert not x['vita_ground_collision_and_actor_world_pos_code_changed']
+          assert x['NO_VPK']
+          print('G258 PASS exact ORIGINAL 2010 ARM literal pool typed Entity3D component names, NO VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase owner original game binary
+        if: always()
+        run: rm -rf /tmp/g258_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G258_ORIGINAL_2010_ENTITY3D_TYPED_POSITION_MODEL_LITERALS_NO_VPK
+          path: /tmp/g258_source/
+          retention-days: 21
+          if-no-files-found: error
