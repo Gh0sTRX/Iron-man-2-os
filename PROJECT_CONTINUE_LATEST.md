@@ -1,3 +1,12 @@
+## 2026-10-20 G279 VERIFIED — SOURCE ONLY, NO VPK
+- Actual G279 single Vita game C11 CSV and full original G171/G278 Vita ARM ELF SUCCESS: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016
+- G279 C11 fast host negative tests SUCCESS: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569074
+- Work lives on feature/b24-unified-gameplay, main does not have latest gameplay code.
+- Optional on-device CSV recorder planned ux0:data/ironman2_g279_walk.csv: first 3 rendered boot samples and 120-frame ground windows; original B14 input/G75 collision/GPU armor/camera deltas, 31 columns, original world native floor rejects, no gameplay changes.
+- Real G171 strict original collision host 120/120 grounded and flight; DOES NOT prove the user's physical PS Vita, old G161 on-device VPK is older than source.
+- No new VPK was created. Original mission/flight/WM/combat/lighting/sky/QTE/audio all remain gate-dependent. Lighting still in original priority 5.
+- Full developer handoff: https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/G279_REAL_VITA_FIRST_RENDERED_WALK_EVIDENCE_CSV_SOURCE_ONLY_2026-10-20_TR.md
+
 ## 2026-10-16 G66 — B24 G65 first Vita playable standalone beta VPK
 
 - **TRUE VitaSDK/GitHub Actions compiled success** CI https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38879471661 plus repeat https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38880036578. GitHub artifact contains `IronMan2_B24_G65_Playable_Beta.vpk` (5,187,584 bytes, ~4.95 MiB). VPK ZIP integrity verified, `eboot.bin` 479,173 bytes + sce_sys/param.sfo, 38 entries total, 32 source textures, title ID **IM2G65001** unique vs older B24 G10 and M1/M2.
