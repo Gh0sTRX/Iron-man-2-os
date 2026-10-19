@@ -69,30 +69,49 @@ def run(ipa:Path,g265:Path,out:Path):
  graph=audit(raw)
  jump=[x for x in graph["all_663_source_rigid_transforms_with_native_parent_child_name_ID_chain"]
    if x["original_named_parent"]=="PD_IM_jump_goal"]
- if len(jump)!=1:raise ValueError("G268 source original scripted MoveEntityToEntity destination Position transform missing")
- goal=jump[0]; pos_offset=goal["native_transform_source_offset"]
- pre=raw[pos_offset-36:pos_offset]
- if pre[8:12]!=b"\x06\x00\x04\x00" or pre[16:18]!=b"\x04\x00" or pre[22:24]!=b"\x0c\x00":
-  raise ValueError("G268 script actual PD_IM_jump_goal typed positional record format drift")
- goal_mode=struct.unpack_from("<i",pre,12)[0]
- goal_bind=struct.unpack_from("<i",pre,18)[0]
- goal_offset=[round(z,6) for z in struct.unpack_from("<3f",pre,24)]
+ goal_candidate_records=[]
+ for parent_rec in graph["original_source_static_parent_record_links"]:
+  if parent_rec["original_parent_id"]!=1892 or parent_rec["source_typed_record_field"]!=92:
+   continue
+  pos_offset=parent_rec["native_child_record_prefix_offset"]+48
+  matches_tags=(
+     raw[pos_offset:pos_offset+2]==bytes([12,0]) and
+     raw[pos_offset+14:pos_offset+16]==bytes([16,0]) and
+     raw[pos_offset+32:pos_offset+34]==bytes([12,0]))
+  row={"actual_original_native_child_ID":parent_rec["original_child_id"],
+    "actual_original_native_parent_ID":1892,"authentic_tagged_12_16_12_lengths_present":matches_tags,
+    "source_2010_parent_child_header_offset":parent_rec["native_child_record_prefix_offset"]}
+  if matches_tags:
+   row["source_raw_numeric_XYZ_without_world_composition"]=[round(x,6) for x in struct.unpack_from("<3f",raw,pos_offset+2)]
+   row["source_raw_numeric_quaternion_xyzw"]=[round(x,6) for x in struct.unpack_from("<4f",raw,pos_offset+16)]
+   row["source_raw_numeric_scale_xyz"]=[round(x,6) for x in struct.unpack_from("<3f",raw,pos_offset+34)]
+  goal_candidate_records.append(row)
  named_goal={
    "genuine_original_Mission000_native_MoveEntityToEntity_VM_PC":170,
    "original_2010_source_mc_actor_class112_ID":1062,
    "original_2010_script_destination_name":"PD_IM_jump_goal",
    "original_2010_script_destination_PositionDummy_ID":1892,
-   "source_native_child_PositionData_ID":goal["original_child_node_ID"],
-   "source_original_goal_XYZ_local":goal["native_vec3_position"],
-   "source_original_goal_quaternion":goal["native_quaternion_xyzw"],
-   "source_original_goal_scale":goal["native_vec3_scale"],
-   "source_original_goal_AttachType":goal_mode,
-   "source_original_goal_Bind_To_Entity":goal_bind,
-   "source_original_goal_AttachOffset":goal_offset,
+   "original_direct_G24_strict_valid_rigid_transform_count":len(jump),
+   "original_2010_position_child_parent_candidates_independent_of_strict_G24_filter":goal_candidate_records,
+   "original_authored_local_goal_XYZ_from_strict_G24_transform_proven":len(jump)==1,
    "original_source_script_third_arg_raw_3000":3000,
    "third_arg_duration_unit_in_real_iOS_runtime_proven":False,
    "actual_original_iOS_MC_world_end_position_reached_or_correct_collision_proven":False
  }
+ if len(jump)==1:
+  goal=jump[0]; pos_offset=goal["native_transform_source_offset"]
+  pre=raw[pos_offset-36:pos_offset]
+  if pre[8:12]!=bytes([6,0,4,0]) or pre[16:18]!=bytes([4,0]) or pre[22:24]!=bytes([12,0]):
+   raise ValueError("G268 original script goal native Position type/size tags changed")
+  named_goal.update({
+    "source_native_child_PositionData_ID":goal["original_child_node_ID"],
+    "source_original_goal_XYZ_local":goal["native_vec3_position"],
+    "source_original_goal_quaternion":goal["native_quaternion_xyzw"],
+    "source_original_goal_scale":goal["native_vec3_scale"],
+    "source_original_goal_AttachType":struct.unpack_from("<i",pre,12)[0],
+    "source_original_goal_Bind_To_Entity":struct.unpack_from("<i",pre,18)[0],
+    "source_original_goal_AttachOffset":[round(z,6) for z in struct.unpack_from("<3f",pre,24)]
+  })
  freq=collections.Counter((m["original_native_Lua_global"],hit["original_node_name"])
   for m in matches for hit in m["authentic_2010_MC_or_PD_MC_entity_arg_nodes"])
  start=next(x for x in script["source_lua_static_CALLBACK_instructions_and_id_links"]
