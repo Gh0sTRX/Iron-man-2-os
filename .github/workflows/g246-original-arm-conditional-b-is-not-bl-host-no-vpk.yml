@@ -1,0 +1,38 @@
+name: G246 ARM BLE/BLO/BL Native Source Accuracy Regression No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g246_original_ARM_BLE_vs_BL_source_regression/**"
+      - ".github/workflows/g246-original-arm-conditional-b-is-not-bl-host-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real_ARM_callsite_id_host_test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actual ARM disassembler
+        run: python3 -m pip install -q capstone
+      - name: Compile original 2010 ARM source scanners and prove true BL vs BLE BLO BLS
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            research/b24_unified/g236_true_2010_weaponDB_asset_owner/g236_original_MachO_WeaponDB_loader_and_C1L1_attack_owner_audit.py \
+            research/b24_unified/g238_native_C1L1_weapon_registration_callers/g238_original_native_AddNewAttack_cpp_callers_C1L1_order_NO_VPK.py \
+            research/b24_unified/g240_original_LoadEntities_native_type_dispatch/g240_native_2010_GS_GamePlay_LoadEntities_AddNew_type_branch_dataflow.py \
+            research/b24_unified/g241_original_LoadEntities_iterator_origin/g241_2010_exact_LoadEntities_EntityData_r6_fp_sl_origin_ARM.py \
+            research/b24_unified/g243_original_ClaraFile_Load_RAM_record_order/g243_2010_original_ClaraFile_Load_BufferStream_source_ARM.py \
+            research/b24_unified/g244_true_original_EntitiesData_record_loader/g244_original_2010_EntitiesData_LoadFromFile_bufferstream_ARM.py \
+            research/b24_unified/g245_original_EntityData_record_grammar/g245_original_2010_EntityData_LoadFromFile_actual_stream_ARM.py
+          python3 research/b24_unified/g246_original_ARM_BLE_vs_BL_source_regression/g246_verify_2010_original_ARM_BNE_BLE_BLO_not_native_BL.py
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G246_ORIGINAL_ARM_BLE_BLO_NOT_BL_REGRESSION_SOURCE_NO_VPK
+          path: /tmp/g246_source_only/
+          retention-days: 21
+          if-no-files-found: error
