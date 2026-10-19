@@ -123,6 +123,11 @@ def install(root: Path) -> None:
              g279_win.cam_x=camera.cam_x;g279_win.cam_y=camera.cam_y;
              g279_win.stick_x=b24_g227_probe.stick_x;
              g279_win.stick_y=b24_g227_probe.stick_y;
+             g279_win.verdict=b24_g229_window_verdict_name(vw);
+             g279_win.net_world_dx=b24_g229_window.last_world_x-b24_g229_window.first_world_x;
+             g279_win.net_world_dy=b24_g229_window.last_world_y-b24_g229_window.first_world_y;
+             g279_win.net_camera_dx=b24_g229_window.last_camera_x-b24_g229_window.first_camera_x;
+             g279_win.net_camera_dy=b24_g229_window.last_camera_y-b24_g229_window.first_camera_y;
              g279_win.b14_path=(float)b24_g229_window.b14_path_xy;
              g279_win.accepted_path=(float)b24_g229_window.resolved_path_xy;
              g279_win.active_stick=(unsigned)b24_g229_window.active_stick_frames;
