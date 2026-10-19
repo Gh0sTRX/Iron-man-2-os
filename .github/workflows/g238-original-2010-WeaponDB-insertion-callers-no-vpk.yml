@@ -1,0 +1,67 @@
+name: G238 Real 2010 WeaponDB AddNew Native Callers and CLARA Order No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g238_native_C1L1_weapon_registration_callers/**"
+      - ".github/workflows/g238-original-2010-WeaponDB-insertion-callers-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_weapon_registration_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: Original iOS MachO/CLARA parser syntax
+        run: python3 -m py_compile research/b24_unified/g238_native_C1L1_weapon_registration_callers/g238_original_native_AddNewAttack_cpp_callers_C1L1_order_NO_VPK.py
+      - name: Install only genuine source disassembly and private user IPA fetch requirements
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G237_TRUE_2010_WEAPONDB_THREE_ARRAYS_NATIVE_PROVENANCE_NO_VPK
+          run-id: 39218307104
+          github-token: ${{ github.token }}
+          path: /tmp/g238_previous_genuine_source
+      - name: Fetch owner original IPA privately in temporary CI workspace
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g238_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g238_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g238_private_owner/owner.ipa
+          test "$(wc -c </tmp/g238_private_owner/owner.ipa)" -eq 248613763
+      - name: Reconstruct exact 2010 native WeaponDB AddNew callers vs native CLARA file order separately
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g238_native_C1L1_weapon_registration_callers/g238_original_native_AddNewAttack_cpp_callers_C1L1_order_NO_VPK.py \
+            --ipa /tmp/g238_private_owner/owner.ipa \
+            --g237 /tmp/g238_previous_genuine_source/G237_TRUE_2010_SOURCE_WEAPONDB_3_NATIVE_ARRAYS.json \
+            --out /tmp/g238_evidence/G238_2010_ORIGINAL_WEAPONDB_NATIVE_CALLER_VS_DISK_ORDER_NO_VPK.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g238_evidence/G238_2010_ORIGINAL_WEAPONDB_NATIVE_CALLER_VS_DISK_ORDER_NO_VPK.json').read_text())
+          assert d['authentic_native_methods_scanned']>1000
+          assert d['original_source_class_instance_counts']['Attack']==26
+          assert d['original_source_class_instance_counts']['Weapon']==13
+          assert len(d['original_C1L1_file_order_of_typed_attack_weapon_accessory_instances'])>=39
+          assert not d['original_WeaponDB_index_0_maps_to_Attack_type0_PROVEN']
+          assert not d['original_C1L1_disk_serialization_order_eq_actual_native_WeaponDB_registration_order_PROVEN']
+          assert not d['original_WarMachine_missile_gatling_gesture_mapping_PROVEN']
+          assert not d['Vita_suit_world_physics_weapon_damage_or_animation_changed']
+          assert d['NO_VPK']
+          print('G238 TRUE original 2010 native method caller and CLARA file order source PASS; not runtime weapon index ordering')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original licensed game IPA from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g238_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G238_TRUE_2010_WEAPONDB_NATIVE_CALLERS_VS_DISK_ORDER_SOURCE_NO_VPK
+          path: /tmp/g238_evidence/
+          retention-days: 21
+          if-no-files-found: error
