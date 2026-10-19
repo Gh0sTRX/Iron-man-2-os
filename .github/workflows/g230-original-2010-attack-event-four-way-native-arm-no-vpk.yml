@@ -1,0 +1,65 @@
+name: G230 Original 2010 DoAttack Event r8 0-3 Native ARM Analysis (NO VPK)
+on:
+  push:
+    branches:
+      - feature/b24-unified-gameplay
+    paths:
+      - "research/b24_unified/g230_original_native_second_attack_event_switch/**"
+      - ".github/workflows/g230-original-2010-attack-event-four-way-native-arm-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_source_2010_native_ARM:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source-only G230 scanner
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g230_original_native_second_attack_event_switch/g230_authentic_DoAttack_nested_r8_four_way_original_ARM.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g230_native
+      - uses: actions/download-artifact@v4
+        with:
+          name: G221_ORIGINAL_2010_ATTACKTYPE_STATETRACK_THIRD_U32_ACTOR_VCALL_SOURCE_NO_VPK
+          run-id: 39141125765
+          github-token: ${{ github.token }}
+          path: /tmp/g230_state
+      - name: Verify true 2010 nested R8 4-way source and quantify original authored states
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g230_original_native_second_attack_event_switch/g230_authentic_DoAttack_nested_r8_four_way_original_ARM.py \
+            --g196 /tmp/g230_native/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --g221 /tmp/g230_state/G221_TRUE_2010_ATTACKTYPE_NATIVE_EVENT_THIRD_U32_VIRTUAL_CALL_SOURCE.json \
+            --out /tmp/g230_verified/G230_2010_DoAttack_event_r8_nested_source_0_1_2_3.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g230_verified/G230_2010_DoAttack_event_r8_nested_source_0_1_2_3.json')
+          d=json.loads(p.read_text())
+          assert d["exact_original_opcode_total"]==646
+          assert d["original_nested_cmp_r8_3_VM"]=="0xf6a30"
+          assert d["original_nested_addls_PC_r8_LSL2_VM"]=="0xf6a34"
+          assert len(d["original_nested_event_0_1_2_3_instructions"])==4
+          assert d["local_source_has_no_r8_direct_overwrite_in_that_span"]
+          assert not d["local_span_proves_all_runtime_paths_enter_with_original_r8"]
+          assert not d["G230_event_values_0_1_2_3_mean_specific_weapon_or_hit_window_PROVEN"]
+          assert not d["Vita_gameplay_armor_animation_damage_or_input_CHANGED"]
+          assert d["NO_VPK"]
+          print("G230 SOURCE-ONLY POSITIVE: original native ARM nested 0-3 table audited; behavior NOT fabricated")
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G230_ORIGINAL_2010_R8_NESTED_4_BRANCH_NATIVE_ARM_SOURCE_NO_VPK
+          path: /tmp/g230_verified/
+          retention-days: 21
+          if-no-files-found: error
