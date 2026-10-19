@@ -1,0 +1,74 @@
+name: G247 Original 2010 CLARA Attack Registration Candidate Order (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g247_2010_WeaponDB_registration_order_candidates/**"
+      - ".github/workflows/g247-original-2010-CLARA-attack-index-evidence-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_CLARA_runtime_index_boundary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check original C1L1 typed Attack source scanner syntax
+        run: python3 -m py_compile research/b24_unified/g247_2010_WeaponDB_registration_order_candidates/g247_authentic_C1L1_Attack_record_name_offset_vs_native_index_hypothesis.py
+      - name: Install private owner IPA reader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G241_TRUE_2010_LOADENTITIES_ENTITYDATA_ITERATOR_ARM_PROVENANCE_NO_VPK
+          run-id: 39225464002
+          github-token: ${{ github.token }}
+          path: /tmp/g247_true_native_dispatch
+      - uses: actions/download-artifact@v4
+        with:
+          name: G245_ORIGINAL_2010_ENTITYDATA_STREAM_READER_ARM_SOURCE_NO_VPK
+          run-id: 39226786975
+          github-token: ${{ github.token }}
+          path: /tmp/g247_true_native_record
+      - name: Read user-owned genuine original 2010 IPA transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g247_original_source
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g247_original_source/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g247_original_source/owner.ipa
+          test "$(wc -c </tmp/g247_original_source/owner.ipa)" -eq 248613763
+      - name: Build genuine Attack Weapon Accessory typed scene source order candidates, NOT live WeaponDB index
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g247_2010_WeaponDB_registration_order_candidates/g247_authentic_C1L1_Attack_record_name_offset_vs_native_index_hypothesis.py \
+            --ipa /tmp/g247_original_source/owner.ipa \
+            --g241 /tmp/g247_true_native_dispatch/G241_TRUE_2010_LOADENTITIES_R6_FP_SL_ORIGINAL_ARM_SOURCE.json \
+            --g245 /tmp/g247_true_native_record/G245_REAL_NATIVE_ORIGINAL_2010_ENTITYDATA_STREAM_READER.json \
+            --out /tmp/g247_verified/G247_2010_CLARA_ATTACK_WEAPON_NAME_ORDER_CANDIDATES_NOT_RUNTIME_INDEX.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g247_verified/G247_2010_CLARA_ATTACK_WEAPON_NAME_ORDER_CANDIDATES_NOT_RUNTIME_INDEX.json').read_text())
+          assert d['authentic_2010_C1L1_native_class_instances_total']==587
+          assert d['original_class_104_107_108_typed_member_count']=={'Attack':26,'Weapon':13,'WeaponAccessory':1}
+          assert len(d['original_Attack_named_entry_file_offset_vs_scene_nodeID_order_candidates'])==26
+          assert len(d['named_source_attack_of_interest'])==4
+          assert d['actual_original_2010_native_dispatch_per_class_confirmed']
+          assert d['file_offset_scan_IS_NOT_original_ClaraFile_GetEntityData_RAM_array_index']
+          assert not d['original_WeaponDB_index_0_1_4_names_confirmed']
+          assert not d['vita_player_motion_weapon_damage_or_Mission000_modified']
+          assert d['NO_VPK']
+          print('G247 PASS original owned CLARA attack class rank hypothesis, NEVER claim WeaponDB[0/1/4] mapping')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase source owner 2010 original IPA in private runner
+        if: always()
+        run: rm -rf /tmp/g247_original_source
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G247_TRUE_2010_ORIGINAL_C1L1_ATTACK_WEAPON_ORDER_CANDIDATES_ONLY_NO_VPK
+          path: /tmp/g247_verified/
+          retention-days: 21
+          if-no-files-found: error
