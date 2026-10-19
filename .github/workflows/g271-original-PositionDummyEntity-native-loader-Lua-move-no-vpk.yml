@@ -1,0 +1,64 @@
+name: G271 Original 2010 PositionDummyEntity C++ Runtime Loader and Lua Goal No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g271_original_PositionDummyEntity_native_method_and_moveto_goal/**"
+      - ".github/workflows/g271-original-PositionDummyEntity-native-loader-Lua-move-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_original_2010_PositionDummy_runtime_Cpp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original C++ runtime constructor/position source parser Python
+        run: python3 -m py_compile research/b24_unified/g271_original_PositionDummyEntity_native_method_and_moveto_goal/g271_true_2010_PositionDummyEntity_Cpp_loader_and_Mission_MoveEntity_symbols.py
+      - name: Install original source ARM reader
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G270_ORIGINAL_2010_GETPARAMCOMPONENT_POSITIONDUMMY_CLASS_NO_VPK
+          run-id: 39270380114
+          github-token: ${{ github.token }}
+          path: /tmp/g271_original_true_class36
+      - name: Temporarily read exact original owner iOS 2010 IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g271_owner_2010
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g271_owner_2010/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g271_owner_2010/owner.ipa
+          test "$(wc -c </tmp/g271_owner_2010/owner.ipa)" -eq 248613763
+      - name: Prove source original PositionDummyEntity runtime methods and original Lua MoveEntity script symbols
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g271_original_PositionDummyEntity_native_method_and_moveto_goal/g271_true_2010_PositionDummyEntity_Cpp_loader_and_Mission_MoveEntity_symbols.py \
+            --ipa /tmp/g271_owner_2010/owner.ipa \
+            --g270 /tmp/g271_original_true_class36/G270_ORIGINAL_2010_NATIVE_GETPARAMCOMPONENT_AND_PDCLASS_SCENE_CHILDREN.json \
+            --out /tmp/g271_metadata/G271_2010_ORIGINAL_PositionDummyEntity_CPP_LOAD_AND_MOVETO_NATIVE_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g271_metadata/G271_2010_ORIGINAL_PositionDummyEntity_CPP_LOAD_AND_MOVETO_NATIVE_ARM.json').read_text())
+          assert x['source_true_original_PositionDummy_constructor_at_d2e84']
+          assert x['source_goal_all_137_positiondummies_have_three_transform_children_verified']
+          assert len(x['genuine_source_PositionDummyEntity_cpp_symbols'])>=2
+          assert not x['source_true_2010_PositionDummy_runtime_selected_child_ordinal_proven']
+          assert not x['Vita_world_camera_collider_movement_changed']
+          assert x['NO_VPK']
+          print('G271 PASS 2010 original PositionDummyEntity native symbol call chain, not synthetic Vita game target')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original owner IPA from private transient runner
+        if: always()
+        run: rm -rf /tmp/g271_owner_2010
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G271_ORIGINAL_2010_POSITIONDUMMY_Cpp_RUNTIME_METHODS_NO_VPK
+          path: /tmp/g271_metadata/
+          retention-days: 21
+          if-no-files-found: error
