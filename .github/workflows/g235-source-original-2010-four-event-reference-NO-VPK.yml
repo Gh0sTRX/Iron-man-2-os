@@ -1,0 +1,30 @@
+name: G235 Host Source-Only Original 2010 Four Event Reference (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g235_verified_four_event_attack_route_reference/**"
+      - ".github/workflows/g235-source-original-2010-four-event-reference-NO-VPK.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g235_original_native_routes_read_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source audit: G197 upper original 2010 ARM table and G235 native event 0..3 mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+          d=research/b24_unified/g235_verified_four_event_attack_route_reference
+          gcc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            -fsanitize=undefined -fno-omit-frame-pointer \
+            "$d/test_g235_original_2010_source_only_event_routes.c" \
+            -o /tmp/im2_g235_source_reference_test
+          /tmp/im2_g235_source_reference_test
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Explicit boundary
+        run: |
+          echo "Only original ARM-authenticated static route reference; no VitaSDK build, no PS Vita device validation, no missile/gatling claim and no VPK."
