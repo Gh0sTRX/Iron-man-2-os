@@ -1,0 +1,26 @@
+name: G277 Vita Real Ground G75 Rejection Reasons Host and Source Integrity NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g277_vita_real_ground_collision_reason_counter/**"
+      - ".github/workflows/g277-real-ground-wall-floor-step-reject-host-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_only_G75_observational_probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify G277 actual Vita collision probe and isolated host regression scripts parse
+        run: |
+          python3 -m py_compile \
+            research/b24_unified/g277_vita_real_ground_collision_reason_counter/g277_install_original_G75_wall_floor_step_reject_probe_after_G229_NO_VPK.py \
+            research/b24_unified/g277_vita_real_ground_collision_reason_counter/g277_test_host_wall_floor_step_diagnostic_fixture.py
+      - name: Original B14-G75 collision mathematics must be untouched; host synthetic regression tests reasons without claiming real Vita hardware
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g277_vita_real_ground_collision_reason_counter/g277_test_host_wall_floor_step_diagnostic_fixture.py
+          test -z "$(find research -type f -name '*.vpk' -print -quit)"
