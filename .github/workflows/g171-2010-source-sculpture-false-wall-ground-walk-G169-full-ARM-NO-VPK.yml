@@ -20,6 +20,7 @@ on:
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
       - "research/b24_unified/g166_original_ground_stuck_source_diagnostics/**"
+      - "research/b24_unified/g167_grounded_actual_start_input/**"
       - "research/b24_unified/g165_warmachine_source_directional_motion/**"
       - "research/b24_unified/g164_source_sky_camera_framing/**"
       - "research/b24_unified/g163_first_world_aim_facing_input/**"
