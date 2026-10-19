@@ -1,5 +1,8 @@
 # Iron Man 2 (2010) iOS → PS Vita — Tersine Mühendislik ve Port Projesi
 
+> 20 Ekim 2026 GELİŞTİRME DURUMU: feature/b24-unified-gameplay çalışma dalında G279 gerçek Vita ELF kaynak derlemesi başarılı; ancak G161 eski cihaz VPK'sındaki yürüyüş kilidinin yeni kodla fiziksel Vita'da düzeldiği doğrulanmadı. Yeni VPK yok. Son test: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016 . G279 raporu: https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/G279_REAL_VITA_FIRST_RENDERED_WALK_EVIDENCE_CSV_SOURCE_ONLY_2026-10-20_TR.md
+
+
 **Projenin hedefi:** Gameloft'un özgün **Iron Man 2 iOS (2010, sürüm 1.0.0)** oyununu, kaynak oyun geometrisi, materyalleri, animasyonları ve görevleri korunarak PS Vita'da çalıştırmak. Mevcut çalışma **özel araştırma/deneysel homebrew** aşamasındadır; henüz tamamlanmış bir oyun portu **değildir**.
 
 > **Güncel durum — 16 Ekim 2026 (G62 orijinal touchHLE C1L1 çalıştırıldı; G65 22.021 özgün UV+PVR üçgen ve kürelerin gerçek UV'si doğrulandı; portun haritası henüz tamamlanmadı):** Öncelik yalnızca **ilk bölümün (C1L1) özgün haritasını doğru oluşturmak**. Yeni VPK, FPS optimizasyonu veya combat ekleme çalışmalarına geçmeden önce haritanın gerçek yerleşim ve çizim davranışı çözülecek.
