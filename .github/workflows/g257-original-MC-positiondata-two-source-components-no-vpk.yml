@@ -1,0 +1,65 @@
+name: G257 Original 2010 MC Entity3D PositionData Typed Components Source No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g257_original_MC_positiondata_source_two_components/**"
+      - ".github/workflows/g257-original-MC-positiondata-two-source-components-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_Player_PositionData_native_component_sources:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exact original iOS two-component MC loader scanner syntax
+        run: python3 -m py_compile research/b24_unified/g257_original_MC_positiondata_source_two_components/g257_original_2010_mc_PositionData_two_native_component_boot_audit.py
+      - name: Install source-original ARM / original level1 reader
+        run: python3 -m pip install -q capstone gdown numpy pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: G254_TRUE_ORIGINAL_MC_ENTITYDATA_PLAYER_INITIALIZATION_SOURCE_NO_VPK
+          run-id: 39238652757
+          github-token: ${{ github.token }}
+          path: /tmp/g257_real_source_prior
+      - name: Temporarily open owner original 2010 iOS IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g257_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g257_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g257_owner/owner.ipa
+          test "$(wc -c </tmp/g257_owner/owner.ipa)" -eq 248613763
+      - name: Verify original Entity3D LoadFromFile true two components and authored MC rigid transform source
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g257_original_MC_positiondata_source_two_components/g257_original_2010_mc_PositionData_two_native_component_boot_audit.py \
+            --ipa /tmp/g257_owner/owner.ipa \
+            --g254 /tmp/g257_real_source_prior/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json \
+            --out /tmp/g257_original/G257_ORIGINAL_2010_MC_TYPED_POSITIONDATA_DIRECT_ARM_SOURCE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          x=json.loads(Path('/tmp/g257_original/G257_ORIGINAL_2010_MC_TYPED_POSITIONDATA_DIRECT_ARM_SOURCE.json').read_text())
+          assert x['original_native_method_VM']=='0x12c78'
+          assert x['true_source_PositionData_ctor_direct_call_VM']=='0x12c98'
+          assert x['true_source_EntityData_GetParamComponent_direct_calls']==['0x12cb0','0x12cd8']
+          assert x['original_source_typed_MC_class']=='MainCharacter'
+          assert not x['actual_runtime_player_initial_parent_world_matrix_proven']
+          assert not x['world_root_collision_vita_modified']
+          assert not x['VPK']
+          print('G257 PASS source-original native two component loads, no invented player spawn')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original copyrighted IPA in private CI
+        if: always()
+        run: rm -rf /tmp/g257_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G257_ORIGINAL_2010_MC_POSITIONDATA_TWO_COMPONENTS_NO_VPK
+          path: /tmp/g257_original/
+          retention-days: 21
+          if-no-files-found: error
