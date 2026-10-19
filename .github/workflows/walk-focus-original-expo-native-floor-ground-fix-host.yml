@@ -52,6 +52,14 @@ jobs:
             research/b24_unified/b24_c1_original_collision.c \
             -lm -o /tmp/walk_regression
           /tmp/walk_regression /tmp/walk_real_c1l1.g66c | tee /tmp/walk_regression_out.txt
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/walk_fix/test_real_C1L1_wall_escape_after_B14_collision.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/walk_wall_escape
+          /tmp/walk_wall_escape /tmp/walk_real_c1l1.g66c | tee -a /tmp/walk_regression_out.txt
           test -z "$(find research -name '*.vpk' -print -quit)"
       - name: Preserve small test result only, not owner's game binaries
         uses: actions/upload-artifact@v4
