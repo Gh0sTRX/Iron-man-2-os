@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse,bisect,hashlib,json,subprocess,sys,zipfile
 from pathlib import Path
 import capstone
-from capstone.arm import ARM_OP_IMM
+from capstone.arm import ARM_OP_IMM, ARM_INS_BL, ARM_INS_BLX
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"g76_original_combat"))
 from g76_2010_native_arm_combat_method_provenance import parse_macho
@@ -50,7 +50,7 @@ def run(ipa:Path,g242:Path,out:Path):
  if len(ops)<60:raise ValueError("ClaraFile native Load instruction list too small")
  direct=[]
  for o in ops:
-  if o.mnemonic.startswith(("bl","blx")) and o.operands and o.operands[0].type==ARM_OP_IMM:
+  if o.id in (ARM_INS_BL,ARM_INS_BLX) and o.operands and o.operands[0].type==ARM_OP_IMM:
    target=o.operands[0].imm&~1
    direct.append({"authentic_CALL_VM":hex(o.address),"target_VM":hex(target),
                   "exact_original_cpp_names":sorted(labels.get(target,()))[:5]})
