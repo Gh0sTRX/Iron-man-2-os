@@ -62,6 +62,14 @@ def run(ipa:Path,g243:Path,out:Path)->dict:
    0xd5890:("mov","r6, sl"),
    0xd589c:("add","r0, r6, r8"),
    0xd58a0:("bl","#0xd356c"),
+   0xd5a58:("add","sl, sl, #1"),
+   0xd5a5c:("cmp","r3, sl"),
+   0xd5a60:("add","r6, r6, #0x24"),
+   0xd5a64:("bgt","#0xd5894"),
+   0xd5a80:("add","sl, sl, #1"),
+   0xd5a84:("cmp","r3, sl"),
+   0xd5a88:("add","r6, r6, #0x24"),
+   0xd5a8c:("bgt","#0xd5894"),
  }.items():
   if source_native.get(site)!=expected:
    raise ValueError(f"G244 exact original 2010 EntitiesData count or 36-byte allocation source drift @ {site:#x}: {source_native.get(site)}")
@@ -91,6 +99,11 @@ def run(ipa:Path,g243:Path,out:Path)->dict:
   "original_native_entity_data_count_from_DataStream_ReadUnsignedShort":True,
   "original_native_36_byte_stride_allocation_count_times_36_plus_4":True,
   "native_original_EntityData_LoadFromFile_called_for_indexed_slot":True,
+  "original_native_successful_EntitiesData_LoadFromFile_advances_current_slot_36_bytes_in_file_stream_order":True,
+  "original_native_loop_index_advances_one_and_rechecks_count":True,
+  "source_C1L1_scene_binary_names_sorted_by_offset_proven_to_be_same_as_native_clara_EntityData_order":False,
+  "source_C1L1_native_WeaponDB_record_index_order_proven":False,
+
   "original_2010_EntityData_per_record_Cpp_method_VM":"0xd356c",
 
   "source_EntitiesData_original_load_contains_runtime_execution_proven":False,
