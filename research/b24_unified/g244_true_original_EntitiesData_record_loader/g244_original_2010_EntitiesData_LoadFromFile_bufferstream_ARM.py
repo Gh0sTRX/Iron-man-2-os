@@ -77,7 +77,7 @@ def run(ipa:Path,g243:Path,out:Path)->dict:
  out.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
  print("G244 original EntitiesData::LoadFromFile",size,"source bytes",len(src),"ARM opcodes")
  for item in special:print("G244 original source loader calls",item)
- for row in src[:225]:print("G244 2010 native EntitiesData ARM",row)
+ for row in src:print("G244 2010 native EntitiesData ARM",row)
  print("G244 PASS exact genuine original 2010 EntitiesData::LoadFromFile method and ClaraFile call provenance; no fake weapon index/VPK")
  return report
 if __name__=="__main__":
