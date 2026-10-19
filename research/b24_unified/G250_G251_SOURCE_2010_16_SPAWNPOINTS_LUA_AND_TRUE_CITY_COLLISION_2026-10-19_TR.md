@@ -50,3 +50,37 @@ CI run: [**G251 G171 gerçek Vita ARM ELF-only kaynak zinciri**](https://github.
 `Mission000_OnStart` node referansları ile asıl `MainCharacter::Init` / `GS_GamePlay::LoadEntities` / `SceneImpl::SetEntityPosition` kaynaklarındaki 2010 actor spawn/transform atamalarını ve `SpawnPoint` class ID 71'nin orijinal native *entity registration/AI kullanım semantiğini* doğrula. Bir noktaya görünüşte yürünebiliyor diye orijinal player spawn ilan etme, G66C wall715'i silme, B14 hız/scale değiştirme. G229 gerçek Vita 120-frame grounded root kaydı olmadan donanım sorunu çözüldü iddia etme.
 
 **VPK YOK, source-parity çalışma ve CI var.**
+
+
+## G251 kaynak testi tamamlandı — 16 node ve 15.360 kare, `SUCCESS`
+
+[**G251 gerçek C1L1 G171 Vita ARM ELF pipeline ve 16 SpawnPoint/C11 native city CI SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39236897754).
+
+Bu testte her yönde **en az 1/60 kare** G75 kabulü "yön hareket etti" sayılır; doğru/engelsiz oyuncu yürüyüşü veya özgün Level1 spawn demek DEĞİLDİR.
+
+| Source node | Orijinal tagged Z | Orijinal G66C floor ham Z yakınında? | Yerde kabul edilen 8 yönden | Stage2 uçuşta kabul |
+|---|---:|---|---:|---:|
+| SpawnPoint000 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint001 | 6.097 | Hayır | **0/8** | **8/8** |
+| SpawnPoint002 | 1.433 | Hayır | **0/8** | **8/8** |
+| SpawnPoint003 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint004 | 10.207 | Hayır | **0/8** | **8/8** |
+| SpawnPoint005 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint006 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint007 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint008 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint009 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint010 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint011 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint012 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint013 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint014 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+| SpawnPoint015 | 0.000 | Evet, Z≈0.073 | 8/8 | 8/8 |
+
+**Toplam:** grounded **104/128 yön**, stage2 flight **128/128 yön** en az bir kare hareket ettirdi; **16 node'dan 3'ü yerde 8/8 tamamen kilitli**, uçuşta hareket var. Kaynak G75 native G66C floor bulunmazsa test çıktısındaki `source_native_Z=0` yalnız başlangıç değişkeninin değeri olarak okunmalı; authored floor `0` doğrulaması değildir. Orijinal 3 elevated nodes'un `G66C` yakın zemin desteği gerçekten *bulunamadı*.
+
+Bu sonuç **üç SpawnPoint'in gerçekten uçan düşman yaratma noktası olduğunu kanıtlamaz**, yalnız AI/spawn/oyuncu ayrımının orijinal native source ile belirlenmesi gerektiğine işaret eder. Önceki G249 düşük MC XY `wall715` site kilidiyle birlikte, Vita walk-in-place problemine sağlam konum+zemin kanıtı ekler; fakat Vita gerçekte bu SpawnPoint'lerden birinde başlatılıyor mu ve HUD/camera motorunda gözlenen yerinde animasyon bunun sebebi mi bilinmiyor.
+
+**Açık aksiyon:** `GS_GamePlay::LoadEntities` native class71 branch'i, source `SpawnPoint`'lerin 24 gerçek Lua script typed node call'ının fonksiyon türü (düşman spawn / kill / trigger olabilir), MC initial actor World transform ve `G229_WALK_WINDOW` gerçek Vita logu. Sırf yürünsün diye özgün duvarları silmek, authored SpawnPoint'i player teleport ile zorlamak, Unity benzeri global world/scale tahmini eklemek yasak.
+
+**Bu turdaki gerçek sonuç: 2 başarılı CI, 16 orijinal node kaydı ve kaynak geometriye dayalı 15.360 hareket karesi. Fiziksel Vita oynanışında değişiklik olmadığı için gerçek cihaz yürüme bug'ı halen AÇIK; yeni VPK YOK.**
