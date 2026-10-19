@@ -1,0 +1,65 @@
+name: G244 Original 2010 EntitiesData LoadFromFile Native ARM No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g244_true_original_EntitiesData_record_loader/**"
+      - ".github/workflows/g244-original-EntitiesData-record-loader-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  authentic_2010_entities_data_load:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate source-only original 2010 ARM loader scanner
+        run: python3 -m py_compile research/b24_unified/g244_true_original_EntitiesData_record_loader/g244_original_2010_EntitiesData_LoadFromFile_bufferstream_ARM.py
+      - name: Install private original iOS loader deps
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G243_REAL_ORIGINAL_CLARAFILE_BUFFERSTREAM_ARM_SOURCE_NO_VPK
+          run-id: 39225909125
+          github-token: ${{ github.token }}
+          path: /tmp/g244_original_Clara
+      - name: Read owner's unmodified original iOS IPA in temporary CI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g244_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g244_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g244_owner/owner.ipa
+          test "$(wc -c </tmp/g244_owner/owner.ipa)" -eq 248613763
+      - name: Follow original native ClaraFile to actual EntitiesData loader bytes/ARM
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g244_true_original_EntitiesData_record_loader/g244_original_2010_EntitiesData_LoadFromFile_bufferstream_ARM.py \
+            --ipa /tmp/g244_owner/owner.ipa \
+            --g243 /tmp/g244_original_Clara/G243_REAL_ORIGINAL_CLARAFILE_NATIVE_BUFFERSTREAM_LOADER.json \
+            --out /tmp/g244_source/G244_REAL_NATIVE_2010_ENTITIESDATA_LOADFROMFILE_ARM_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g244_source/G244_REAL_NATIVE_2010_ENTITIESDATA_LOADFROMFILE_ARM_SOURCE.json').read_text())
+          assert d['original_source_CPP_method']=='EntitiesData::LoadFromFile(BufferStream&, int)'
+          assert d['original_source_VM']=='0xd56c8'
+          assert d['original_ClaraFile_Load_BL_EntitiesData_loader_VM']=='0xd5af0'
+          assert d['original_ClaraFile_GetEntityData_index_stride_bytes']==36
+          assert not d['actual_original_C1L1_list_layout_and_per_Attack_id_0_1_4_registration_proven']
+          assert not d['vita_gameplay_ground_world_or_weapon_code_modified']
+          assert d['NO_VPK']
+          print('G244 PASS original 2010 EntitiesData native loader, no invented weapon data')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original licensed game IPA
+        if: always()
+        run: rm -rf /tmp/g244_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G244_2010_ORIGINAL_ENTITIESDATA_NATIVE_LOADER_SOURCE_NO_VPK
+          path: /tmp/g244_source/
+          retention-days: 21
+          if-no-files-found: error
