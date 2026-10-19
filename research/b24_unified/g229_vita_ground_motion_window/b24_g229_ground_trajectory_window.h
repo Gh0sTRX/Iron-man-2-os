@@ -28,6 +28,8 @@ typedef struct {
  uint32_t root_mismatch_frames,missing_original_clip_frames;
  uint32_t previous_frame,first_tick_ms,last_tick_ms;
  float first_world_x,first_world_y,last_world_x,last_world_y;
+ /* G256: Real source C1L1 Z-up height of same single rendered world root. */
+ float first_world_z,last_world_z,min_world_z,max_world_z;
  float first_camera_x,first_camera_y,last_camera_x,last_camera_y;
  double b14_path_xy,resolved_path_xy,max_gpu_root_error;
 } B24G229WalkWindow;
@@ -52,6 +54,9 @@ static inline int b24_g229_window_push(B24G229WalkWindow *w,
   w->first_tick_ms=tick_ms;
   w->first_world_x=q->old_world_x;
   w->first_world_y=q->old_world_y;
+  w->first_world_z=q->resolved_world_z;
+  w->min_world_z=q->resolved_world_z;
+  w->max_world_z=q->resolved_world_z;
   w->first_camera_x=q->camera_target_x;
   w->first_camera_y=q->camera_target_y;
  }
@@ -59,6 +64,9 @@ static inline int b24_g229_window_push(B24G229WalkWindow *w,
  w->last_tick_ms=tick_ms;
  w->last_world_x=q->resolved_world_x;
  w->last_world_y=q->resolved_world_y;
+ w->last_world_z=q->resolved_world_z;
+ if(q->resolved_world_z<w->min_world_z)w->min_world_z=q->resolved_world_z;
+ if(q->resolved_world_z>w->max_world_z)w->max_world_z=q->resolved_world_z;
  w->last_camera_x=q->camera_target_x;
  w->last_camera_y=q->camera_target_y;
  w->samples++;
