@@ -1,0 +1,64 @@
+name: G254 Authentic 2010 MainCharacter Init and PositionData Source Chain No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g254_original_mc_player_source_transform/**"
+      - ".github/workflows/g254-original-player-entitydata-transform-mc-source-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native_2010_MainCharacter_load_and_init:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate G254 2010 native player/PositionData source code
+        run: python3 -m py_compile research/b24_unified/g254_original_mc_player_source_transform/g254_original_2010_MC_LoadFromFile_Init_and_true_GamePlay_constructor_ARM.py
+      - name: Install original ARM owner source reader
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G253_TRUE_ORIGINAL_MAINCHARACTER_ACTOR_INITIALIZATION_CPP_NO_VPK
+          run-id: 39238427873
+          github-token: ${{ github.token }}
+          path: /tmp/g254_original_previous
+      - name: Temporarily read exact original 2010 iOS owner IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g254_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g254_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g254_private_owner/owner.ipa
+          test "$(wc -c </tmp/g254_private_owner/owner.ipa)" -eq 248613763
+      - name: Verify real original MC creator LoadFromFile Init and position loader native ARM
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g254_original_mc_player_source_transform/g254_original_2010_MC_LoadFromFile_Init_and_true_GamePlay_constructor_ARM.py \
+            --ipa /tmp/g254_private_owner/owner.ipa \
+            --g253 /tmp/g254_original_previous/G253_2010_NATIVE_MAINCHARACTER_GS_GAMEPLAY_PLAYER_BOOTSTRAP_CPP_METHODS.json \
+            --out /tmp/g254_native/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g254_native/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json').read_text())
+          assert d['source_direct_GamePlay_LoadEntities_BL_MainCharacter_ctor_VM']=='0xc36fc'
+          assert len(d['true_original_native_constructor_MainCharacter_LoadFromFile_and_Init_methods'])==8
+          assert not d['original_Mission000_initial_player_position_globalXYZ_proven']
+          assert not d['original_MC_local_entity_transform_equals_real_player_feet_world_xyz_proven']
+          assert not d['Vita_B14_ground_start_player_root_changes']
+          assert not d['VPK']
+          print('G254 exact true native 2010 actor constructor LoadFromFile Init source PASS; no guessed spawn')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original user-owned copyrighted IPA
+        if: always()
+        run: rm -rf /tmp/g254_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G254_TRUE_ORIGINAL_MC_ENTITYDATA_PLAYER_INITIALIZATION_SOURCE_NO_VPK
+          path: /tmp/g254_native/
+          retention-days: 21
+          if-no-files-found: error
