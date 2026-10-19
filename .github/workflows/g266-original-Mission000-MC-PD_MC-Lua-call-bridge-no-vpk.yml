@@ -1,0 +1,68 @@
+name: G266 Original 2010 Mission000 MC versus PD_MC Real Lua Calls No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g266_Mission000_MC_PD_MC_source_bridge/**"
+      - ".github/workflows/g266-original-Mission000-MC-PD_MC-Lua-call-bridge-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  owner_original_2010_Mission000_MC_PD_MC_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original first mission player and relative dummy Lua scanner syntax
+        run: python3 -m py_compile research/b24_unified/g266_Mission000_MC_PD_MC_source_bridge/g266_true_2010_Mission000_MC_and_PD_MC_Lua_native_call_links.py
+      - name: Install owner iOS archive downloader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G265_TRUE_ORIGINAL_MC_ATTACHTYPE_BIND_VALUES_NO_VPK
+          run-id: 39266087905
+          github-token: ${{ github.token }}
+          path: /tmp/g266_original_MC_binding
+      - name: Transiently read original 2010 owner Iron Man 2 iOS IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g266_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g266_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g266_original_private/owner.ipa
+          test "$(wc -c </tmp/g266_original_private/owner.ipa)" -eq 248613763
+      - name: Connect original first mission native Lua to actual MC versus attached PD_MC records
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g266_Mission000_MC_PD_MC_source_bridge/g266_true_2010_Mission000_MC_and_PD_MC_Lua_native_call_links.py \
+            --ipa /tmp/g266_original_private/owner.ipa \
+            --g265 /tmp/g266_original_MC_binding/G265_TRUE_ORIGINAL_2010_MC_BIND_TO_ENTITY_ATTACH_TYPE_AND_OFFSET.json \
+            --out /tmp/g266_metadata/G266_ORIGINAL_2010_MISSION000_MC_PD_MC_LUA_NATIVE_TYPED_CALLS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g266_metadata/G266_ORIGINAL_2010_MISSION000_MC_PD_MC_LUA_NATIVE_TYPED_CALLS.json').read_text())
+          assert x['source_Mission000_original_MC_class112_ID']==1062
+          assert x['source_Original_PD_MC_PositionDummy_node_ID']==1195
+          assert x['source_MC_actual_AttachType']==0
+          assert x['source_MC_actual_Bind_To_Entity']==-1
+          assert x['source_PD_MC_actual_AttachType']==1
+          assert x['source_PD_MC_actual_Bind_To_Entity']==1062
+          assert x['source_Mission000_total_original_Lua_global_CALLs']==1035
+          assert not x['original_iOS_live_story_Mission000_boot_player_world_transform_proven']
+          assert not x['Vita_movement_camera_lighting_or_mission_runtime_modified']
+          assert x['NO_VPK']
+          print('G266 PASS source MC / PD_MC different original classes and Lua calls, no invented runtime world XYZ')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original copyrighted game source from private runner
+        if: always()
+        run: rm -rf /tmp/g266_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G266_TRUE_ORIGINAL_MISSION000_MC_PD_MC_LUA_LINKS_NO_VPK
+          path: /tmp/g266_metadata/
+          retention-days: 21
+          if-no-files-found: error
