@@ -13,10 +13,12 @@
 
 typedef struct {
  const char *phase; /* only internal literal BOOT or WALK120 */
+ const char *verdict; /* G229 120-render-frame classification, no commas */
  unsigned frame, millis;
  float initial_x,initial_y,initial_z;
  float x,y,z,gpu_x,gpu_y,gpu_z,cam_x,cam_y,stick_x,stick_y;
  float b14_path,accepted_path,native_floor_z;
+ float net_world_dx,net_world_dy,net_camera_dx,net_camera_dy;
  unsigned active_stick,coll_reject,root_mismatch;
  unsigned wall_reject,missing_floor,step_reject,has_native_floor;
 } B24G279Row;
@@ -38,7 +40,8 @@ static int b24_g279_trace_open(const char *path) {
  if(fputs("phase,frame,ms,initial_x,initial_y,initial_z,world_x,world_y,world_z,"
           "gpu_x,gpu_y,gpu_z,camera_x,camera_y,stick_x,stick_y,"
           "b14_path,resolved_path,native_floor_z,active_stick,collision_reject,"
-          "gpu_root_mismatch,wall_reject,missing_floor,step_reject,has_native_floor\n",f)<0 ||
+          "gpu_root_mismatch,wall_reject,missing_floor,step_reject,has_native_floor,"
+          "world_dx,world_dy,camera_dx,camera_dy,verdict\n",f)<0 ||
     fflush(f)!=0) {
   b24_g279_trace_close();return 0;
  }
@@ -49,25 +52,31 @@ static int b24_g279_trace_write(const B24G279Row *r) {
  if(!r||!b24_g279_trace_stream)return 0;
  if(!r->phase || (strcmp(r->phase,"BOOT")!=0 &&
                   strcmp(r->phase,"WALK120")!=0))return 0;
+ const char *verdict=r->verdict?r->verdict:"BOOT_SAMPLE";
+ const size_t vlen=strlen(verdict);
+ if(vlen==0u || vlen>80u || strspn(verdict,"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")!=vlen) return 0;
  const float f[]={
   r->initial_x,r->initial_y,r->initial_z,
   r->x,r->y,r->z,r->gpu_x,r->gpu_y,r->gpu_z,
   r->cam_x,r->cam_y,r->stick_x,r->stick_y,
-  r->b14_path,r->accepted_path,r->native_floor_z
+  r->b14_path,r->accepted_path,r->native_floor_z,
+  r->net_world_dx,r->net_world_dy,r->net_camera_dx,r->net_camera_dy
  };
  for(unsigned i=0;i<sizeof(f)/sizeof(f[0]);++i)
   if(!isfinite(f[i]))return 0;
  int n=fprintf(b24_g279_trace_stream,
   "%s,%u,%u,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,"
   "%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,"
-  "%.5f,%.5f,%.5f,%u,%u,%u,%u,%u,%u,%u\n",
+  "%.5f,%.5f,%.5f,%u,%u,%u,%u,%u,%u,%u,"
+  "%.5f,%.5f,%.5f,%.5f,%s\n",
   r->phase,r->frame,r->millis,
   r->initial_x,r->initial_y,r->initial_z,
   r->x,r->y,r->z,r->gpu_x,r->gpu_y,r->gpu_z,
   r->cam_x,r->cam_y,r->stick_x,r->stick_y,
   r->b14_path,r->accepted_path,r->native_floor_z,
   r->active_stick,r->coll_reject,r->root_mismatch,
-  r->wall_reject,r->missing_floor,r->step_reject,r->has_native_floor);
+  r->wall_reject,r->missing_floor,r->step_reject,r->has_native_floor,
+  r->net_world_dx,r->net_world_dy,r->net_camera_dx,r->net_camera_dy,verdict);
  if(n<0 || fflush(b24_g279_trace_stream)!=0) {
   b24_g279_trace_close();return 0;
  }
