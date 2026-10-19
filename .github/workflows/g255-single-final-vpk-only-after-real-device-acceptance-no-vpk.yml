@@ -1,0 +1,52 @@
+name: G255 One Final VPK Only After 12 Real Vita Original Gameplay Gates (No VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g255_single_integrated_VPK_acceptance_gate/**"
+      - "research/b24_unified/g83_final_vpk_gate/READINESS_STATUS.json"
+      - ".github/workflows/g255-single-final-vpk-only-after-real-device-acceptance-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  one_vpk_staging_fails_closed_while_original_gates_open:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source-only script syntax; ensure original 12 gameplay gates and no VPK source artifacts
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g255_single_integrated_VPK_acceptance_gate/g255_fail_closed_one_vpk_only_after_original_vita_gameplay_qa.py
+          python3 research/b24_unified/g255_single_integrated_VPK_acceptance_gate/g255_fail_closed_one_vpk_only_after_original_vita_gameplay_qa.py
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('/tmp/g255_vpk_release_guard/G255_SINGLE_VPK_SOURCE_AND_HARDWARE_ACCEPTANCE_STATUS.json')
+          x=json.loads(p.read_text())
+          assert x['original_release_acceptance_gates_total']==12
+          assert x['verified_count']==1
+          assert x['blocking_count']==11
+          assert not x['VPK_build_authorized_by_gates']
+          assert not x['G229_real_physical_Vita_120_ground_frames_telemetry_received_as_of_2026_10_19']
+          assert not x['no_VPK_produced_by_this_audit']==False
+          print('G255 12-gate one-VPK staging NOT READY; refuse to fake original 2010 Vita hardware QA')
+          PY
+      - name: Verify one-VPK packaging is rigorously BLOCKED while essential actual-device gameplay checks are open
+        run: |
+          set -euo pipefail
+          set +e
+          python3 research/b24_unified/g255_single_integrated_VPK_acceptance_gate/g255_fail_closed_one_vpk_only_after_original_vita_gameplay_qa.py --require-ready
+          rc=$?
+          set -e
+          test "$rc" -eq 3
+          test -z "$(find . -name '*.vpk' -print -quit)"
+          echo 'G255 PASS: a premature PS Vita VPK build is rejected until all true gameplay checks pass.'
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G255_SINGLE_VPK_RELEASE_FAIL_CLOSED_12_GATES_NO_VPK
+          path: /tmp/g255_vpk_release_guard/
+          retention-days: 21
+          if-no-files-found: error
