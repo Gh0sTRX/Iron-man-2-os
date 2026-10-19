@@ -5,6 +5,7 @@ on:
     paths:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
+      - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
