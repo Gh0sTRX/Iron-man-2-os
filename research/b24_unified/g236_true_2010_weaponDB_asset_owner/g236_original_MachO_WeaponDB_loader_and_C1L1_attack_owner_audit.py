@@ -17,7 +17,7 @@ import sys
 import zipfile
 
 import capstone
-from capstone.arm import ARM_OP_IMM
+from capstone.arm import ARM_OP_IMM, ARM_INS_BL, ARM_INS_BLX
 
 HERE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(HERE/"g76_original_combat"))
@@ -98,7 +98,7 @@ def run(ipa:Path,out:Path)->dict:
    ops=list(cs.disasm(exe[ofs:ofs+length],vm))
    bl=[]
    for op in ops:
-    if op.mnemonic.startswith(("bl","blx")):
+    if op.id in (ARM_INS_BL,ARM_INS_BLX):
      direct=(op.operands and op.operands[0].type==ARM_OP_IMM)
      dest=op.operands[0].imm&~1 if direct else None
      item={"callsite_VM":hex(op.address),
