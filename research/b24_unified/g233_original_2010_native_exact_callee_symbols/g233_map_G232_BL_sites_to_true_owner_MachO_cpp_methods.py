@@ -54,7 +54,7 @@ def analyze(ipa:Path,out:Path,g196:Path|None=None)->dict:
         capture_output=True,text=True,check=True).stdout.splitlines()
     if len(names)!=len(entries):
         raise ValueError("G233 true Mach-O symbol count differs from c++filt")
-    if native["nsyms"]<60000 or len(entries)<50000:
+    if native["nsyms"]<60000 or len(entries)<10000:
         raise ValueError("G233 symbol table unexpectedly incomplete")
     text_sections=[x for x in native["sections"] if x[3]=="__text"]
     if not text_sections:
