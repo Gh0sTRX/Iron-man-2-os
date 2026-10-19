@@ -46,8 +46,19 @@ def run(ipa:Path,g265:Path,out:Path):
      "native_Lua_CALL_PC":call["source_bytecode_PC"],
      "original_native_Lua_global":call["native_global_function"],
      "authentic_2010_MC_or_PD_MC_entity_arg_nodes":named,
+     "original_2010_static_entire_CALL_arguments":call["literal_or_statically_tracked_arguments"],
+     "other_typed_entity_argument_nodes_in_same_CALL":[x for x in call["source_verified_named_entity_argument_candidates"]
+                      if x["original_source_typed_node_ID"] not in (1062,1195)],
      "source_Lua_static_CALL_not_executed":True,
    })
+ mc_start_moves=[
+  entry for entry in matches
+  if entry["original_2010_Lua_callback"]=="Mission000_OnStart"
+  and entry["original_native_Lua_global"]=="MoveEntityToEntity"
+  and any(hit["original_node_name"]=="MC" for hit in entry["authentic_2010_MC_or_PD_MC_entity_arg_nodes"])
+ ]
+ if len(mc_start_moves)!=1 or mc_start_moves[0]["native_Lua_CALL_PC"]!=170:
+  raise ValueError("original 2010 Mission000 MC scripted move source PC drift")
  freq=collections.Counter((m["original_native_Lua_global"],hit["original_node_name"])
   for m in matches for hit in m["authentic_2010_MC_or_PD_MC_entity_arg_nodes"])
  start=next(x for x in script["source_lua_static_CALLBACK_instructions_and_id_links"]
@@ -69,6 +80,9 @@ def run(ipa:Path,g265:Path,out:Path):
    "source_Mission000_71_Lua_native_callback_count":71,
    "source_Mission000_total_original_Lua_global_CALLs":1035,
    "source_2010_all_MC_PD_MC_statically_identified_entity_argument_calls":matches,
+   "source_true_original_Mission000_OnStart_MC_MoveEntityToEntity_PC170_target_source":mc_start_moves[0],
+   "source_Mission000_MoveEntityToEntity_source_target_name_if_typed":
+      next((x["original_node_name"] for x in mc_start_moves[0]["other_typed_entity_argument_nodes_in_same_CALL"] if x["argument_index"]==1),None),
    "source_2010_MC_PD_MC_Lua_global_frequency":[
        {"real_native_call":a,"native_named_entity":n,"num_static_CALLs":count}
        for (a,n),count in sorted(freq.items())],
@@ -85,6 +99,7 @@ def run(ipa:Path,g265:Path,out:Path):
  out.write_text(json.dumps(result,indent=2,ensure_ascii=False)+"\n")
  print("G266 source real 2010 MC ID1062 Position no-bind; PD_MC ID1195 Bind MC AttachType1")
  print("G266 original Lua MC+PD_MC source-typed CALL count",len(matches))
+ print("G266 TRUE ORIGINAL Mission000 OnStart MC MoveEntityToEntity PC170 ACTUAL TARGET",mc_start_moves[0])
  for x in matches:print("G266 original Lua typed MC/PD_MC node source CALL",x)
  print("G266 Mission000 original native OnStart <=PC73 source CALL count",len(opening))
  for x in opening:print("G266 genuine pre-first-branch source CALL",x)
