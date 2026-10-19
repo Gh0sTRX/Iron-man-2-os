@@ -46,7 +46,7 @@
     "G68_original_Expo_collision_camera_flight_lighting_issues_regressed": {
       "verified": false,
       "evidence_uri": null,
-      "test_details": null
+      "test_details": "After the SINGLE integrated test VPK is built from all 7 prior-source gates, inspect PHYSICAL VITA screenshots/video/QA logs for: ground collision and camera scale against source vehicle; overhead/source original night sky and moon, city windows, ambient environmental light, original four Sun001..004 placements (true final shader source semantics vs engineering tint distinguished); illuminated and shadowed armor/War Machine/vehicles/roads/buildings; floor contact/real shadow, NO black alpha rectangles, correct translucent depth and source PNG alpha, HUD third-person reticle fixed center with ground avatar offset and centered stage2 flight, skybox and 60fps stability. Host C11/ARM ELF only is NOT physical Vita lighting parity; do not mark verified until device QA."
     },
     "2010_touchHLE_gameplay_reference_recorded_and_parity_checked": {
       "verified": false,
