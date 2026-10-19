@@ -8,7 +8,7 @@ from __future__ import annotations
 import argparse,bisect,hashlib,json,subprocess,sys,zipfile
 from pathlib import Path
 import capstone
-from capstone.arm import ARM_OP_IMM
+from capstone.arm import ARM_OP_IMM, ARM_INS_BL, ARM_INS_BLX
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"g76_original_combat"))
 from g76_2010_native_arm_combat_method_provenance import parse_macho
@@ -105,7 +105,7 @@ def run(ipa:Path,g238:Path,out:Path):
   })
  directcalls=[]
  for op in allops:
-  if op.mnemonic.startswith(("bl","blx")) and op.operands and op.operands[0].type==ARM_OP_IMM:
+  if op.id in (ARM_INS_BL,ARM_INS_BLX) and op.operands and op.operands[0].type==ARM_OP_IMM:
    target=op.operands[0].imm&~1
    directcalls.append({"VM":hex(op.address),"target_VM":hex(target),
     "source_exact_CPP_symbol_names":sorted(names.get(target,()))[:3]})
