@@ -1,0 +1,26 @@
+name: G278 Real Vita First Rendered Boot XYZ Hook Source Host NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/**"
+      - ".github/workflows/g278-real-vita-first-rendered-boot-native-floor-source-host-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source_only_original_C1L1_first_rendered_boot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify exact boot/real G66C native source first-three-rendered frames Python syntax
+        run: |
+          python3 -m py_compile \
+            research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/g278_install_first_rendered_Vita_world_and_original_G66C_support_probe_NO_VPK.py \
+            research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/g278_test_boot_probe_source_injection_unique_and_negative.py
+      - name: Fail-closed unique source boot trace, cannot patch twice or without real original G66C city
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/g278_test_boot_probe_source_injection_unique_and_negative.py
+          test -z "$(find research -type f -name '*.vpk' -print -quit)"
