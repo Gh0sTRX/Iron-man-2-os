@@ -27,6 +27,8 @@ jobs:
           x=json.loads(p.read_text())
           assert x['original_release_acceptance_gates_total']==12
           assert x['source_preflight_gates_total']==7
+          assert x['original_seven_workstream_order_verified_unchanged']
+          assert x['lighting_mandatory_in_unchanged_fifth_map_visuals_gate']
           assert x['source_preflight_verified_count']==0
           assert x['source_preflight_blocking_count']==7
           assert not x['VPK_build_authorized_by_source_gates']
