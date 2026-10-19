@@ -16,7 +16,7 @@ G161 kurulmuş eski PS Vita testinde yürüyüş animasyonu oynuyordu, fakat yer
 **Hedef:** Bir sonraki *tek bütünleşik VPK* cihaz testinde, VitaShell ile erişilebilecek kaynak-bağlı ve bozulmaya dirençli yürüyüş teşhis dosyası. G279, oyun mekaniğini düzeltmek yerine kullanıcı gözlemine **neden** olan zincirin hangi halkasının farklı olduğunu göstermek için vardır.
 
 - Dosya (Vita'da yazma izni mevcutsa): \`ux0:data/ironman2_g279_walk.csv\`. Açılmazsa oyun yüklenmeye devam eder; bu yol Vita cihazında henüz denenmedi.
-- **BOOT**: İlk üç başarılı C1L1 GPU çizim karesinin gerçek G278/B14 başlangıcı, özgün kaynak G66C yakın zemin tespiti, G75 çarpışma reddi, G8/GPU zırh root XYZ, kamera ve pad girdileri.
+- **BOOT**: İlk üç başarılı C1L1 GPU çizim karesinin gerçek G278/B14 başlangıcı, özgün kaynak G66C yakın zemin tespiti, G75 çarpışma reddi, GPU zırh root XYZ, kamera ve pad girdileri. G8 dosya seçimi bu CSV'de ayrıca kaydedilmez; önceki G227-G229 kaynak gözlemcisi animasyon eksikliğini ayrı sayar.
 - **WALK120**: G229'un **aralıksız 120 başarılı yerde oynanmış/çizilmiş kare** penceresi kapanınca gerçek B14 önerilen yol, G75 kabul edilen yol, stick var/yok, collision rejected sayısı, GPU root mismatch, aynı pencerenin dünya ve kamera \`dx/dy\` farkı ve G229 sınıflandırma açıklaması yazılır. Son G277 wall/no-floor/step sayıları yalnız *son* G75 alt-sweep'e aittir, pencere toplamı olarak etiketlenmez.
 - Orijinal \`B14\`, \`G75\`, \`G8\`, \`GPU\`, kamera döngüsünün **tamamında yalnızca birer** gerçek çağrı kalır. Kod yalnız gerçek G171+G278 dosyasına tekil noktalardan eklenebilir; bozuk kaynak/çift ekleme/VPK bulunduğunda hata ile durur.
 - Teşhis varsayılan olarak **OFF**: gelecekte tam oyun derlemesinde isteğe bağlı \`-DB24_G279_WALK_TRACE_FILE=ON\`, ayrıca G227/G171 doğrulama makroları gerekli.
@@ -31,7 +31,7 @@ G161 kurulmuş eski PS Vita testinde yürüyüş animasyonu oynuyordu, fakat yer
 - \`research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py\`
 - GitHub Actions **G279 hızlı C11/negative-source CI SUCCESS**: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569074
 - Önceki G279 26-kolonlu ilk sürümün **G171 tüm gerçek Vita ARM ELF derleme SUCCESS**: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341249175
-- 31-kolonlu genişletmenin aynı gerçek full Vita ARM ELF tekrarı: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016 — durum/sonucu yayınlanmadan PASS **denmemeli**.
+- 31-kolonlu genişletmenin gerçek full VitaSDK ARM ELF + B14/G75 kaynak yürüyüş 120/120 + C11 testleri SUCCESS: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016 (`[100%] Built target im2_beta`). Fiziksel Vita cihazında yürüyüş hâlâ test edilmedi.
 
 ## Cihaz logu nasıl yorumlanacak?
 
