@@ -56,6 +56,24 @@ int main(void){
  assert(!b24_g229_window_push(&w,&q,160u));assert(w.samples==0u);
  assert(!strcmp(b24_g229_window_verdict_name(B24_G229_GPU_ROOT_DIVERGES_FROM_WORLD),
                 "GPU_RENDER_ROOT_DISAGREES_WITH_WORLD"));
+ /* G256: source-reproduced original Expo MC XY low/mid collision floors
+  * must remain observable across 120 continuous grounded rendered frames.
+  * Heights here are diagnostic fixture input, NOT real Vita measurement. */
+ B24G229WalkWindow height={0};
+ B24G227GroundProbe zh={0};
+ zh.recorded=1;zh.original_G8_clip_loaded=1;zh.stick_y=1.f;
+ for(uint32_t n=0;n<120;n++){
+   zh.frame_num=n;
+   zh.resolved_world_z=n<60u?.0725f:2.82955f;
+   zh.proposed_world_z=zh.resolved_world_z;
+   zh.gpu_actor_world_z=zh.resolved_world_z;
+   assert(b24_g229_window_push(&height,&zh,n*16u)==(n==119u));
+ }
+ assert(fabsf(height.first_world_z-.0725f)<.00001f);
+ assert(fabsf(height.last_world_z-2.82955f)<.00001f);
+ assert(fabsf(height.min_world_z-.0725f)<.00001f);
+ assert(fabsf(height.max_world_z-2.82955f)<.00001f);
+ printf("G256 HOST PASS original G249 low/mid source Z-up telemetry (synthetic fixture, NOT real Vita).\n");
  printf("G229 HOST PASS: 7 original-path synthetic scenarios, discontinuity/flight/pause/NaN resets; READ-ONLY; no VPK.\n");
  return 0;
 }
