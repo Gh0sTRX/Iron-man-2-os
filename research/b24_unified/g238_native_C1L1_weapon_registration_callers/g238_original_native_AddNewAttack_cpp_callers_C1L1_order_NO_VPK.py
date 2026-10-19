@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse,bisect,collections,hashlib,json,subprocess,sys,zipfile
 from pathlib import Path
 import capstone
-from capstone.arm import ARM_OP_IMM
+from capstone.arm import ARM_OP_IMM, ARM_INS_BL, ARM_INS_BLX
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"g76_original_combat"))
 sys.path.insert(0,str(ROOT))
@@ -78,7 +78,7 @@ def audit(ipa:Path,out:Path,g237:Path|None)->dict:
   decoder=decoder_thumb if "thumb" in choices else decoder_arm
   checked+=1
   for ins in decoder.disasm(exe[ofs:ofs+length],addr):
-   if not ins.mnemonic.startswith(("bl","blx")) or not ins.operands:
+   if ins.id not in (ARM_INS_BL,ARM_INS_BLX) or not ins.operands:
     continue
    p=ins.operands[0]
    if p.type!=ARM_OP_IMM:continue
