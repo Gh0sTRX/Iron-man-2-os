@@ -42,3 +42,10 @@ G161 kurulmuş eski PS Vita testinde yürüyüş animasyonu oynuyordu, fakat yer
 - \`native_floor\` yoksa bunun tek başına gerçek iOS spawn'ını ispat etmediğini unutma.
 
 **Öncelik:** (1) Gerçek başlangıç+ground cihaz teşhisi; sonra mevcut sırayla (2) flight, (3) G8/War Machine anim, (4) özgün combat, (5) orijinal map/sky/ışık/alpha/HUD, (6) Mission000/QTE/ses/NPC, (7) tüm gate'lerden sonra **tek** test VPK. Bu adım bu sıralamayı değiştirmez.
+
+## G279 CSV bağımsız otomatik yorumlayıcı — aynı yürüyüş odağında ek gelişme
+
+- `research/b24_unified/g279_vita_walk_persistent_trace/g279_analyze_Vita_walk_trace_TR.py` kayıt gelince Türkçe çıktı üretir. Özgün Vita dosyası gelmeden herhangi bir gerçek cihaz başarısı iddia etmez.
+- Başlık ve 31 sütun 1:1 denetlenir; sahte/eksik sütun, NaN/Infinity, yüksek/negatif sayaç, bilinmeyen G229 sonucu, bozuk kare sırası ve >8 MiB kayıt reddedilir.
+- Gerçek veri yüklenirse B14 önerilen dünya yolu, C1L1 çözümlenen dünya yolu, camera/world net hareket, GPU mismatch ve kaynak çarpışma red sayılarıyla, 'girdi yok / B14 hareket üretmedi / çarpışma reddi / GPU dünya kökü farkı / dünya hareket ediyor' sınıfları üretilir.
+- Cihazdan gerçek dosya henüz alınmadığı için sadece sentetik host testleri yapıldı. [G279 kaynak/analizci bütün fast CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39342242088). **NO VPK**.
