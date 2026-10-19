@@ -79,7 +79,9 @@ def source(ipa:Path,g268:Path,out:Path):
  for x,name in zip(syms,dem):named[x[1]&~1].add(name)
  pd_symbols=sorted([{"cpp":name,"native_VM":hex(vm)} for vm,names in named.items() for name in names
   if name.startswith("PositionDummy::")],key=lambda x:(x["cpp"],x["native_VM"]))
- if not pd_symbols:raise ValueError("source original PositionDummy class symbols not found")
+ # Original strip/symbol export may not expose a dedicated PositionDummy:: method;
+ # do not invent a C++ implementation or treat absent symbol as runtime absence.
+ position_dummy_native_cpp_owner_named_in_MachO=bool(pd_symbols)
  code_secs=[s for s in whole["sections"] if s[3]=="__text"]
  starts=sorted(k for k in named if any(s[0]<=k<s[0]+s[1] for s in code_secs))
  dis=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM);dis.detail=True
@@ -112,6 +114,8 @@ def source(ipa:Path,g268:Path,out:Path):
   "genuine_PoistionDummy_class_name":"PositionDummy",
   "genuine_original_goal_3_different_typed_component_records":selected,
   "source_original_PositionDummy_native_cpp_symbols":pd_symbols,
+  "original_PositionDummy_dedicated_Cpp_method_symbol_present":position_dummy_native_cpp_owner_named_in_MachO,
+  "original_PositionDummy_inherits_entity_loader_or_has_hidden_cpp_method_PROVEN":False,
   "source_original_PositionDummy_method_ARM_windows":methods,
   "genuine_original_3_source_transform_child_ordinal_proven":True,
   "genuine_runtime_get_position_selects_child_index_proven":False,
@@ -122,13 +126,13 @@ def source(ipa:Path,g268:Path,out:Path):
  out.parent.mkdir(parents=True,exist_ok=True)
  out.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
  for c in selected:print("G269 original C1L1 real goal typed child",c)
- print("G269 original PositionDummy C++ symbol count",len(pd_symbols))
+ print("G269 actual original PositionDummy:: exact symbol count",len(pd_symbols),"(0 means not exported by this native symbols inventory, NOT absent runtime class)")
  for s in pd_symbols:print("G269 original native PD method",s)
  for method in methods:
   print("G269 PD method source ARM",method["2010_original_CPP_method"],method["native_VM"],len(method["first_190_native_ARM_instructions"]))
   for o in method["first_190_native_ARM_instructions"]:
    if "direct_called_VM" in o:print("G269 original PositionDummy genuine native BL",o)
- print("G269 PASS original 2010 PD_IM_jump_goal three distinct typed components; native method source; runtime target still uncertain, NO VPK")
+ print("G269 PASS original 2010 PD_IM_jump_goal three distinct typed components and source C++ symbol check; runtime target still uncertain, NO VPK")
 if __name__=="__main__":
  p=argparse.ArgumentParser()
  p.add_argument("--ipa",type=Path,required=True)
