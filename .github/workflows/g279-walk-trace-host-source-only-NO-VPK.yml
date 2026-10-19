@@ -1,0 +1,31 @@
+name: G279 strict on-device walk log writer C11 plus Vita game one-owner patch source test NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g279-walk-trace-host-source-only-NO-VPK.yml"
+      - "research/b24_unified/g279_vita_walk_persistent_trace/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g279_small_2010_vita_observer_source_only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: G279 strict C11 Vita log format and fail-closed source patch positive/negative
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile \
+            research/b24_unified/g279_vita_walk_persistent_trace/g279_install_file_trace_after_G278_one_Vita_game_NO_VPK.py \
+            research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py
+          python3 research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py
+          cc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+            research/b24_unified/g279_vita_walk_persistent_trace/test_g279_bounded_csv_writer.c \
+            -lm -o /tmp/g279_test_host_c11
+          /tmp/g279_test_host_c11
+          test -z "$(find research/b24_unified/g279_vita_walk_persistent_trace -type f -name '*.vpk' -print -quit)"
+          test -z "$(find research/b24_unified/g279_vita_walk_persistent_trace -type f -name '*.ipa' -print -quit)"
+          echo 'G279 HOST VERIFIED: ONLY record existing G278 real first rendered frames and G229 original world/GPU/camera 120-frame snapshots; no animation physics/weapon changes. Real Vita hardware remains UNTESTED. NO VPK.'
