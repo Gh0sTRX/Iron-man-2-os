@@ -111,6 +111,14 @@ def run(g196:Path,out:Path)->dict:
             "branch_entry_VM":hex(root),
             "structurally_reachable_ARM_instructions":len(visited),
             "reachable_original_DoUniBeamAttack_calls":calls,
+            "reachable_original_direct_BL_call_inventory":[
+                {"source_native_callsite_VM":hex(site),
+                 "source_original_called_VM_string":instruction["target"],
+                 "cpp_method_identity_authenticated_as_DoUniBeamAttack":
+                    instruction["target"]=="#0xf60ac",
+                 "2010_gameplay_effect_or_weapon_input_proven":False}
+                for site,instruction in sorted(direct_calls.items()) if site in visited
+            ],
             "unresolved_indirect_or_control_flow_sites":indirect[:32],
             "original_ARM_CFG_is_predicate_and_virtual_indirect_incomplete":True,
         })
@@ -132,7 +140,9 @@ def run(g196:Path,out:Path)->dict:
               "branch",item["branch_entry_VM"],
               "static UniBeam callsites",[(c["original_UniBeam_call_VM"],c["2010_original_dummy_group"])
               for c in item["reachable_original_DoUniBeamAttack_calls"]],
-              "visited",item["structurally_reachable_ARM_instructions"])
+              "visited",item["structurally_reachable_ARM_instructions"],
+              "source BL calls",[(a["source_native_callsite_VM"],a["source_original_called_VM_string"])
+               for a in item["reachable_original_direct_BL_call_inventory"]])
     print("G231 PASS actual original ARM structural CFG; runtime predicates/suit/weapon effects still UNKNOWN, no VPK")
     return report
 
