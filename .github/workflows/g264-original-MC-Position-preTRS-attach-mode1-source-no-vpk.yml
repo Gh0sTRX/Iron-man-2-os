@@ -1,0 +1,71 @@
+name: G264 True Original MC Position 92Byte PreTRS and Native Attach Mode1 No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g264_original_MC_preTRS_record_and_attach_mode1/**"
+      - ".github/workflows/g264-original-MC-Position-preTRS-attach-mode1-source-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_C1L1_position_record_and_native_attached_entity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile original native source CLARA typed component reader
+        run: python3 -m py_compile research/b24_unified/g264_original_MC_preTRS_record_and_attach_mode1/g264_source_original_MC_92byte_Position_prefix_and_RefreshPosition_mode1.py
+      - name: Install original 2010 iOS private archive reader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G260_ORIGINAL_2010_POSITIONDATA_CPP_WORLD_MATRIX_METHODS_NO_VPK
+          run-id: 39262527719
+          github-token: ${{ github.token }}
+          path: /tmp/g264_2010_native_CPP
+      - uses: actions/download-artifact@v4
+        with:
+          name: G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACHTYPE_SOURCE_ONLY_NO_VPK
+          run-id: 39265134305
+          github-token: ${{ github.token }}
+          path: /tmp/g264_2010_verified_MC
+      - name: Retrieve user's original iOS 2010 IPA into ephemeral private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g264_owner_original
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g264_owner_original/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g264_owner_original/owner.ipa
+          test "$(wc -c </tmp/g264_owner_original/owner.ipa)" -eq 248613763
+      - name: Verify original typed MC Position field 92-byte record and native conditional attachment manager source path
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g264_original_MC_preTRS_record_and_attach_mode1/g264_source_original_MC_92byte_Position_prefix_and_RefreshPosition_mode1.py \
+            --ipa /tmp/g264_owner_original/owner.ipa \
+            --g260 /tmp/g264_2010_native_CPP/G260_TRUE_2010_POSITIONDATA_WORLD_MATRIX_CPP_METHODS.json \
+            --g263 /tmp/g264_2010_verified_MC/G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACH_TYPE_BRANCH_SOURCE.json \
+            --out /tmp/g264_source_report/G264_TRUE_2010_MC_POSITION_92BYTE_PRETRS_AND_NATIVE_ATTACHMODE1.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g264_source_report/G264_TRUE_2010_MC_POSITION_92BYTE_PRETRS_AND_NATIVE_ATTACHMODE1.json').read_text())
+          assert x['total_original_2010_tag92_source_position_components']==663
+          assert x['authentic_2010_AttachType_mode1_c8054_GetInstance_and_c805c_FindEntityById']
+          assert len(x['original_typed_MC_and_reference_Preload_component_records'])==4
+          assert not x['MC_raw_36byte_prefix_values_correctly_named_as_2010_Bind_To_Entity']
+          assert not x['source_real_MC_runtime_world_matrix_computed']
+          assert x['NO_VPK']
+          print('G264 original source MC typed Position component metadata/true ARM attach path PASS (not Vita fix)')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Remove owner original iOS 2010 game from temporary runner
+        if: always()
+        run: rm -rf /tmp/g264_owner_original
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G264_TRUE_MC_POSITION_92BYTE_PREFIX_NATIVE_ATTACH_MODE1_NO_VPK
+          path: /tmp/g264_source_report/
+          retention-days: 21
+          if-no-files-found: error
