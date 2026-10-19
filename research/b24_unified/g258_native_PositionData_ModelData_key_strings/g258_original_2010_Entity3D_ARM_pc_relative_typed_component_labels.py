@@ -7,12 +7,13 @@ Grounded source player world startup STILL unknown. NO Vita runtime/VPK.
 from __future__ import annotations
 import argparse,hashlib,json,struct,zipfile
 from pathlib import Path
+import sys
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
+sys.path.insert(0,str(ROOT/"g76_original_combat"))
 from capstone import Cs,CS_ARCH_ARM,CS_MODE_ARM
 from b24_owner_pack_extract import decode,get_exact
 from b24_g25_original_clara_class_schema_and_actual_MC_maincharacter import summarize
-import sys
-ROOT=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT/"g76_original_combat"))
 from g76_2010_native_arm_combat_method_provenance import parse_macho
 VM=0x12c78
 LITERALS=[
