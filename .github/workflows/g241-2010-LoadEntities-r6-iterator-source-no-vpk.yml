@@ -1,0 +1,66 @@
+name: G241 Authentic 2010 LoadEntities EntityData Iterator r6 Source (No VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g241_original_LoadEntities_iterator_origin/**"
+      - ".github/workflows/g241-2010-LoadEntities-r6-iterator-source-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_2010_LoadEntities_iterator_provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check source-only actual original ARM scanner
+        run: |
+          python3 -m py_compile research/b24_unified/g241_original_LoadEntities_iterator_origin/g241_2010_exact_LoadEntities_EntityData_r6_fp_sl_origin_ARM.py
+          test -z "$(find . -type f -name '*.vpk' -print -quit)"
+      - name: Install exact original source parsing deps
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G240_SOURCE_TRUE_2010_NATIVE_LOADENTITIES_ATTACK_WEAPON_ACCESSORY_NO_VPK
+          run-id: 39221185745
+          github-token: ${{ github.token }}
+          path: /tmp/g241_prior_original_2010
+      - name: Read user owner source IPA temporarily
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g241_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g241_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g241_private_owner/owner.ipa
+          test "$(wc -c </tmp/g241_private_owner/owner.ipa)" -eq 248613763
+      - name: Verify real original 2010 native entity iteration branch provenance
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g241_original_LoadEntities_iterator_origin/g241_2010_exact_LoadEntities_EntityData_r6_fp_sl_origin_ARM.py \
+            --ipa /tmp/g241_private_owner/owner.ipa \
+            --g240 /tmp/g241_prior_original_2010/G240_ORIGINAL_2010_NATIVE_LOADENTITIES_THREE_TYPED_ADDS.json \
+            --out /tmp/g241_verified/G241_TRUE_2010_LOADENTITIES_R6_FP_SL_ORIGINAL_ARM_SOURCE.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g241_verified/G241_TRUE_2010_LOADENTITIES_R6_FP_SL_ORIGINAL_ARM_SOURCE.json').read_text())
+          assert d['true_original_ARM_method_VM']=='0xc2e8c'
+          assert d['original_loadentities_native_instruction_count']>200
+          assert len(d['original_native_iterate_and_type_switch_source_windows'])==4
+          assert d['three_AddNew_arm_calls_share_one_native_iterator']
+          assert not d['actual_2010_C1L1_runtime_EntityData_list_order_PROVEN']
+          assert not d['actual_2010_WeaponDB_array_entries_0_1_4_names_PROVEN']
+          assert not d['source_generated_VPK']
+          print('G241 PASS actual original native r6/sl/fp LoadEntities source; NEVER equate file order with real runtime weapon index')
+          PY
+      - name: Delete original game executable and archive from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g241_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G241_TRUE_2010_LOADENTITIES_ENTITYDATA_ITERATOR_ARM_PROVENANCE_NO_VPK
+          path: /tmp/g241_verified/
+          retention-days: 21
+          if-no-files-found: error
