@@ -1,0 +1,64 @@
+name: G270 Original EntityData GetParamComponent and PositionDummy C1L1 Branch No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g270_true_original_EntityData_GetParamComponent_three_goal_children/**"
+      - ".github/workflows/g270-original-GetParamComponent-positiondummy-native-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  owner_original_iOS2010_EntityData_component_selector:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile literal original C++ GetParamComponent and position dummy scene comparator syntax
+        run: python3 -m py_compile research/b24_unified/g270_true_original_EntityData_GetParamComponent_three_goal_children/g270_original_2010_GetParamComponent_EntityData_and_PositionDummy_source.py
+      - name: Install original MachO ARM disassembler and private source reader
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G269_ORIGINAL_2010_C1L1_THREE_GOAL_POSITIONDUMMY_ARM_NO_VPK
+          run-id: 39270034638
+          github-token: ${{ github.token }}
+          path: /tmp/g270_actual_3goal
+      - name: Download user-owned original iOS 2010 game temporarily for private CI source evidence
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g270_original_private
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g270_original_private/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g270_original_private/owner.ipa
+          test "$(wc -c </tmp/g270_original_private/owner.ipa)" -eq 248613763
+      - name: Inspect genuine 2010 EntityData typed component selector native ARM and PositionDummy class dispatch
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g270_true_original_EntityData_GetParamComponent_three_goal_children/g270_original_2010_GetParamComponent_EntityData_and_PositionDummy_source.py \
+            --ipa /tmp/g270_original_private/owner.ipa \
+            --g269 /tmp/g270_actual_3goal/G269_ORIGINAL_2010_MISSION000_JUMP_GOAL_THREE_NATIVE_TYPED_COMPONENTS.json \
+            --out /tmp/g270_source/G270_ORIGINAL_2010_NATIVE_GETPARAMCOMPONENT_AND_PDCLASS_SCENE_CHILDREN.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          x=json.loads(Path('/tmp/g270_source/G270_ORIGINAL_2010_NATIVE_GETPARAMCOMPONENT_AND_PDCLASS_SCENE_CHILDREN.json').read_text())
+          assert x['original_EntityData_GetParamComponent_native_VM']=='0xd7bb4'
+          assert x['original_C1L1_PositionDummy_entities_with_at_least_one_strict_TRS']>0
+          assert x['source_2010_C1L1_three_children_1893_1894_1895_expected']
+          assert not x['original_EntityData_GetParamComponent_selected_child_index_or_field_runtime_proven']
+          assert not x['original_MC_actual_runtime_world_position_proven']
+          assert x['NO_VPK']
+          print('G270 original 2010 native EntityData selector and PositionDummy source dispatch inspected; no gameplay binary packaged')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete owner original game from ephemeral private CI runner
+        if: always()
+        run: rm -rf /tmp/g270_original_private
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G270_ORIGINAL_2010_GETPARAMCOMPONENT_POSITIONDUMMY_CLASS_NO_VPK
+          path: /tmp/g270_source/
+          retention-days: 21
+          if-no-files-found: error
