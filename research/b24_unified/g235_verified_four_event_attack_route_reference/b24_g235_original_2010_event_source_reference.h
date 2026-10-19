@@ -1,5 +1,6 @@
 /* G235: source-only 2010 iOS DoAttack event callsite metadata.
- * Proven by original ARM 0xF6930 -> 0xF6A30 native r8[0..3],
+ * Proven by original ARM 0xF6A30 native r8[0..3] (outer AttackType 0
+ * directly, AttackType 1/18 via conditional paths),
  * G233 real MachO C++ symbols, G234 exact 2010 immediate arg writes.
  * This is NOT a new Vita weapon/animation/touch input controller:
  * name-based G218 clip->state match is NOT actual 2010 live state proof.
@@ -29,10 +30,13 @@ typedef struct {
 static inline B24G235EventReference b24_g235_original_source_event(
     uint32_t original_AttackType,uint32_t original_event_third_u32) {
  B24G235EventReference a={0};
- /* Only genuine native upper DoAttack jump cases 1,18 reach 0xF6930.
+ /* Outer source index 0 directly selects 0xF6A30. Native selectors 1/18
+  * share 0xF6930 and may reach this secondary switch conditionally.
+  * Other AttackType values must not use this 4-way source map.
   * No assertion that this StateData is currently SELECTED in Vita. */
- if(b24_g197_original_source_attack_entry(original_AttackType)
-     .original_ARM_branch_target_VM!=0xF6930u)return a;
+ const uint32_t upper=b24_g197_original_source_attack_entry(original_AttackType)
+     .original_ARM_branch_target_VM;
+ if(upper!=0xF6A30u && upper!=0xF6930u)return a;
  switch(original_event_third_u32){
  case 0u:
    a.candidate_source_path=B24_G235_ORIGINAL_GETWEAPON_SLOT0_DB_ATTACK0;
