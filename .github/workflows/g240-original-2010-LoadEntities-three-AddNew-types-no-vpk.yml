@@ -45,7 +45,7 @@ jobs:
           d=json.loads(Path('/tmp/g240_verified/G240_ORIGINAL_2010_NATIVE_LOADENTITIES_THREE_TYPED_ADDS.json').read_text())
           assert d['true_original_native_method_VM']=='0xc2e8c'
           assert len(d['real_original_three_weapon_registration_subbranches'])==3
-          assert d['real_original_native_method_CPP']=='GS_GamePlay::LoadEntities()'
+          assert d['true_original_native_method_CPP']=='GS_GamePlay::LoadEntities()'
           assert not d['true_2010_scene_file_order_equal_registration_sequence_proven']
           assert not d['real_original_runtime_GetEntityData_iteration_order_proven']
           assert not d['original_2010_iOS_touch_missile_gatling_input_mapped']
