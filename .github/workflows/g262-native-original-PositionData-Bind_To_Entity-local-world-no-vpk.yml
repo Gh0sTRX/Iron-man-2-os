@@ -1,0 +1,59 @@
+name: G262 Original 2010 PositionData Bind Entity Local XYZ Matrix Source No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g262_original_PositionData_bind_world_translation/**"
+      - ".github/workflows/g262-native-original-PositionData-Bind_To_Entity-local-world-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source_native_original_2010_xyz_and_bound_entity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check original ARM source-only semantic regression scanner
+        run: python3 -m py_compile research/b24_unified/g262_original_PositionData_bind_world_translation/g262_verify_native_2010_PosData_bind_entity_world_translation_source.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G260_ORIGINAL_2010_POSITIONDATA_CPP_WORLD_MATRIX_METHODS_NO_VPK
+          run-id: 39262527719
+          github-token: ${{ github.token }}
+          path: /tmp/g262_original_cpp
+      - uses: actions/download-artifact@v4
+        with:
+          name: G261_GENUINE_2010_POSITIONDATA_SIX_LITERAL_PROPERTIES_NO_VPK
+          run-id: 39262916694
+          github-token: ${{ github.token }}
+          path: /tmp/g262_original_labels
+      - name: Prove original iOS 2010 PositionData Bind_To_Entity and XYZ matrix translation strictly from native opcode evidence
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g262_original_PositionData_bind_world_translation/g262_verify_native_2010_PosData_bind_entity_world_translation_source.py \
+            --g260 /tmp/g262_original_cpp/G260_TRUE_2010_POSITIONDATA_WORLD_MATRIX_CPP_METHODS.json \
+            --g261 /tmp/g262_original_labels/G261_TRUE_ORIGINAL_2010_POSITIONDATA_SIX_NATIVE_PROPERTY_STRINGS.json \
+            --out /tmp/g262_report/G262_GENUINE_ORIGINAL_2010_POSITIONDATA_PARENT_MATRIX_NATIVE_ARM.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g262_report/G262_GENUINE_ORIGINAL_2010_POSITIONDATA_PARENT_MATRIX_NATIVE_ARM.json').read_text())
+          assert x['original_2010_native_Bind_To_Entity_direct_EntityMgr_FindEntityById_proven']
+          assert x['original_2010_native_GetMatrix_uses_Position_XYZ_and_writes_4x4_matrix_translate_columns_proven']
+          assert x['original_2010_native_AttachType_controls_RefreshPosition_source_branch_proven']
+          assert not x['source_original_MC_class112_Bind_To_Entity_record_actual_ID_proven']
+          assert not x['original_source_mc_world_boot_feet_xyz_proven']
+          assert not x['physical_Vita_ground_root_bug_fixed']
+          assert x['NO_VPK']
+          print('G262 PASS authentic original parent link & local TRS, NO VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G262_GENUINE_ORIGINAL_POSITIONDATA_PARENT_MATRIX_PROVENANCE_NO_VPK
+          path: /tmp/g262_report/
+          retention-days: 21
+          if-no-files-found: error
