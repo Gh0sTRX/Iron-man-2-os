@@ -1,0 +1,63 @@
+name: G260 Original 2010 PositionData World Matrix Cpp ARM Source (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g260_original_PositionData_world_matrix_source/**"
+      - ".github/workflows/g260-original-2010-PositionData-native-world-matrix-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  real_original_iOS2010_PositionData_cpp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate native PositionData source scanner
+        run: python3 -m py_compile research/b24_unified/g260_original_PositionData_world_matrix_source/g260_original_2010_PositionData_CPP_native_world_matrix_methods.py
+      - name: Install genuine 2010 iOS ARM metadata dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G258_ORIGINAL_2010_ENTITY3D_TYPED_POSITION_MODEL_LITERALS_NO_VPK
+          run-id: 39241268978
+          github-token: ${{ github.token }}
+          path: /tmp/g260_original_position_model
+      - name: Temporarily read exact original 2010 iOS game IPA
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g260_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g260_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g260_original_owner/owner.ipa
+          test "$(wc -c </tmp/g260_original_owner/owner.ipa)" -eq 248613763
+      - name: Map real original PositionData 2010 native Cpp getters and world transform methods
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g260_original_PositionData_world_matrix_source/g260_original_2010_PositionData_CPP_native_world_matrix_methods.py \
+            --ipa /tmp/g260_original_owner/owner.ipa \
+            --g258 /tmp/g260_original_position_model/G258_TRUE_ORIGINAL_2010_ENTITY3D_TYPED_COMPONENT_NATIVE_ARM_LITERAL_KEYS.json \
+            --out /tmp/g260_original_native/G260_TRUE_2010_POSITIONDATA_WORLD_MATRIX_CPP_METHODS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g260_original_native/G260_TRUE_2010_POSITIONDATA_WORLD_MATRIX_CPP_METHODS.json').read_text())
+          assert d['authentic_original_Entity3D_GetParamComponent_2010_key']=='Position'
+          assert len(d['authentic_native_2010_PositionData_field_owner_symbols'])>=3
+          assert not d['native_original_player_world_initialization_source_proven']
+          assert not d['Vita_world_collision_velocity_player_mutated']
+          assert d['NO_VPK']
+          print('G260 genuine original 2010 PositionData native source verified, no fake actor boot coordinates')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase copyrighted original game source from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g260_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G260_ORIGINAL_2010_POSITIONDATA_CPP_WORLD_MATRIX_METHODS_NO_VPK
+          path: /tmp/g260_original_native/
+          retention-days: 21
+          if-no-files-found: error
