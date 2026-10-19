@@ -29,3 +29,28 @@ G248 source:
 2. `MC` scene local transform konumu **orijinal hikâye spawn kanıtı değildir**. Orijinal Mission000 `SetCamera`, C1L1 `SpawnPoint000...015`, `SetPlayerState` ve native scene aktör yerleşimi üzerinden gerçekte kullanılacak spawn/tavan alanı bulunmalı. Yalnızca yürüsün diye `G66C` wall715'i silme, uydurma hız veya karakter/harita scale değiştirme.
 
 **Bu turda yeni Vita gameplay fiziği, sky, silah, animasyon, NPC veya görev davranışı değiştirilmedi; gerçek Vita'da yürüyüş düzeldiği iddiası yok, VPK YOK.**
+
+
+## G249 genişletilmiş kaynak sonucu — **tamamlandı / CI SUCCESS**
+
+[**G249 gerçek tek Vita oyununun yeniden kaynak kurulumu, 96-senaryo 11.520 çarpışma/hareket kare host testi ve Vita ARM `im2_beta` ELF SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39234051299).
+
+Aynı `(-1.319,-6.747)` gerçek `MC` lokal XY kaynak konumunun birden fazla orijinal geometrik dikey katmanı vardır. Orijinal `G66C` destek yükseklikleri ve gerçek `MC` authored transform `Z=25.054` ayrı hipotez olarak incelendi. **Her 8 test yönünde en az 1/120 karenin G75 tarafından kabul edilmesi** başarı sayılır; tüm 120 kare boyunca engelsiz yol/çalışır son kullanıcı gameplay demek değildir.
+
+| Kaynak site hipotezi (tamamı 8 yön) | Yer: hareket kabul edilen yön | Uçuş: hareket kabul edilen yön |
+|---|---:|---:|
+| Homebrew B14 `(0,0,0)` | **8/8** | **8/8** |
+| 2010 G66M source road `(-160,-160,2.6937)` | **8/8** | **8/8** |
+| Orijinal MC XY, en alt G66C `Z=.0725` | **0/8** | **3/8** |
+| Orijinal MC XY, orta G66C `Z=2.82955` | **8/8** | **8/8** |
+| Orijinal MC XY, üst G66C `Z=6.673064` | **0/8** | **0/8** |
+| Orijinal MC authored 3B `(-1.319,-6.747,25.054)` | **0/8** | **0/8** |
+
+**En kritik gerçek ayrı veri:** MC alt kaynak yüksekliğinde ileri stick `(0,+1)` ve diğer 7 yön, B14 tarafından her 120 karede kaynak hareket önerisi oluşturuyor ama kaynak G75 **120/120 reddediyor**. Aynı XY'nin **orta `Z≈2.82955` katmanında** sağa ve sola yerde hareket `120/120` kabul ediliyor; ileri `2/120`, geri `15/120`, diagonallerde G75'nin gerçekten kabul ettiği XY hareketi var (bazı framelerde duvara teğet kayma ve eksen kilidi). Bu kuvvetle **zemin katmanı/duvar teması / kapsül mevcut başlangıç wysokołu** bulgusudur; kaynak kodda B14 movement hiç gitmiyor veya G8 animasyon kareleri dünya root'una kesin müdahale ediyor gibi genellenmemeli.
+
+- Orijinal kaynak **G66C face `715`** bu düşük MC XY ayak yüksekliğinde kapsüle değiyor. Test gerçek `b24_g156_exact_vertical_triangle_contact` ile bunu ayrıca `assert` ediyor. Yüzey orijinal `G66C` verisidir; **duvarı silmek doğru değildir**.
+- Orijinal authored MC `Z=25.054` eşzamanlı bir şüpheli spawn olabilir ancak **gerçekte Mission000 başlangıç XYZ'si olduğu kanıtlanmadı**; B14 testi bu kaynak seviyeyi geçerli yere basma yüksekliği şeklinde zorlayıp kıyaslar, native iOS actor giriş akışı bundan çıkarılamaz.
+- İki G249 bağlanması da gerçek C1L1 kurulum+ VitaSDK ARM `im2_beta` ELF-only zincirinde geçti, tamamı host statik simülasyon/test sonucu; **fiziksel cihaz donanımında G229 telemetri henüz alınmadı**.
+- Statik grafik yerel olarak hazırlanmıştır, GitHub raporu test metaverisi sağlar; sahne ekran görüntüsü/gerçek Vita görüntüsü değildir.
+
+**Önerilen G250:** `Mission000_OnStart` gerçek native source initial spawn ve orijinal `SpawnPoint000..015` transformu bağlantısı; fiziksel kullanıcı `G229_WALK_WINDOW` source analog/B14/native collision/GPU root kaydı. Gerçek spawn/ayak dünya koordinatı çözülünce yalnız orijinal G66C etkileşimi veya source-authentic boot izni düzeltilecek; uydurma 2.82955 konumuna sürekli teleport, source wall silme, körlemesine ground speed yükseltme yapılmayacak. **VPK halen yok.**
