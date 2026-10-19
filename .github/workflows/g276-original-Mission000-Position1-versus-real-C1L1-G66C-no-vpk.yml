@@ -1,0 +1,78 @@
+name: G276 Original 2010 Script Position1 Candidate vs Real G66C Ground Host No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g276_original_Mission000_Position1_vs_true_G66C_world_source/**"
+      - ".github/workflows/g276-original-Mission000-Position1-versus-real-C1L1-G66C-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_source_goal_and_ground_collision_consistency:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download original 2010 sourced Mission000 Position1 native C11 read-only header
+        uses: actions/download-artifact@v4
+        with:
+          name: G275_TRUE_2010_MISSION000_NUM0_POSITION1_C11_QA_NO_VPK
+          run-id: 39272740265
+          github-token: ${{ github.token }}
+          path: /tmp/g276_real_source
+      - name: Restore prior ORIGINAL 2010 sourced G68 game archive read-only (DO NOT build VPK)
+        uses: actions/download-artifact@v4
+        with:
+          name: IRONMAN2_B24_G68_MARK_V_MEDIA_MAYHEM_SOURCE_CANDIDATE_VPK
+          run-id: 38885906487
+          github-token: ${{ github.token }}
+          path: /tmp/g276_existing_g68_source
+      - name: Read ONLY verified original G66C source asset from historical archive
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct,zipfile
+          source=Path('/tmp/g276_existing_g68_source')
+          available=[]
+          for path in source.rglob('*'):
+            if not path.is_file():continue
+            if path.suffix.lower()=='.g66c':
+              available.append((str(path),path.read_bytes()))
+            elif path.suffix.lower() in ('.vpk','.zip'):
+              with zipfile.ZipFile(path) as pack:
+                for name in pack.namelist():
+                  if name.lower().endswith('.g66c'):
+                    available.append((str(path)+'!'+name,pack.read(name)))
+          matches=[(name,raw) for name,raw in available
+             if len(raw)==12+1910*36 and struct.unpack_from('<4sII',raw)==(b'G66C',1,1910)]
+          print('G276 actual historical-original sourced G66C artifact file candidates', [name for name,_ in available])
+          if not matches:
+            raise RuntimeError('G276 previous source artifact lacks verified ORIGINAL C1L1 1910 G66C; do not fabricate city collision')
+          name,blob=matches[0]
+          dest=Path('/tmp/g276_actual_authored_original_collision.g66c')
+          dest.write_bytes(blob)
+          print('G276 exact original previously verified G66C 1910 source faces restored from',name)
+          PY
+      - name: Host C11 authentic original Position1 vs native G66C collision without wrong runtime world attribution
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I /tmp/g276_real_source -I research/b24_unified -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g276_original_Mission000_Position1_vs_true_G66C_world_source/test_g276_true_original_Mission000_Position1_local_vs_G66C.c \
+            research/b24_unified/g75_device_qa/b24_g75_source_capsule.c \
+            research/b24_unified/b24_gpu_g68_collision.c \
+            research/b24_unified/b24_c1_original_collision.c \
+            -lm -o /tmp/g276_2010_real_ground_source_host
+          /tmp/g276_2010_real_ground_source_host /tmp/g276_actual_authored_original_collision.g66c \
+            | tee /tmp/g276_source_collision_report.txt
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G276_ORIGINAL_SCRIPT_POSITION1_VS_G66C_COLLISION_HOST_ONLY_NO_VPK
+          path: /tmp/g276_source_collision_report.txt
+          retention-days: 21
+          if-no-files-found: error
