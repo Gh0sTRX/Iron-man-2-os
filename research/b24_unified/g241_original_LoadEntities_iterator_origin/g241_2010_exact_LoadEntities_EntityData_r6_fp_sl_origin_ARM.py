@@ -66,6 +66,27 @@ def run(ipa:Path,g240:Path,out:Path):
    q=byaddr.get(site+shift)
    if not q or (q.mnemonic,q.op_str)!=(opcode,arg):
     raise ValueError(f"G241 no source true loop return @{site+shift:#x}")
+ # 2010 original source ClassID 104/107/108 from genuine typed native
+ # CLARA class registry (G25): do NOT conflate with AttackType or WeaponDB
+ # index. ARM PC at ADDLS is current PC+8; index = classId-1.
+ exact_g25_class_ids={104:"WeaponAccessory",107:"Weapon",108:"Attack"}
+ routes={}
+ for classid,nm in exact_g25_class_ids.items():
+  switch_vm=0xc2ee0+4*(classid-1)
+  entry=byaddr.get(switch_vm)
+  if entry is None or entry.mnemonic!="b":
+   raise ValueError(f"G241 authentic native ClassID switch entry missing for {nm} at {switch_vm:#x}")
+  expected={104:0xc3650,107:0xc366c,108:0xc3688}[classid]
+  if entry.op_str!=f"#{expected:#x}":
+   raise ValueError(f"G241 native {nm} class routing wrong: {entry.op_str} vs {expected:#x}")
+  routes[str(classid)]={
+    "true_original_2010_C1L1_native_classid":classid,
+    "G25_native_class_name":nm,
+    "true_original_source_jump_table_B_VM":hex(switch_vm),
+    "true_original_ARM_class_dispatch_destination_VM":hex(expected),
+    "native_2010_entity_class_tag_read_VM":"0xc2ec8",
+    "class_ID_not_WeaponDB_attack_array_index":True,
+  }
  # Enumerate direct/writer instructions in the ORIGINAL method, but
  # be conservative: a textual writer is not a proven reaching definition.
  writes=[]
@@ -98,6 +119,11 @@ def run(ipa:Path,g240:Path,out:Path):
   "original_native_iterate_and_type_switch_source_windows":resultwindows,
   "original_native_direct_calls_in_LoadEntities_source_only":hits,
   "three_AddNew_arm_calls_share_one_native_iterator":True,
+  "real_native_original_2010_class_104_107_108_exact_ARM_dispatch":routes,
+  "real_native_original_iterator_GetEntitiesCount_VM":"0xc2ea8",
+  "real_native_original_iterator_GetEntityData_index_SL_VM":"0xc2ec4",
+  "original_native_EntityData_class_type_field_offset":"0x14",
+
   "native_ARM_r6_reaching_definition_across_all_paths_PROVEN":False,
   "actual_2010_C1L1_runtime_EntityData_list_order_PROVEN":False,
   "actual_2010_WeaponDB_array_entries_0_1_4_names_PROVEN":False,
@@ -106,6 +132,7 @@ def run(ipa:Path,g240:Path,out:Path):
  }
  out.parent.mkdir(parents=True,exist_ok=True)
  out.write_text(json.dumps(result,indent=2,ensure_ascii=False)+"\n")
+ for cls,route in routes.items():print("G241 TRUE CLASS ID ARM BRANCH",cls,route)
  print("G241 true original native LoadEntities",len(ops),"instructions",end-VM,"bytes")
  for q in writes[:80]:
   print("G241 SOURCE R6/SL/FP WRITER CANDIDATE",q)
