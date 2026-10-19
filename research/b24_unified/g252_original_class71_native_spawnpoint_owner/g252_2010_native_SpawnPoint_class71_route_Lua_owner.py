@@ -89,7 +89,7 @@ def main(ipa:Path,g250:Path,out:Path):
   "source_spawnpoints_typing_and_native_class_branch_proven":True,
   "original_native_spawnpoint_runtime_player_start_route_proven":False,
   "original_native_MainCharacter_initial_world_transform_proven":False,
-  "source_Class71_EntityData_load_is_not_PlayerBoot_proven":True,
+  "source_Class71_EntityData_load_is_not_PlayerBoot_proven":False,
   "Vita_runtime_world_player_or_combat_changed":False,
   "VPK_produced":False}
  out.parent.mkdir(parents=True,exist_ok=True)
