@@ -1,0 +1,66 @@
+name: G242 Authentic 2010 ClaraFile GetEntityData Index Storage Source No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g242_native_original_ClaraFile_GetEntityData/**"
+      - ".github/workflows/g242-original-2010-ClaraFile-entitydata-index-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_ClaraFile_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original 2010 ClaraFile ARM source code scanner
+        run: python3 -m py_compile research/b24_unified/g242_native_original_ClaraFile_GetEntityData/g242_true_original_iOS_ClaraFile_native_indexed_entitydata_source.py
+      - name: Install original user game MachO parser dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G241_TRUE_2010_LOADENTITIES_ENTITYDATA_ITERATOR_ARM_PROVENANCE_NO_VPK
+          run-id: 39225464002
+          github-token: ${{ github.token }}
+          path: /tmp/g242_original_r6_provenance
+      - name: Download user's original 2010 iOS IPA transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g242_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g242_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g242_private_owner/owner.ipa
+          test "$(wc -c </tmp/g242_private_owner/owner.ipa)" -eq 248613763
+      - name: Verify real original ClaraFile GetEntitiesCount and GetEntityData(int) native source
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g242_native_original_ClaraFile_GetEntityData/g242_true_original_iOS_ClaraFile_native_indexed_entitydata_source.py \
+            --ipa /tmp/g242_private_owner/owner.ipa \
+            --g241 /tmp/g242_original_r6_provenance/G241_TRUE_2010_LOADENTITIES_R6_FP_SL_ORIGINAL_ARM_SOURCE.json \
+            --out /tmp/g242_verified/G242_ORIGINAL_2010_CLARAFILE_ENTITYDATA_INDEXED_NATIVE_SOURCE.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g242_verified/G242_ORIGINAL_2010_CLARAFILE_ENTITYDATA_INDEXED_NATIVE_SOURCE.json').read_text())
+          names={x['native_method_VM']:x['real_original_2010_Cpp_method'] for x in d['original_native_ClaraFile_exact_GetEntitiesCount_and_GetEntityData_sources']}
+          assert names['0xd31a4']=='ClaraFile::GetEntitiesCount()'
+          assert names['0xd31b4']=='ClaraFile::GetEntityData(int)'
+          assert d['real_G241_native_clara_count_then_index_selector_connected']
+          assert not d['actual_C1L1_file_order_matches_memory_EntityData_index_PROVEN']
+          assert not d['original_WeaponDB_0_1_4_named_Attack_objects_PROVEN']
+          assert not d['Vita_gameplay_or_physics_modified']
+          assert d['NO_VPK']
+          print('G242 PASS genuine original 2010 ClaraFile count/index ARM function proof; no weapon index guesses')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase genuine original owner's IPA from temporary runner
+        if: always()
+        run: rm -rf /tmp/g242_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G242_ORIGINAL_2010_CLARAFILE_INDEXED_ENTITYDATA_SOURCE_NO_VPK
+          path: /tmp/g242_verified/
+          retention-days: 21
+          if-no-files-found: error
