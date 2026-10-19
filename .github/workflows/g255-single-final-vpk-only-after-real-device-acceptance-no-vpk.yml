@@ -26,14 +26,18 @@ jobs:
           p=Path('/tmp/g255_vpk_release_guard/G255_SINGLE_VPK_SOURCE_AND_HARDWARE_ACCEPTANCE_STATUS.json')
           x=json.loads(p.read_text())
           assert x['original_release_acceptance_gates_total']==12
+          assert x['source_preflight_gates_total']==7
+          assert x['source_preflight_verified_count']==0
+          assert x['source_preflight_blocking_count']==7
+          assert not x['VPK_build_authorized_by_source_gates']
           assert x['verified_count']==1
           assert x['blocking_count']==11
           assert not x['VPK_build_authorized_by_gates']
-          assert not x['G229_real_physical_Vita_120_ground_frames_telemetry_received_as_of_2026_10_19']
-          assert not x['no_VPK_produced_by_this_audit']==False
-          print('G255 12-gate one-VPK staging NOT READY; refuse to fake original 2010 Vita hardware QA')
+          assert not x['G229_real_physical_Vita_120_frames_received_at_2026_10_19']
+          assert x['no_VPK_produced_by_audit']
+          print('G255 pre-VPK source 0/7 NOT READY, post-VPK hardware 1/12; no first-device test before packaging deadlock')
           PY
-      - name: Verify one-VPK packaging is rigorously BLOCKED while essential actual-device gameplay checks are open
+      - name: Verify first VPK packaging is blocked by source/ARM prerequisites, not by before-package physical QA
         run: |
           set -euo pipefail
           set +e
