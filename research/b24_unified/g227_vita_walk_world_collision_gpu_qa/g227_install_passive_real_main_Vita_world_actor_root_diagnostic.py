@@ -59,6 +59,7 @@ def run():
   " b24_g227_probe.old_world_y=old_c1y;\n"
   " b24_g227_probe.proposed_world_x=world.x;\n"
   " b24_g227_probe.proposed_world_y=world.y;\n"
+  " b24_g227_probe.proposed_world_z=world.z;\n"
   " b24_g227_probe.stick_x=move_x;\n"
   " b24_g227_probe.stick_y=move_y;\n"
   " b24_g227_probe.flying=(uint8_t)world.flying;\n"
@@ -83,8 +84,10 @@ def run():
            * and animation semantics remain completely untouched. */
           b24_g227_probe.resolved_world_x=world.x;
           b24_g227_probe.resolved_world_y=world.y;
+          b24_g227_probe.resolved_world_z=world.z;
           b24_g227_probe.gpu_actor_world_x=b24_gpu_rt.frame_pose.x;
           b24_g227_probe.gpu_actor_world_y=b24_gpu_rt.frame_pose.y;
+          b24_g227_probe.gpu_actor_world_z=b24_gpu_rt.frame_pose.z;
           /* Camera cam_x/y is a position, not the look-at target. */
           b24_g227_probe.camera_target_x=camera.cam_x;
           b24_g227_probe.camera_target_y=camera.cam_y;
@@ -100,7 +103,8 @@ def run():
                  "stick=(%.3f,%.3f) world_pre=(%.4f,%.4f) "
                  "B14_proposal=(%.4f,%.4f) native_collision_resolved=(%.4f,%.4f) "
                  "GPU_ACTOR=(%.4f,%.4f) camera_POSITION=(%.4f,%.4f) "
-                 "G8_original_loaded=%u G8_missing=%u original_clip=%s",
+                 "G8_original_loaded=%u G8_missing=%u original_clip=%s "
+                 "Zup_B14=%.4f Zup_G75=%.4f Zup_GPU=%.4f",
                b24_g227_walk_verdict_name(verdict),
                b24_g227_probe.stick_x,b24_g227_probe.stick_y,
                b24_g227_probe.old_world_x,b24_g227_probe.old_world_y,
@@ -110,7 +114,10 @@ def run():
                b24_g227_probe.camera_target_x,b24_g227_probe.camera_target_y,
                (unsigned)b24_g227_probe.original_G8_clip_loaded,
                (unsigned)b24_g227_probe.original_G8_source_clip_missing,
-               b24_original_motion.selected);
+               b24_original_motion.selected,
+               b24_g227_probe.proposed_world_z,
+               b24_g227_probe.resolved_world_z,
+               b24_g227_probe.gpu_actor_world_z);
           }
 #endif'''
  m=m[:matches[0].start()]+new+m[matches[0].end():]
