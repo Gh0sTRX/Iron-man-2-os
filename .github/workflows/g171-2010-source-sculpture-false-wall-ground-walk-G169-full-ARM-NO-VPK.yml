@@ -810,6 +810,7 @@ jobs:
           ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
           cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=1 \
             -I work/src -I work/b24/b24_unified \
             work/src/b14_world.c \
             work/b24/b24_unified/b24_g75_source_capsule.c \
