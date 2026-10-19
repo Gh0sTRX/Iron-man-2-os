@@ -6,6 +6,7 @@ on:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
       - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
+      - "research/b24_unified/g251_real_source_16_spawn_collision_matrix/**"
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
@@ -135,6 +136,13 @@ jobs:
           run-id: 39135629451
           github-token: ${{ github.token }}
           path: /tmp/g218_original_authored_2010_G217
+      - name: Restore original G250 proven 16 C1L1 SpawnPoint tagged node source header for G251 host QA
+        uses: actions/download-artifact@v4
+        with:
+          name: G250_REAL_ORIGINAL_2010_C1L1_16_SPAWNS_AND_LUA_SOURCE_METADATA_NO_VPK
+          run-id: 39236682307
+          github-token: ${{ github.token }}
+          path: /tmp/g251_original_verified_2010_spawns
       - name: Restore original G27 source verified 2010 Level1 71 Lua callback native CALLs
         uses: actions/download-artifact@v4
         with:
@@ -696,6 +704,29 @@ jobs:
             research/b24_unified/g248_original_vita_ground_8dir_source_replay/test_g248_G171_real_grounded_8way_input_collision_Flight_source.c \
             -lm -o /tmp/g248_original_2010_source_8way_ground_air
           /tmp/g248_original_2010_source_8way_ground_air work/assets/G66_original_collision.g66c
+          rm -f 'app0:assets/G66_city.g66m'
+          rmdir 'app0:assets'
+          test -z "$(find work -name '*.vpk' -print -quit)"
+      - name: G251 original 16 SpawnPoint nodes against true Expo G66C authored collision 8way ground flight no VPK
+        run: |
+          set -euo pipefail
+          test -s /tmp/g251_original_verified_2010_spawns/b24_g250_source_authentic_16_spawn_candidates.h
+          mkdir -p 'app0:assets'
+          ln -s "$PWD/work/assets/G66_city.g66m" 'app0:assets/G66_city.g66m'
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G108_SOURCE_VISUAL_WALLS=1 -DB24_G159_ROAD_FLOOR_CANDIDATE=1 -DB24_G160_ROAD_SPATIAL_INDEX=1 \
+            -DB24_G171_STRICT_SCULPTURE_NO_VISUAL_INFERRED_WALL=1 \
+            -I /tmp/g251_original_verified_2010_spawns -I work/src -I work/b24/b24_unified \
+            work/src/b14_world.c \
+            work/b24/b24_unified/b24_g75_source_capsule.c \
+            work/b24/b24_unified/b24_g108_visible_original_wall_grid.c \
+            work/b24/b24_unified/b24_g159_real_source_road.c \
+            work/b24/b24_unified/b24_g160_original_road_spatial.c \
+            work/b24/b24_unified/b24_gpu_g68_collision.c \
+            work/b24/b24_unified/b24_c1_original_collision.c \
+            research/b24_unified/g251_real_source_16_spawn_collision_matrix/test_g251_true_2010_16_spawn_XYZ_against_real_G171_B14_G75_collision.c \
+            -lm -o /tmp/g251_real_2010_spawns_C1L1_ground_host
+          /tmp/g251_real_2010_spawns_C1L1_ground_host work/assets/G66_original_collision.g66c
           rm -f 'app0:assets/G66_city.g66m'
           rmdir 'app0:assets'
           test -z "$(find work -name '*.vpk' -print -quit)"
