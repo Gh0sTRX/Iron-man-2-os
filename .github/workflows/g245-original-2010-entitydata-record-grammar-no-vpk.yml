@@ -1,0 +1,66 @@
+name: G245 Original 2010 EntityData Per Record Stream Native ARM No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g245_original_EntityData_record_grammar/**"
+      - ".github/workflows/g245-original-2010-entitydata-record-grammar-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual_original_iOS_native_EntityData:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Authenticate source scanner syntax
+        run: python3 -m py_compile research/b24_unified/g245_original_EntityData_record_grammar/g245_original_2010_EntityData_LoadFromFile_actual_stream_ARM.py
+      - name: Install source original ARM dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G244_2010_ORIGINAL_ENTITIESDATA_NATIVE_LOADER_SOURCE_NO_VPK
+          run-id: 39226459034
+          github-token: ${{ github.token }}
+          path: /tmp/g245_original_EntitiesData
+      - name: Temporarily read original 2010 IPA owner source
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g245_sourceowner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g245_sourceowner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g245_sourceowner/owner.ipa
+          test "$(wc -c </tmp/g245_sourceowner/owner.ipa)" -eq 248613763
+      - name: Read actual original EntityData::LoadFromFile source method rather than guessing C1L1 registration order
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g245_original_EntityData_record_grammar/g245_original_2010_EntityData_LoadFromFile_actual_stream_ARM.py \
+            --ipa /tmp/g245_sourceowner/owner.ipa \
+            --g244 /tmp/g245_original_EntitiesData/G244_REAL_NATIVE_2010_ENTITIESDATA_LOADFROMFILE_ARM_SOURCE.json \
+            --out /tmp/g245_report/G245_REAL_NATIVE_ORIGINAL_2010_ENTITYDATA_STREAM_READER.json
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          d=json.loads(Path('/tmp/g245_report/G245_REAL_NATIVE_ORIGINAL_2010_ENTITYDATA_STREAM_READER.json').read_text())
+          assert d['real_native_2010_EntityData_load_cpp_name']=='EntityData::LoadFromFile(DataStream&)'
+          assert d['native_source_method_VM']=='0xd356c'
+          assert d['source_original_ARM_instruction_count']>10
+          assert d['parent_EntitiesData_sequential_36byte_array_insert_proven']
+          assert not d['actual_2010_WeaponDB_index_0_1_4_to_C1L1_Attack_source_objects_proven']
+          assert not d['actual_device_Vita_ground_motion_fix_proven']
+          assert not d['vita_player_weapon_damage_render_or_mission_modified']
+          assert d['NO_VPK']
+          print('G245 original owner source entity record parser verified; no invented weapon fields')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase user's original binary from ephemeral runner
+        if: always()
+        run: rm -rf /tmp/g245_sourceowner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G245_ORIGINAL_2010_ENTITYDATA_STREAM_READER_ARM_SOURCE_NO_VPK
+          path: /tmp/g245_report/
+          retention-days: 21
+          if-no-files-found: error
