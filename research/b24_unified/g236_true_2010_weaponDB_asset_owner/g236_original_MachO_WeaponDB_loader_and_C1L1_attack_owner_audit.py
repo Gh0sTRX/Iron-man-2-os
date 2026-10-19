@@ -80,6 +80,8 @@ def run(ipa:Path,out:Path)->dict:
  decoder_thumb=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_THUMB); decoder_thumb.detail=True
  owners={}
  calls=[]
+ g237_native_loader_opcode_sources={}
+ G237_LOADER_VMS={0xab894,0xabbd4,0xabf14,0xb27e4}
  for cls,rows in sorted(byclass.items()):
   for obj in sorted(rows,key=lambda x:int(x["vm"],16)):
    vm=int(obj["vm"],16)
@@ -108,6 +110,14 @@ def run(ipa:Path,out:Path)->dict:
          (dest is not None and any("AttackEntity" in n or "WeaponDB" in n
                      for n in syms.get(dest,())))):
       calls.append({"source_original_cpp_method":obj["method"],"original_cpp_VM":hex(vm),**item})
+   if vm in G237_LOADER_VMS:
+    g237_native_loader_opcode_sources[hex(vm)]={
+      "native_original_cpp_method":obj["method"],
+      "original_source_method_VM":hex(vm),
+      "bounded_authentic_2010_ARM_ops":[
+        {"vm":hex(i.address),"mnemonic":i.mnemonic,"args":i.op_str}
+        for i in ops[:300]],
+      "cpp_serialized_scene_to_WeaponDB_index_order_PROVEN":False}
    owners[vm]={"method":obj["method"],"original_function_VM":hex(vm),
                "native_ARM_or_THUMB":"THUMB" if obj["thumb"] else "ARM",
                "bounded_original_text_byte_count":length,
@@ -126,6 +136,7 @@ def run(ipa:Path,out:Path)->dict:
       {k:sorted(v,key=lambda x:int(x["vm"],16)) for k,v in byclass.items()},
   "actual_original_2010_weapon_method_bounded_source_callgraph":[owners[k] for k in sorted(owners)],
   "native_cross_weaponDB_getattackentity_related_direct_edges":calls,
+  "G237_original_2010_native_loader_opcode_source_windows":g237_native_loader_opcode_sources,
   "original_level1_native_scene_source_objects":targets,
   "original_C1L1_2010_typed_attack_count":freq["Attack"],
   "original_C1L1_2010_typed_weapon_count":freq["Weapon"],
@@ -147,6 +158,11 @@ def run(ipa:Path,out:Path)->dict:
   print("G236 original C++",cls,"methods",len(methods))
   for m in methods[:60]:print("G236 ORIGINAL_METHOD",m["vm"],m["method"])
  for rec in named01:print("G236 ORIGINAL_C1L1_TYPED_OBJECT",rec)
+ for method,rec in sorted(g237_native_loader_opcode_sources.items()):
+  print("G237 AUTHENTIC 2010 native loader",method,rec["native_original_cpp_method"],
+    "ops",len(rec["bounded_authentic_2010_ARM_ops"]))
+  for op in rec["bounded_authentic_2010_ARM_ops"][:135]:
+   print("G237 ORIGINAL_OPCODE",method,op)
  for edge in calls[:60]:print("G236 REAL_METHOD_EDGE",edge)
  print("G236 original CLARA source Attack named ID not assumed global WeaponDB runtime index. NO VPK")
  return report
