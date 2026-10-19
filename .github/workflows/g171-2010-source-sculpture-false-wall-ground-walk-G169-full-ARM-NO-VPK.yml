@@ -16,6 +16,7 @@ on:
       - "research/b24_unified/g229_vita_ground_motion_window/**"
       - "research/b24_unified/g277_vita_real_ground_collision_reason_counter/**"
       - "research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/**"
+      - "research/b24_unified/g279_vita_walk_persistent_trace/**"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -230,6 +231,15 @@ jobs:
           python3 research/b24_unified/g229_vita_ground_motion_window/g229_install_window_into_real_vita_main.py
           python3 research/b24_unified/g277_vita_real_ground_collision_reason_counter/g277_install_original_G75_wall_floor_step_reject_probe_after_G229_NO_VPK.py
           python3 research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/g278_install_first_rendered_Vita_world_and_original_G66C_support_probe_NO_VPK.py
+          python3 research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            research/b24_unified/g279_vita_walk_persistent_trace/test_g279_bounded_csv_writer.c \
+            -lm -o /tmp/g279_host_csv_writer
+          /tmp/g279_host_csv_writer
+          python3 research/b24_unified/g279_vita_walk_persistent_trace/g279_install_file_trace_after_G278_one_Vita_game_NO_VPK.py
+          grep -q 'B24_G279_WALK_TRACE_FILE' work/CMakeLists.txt
+          grep -q 'g279_win.phase="WALK120"' work/src/main.c
+          grep -q 'ux0:data/ironman2_g279_walk.csv' work/src/main.c
           grep -q 'G278_INITIAL_BOOT_WORLD' work/src/main.c
           grep -q 'g278_has_native_floor' work/src/main.c
           grep -q 'G277_GROUND_REJECTION_BREAKDOWN' work/src/main.c
@@ -1118,6 +1128,7 @@ jobs:
               -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=ON \
               -DB24_G218_SOURCE_STATE_OBSERVER=ON \
               -DB24_G227_WALK_ROOT_DIAGNOSTIC=ON \
+              -DB24_G279_WALK_TRACE_FILE=ON \
               -DB24_G111_NATIVE_SOURCE_GATES=ON \
               -DB24_G124_ORIGINAL_NPC_SOURCE_RULES=ON \
               -DB24_G127_ORIGINAL_STATESMGR_SOURCE=ON \
