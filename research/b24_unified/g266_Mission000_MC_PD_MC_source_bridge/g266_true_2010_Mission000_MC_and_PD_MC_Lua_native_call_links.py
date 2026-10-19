@@ -72,7 +72,7 @@ def run(ipa:Path,g265:Path,out:Path):
  if len(jump)!=1:raise ValueError("G268 source original scripted MoveEntityToEntity destination Position transform missing")
  goal=jump[0]; pos_offset=goal["native_transform_source_offset"]
  pre=raw[pos_offset-36:pos_offset]
- if pre[8:12]!=b"\\x06\\x00\\x04\\x00" or pre[16:18]!=b"\\x04\\x00" or pre[22:24]!=b"\\x0c\\x00":
+ if pre[8:12]!=b"\x06\x00\x04\x00" or pre[16:18]!=b"\x04\x00" or pre[22:24]!=b"\x0c\x00":
   raise ValueError("G268 script actual PD_IM_jump_goal typed positional record format drift")
  goal_mode=struct.unpack_from("<i",pre,12)[0]
  goal_bind=struct.unpack_from("<i",pre,18)[0]
