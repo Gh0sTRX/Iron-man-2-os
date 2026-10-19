@@ -1,0 +1,64 @@
+name: G269 Original Mission000 Script Goal Three True PositionDummy Child Records No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g269_2010_Mission000_jump_goal_PositionDummy_three_child_semantics/**"
+      - ".github/workflows/g269-original-Mission000-script-goal-three-child-native-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_three_position_dummy_children_native_cpp:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check genuine source 3-child and native PositionDummy parser Python
+        run: python3 -m py_compile research/b24_unified/g269_2010_Mission000_jump_goal_PositionDummy_three_child_semantics/g269_authentic_2010_three_Position_dummy_source_owner_native_methods.py
+      - name: Install original 2010 iOS source analysis dependencies
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G266_TRUE_ORIGINAL_MISSION000_MC_PD_MC_LUA_LINKS_NO_VPK
+          run-id: 39267245206
+          github-token: ${{ github.token }}
+          path: /tmp/g269_original_script_verified
+      - name: Temporarily load user original 2010 game IPA on ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g269_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g269_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g269_original_owner/owner.ipa
+          test "$(wc -c </tmp/g269_original_owner/owner.ipa)" -eq 248613763
+      - name: Validate original typed PD_IM_jump_goal 1893 1894 1895 and real PositionDummy native ARM loaders
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g269_2010_Mission000_jump_goal_PositionDummy_three_child_semantics/g269_authentic_2010_three_Position_dummy_source_owner_native_methods.py \
+            --ipa /tmp/g269_original_owner/owner.ipa \
+            --g268 /tmp/g269_original_script_verified/G266_ORIGINAL_2010_MISSION000_MC_PD_MC_LUA_NATIVE_TYPED_CALLS.json \
+            --out /tmp/g269_metadata/G269_ORIGINAL_2010_MISSION000_JUMP_GOAL_THREE_NATIVE_TYPED_COMPONENTS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g269_metadata/G269_ORIGINAL_2010_MISSION000_JUMP_GOAL_THREE_NATIVE_TYPED_COMPONENTS.json').read_text())
+          assert d['original_native_MoveEntityToEntity_source_args']==[1062,1892,3000]
+          assert [x['child_ID'] for x in d['genuine_original_goal_3_different_typed_component_records']]==[1893,1894,1895]
+          assert d['genuine_original_3_source_transform_child_ordinal_proven']
+          assert not d['genuine_runtime_get_position_selects_child_index_proven']
+          assert not d['Vita_runtime_gameplay_or_collider_modified']
+          assert d['NO_VPK']
+          print('G269 authentic 2010 three goal child components and true PositionDummy C++ class inspected; no Vita spawn claim')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original owner IPA permanently from transient runner
+        if: always()
+        run: rm -rf /tmp/g269_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G269_ORIGINAL_2010_C1L1_THREE_GOAL_POSITIONDUMMY_ARM_NO_VPK
+          path: /tmp/g269_metadata/
+          retention-days: 21
+          if-no-files-found: error
