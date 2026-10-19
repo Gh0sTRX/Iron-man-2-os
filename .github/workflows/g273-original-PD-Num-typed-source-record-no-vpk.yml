@@ -1,0 +1,63 @@
+name: G273 Original 2010 PositionDummy Num CLARA Root Typed Integer Audit No VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g273_original_PD_IM_jump_goal_Num_root_typed_CLARA/**"
+      - ".github/workflows/g273-original-PD-Num-typed-source-record-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_2010_PositionDummy_Num_root_parent_record:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exact source parent record integer parameter parser
+        run: python3 -m py_compile research/b24_unified/g273_original_PD_IM_jump_goal_Num_root_typed_CLARA/g273_source_true_2010_PD_Num_parent_record_TLV_candidates.py
+      - name: Install owner original game downloader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_STRING_AND_FLOAT_NO_VPK
+          run-id: 39271120298
+          github-token: ${{ github.token }}
+          path: /tmp/g273_original_cpp_labels
+      - name: Read real 2010 iOS owner IPA in transient private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g273_original_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g273_original_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g273_original_owner/owner.ipa
+          test "$(wc -c </tmp/g273_original_owner/owner.ipa)" -eq 248613763
+      - name: Find source-authentic original PositionDummy CLARA Num root tagged values for PD_IM_jump_goal
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g273_original_PD_IM_jump_goal_Num_root_typed_CLARA/g273_source_true_2010_PD_Num_parent_record_TLV_candidates.py \
+            --ipa /tmp/g273_original_owner/owner.ipa \
+            --g272 /tmp/g273_original_cpp_labels/G272_TRUE_ORIGINAL_2010_POSITIONDUMMY_PROPERTY_KEYS_AND_POSITION_F32.json \
+            --out /tmp/g273_real_metadata/G273_ORIGINAL_2010_PD_POSITIONDUMMY_NUM_ROOT_TLV_CANDIDATES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g273_real_metadata/G273_ORIGINAL_2010_PD_POSITIONDUMMY_NUM_ROOT_TLV_CANDIDATES.json').read_text())
+          assert d['original_Source_PositionDummy_type36_count']==137
+          assert d['authentic_native_2010_PositionDummy_source_key_Num']=='Num'
+          assert not d['original_goal_C1L1_Num_real_value_resolved']
+          assert not d['Vita_ground_render_or_world_root_mutated']
+          assert d['NO_VPK']
+          print('G273 PASS all 137 real CLARA PositionDummy source root integer patterns; no fake Num mode or Vita goal')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete original user game from temporary private runner
+        if: always()
+        run: rm -rf /tmp/g273_original_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G273_ORIGINAL_2010_POSITIONDUMMY_SOURCE_NUM_PARENT_TLV_NO_VPK
+          path: /tmp/g273_real_metadata/
+          retention-days: 21
+          if-no-files-found: error
