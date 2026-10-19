@@ -96,7 +96,7 @@ def run(ipa:Path,g271:Path,g272:Path,g273:Path,out:Path):
   raise ValueError("original script source PositionDummy authored Num changed")
  child = next(x for x in graph["all_663_source_rigid_transforms_with_native_parent_child_name_ID_chain"]
   if x["original_child_node_ID"]==goal["source_first_Position_child_scene_ID"])
- cxxklass=next(x for x in types["source_class_schema"]
+ cxxklass=next(x for x in types["source_2010_class_schema"]
   if x["original_class_id"]==36)
  klass_off=cxxklass["original_class_name_file_offset"]
  keys={}
