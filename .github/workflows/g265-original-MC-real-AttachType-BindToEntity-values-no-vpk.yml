@@ -1,0 +1,80 @@
+name: G265 Authentic 2010 MC Actual Bind To Entity and AttachType Values NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g265_original_MC_TRUE_AttachType_Bind_AttachOffset_values/**"
+      - ".github/workflows/g265-original-MC-real-AttachType-BindToEntity-values-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_original_2010_663_position_data_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate genuine 2010 MC 663 tagged Position record typed parser
+        run: python3 -m py_compile research/b24_unified/g265_original_MC_TRUE_AttachType_Bind_AttachOffset_values/g265_authentic_2010_MC_and_663_Position_component_attached_typed_values.py
+      - name: Install original owner iOS 2010 source downloader
+        run: python3 -m pip install -q gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G261_GENUINE_2010_POSITIONDATA_SIX_LITERAL_PROPERTIES_NO_VPK
+          run-id: 39262916694
+          github-token: ${{ github.token }}
+          path: /tmp/g265_true_native_property_keys
+      - uses: actions/download-artifact@v4
+        with:
+          name: G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACHTYPE_SOURCE_ONLY_NO_VPK
+          run-id: 39265134305
+          github-token: ${{ github.token }}
+          path: /tmp/g265_true_mc_child
+      - uses: actions/download-artifact@v4
+        with:
+          name: G264_TRUE_MC_POSITION_92BYTE_PREFIX_NATIVE_ATTACH_MODE1_NO_VPK
+          run-id: 39265523733
+          github-token: ${{ github.token }}
+          path: /tmp/g265_true_clara_prefix
+      - name: Open user's exact original iOS 2010 IPA transiently
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g265_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g265_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g265_private_owner/owner.ipa
+          test "$(wc -c </tmp/g265_private_owner/owner.ipa)" -eq 248613763
+      - name: Prove all 663 original C1L1 true typed AttachType and Bind To Entity plus exact MC source value
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g265_original_MC_TRUE_AttachType_Bind_AttachOffset_values/g265_authentic_2010_MC_and_663_Position_component_attached_typed_values.py \
+            --ipa /tmp/g265_private_owner/owner.ipa \
+            --g261 /tmp/g265_true_native_property_keys/G261_TRUE_ORIGINAL_2010_POSITIONDATA_SIX_NATIVE_PROPERTY_STRINGS.json \
+            --g263 /tmp/g265_true_mc_child/G263_ORIGINAL_2010_MC_POSITION_CHILD_ATTACH_TYPE_BRANCH_SOURCE.json \
+            --g264 /tmp/g265_true_clara_prefix/G264_TRUE_2010_MC_POSITION_92BYTE_PRETRS_AND_NATIVE_ATTACHMODE1.json \
+            --out /tmp/g265_real_evidence/G265_TRUE_ORIGINAL_2010_MC_BIND_TO_ENTITY_ATTACH_TYPE_AND_OFFSET.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g265_real_evidence/G265_TRUE_ORIGINAL_2010_MC_BIND_TO_ENTITY_ATTACH_TYPE_AND_OFFSET.json').read_text())
+          assert x['authentic_source_Position_component_count']==663
+          assert x['original_MC_Position_AttachType']==0
+          assert x['original_MC_Position_Bind_To_Entity']==-1
+          assert x['original_MC_Position_AttachOffset']==[0.0,0.0,0.0]
+          assert x['source_native_six_Attach_property_type_and_offset_verification']
+          assert not x['original_MC_story_start_runtime_world_Z_or_foot_position_PROVEN']
+          assert not x['real_physical_Vita_walk_in_place_fixed']
+          assert x['NO_VPK']
+          print('G265 original 2010 MC authored no bind, AttachType0, zero offset verified; player runtime world still unproven NO VPK')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Remove original copyright owner IPA after source proof
+        if: always()
+        run: rm -rf /tmp/g265_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G265_TRUE_ORIGINAL_MC_ATTACHTYPE_BIND_VALUES_NO_VPK
+          path: /tmp/g265_real_evidence/
+          retention-days: 21
+          if-no-files-found: error
