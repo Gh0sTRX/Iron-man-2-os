@@ -1,0 +1,66 @@
+name: G250 Original 2010 Mission000 16 SpawnPoint Native Lua Source (No VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g250_true_original_Mission000_16_SpawnPoint_source/**"
+      - ".github/workflows/g250-original-2010-C1L1-Mission000-spawns-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original_2010_owner_C1L1_spawn_source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate G250 source-only original 16 spawn/Lua parser syntax
+        run: python3 -m py_compile research/b24_unified/g250_true_original_Mission000_16_SpawnPoint_source/g250_2010_original_C1L1_spawns_and_Mission000_Lua_exact_node_links.py
+      - name: Install minimal original G19 geometry metadata imports and private owner retrieval
+        run: python3 -m pip install -q gdown numpy pillow
+      - name: Read authentic original 2010 iOS owner IPA from ephemeral runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g250_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g250_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g250_owner/owner.ipa
+          test "$(wc -c </tmp/g250_owner/owner.ipa)" -eq 248613763
+      - name: Verify true native 2010 scene SpawnPoint transforms and Mission000 static Lua entity references
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g250_true_original_Mission000_16_SpawnPoint_source/g250_2010_original_C1L1_spawns_and_Mission000_Lua_exact_node_links.py \
+            --ipa /tmp/g250_owner/owner.ipa \
+            --out /tmp/g250_public_test_metadata/G250_REAL_ORIGINAL_2010_SPAWNPOINT_16_AND_MISSION000_LUA_NODE_REFS.json \
+            --header /tmp/g250_public_test_metadata/b24_g250_source_authentic_16_spawn_candidates.h
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('/tmp/g250_public_test_metadata/G250_REAL_ORIGINAL_2010_SPAWNPOINT_16_AND_MISSION000_LUA_NODE_REFS.json').read_text())
+          assert d['original_source_16_spawnpoint_count']==16
+          assert len(d['actual_original_16_source_SpawnPoint_transforms'])==16
+          assert d['original_native_2010_exact_tagged_12_16_12_source_transform']
+          assert d['original_source_2010_71_callbacks_1035_Lua_CALL_opcode_scan']
+          assert not d['real_original_2010_gameplay_runtime_player_SpawnPoint_index_proven']
+          assert not d['Vita_actor_start_world_modified']
+          assert not d['VPK']
+          print('G250 PASS original 2010 16 3D SpawnPoint nodes source and native Mission000 Lua static crossrefs, runtime player spawn still unknown')
+          PY
+          cat >/tmp/g250_header_C11_smoke.c <<'EOF'
+          #include "b24_g250_source_authentic_16_spawn_candidates.h"
+          _Static_assert(sizeof(g250_source_spawns)/sizeof(g250_source_spawns[0])==16, "G250 exact original node count");
+          int main(void){return g250_source_spawns[0].name==0;}
+          EOF
+          cc -std=c11 -Wall -Wextra -Werror -pedantic -I /tmp/g250_public_test_metadata \
+            /tmp/g250_header_C11_smoke.c -o /tmp/g250_header_C11_smoke
+          /tmp/g250_header_C11_smoke
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete owner IPA after original source analysis
+        if: always()
+        run: rm -rf /tmp/g250_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G250_REAL_ORIGINAL_2010_C1L1_16_SPAWNS_AND_LUA_SOURCE_METADATA_NO_VPK
+          path: /tmp/g250_public_test_metadata/
+          retention-days: 21
+          if-no-files-found: error
