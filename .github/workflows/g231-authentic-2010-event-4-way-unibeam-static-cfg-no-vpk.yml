@@ -1,0 +1,58 @@
+name: G231 2010 event four native ARM paths to UniBeam static CFG (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g231_authentic_2010_event_branch_UniBeam_CFG/**"
+      - ".github/workflows/g231-authentic-2010-event-4-way-unibeam-static-cfg-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual_2010_source_static_cfg:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source-only Python compile
+        run: python3 -m py_compile research/b24_unified/g231_authentic_2010_event_branch_UniBeam_CFG/g231_native_2010_original_four_event_static_unibeam_cfg.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: G196_ORIGINAL_2010_NATIVE_UNIBEAM_14_33_GUARD_CFG_SOURCE_PNG_NO_VPK
+          run-id: 39124662533
+          github-token: ${{ github.token }}
+          path: /tmp/g231_source
+      - name: Resolve original 0..3 event-case-to-native-UniBeam-call candidate paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g231_authentic_2010_event_branch_UniBeam_CFG/g231_native_2010_original_four_event_static_unibeam_cfg.py \
+            --g196 /tmp/g231_source/G196_ORIGINAL_2010_UNIBEAM_CHEST_FOOT_NATIVE_DISPATCH_CFG.json \
+            --out /tmp/g231_verified/G231_2010_four_event_ARM_cfg_to_original_UniBeam_calls.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("/tmp/g231_verified/G231_2010_four_event_ARM_cfg_to_original_UniBeam_calls.json").read_text())
+          assert len(d["per_event_arm_static_paths"])==4
+          assert d["source_only_conditional_branch_structural_cfg"]
+          assert not d["branch_predicate_satisfiability_proven"]
+          assert not d["runtime_original_iOS_suit_weapon_semantics_proven"]
+          assert not d["changed_Vita_animation_weapons_input_or_physics"]
+          assert d["NO_VPK"]
+          for p in d["per_event_arm_static_paths"]:
+             for c in p["reachable_original_DoUniBeamAttack_calls"]:
+                assert c["original_UniBeam_call_VM"] in ("0xf6638","0xf6d8c","0xf6e04")
+                assert c["2010_original_dummy_group"] in (14,33)
+                assert not c["branch_predicates_resolved"]
+                assert not c["original_real_gameplay_execution_proven"]
+          print("G231 source-only static CFG checks pass, no weapon semantics fabricated")
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G231_2010_FOUR_EVENT_STATIC_NATIVE_UNIBEAM_CFG_NO_VPK
+          path: /tmp/g231_verified/
+          retention-days: 21
+          if-no-files-found: error
