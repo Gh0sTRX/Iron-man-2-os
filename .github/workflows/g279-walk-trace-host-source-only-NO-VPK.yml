@@ -22,6 +22,7 @@ jobs:
             research/b24_unified/g279_vita_walk_persistent_trace/g279_install_file_trace_after_G278_one_Vita_game_NO_VPK.py \
             research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py
           python3 research/b24_unified/g279_vita_walk_persistent_trace/test_g279_real_source_patch_guards.py
+          python3 research/b24_unified/g279_vita_walk_persistent_trace/test_g279_offline_vita_csv_analysis.py
           cc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
             research/b24_unified/g279_vita_walk_persistent_trace/test_g279_bounded_csv_writer.c \
             -lm -o /tmp/g279_test_host_c11
