@@ -1,0 +1,67 @@
+name: G252 Original 2010 SpawnPoint Class71 Native Loader and Mission Lua Role (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g252_original_class71_native_spawnpoint_owner/**"
+      - ".github/workflows/g252-original-class71-spawnpoint-native-gameplay-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  authentic_original_class71_spawn_2010:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate exact ARM source scanner syntax
+        run: python3 -m py_compile research/b24_unified/g252_original_class71_native_spawnpoint_owner/g252_2010_native_SpawnPoint_class71_route_Lua_owner.py
+      - name: Install original MachO parser and owner source retrieval
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G250_REAL_ORIGINAL_2010_C1L1_16_SPAWNS_AND_LUA_SOURCE_METADATA_NO_VPK
+          run-id: 39236682307
+          github-token: ${{ github.token }}
+          path: /tmp/g252_genuine_c1l1_spawn
+      - name: Retrieve 2010 owner iOS IPA into temporary CI
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g252_private_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g252_private_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g252_private_owner/owner.ipa
+          test "$(wc -c </tmp/g252_private_owner/owner.ipa)" -eq 248613763
+      - name: Inspect authentic 2010 ARM class 71 SpawnPoint dispatch and original native Lua use
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g252_original_class71_native_spawnpoint_owner/g252_2010_native_SpawnPoint_class71_route_Lua_owner.py \
+            --ipa /tmp/g252_private_owner/owner.ipa \
+            --g250 /tmp/g252_genuine_c1l1_spawn/G250_REAL_ORIGINAL_2010_SPAWNPOINT_16_AND_MISSION000_LUA_NODE_REFS.json \
+            --out /tmp/g252_source/G252_TRUE_2010_CLASS71_NATIVE_LOADER_AND_SPAWN_LUA_ROLES.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g252_source/G252_TRUE_2010_CLASS71_NATIVE_LOADER_AND_SPAWN_LUA_ROLES.json').read_text())
+          assert x['native_original_source_SpawnPoint_class_ID']==71
+          assert x['actual_original_class71_jump_table_entry_VM']=='0xc2ff8'
+          assert sum(x['actual_original_Lua_source_spawnpoint_static_call_function_frequency'].values())==24
+          assert x['source_original_Mission000_OnStart_direct_SpawnPoint_refs']==0
+          assert x['source_spawnpoints_typing_and_native_class_branch_proven']
+          assert not x['original_native_spawnpoint_runtime_player_start_route_proven']
+          assert not x['source_Class71_EntityData_load_is_not_PlayerBoot_proven']
+          assert not x['Vita_runtime_world_player_or_combat_changed']
+          assert not x['VPK_produced']
+          print('G252 PASS original 2010 native SpawnPoint loader class71 and source Lua roles; no player boot guess')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Delete copyrighted original iOS IPA from ephemeral CI workspace
+        if: always()
+        run: rm -rf /tmp/g252_private_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G252_ORIGINAL_2010_SPAWNPOINT_NATIVE_CLASS71_AND_LUA_NO_VPK
+          path: /tmp/g252_source/
+          retention-days: 21
+          if-no-files-found: error
