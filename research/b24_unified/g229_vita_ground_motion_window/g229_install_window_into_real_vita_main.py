@@ -65,7 +65,8 @@ def run(root: Path) -> None:
                   "active_stick=%u B14_idle=%u collision_reject=%u GPU_root_mismatch=%u "
                   "B14_path=%.4f accepted_world_path=%.4f max_GPU_error=%.4f "
                   "world_displacement=(%.4f,%.4f) camera_position_displacement=(%.4f,%.4f) "
-                  "G8_missing_frames=%u",
+                  "G8_missing_frames=%u Zup_first_last=(%.4f,%.4f) "
+                  "Zup_min_max=(%.4f,%.4f) GPU_actor_Zup_last=%.4f",
                   b24_g229_window_verdict_name(vw),
                   (unsigned)b24_g229_window.samples,
                   (unsigned)(b24_g229_window.last_tick_ms-b24_g229_window.first_tick_ms),
@@ -75,7 +76,10 @@ def run(root: Path) -> None:
                   (unsigned)b24_g229_window.root_mismatch_frames,
                   b24_g229_window.b14_path_xy,b24_g229_window.resolved_path_xy,
                   b24_g229_window.max_gpu_root_error,dwx,dwy,dcx,dcy,
-                  (unsigned)b24_g229_window.missing_original_clip_frames);
+                  (unsigned)b24_g229_window.missing_original_clip_frames,
+                  b24_g229_window.first_world_z,b24_g229_window.last_world_z,
+                  b24_g229_window.min_world_z,b24_g229_window.max_world_z,
+                  b24_g227_probe.gpu_actor_world_z);
              b24_g229_window_reset(&b24_g229_window);
           }''',
         "G227 successful GPU-frame sample")
