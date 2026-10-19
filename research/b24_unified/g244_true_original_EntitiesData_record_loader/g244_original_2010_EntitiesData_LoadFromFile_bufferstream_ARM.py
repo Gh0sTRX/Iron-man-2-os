@@ -46,6 +46,27 @@ def run(ipa:Path,g243:Path,out:Path)->dict:
  arm=capstone.Cs(capstone.CS_ARCH_ARM,capstone.CS_MODE_ARM);arm.detail=True
  ops=list(arm.disasm(exe[offset:offset+size],VM))
  if not ops or ops[0].address!=VM:raise ValueError("genuine EntitiesData loader native ARM decode failed")
+ source_native={o.address:(o.mnemonic,o.op_str) for o in ops}
+ # Concrete 2010 source allocation:
+ # DataStream::ReadUnsignedShort() returns source number of EntityData
+ # records; r0*4+r0*32=36 per record; +4 for array header; new[].
+ for site,expected in {
+   0xd56fc:("bl","#0x768f8"),
+   0xd5700:("lsl","r3, r0, #2"),
+   0xd5704:("lsl","r1, r0, #5"),
+   0xd570c:("str","r0, [r5, #4]"),
+   0xd5710:("add","r0, r3, r1"),
+   0xd5714:("add","r0, r0, #4"),
+   0xd5718:("bl","#0x5034"),
+   0xd588c:("mov","sl, #0"),
+   0xd5890:("mov","r6, sl"),
+   0xd589c:("add","r0, r6, r8"),
+   0xd58a0:("bl","#0xd356c"),
+ }.items():
+  if source_native.get(site)!=expected:
+   raise ValueError(f"G244 exact original 2010 EntitiesData count or 36-byte allocation source drift @ {site:#x}: {source_native.get(site)}")
+ if "EntityData::LoadFromFile(DataStream&)" not in names.get(0xd356c,()):
+  raise ValueError("G244 original per-entity DataStream class loader C++ name drift")
  def serialize(o):
   q={"VM":hex(o.address),"mnemonic":o.mnemonic,"args":o.op_str}
   if o.mnemonic.startswith(("bl","blx")) and o.operands and o.operands[0].type==ARM_OP_IMM:
@@ -67,6 +88,11 @@ def run(ipa:Path,g243:Path,out:Path)->dict:
   "original_source_Cpp_direct_callees":special,
   "original_ClaraFile_Load_BL_EntitiesData_loader_VM":hex(CALL_VM),
   "original_ClaraFile_GetEntityData_index_stride_bytes":36,
+  "original_native_entity_data_count_from_DataStream_ReadUnsignedShort":True,
+  "original_native_36_byte_stride_allocation_count_times_36_plus_4":True,
+  "native_original_EntityData_LoadFromFile_called_for_indexed_slot":True,
+  "original_2010_EntityData_per_record_Cpp_method_VM":"0xd356c",
+
   "source_EntitiesData_original_load_contains_runtime_execution_proven":False,
   "actual_original_C1L1_list_layout_and_per_Attack_id_0_1_4_registration_proven":False,
   "original_WarMachine_AimM_missile_gatling_control_proven":False,
