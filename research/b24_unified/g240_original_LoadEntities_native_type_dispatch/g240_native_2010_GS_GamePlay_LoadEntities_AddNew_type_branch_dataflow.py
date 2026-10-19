@@ -71,6 +71,20 @@ def run(ipa:Path,g238:Path,out:Path):
   if (not i or i.mnemonic!="bl" or not i.operands or
       i.operands[0].type!=ARM_OP_IMM or (i.operands[0].imm&~1)!=target):
    raise ValueError(f"G240 actual original native opcode changed at {site:#x}")
+  # All three authentic typed AddNew branches use one source iterator:
+  # increment sl, feed EntityData in r6, compare with fp count, jump back
+  # to 0xC2EB8, or continue to 0xC32D0 when complete.
+  guard={
+     site-8:("add","sl, sl, #1"),
+     site-4:("mov","r1, r6"),
+     site+4:("cmp","sl, fp"),
+     site+8:("bne","#0xc2eb8"),
+     site+12:("b","#0xc32d0")
+  }
+  for vm,expected in guard.items():
+   op=byvm.get(vm)
+   if not op or (op.mnemonic,op.op_str)!=expected:
+    raise ValueError(f"G240 original shared type iterator guard drift at {vm:#x}: {None if not op else (op.mnemonic,op.op_str)}")
  windows=[]
  for site,(target,name) in CALLS.items():
   range_ops=[i for i in allops if site-176<=i.address<=site+56]
@@ -104,6 +118,8 @@ def run(ipa:Path,g238:Path,out:Path):
   "original_native_method_bounded_bytes":size,
   "original_native_method_direct_calls_metadata":directcalls,
   "real_original_three_weapon_registration_subbranches":windows,
+  "source_original_three_typed_AddNew_share_iterator_sl_and_EntityData_r6":True,
+  "source_original_three_typed_AddNew_share_iteration_backedge_0xC2EB8":True,
   "real_iOS_original_WeaponDB_record_index0_name_AUTHENTICATED":False,
   "true_2010_scene_file_order_equal_registration_sequence_proven":False,
   "real_original_runtime_GetEntityData_iteration_order_proven":False,
