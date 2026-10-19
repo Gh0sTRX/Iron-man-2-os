@@ -8,6 +8,7 @@
 #define B24_G279_WALK_TRACE_H
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 typedef struct {
@@ -46,12 +47,8 @@ static int b24_g279_trace_open(const char *path) {
 }
 static int b24_g279_trace_write(const B24G279Row *r) {
  if(!r||!b24_g279_trace_stream)return 0;
- if(!r->phase || 
-    !((r->phase[0]=='B' && r->phase[1]=='O' && r->phase[2]=='O' &&
-       r->phase[3]=='T' && r->phase[4]=='\0') ||
-      (r->phase[0]=='W' && r->phase[1]=='A' && r->phase[2]=='L' &&
-       r->phase[3]=='K' && r->phase[4]=='1' && r->phase[5]=='2' &&
-       r->phase[6]=='0' && r->phase[7]=='\0'))) return 0;
+ if(!r->phase || (strcmp(r->phase,"BOOT")!=0 &&
+                  strcmp(r->phase,"WALK120")!=0))return 0;
  const float f[]={
   r->initial_x,r->initial_y,r->initial_z,
   r->x,r->y,r->z,r->gpu_x,r->gpu_y,r->gpu_z,
