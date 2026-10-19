@@ -1,0 +1,64 @@
+name: G253 Genuine 2010 MainCharacter Player Boot Native Functions Source (NO VPK)
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - "research/b24_unified/g253_original_player_maincharacter_bootstrap_sources/**"
+      - ".github/workflows/g253-original-2010-player-bootstrap-maincharacter-no-vpk.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  genuine_2010_player_start_cpp_provenance:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate original C++ boot function source scanner
+        run: python3 -m py_compile research/b24_unified/g253_original_player_maincharacter_bootstrap_sources/g253_original_2010_maincharacter_player_boot_native_cpp_inventory.py
+      - name: Install authentic 2010 ARM source disassembler and private source reader
+        run: python3 -m pip install -q capstone gdown
+      - uses: actions/download-artifact@v4
+        with:
+          name: G252_ORIGINAL_2010_SPAWNPOINT_NATIVE_CLASS71_AND_LUA_NO_VPK
+          run-id: 39238133152
+          github-token: ${{ github.token }}
+          path: /tmp/g253_previous_native_2010
+      - name: Open original user-owned 2010 iOS IPA only in ephemeral private runner
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/g253_owner
+          gdown '1bjkPiM9WvU_WrzIaUUnx-Lq3bnyJTE0I' -O /tmp/g253_owner/owner.ipa ||
+            gdown '131--LA4lrPKxpieS6LFKftIpkMY8YWsA' -O /tmp/g253_owner/owner.ipa
+          test "$(wc -c </tmp/g253_owner/owner.ipa)" -eq 248613763
+      - name: Trace real 2010 MainCharacter init and GS_GamePlay actor construction methods
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g253_original_player_maincharacter_bootstrap_sources/g253_original_2010_maincharacter_player_boot_native_cpp_inventory.py \
+            --ipa /tmp/g253_owner/owner.ipa \
+            --g252 /tmp/g253_previous_native_2010/G252_TRUE_2010_CLASS71_NATIVE_LOADER_AND_SPAWN_LUA_ROLES.json \
+            --out /tmp/g253_evidence/G253_2010_NATIVE_MAINCHARACTER_GS_GAMEPLAY_PLAYER_BOOTSTRAP_CPP_METHODS.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('/tmp/g253_evidence/G253_2010_NATIVE_MAINCHARACTER_GS_GAMEPLAY_PLAYER_BOOTSTRAP_CPP_METHODS.json').read_text())
+          assert len(x['actual_original_maincharacter_all_named_cpp_methods'])>=20
+          assert x['source_CPP_bootstrap_candidates_total']>=15
+          assert x['source_cpp_spawnpoint_constructor_native_class71_confirmed']
+          assert not x['genuine_2010_Player_start_World_XYZ_or_SpawnPoint_association_proven']
+          assert not x['Vita_source_physics_render_animation_or_mission_mutated']
+          assert not x['VPK']
+          print('G253 PASS real C++ player/scene initialization call inventory; no runtime player initial world XYZ claim')
+          PY
+          test -z "$(find . -name '*.vpk' -print -quit)"
+      - name: Erase original copyrighted game executable/archive after analysis
+        if: always()
+        run: rm -rf /tmp/g253_owner
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: G253_TRUE_ORIGINAL_MAINCHARACTER_ACTOR_INITIALIZATION_CPP_NO_VPK
+          path: /tmp/g253_evidence/
+          retention-days: 21
+          if-no-files-found: error
