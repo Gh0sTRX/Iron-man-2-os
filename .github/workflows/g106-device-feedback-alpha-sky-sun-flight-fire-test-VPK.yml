@@ -1,14 +1,8 @@
 name: G106 ON-DEVICE FEEDBACK FIX Alpha Skybox Sun and MarkV Stage2 Rush Fire Vita TEST VPK
+# Historical G106 VPK workflow. HARD STOP: no automatic packaging on any
+# source push. Manual invocation must first satisfy all seven G255 source
+# gates; current project gates are 0/7. Owner wants exactly ONE final VPK.
 on:
-  push:
-    branches: [feature/b24-unified-gameplay]
-    paths:
-      - ".github/workflows/g106-device-feedback-alpha-sky-sun-flight-fire-test-VPK.yml"
-      - "research/b24_unified/g91_offline_integrated_preview/**"
-      - "research/b24_unified/g106_visual_repair/**"
-      - "research/b24_unified/b24_gpu_g68_city.c"
-      - "research/b24_unified/b24_g10_practice_target.c"
-      - "research/b24_unified/b24_g11_practice_melee_feedback.c"
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,6 +13,11 @@ jobs:
     timeout-minutes: 65
     steps:
       - uses: actions/checkout@v4
+      - name: G255 strict no-VPK-until-seven-source-gates PASS (current 0/7; fail closed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g255_single_integrated_VPK_acceptance_gate/g255_fail_closed_one_vpk_only_after_original_vita_gameplay_qa.py --require-ready
       - name: G88 test real G82 source ledger failure A to B to A, unverified attack never damages
         run: |
           set -euo pipefail
