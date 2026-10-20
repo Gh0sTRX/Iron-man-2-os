@@ -196,9 +196,15 @@ int b24_g83_select_original_motion(const B24G83Input *p,
  out->source_authored_name=stem!=NULL;
  out->one_shot_not_looping=oneshot || (fire && aim!=B24G83_AIM_NONE && (ground||hover));
  out->original_source_duration_ms=b24_g83_authentic_source_duration(stem);
- /* UNKNOWN original iOS input semantics and damage hit frames stay false */
+ /* G297: one confirmed ranged input is NOT evidence of a source hit
+  * event when the chosen authored clip is only directional flight, rush,
+  * transition, unsupported rig or no-aim locomotion. This does NOT mute
+  * B16's own accepted shot: it prevents a spurious SECOND G83 hit request.
+  * Hit timing and original iOS permission are still unknown. */
  out->input_semantics_verified_original_ios=0;
- out->needs_2010_hit_event=fire;
+ out->needs_2010_hit_event=fire && stem!=NULL &&
+     p->transition==B24G83_EVENT_NONE && (ground||hover) &&
+     aim!=B24G83_AIM_NONE;
  return 1;
 }
 int b24_g83_select_combined(B24G82Combat *combat,uint32_t time_ms,
