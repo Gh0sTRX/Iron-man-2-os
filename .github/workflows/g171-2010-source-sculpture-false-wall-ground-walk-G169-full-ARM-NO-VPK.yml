@@ -5,6 +5,8 @@ on:
     paths:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
+      - "research/b24_unified/b24_gpu_g68_city.c"
+      - "research/b24_unified/g298_expo_ambient_vitagl/**"
       - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
       - "research/b24_unified/g83_full_motion_aim/**"
       - "research/b24_unified/g251_real_source_16_spawn_collision_matrix/**"
@@ -111,6 +113,20 @@ jobs:
             research/b24_unified/g83_full_motion_aim/test_g83_original_movement_aim_combat.c \
             -lm -o /tmp/g297_g83_original_flight_hit_isolation
           /tmp/g297_g83_original_flight_hit_isolation
+      - name: G298 original Expo source-owned 4-Sun ambient RGB textured modulate with alpha and HUD state restore NO VPK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=1 \
+            -DB24_G71_ALPHA_PASSES=1 \
+            -I research/b24_unified/g298_expo_ambient_vitagl/mock \
+            -I research/b24_unified \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/b24_gpu_g68_city.c \
+            research/b24_unified/g298_expo_ambient_vitagl/test_g298_real_city_renderer_texture_env_alpha.c \
+            -lm -o /tmp/g298_native_city_renderer_source
+          /tmp/g298_native_city_renderer_source
       - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
         run: |
           set -euo pipefail
