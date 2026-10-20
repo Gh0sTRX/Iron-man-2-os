@@ -60,10 +60,10 @@ if(B24_G299_SUIT_ENVIRONMENT_CANDIDATE)
  target_compile_definitions(im2_beta PRIVATE B24_G299_SUIT_ENVIRONMENT_CANDIDATE=1)
 endif()
 '''
- if c.count("b24_gpu_suit_draw(")!=1 or
-    c.count("glDrawElements(")!=1 or
-    c.count("src->native_bind_min_z")!=2 or
-    c.count("g299_prior_texture_env")!=3:
+ if (c.count("b24_gpu_suit_draw(")!=1 or
+     c.count("glDrawElements(")!=1 or
+     c.count("src->native_bind_min_z")!=2 or
+     c.count("g299_prior_texture_env")!=3):
   raise ValueError("G299 sole renderer draw, G168 foot, and state restoration broken")
  if list(work.rglob("*.vpk")):raise ValueError("G299 NO VPK")
  path.write_text(c);cm.write_text(cfg)
