@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 20
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      G280_LOGS: ${{ runner.temp }}/g280-logs
+      G280_LOGS: g280-logs
     steps:
       - name: Checkout only original research repository code
         uses: actions/checkout@v4
@@ -104,6 +104,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: G280_OFFICIAL_VITA3K_CLI_AND_OPTIONAL_OLD_G161_LOGS_NO_VPK
-          path: ${{ runner.temp }}/g280-logs/
+          path: g280-logs/
           if-no-files-found: warn
           retention-days: 7
