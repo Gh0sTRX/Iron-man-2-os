@@ -21,7 +21,7 @@ Bu görsel şimdilik **deneysel**, fiziksel Vita/gerçek oyun ekranı **doğrula
 - `test_g299_install_guarded_original_source.py`: pozitif, double injection, G168 kaybolması ve yanlış VPK testi.
 - `test_g299_real_suit_source_light_alpha.c`: **gerçek VitaGL suit C renderer** syntetik 3-vertex suit / RGBA atlas ile derlenir; orijinal kaynak PVR/IPA yeniden dağıtılmaz. Proximity değişimi, texture state save/restore, alpha değişmemesi ve bir draw / frame senaryoları test edilir.
 - [G299 hızlı gerçek kaynak-mock VitaGL regresyonu — **SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39506543873).
-- [G299 2010 gerçek tek Vita oyunu kaynağı / G168 + G279 / ARM ELF-only](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39506543817) — bu rapor yazılırken **tam build sonucu henüz doğrulanmamıştı**; bağlantıdan tamamlanmış sonucu kontrol edin.
+- [G299 gerçekten bütünleşmiş VitaSDK ARM **im2_beta ELF-only SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39506908295) — G168 kaynak zırh ayak bind, G279 gerçek kaynak yürüyüş logu ve G299 isteğe bağlı `Sun001..004` zırh ambiance aynı geçici oyun ağacında derlendi; 60 CI adımı tamamlandı, başarısız adım yok. **Bu ekran görüntüsü/FPS ya da Vita donanım ışık karşılaştırması değildir.**
 
 ## Orijinal ışıklandırmada kalanlar
 
@@ -29,3 +29,4 @@ Bu görsel şimdilik **deneysel**, fiziksel Vita/gerçek oyun ekranı **doğrula
 - Zırh uniform RGB testi, gerçek yüzey başına yönlü light/specular/gölge değildir. Araba/sahne geometrisine gerçek zamanlı ışık, ışık yansımaları, true shadow caster, moon/world skyline ve source material-alpha depth hâlâ stage5'tedir.
 - `G161` cihaz eski demo; G171 / G296 / G297 / G298 / **G299** kaynak değişiklikleri gerçek PS Vita **oynanış/görüntü testi geçmedi**.
 - Ana sıra: 1 gerçek ground/spawn Vita doğrulaması açık; 2 hover→Stage2→Rush flight; 3 G8 / WM özgün animasyon; 4 genuine combat; 5 Expo scale, **environment LIGHTING + shadow/sky/alpha**; 6 QTE/mission/sound; 7 aynı commit 7/7 gate ve SONRA bir VPK. `g255_single_integrated_VPK_acceptance_gate/SOURCE_PRE_VPK_READINESS.json` hâlâ 7/7 değil.
+\n## G299 entegrasyonda tekrar oluşan kaynağın güvenli ele alınması\n\nG70 önce güncel araştırma kaynaklarından `b24_gpu_suit_vitagl.c` dosyasını zaten kopyaladığından G299 açma makrosu, G168 orijinal ayak hizalaması eklendikten sonra mevcut olabilir. İlk G171, G299 tekrar ekleme korumasında durdu. Installer düzeltildi: CMake seçeneği yoksa, dosyadaki G299 bloğunu *doğrulayarak korur* ve yalnız CMake seçeneğini ekler. Her iki pozitif yol için test eklendi; G168 dosyası asla eski sürümle ezilmez. Güncel hızlı CI: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39506952916 (**SUCCESS**).\n
