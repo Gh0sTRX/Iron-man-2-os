@@ -1,5 +1,8 @@
 # Iron Man 2 (2010) iOS → PS Vita — Tersine Mühendislik ve Port Projesi
 
+> **G280 Vita3K entegrasyonu (20 Ekim 2026):** [Resmî Vita3K v0.2.1 Build 4206 Ubuntu/Xvfb çalıştırma CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39379800659). Emulator binary SHA256 doğrulanıyor; isteğe bağlı G161 eski VPK denemesi için manual workflow eklendi. **Oyun boot/FPS/G171 Vita yürüyüşü HENÜZ TEST EDİLMEDİ.** Yeni VPK, firmware, IPA üretimi/yüklemesi yok. [G280 ayrıntılı Türkçe rapor](research/b24_unified/G280_VITA3K_GITHUB_ACTIONS_EMULATOR_TEST_2026-10-20_TR.md). G279 ve ışıklandırma iş sırası değişmedi.
+
+
 > G279 (20 Ekim): G171 kaynak 120/120 yürüyüş/flight regresyonu + G278 gerçek ilk üç GPU kare + G229 120 kare hareket analizi isteğe bağlı Vita CSV kaydına (ux0:data/ironman2_g279_walk.csv) bağlandı. G279 genişletilmiş son tam Vita ARM ELF başarıyla derlendi: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016 . Oyun mekaniği değiştirilmedi, fiziksel cihaz testi yok, VPK yok. Teknik rapor: research/b24_unified/G279_REAL_VITA_FIRST_RENDERED_WALK_EVIDENCE_CSV_SOURCE_ONLY_2026-10-20_TR.md . İş sırası ve ışıklandırma maddesi değişmedi.
 
 
