@@ -3,6 +3,14 @@
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
+#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
+/* G299: only original four Sun positions are sourced, NOT the original
+ * GameLoft shading equation. Strictly experimental per-actor ambient. */
+#ifndef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
+#error "G299 only with G75 shared original CLARA four-Sun source and its candidate"
+#endif
+#include "b24_g75_original_sun_lighting_candidate.h"
+#endif
 _Static_assert(sizeof(B24GpuSuitVertex)==20,"IM2T GPU animated vertex ABI");
 _Static_assert(sizeof(B24GpuSuitTriangle)==6,"IM2T GPU triangle ABI");
 
@@ -79,7 +87,24 @@ int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
  glEnable(GL_DEPTH_TEST);
  glEnable(GL_TEXTURE_2D);
  glBindTexture(GL_TEXTURE_2D,s->texture_id);
+#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
+ /* G299 research candidate: reuse G95's four SOURCE-LOCAL Sun coords,
+  * never guess original 2010 dynamic light type/shader or rig normals.
+  * Uniform actor color follows B14/G75 actual WORLD root each frame,
+  * with alpha=1 so original recovered IM2T atlas alpha is untouched.
+  * The CLARA local->world light transform is NOT yet resolved; this is
+  * diagnostic illumination only, not parity with original iOS. */
+ GLint g299_prior_texture_env=GL_MODULATE;
+ glGetTexEnviv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,&g299_prior_texture_env);
+ glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+ const B24G75Vec actor_xyz={pose->x,pose->y,pose->z};
+ const B24G75Vec test_up={0.f,0.f,1.f};
+ const float g299_brightness=fminf(1.f,fmaxf(0.f,
+                       b24_g75_light_factor(actor_xyz,test_up)));
+ glColor4f(g299_brightness,g299_brightness,g299_brightness,1.f);
+#else
  glColor4f(1.f,1.f,1.f,1.f);
+#endif
  glEnableClientState(GL_VERTEX_ARRAY);
  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
  glVertexPointer(3,GL_FLOAT,sizeof(B24GpuSuitVertex),&src->vertices[0].x);
@@ -89,6 +114,10 @@ int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
  glDisableClientState(GL_VERTEX_ARRAY);
  glDisable(GL_TEXTURE_2D);
+#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
+ glColor4f(1.f,1.f,1.f,1.f);
+ glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,g299_prior_texture_env);
+#endif
  glPopMatrix();
  return 1;
 }
