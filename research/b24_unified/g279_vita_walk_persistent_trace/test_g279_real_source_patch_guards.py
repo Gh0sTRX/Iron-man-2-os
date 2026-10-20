@@ -18,6 +18,7 @@ def fixtures(root:Path):
 #include "../b24/b24_unified/b24_g277_real_c1l1_ground_reject_reasons.h"
 G278_INITIAL_BOOT_WORLD B24G229WalkWindow G277_GROUND_REJECTION_BREAKDOWN
 B24_G227_WALK_ROOT_DIAGNOSTIC g278_has_native_floor
+b24_original_walls b24_g74_near_original_floor(
 unsigned g278_boot_sample_count=0u;
 b14_world_tick(&world,dt,move_x,move_y,turn,look,ascend)
 b24_g75_capsule_reconcile(
@@ -46,6 +47,9 @@ with tempfile.TemporaryDirectory(prefix="g279_exact_vita_no_vpk_") as t:
   assert before.count(original)==after.count(original)==1,original
  assert after.count("b24_g279_trace_write(")==2
  assert after.count("b24_g279_trace_open(")==1
+ assert after.count("g279_win.has_native_floor=")==1
+ assert after.count("b24_g74_near_original_floor(&b24_original_walls,")==1
+ assert "world.x,world.y,world.z,&g279_win.native_floor_z" in after
  assert 'B24_G279_WALK_TRACE_FILE' in (root/"work/CMakeLists.txt").read_text()
  assert (root/"work/b24/b24_unified/b24_g279_walk_trace.h").is_file()
  assert not list((root/"work").rglob("*.vpk"))
@@ -69,4 +73,12 @@ with tempfile.TemporaryDirectory(prefix="g279_fail_closed_") as t:
   raise AssertionError("VPK presence must fail")
  except ValueError as e:
   assert "VPK" in str(e),e
-print("G279 PASS one-G171-G278 real-Vita-source guarded patch, no extra movement/G75/G8/GPU, refuse double injection/source drift/VPK, NO VPK")
+with tempfile.TemporaryDirectory(prefix="g296_reject_missing_true_G66C_floor_") as t:
+ root=Path(t);m=fixtures(root)
+ m.write_text(m.read_text().replace("b24_g74_near_original_floor(","NO_G66C_SOURCE_FLOOR("))
+ try:
+  mod.install(root)
+  raise AssertionError("Missing authentic G66C floor owner must fail")
+ except ValueError as e:
+  assert "b24_g74_near_original_floor" in str(e),e
+print("G296 PASS G279 one-source Vita diagnostic with CURRENT 120-frame original G66C floor, guarded original source, NO VPK")
