@@ -94,7 +94,13 @@ def probe(app,pup,vpk,out,private):
     home=private/"home";home.mkdir(exist_ok=True)
     runtime=private/"xdg";runtime.mkdir(exist_ok=True,mode=0o700);runtime.chmod(0o700)
     env=os.environ.copy()
+    config_home=private/"config";config_home.mkdir(exist_ok=True)
+    cache_home=private/"cache";cache_home.mkdir(exist_ok=True)
+    data_home=home/".local/share";data_home.mkdir(parents=True,exist_ok=True)
     env.update({"HOME":str(home),"XDG_RUNTIME_DIR":str(runtime),
+                "XDG_CONFIG_HOME":str(config_home.resolve()),
+                "XDG_CACHE_HOME":str(cache_home.resolve()),
+                "XDG_DATA_HOME":str(data_home.resolve()),
                 "LIBGL_ALWAYS_SOFTWARE":"1","GALLIUM_DRIVER":"llvmpipe",
                 "SDL_AUDIODRIVER":"dummy","MESA_LOADER_DRIVER_OVERRIDE":"llvmpipe"})
     first_run=initialize_first_run(app,env,out)
@@ -104,18 +110,32 @@ def probe(app,pup,vpk,out,private):
     # Historical source VPK only; the LAST valid release is still on source branch.
     # Main-firmware install may still miss separate fonts; only dismiss observed warning.
     boot_cmd=[str(app),"--console","--backend-renderer","OpenGL",str(vpk)]
-    start=time.monotonic();clicks=[];samples=[]
+    start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False
     with (out/"g284_G161_launch.log").open("wb") as log:
         proc=subprocess.Popen(boot_cmd,env=env,stdout=log,stderr=subprocess.STDOUT,
                               start_new_session=True)
         try:
             for t in SAMPLES:
                 while time.monotonic()-start<t and proc.poll() is None:
-                    if shutil.which("xdotool") and time.monotonic()-start>4:
+                    if shutil.which("xdotool") and time.monotonic()-start>3:
+                        # Vita3K Qt first run welcome has "Show next time" checked.
+                        # Dismiss only observed welcome UI; do not install other files.
+                        if not welcome_dismissed:
+                            welcome=subprocess.run(["xdotool","search","--name","Welcome to Vita3K"],
+                                capture_output=True,text=True,timeout=3,check=False)
+                            if welcome.returncode==0:
+                                c1=subprocess.run(["xdotool","mousemove","722","407","click","1"],
+                                    capture_output=True,text=True,timeout=3,check=False)
+                                c2=subprocess.run(["xdotool","mousemove","135","407","click","1"],
+                                    capture_output=True,text=True,timeout=3,check=False)
+                                welcome_dismissed=(c1.returncode==0 and c2.returncode==0)
+                                clicks.append({"type":"welcome_uncheck_show_next_time_then_OK",
+                                               "tool_return_code":int(not welcome_dismissed)})
+                                time.sleep(.5)
                         search=subprocess.run(["xdotool","search","--name","Missing Firmware"],
                                               capture_output=True,text=True,timeout=3,check=False)
                         # One warning dismissal after verified "Missing Firmware" title only.
-                        if search.returncode==0 and not clicks:
+                        if search.returncode==0 and not any(x["type"]=="acknowledge_missing_firmware_warning_only" for x in clicks):
                             click=subprocess.run(["xdotool","mousemove","586","402","click","1"],
                                                  capture_output=True,text=True,timeout=3,check=False)
                             clicks.append({"type":"acknowledge_missing_firmware_warning_only",
