@@ -1,5 +1,8 @@
 # Iron Man 2 (2010) iOS → PS Vita — Tersine Mühendislik ve Port Projesi
 
+> **G295 (20 Ekim): Kullanıcının gerçek PSVUPDAT.PUP 3.74 sistem dosyası GitHub runner içindeki Vita3K 4206'ya başarıyla kuruldu** (SHA256 pinli, yazılım/fizikî oyun dosyaları repoya girmez). Eski G161 emülatör `Loading...` penceresine ulaştı fakat host OpenGL4.4 context kuramadı; Vulkan llvmpipe hostta doğrulandıysa da Vita3K native C++ `enumeratePhysicalDevices: ErrorInitializationFailed` ile kapanıyor. **Oyun hâlâ açılmış/oynanabilir değil; yeni VPK yok.** [Tam G295 raporu](research/b24_unified/G284_G285_USER_DRIVE_PSVUPDAT_374_VITA3K_PRIVATE_CI_2026-10-20_TR.md). Oyun kaynak testleri/G171/G279 ve ışıklandırma sırası değişmedi.
+
+
 > **G280 Vita3K entegrasyonu (20 Ekim 2026):** [Resmî Vita3K v0.2.1 Build 4206 Ubuntu/Xvfb çalıştırma CI SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39379800659). Emulator binary SHA256 doğrulanıyor; isteğe bağlı G161 eski VPK denemesi için manual workflow eklendi. **Oyun boot/FPS/G171 Vita yürüyüşü HENÜZ TEST EDİLMEDİ.** Yeni VPK, firmware, IPA üretimi/yüklemesi yok. [G280 ayrıntılı Türkçe rapor](research/b24_unified/G280_VITA3K_GITHUB_ACTIONS_EMULATOR_TEST_2026-10-20_TR.md). G279 ve ışıklandırma iş sırası değişmedi.
 
 
