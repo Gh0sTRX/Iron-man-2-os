@@ -24,8 +24,12 @@ def install(root:Path):
   if not name.is_file():raise FileNotFoundError(str(name))
  if list(work.rglob("*.vpk")):raise ValueError("G299 NO VPK")
  c=path.read_text();cfg=cm.read_text();game=main.read_text();reference=REF.read_text()
- if "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in c or "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in cfg:
+ if "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in cfg:
   raise ValueError("G299 duplicate source modification")
+ # G70 source restorer may already copy repository current G299 renderer
+ # before the G168 foot transform patch. Preserve that source branch;
+ # add its CMake flag only. Still fail-closed on partial source changes.
+ preexisting_g299="B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in c
  if "src->native_bind_min_z" not in c or "B24_G168_ORIGINAL_SUIT_RENDER_FOOT" not in cfg:
   raise ValueError("G299 requires intact G168 authentic IM2T foot-bound suit code")
  if "B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE" not in cfg:
@@ -34,19 +38,20 @@ def install(root:Path):
   raise ValueError("G299 requires one B14 integrator")
  if game.count("b24_g8_motion_tick_g84(")!=1:
   raise ValueError("G299 requires one real G8 source pose renderer")
- header=reference.split("#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE",1)[1].split("_Static_assert(",1)[0]
- header="#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE"+header
- c=one(c,"#include <string.h>\n","#include <string.h>\n"+header,
-       "insert original shared candidate source only")
- start=reference.index(' glBindTexture(GL_TEXTURE_2D,s->texture_id);')
- end=reference.index(' glEnableClientState(GL_VERTEX_ARRAY);',start)
- source_block=reference[start:end]
- c=one(c," glBindTexture(GL_TEXTURE_2D,s->texture_id);\n glColor4f(1.f,1.f,1.f,1.f);\n",
-       source_block,"real animated suit alpha-preserving RGB light")
- start=reference.index(" glDisable(GL_TEXTURE_2D);\n#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE")
- end=reference.index(" glPopMatrix();",start)
- c=one(c," glDisable(GL_TEXTURE_2D);\n",reference[start:end],
-       "restore old texture env and white to next HUD")
+ if not preexisting_g299:
+  header=reference.split("#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE",1)[1].split("_Static_assert(",1)[0]
+  header="#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE"+header
+  c=one(c,"#include <string.h>\n","#include <string.h>\n"+header,
+        "insert original shared candidate source only")
+  start=reference.index(' glBindTexture(GL_TEXTURE_2D,s->texture_id);')
+  end=reference.index(' glEnableClientState(GL_VERTEX_ARRAY);',start)
+  source_block=reference[start:end]
+  c=one(c," glBindTexture(GL_TEXTURE_2D,s->texture_id);\n glColor4f(1.f,1.f,1.f,1.f);\n",
+        source_block,"real animated suit alpha-preserving RGB light")
+  start=reference.index(" glDisable(GL_TEXTURE_2D);\n#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE")
+  end=reference.index(" glPopMatrix();",start)
+  c=one(c," glDisable(GL_TEXTURE_2D);\n",reference[start:end],
+        "restore old texture env and white to next HUD")
  cfg+='''
 # G299: experimental only, source-local 2010 Sun001..004 positions
 # shared with G95. Dynamic suit uniform attenuation only; no original
