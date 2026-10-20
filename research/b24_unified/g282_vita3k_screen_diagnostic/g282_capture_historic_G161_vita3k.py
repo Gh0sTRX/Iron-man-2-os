@@ -45,7 +45,7 @@ def compact_log(p:Path,max_lines:int=65)->dict[str,list[str]]:
         out[category]=found[-max_lines:]
     return out
 
-def run(app:Path,vpk:Path,out:Path)->dict[str,Any]:
+def run(app:Path,vpk:Path,out:Path, acknowledge_welcome:bool=False)->dict[str,Any]:
     if not os.environ.get("DISPLAY"):
         raise RuntimeError("G282 needs Xvfb-run exported DISPLAY; refuse unguarded desktop capture")
     if not app.is_file() or not os.access(app,os.X_OK):
@@ -72,10 +72,24 @@ def run(app:Path,vpk:Path,out:Path)->dict[str,Any]:
     snaps=[]
     start=time.monotonic()
     exit_code=None
+    click_evidence={"attempted":False,"tool_exit_code":None,"note":"No installation or firmware acceptance performed"}
     with log.open("wb") as fd:
         proc=subprocess.Popen(cmd,stdout=fd,stderr=subprocess.STDOUT,
                               env=env,start_new_session=True)
         try:
+            if acknowledge_welcome:
+                # Coordinates measured from G282 actual frozen 960x544 framebuffer;
+                # the ONLY action is clicking informational Welcome -> Ok (135,407).
+                # No firmware/license/install or unknown dialogs are clicked.
+                if not shutil.which("xdotool"):
+                    raise FileNotFoundError("G283 needs xdotool for the measured Welcome/Ok position")
+                while time.monotonic()-start<5 and proc.poll() is None:
+                    time.sleep(.3)
+                click_evidence["attempted"]=True
+                mouse=subprocess.run(["xdotool","mousemove","135","407","click","1"],
+                                     timeout=8,capture_output=True,text=True,check=False)
+                click_evidence["tool_exit_code"]=mouse.returncode
+                click_evidence["note"]="Clicked exact G282 observed Welcome/Ok at (135,407); not firmware installation"
             for t in SAMPLES:
                 while time.monotonic()-start<t and proc.poll() is None:
                     time.sleep(.35)
@@ -112,6 +126,7 @@ def run(app:Path,vpk:Path,out:Path)->dict[str,Any]:
         "time_seconds":round(time.monotonic()-start,1),
         "emulator_exit_code_after_termination":exit_code,
         "screen_evidence":snaps,
+        "welcome_acknowledgement":click_evidence,
         "log_findings":compact_log(log),
         "initial_wizard_or_firmware_state":"TO_BE_REVIEWED_FROM_CAPTURED_SCREEN",
         "gameplay_frame_confirmed":False,
@@ -137,8 +152,9 @@ def main()->None:
     p.add_argument("--app",type=Path,required=True)
     p.add_argument("--folder",type=Path,required=True)
     p.add_argument("--out",type=Path,required=True)
+    p.add_argument("--acknowledge-welcome",action="store_true")
     a=p.parse_args()
-    run(a.app,get_one_vpk(a.folder),a.out.resolve())
+    run(a.app,get_one_vpk(a.folder),a.out.resolve(),acknowledge_welcome=a.acknowledge_welcome)
 
 if __name__=="__main__":
     main()
