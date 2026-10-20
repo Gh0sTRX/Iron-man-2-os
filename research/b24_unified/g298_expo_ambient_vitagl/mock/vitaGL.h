@@ -12,6 +12,8 @@ typedef unsigned char GLubyte;
 typedef float GLfloat;
 typedef ptrdiff_t GLsizeiptr;
 #define GL_NO_ERROR 0u
+#define GL_TRUE 1
+#define GL_FALSE 0
 #define GL_TEXTURE_2D 0x0DE1u
 #define GL_RGBA 0x1908u
 #define GL_UNSIGNED_BYTE 0x1401u
