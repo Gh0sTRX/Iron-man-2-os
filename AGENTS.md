@@ -39,3 +39,10 @@ The narrow quick CI is `.github/workflows/g279-walk-trace-host-source-only-NO-VP
 4. Preserve the stage order, especially **real original lighting** at stage 5. Full Vita gameplay and performance claims require GPU/device evidence.
 
 Do not ask the user to re-send previously provided links or spend time on repeated Vita3K driver failures. Only request input when technically indispensable.
+
+## G298 renderer and VPK workflow safety (2026-10-20)
+
+- Source `research/b24_unified/b24_gpu_g68_city.c` now explicitly uses `GL_MODULATE` during experimental G95 four-Sun source-position vertex RGB lighting; it restores preceding texture environment for armor/HUD. This is a textured-city **render contract**, not decoded native Gameloft lighting/shadows. G71 source alpha/depth must be unchanged.
+- Fast renderer mock/source C test (synthetic-only atlas, no original assets): `.github/workflows/g298-expo-source-light-texture-modulate-alpha-host-NO-VPK.yml`, run **39492824279 SUCCESS**. Full same-source VitaSDK `im2_beta` ARM ELF-only build: G171 run **39492921146 SUCCESS**. Still no physical Vita G298 lighting observation.
+- WARNING: historical G106 `.github/workflows/g106-device-feedback-alpha-sky-sun-flight-fire-test-VPK.yml` had a push trigger on city source; G298 source change inadvertently triggered a legacy private test-VPK artifact (NOT installed or approved as next tester). This has been fixed by removing **all automatic push triggers** and placing G255 `--require-ready` as the first manual step. **Do not reinstate auto VPK**, and do not use that old artifact. Final one-VPK policy is still binding. GitHub Actions artifacts from old runs may exist; they are not proof of an approved current build.
+- Detailed [G298 Turkish handoff](research/b24_unified/G298_ORIGINAL_EXPO_FOUR_SUN_AMBIENT_TEXTURE_MODULATION_RENDER_QA_NO_VPK_2026-10-20_TR.md). Ground physical QA remains open; Flight Stage2/Rush phase stays primary, source lighting is parallel stage-5 groundwork, not a reordered acceptance gate.
