@@ -37,7 +37,8 @@ def install(root: Path) -> None:
     for token in (
         "G278_INITIAL_BOOT_WORLD", "B24G229WalkWindow",
         "G277_GROUND_REJECTION_BREAKDOWN","B24_G227_WALK_ROOT_DIAGNOSTIC",
-        "g278_has_native_floor","b24_g278_boot_sample_count"
+        "g278_has_native_floor","b24_g278_boot_sample_count",
+        "b24_original_walls", "b24_g74_near_original_floor("
     ):
         # The G278 variable name is g278_boot_sample_count (without b24);
         # check the actual real source-specific symbol below separately.
@@ -117,6 +118,14 @@ def install(root: Path) -> None:
              g279_win.initial_y=g278_initial_b14_y;
              g279_win.initial_z=g278_initial_b14_z;
              g279_win.x=world.x;g279_win.y=world.y;g279_win.z=world.z;
+             /* G296: unlike G278's BOOT-only original C1L1 floor probe,
+              * measure the true source G66C floor near the CURRENT 120-frame
+              * window endpoint. Read-only; neither world position nor G75
+              * movement/collision result is changed. */
+             g279_win.has_native_floor=(unsigned)(
+                 b24_original_walls.ready &&
+                 b24_g74_near_original_floor(&b24_original_walls,
+                     world.x,world.y,world.z,&g279_win.native_floor_z));
              g279_win.gpu_x=b24_gpu_rt.frame_pose.x;
              g279_win.gpu_y=b24_gpu_rt.frame_pose.y;
              g279_win.gpu_z=b24_gpu_rt.frame_pose.z;
