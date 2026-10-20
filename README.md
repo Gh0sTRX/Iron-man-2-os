@@ -1,5 +1,8 @@
 # Iron Man 2 (2010) iOS → PS Vita — Tersine Mühendislik ve Port Projesi
 
+> **G295 gerçek Vita3K durum raporu (20 Ekim):** Kullanıcının 3.74 PS Vita firmware'i ile Vita3K 4206 GitHub Actions üzerinde yükleme başarılı. Tarihî G161 `Loading...` penceresine erişildi; GitHub runner OpenGL4.4 bağlamını açamıyor, Vita3K Vulkan aygıt sayımında C++ istisnasıyla kapanıyor. **Bu game boot / FPS / Vita donanım kabulü değildir**, yeni VPK üretilmedi. [GitHub G294 teşhis](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39484581491), [G295 detay raporu](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/G284_G285_USER_DRIVE_PSVUPDAT_374_VITA3K_PRIVATE_CI_2026-10-20_TR.md).
+
+
 > **G280 Vita3K GitHub entegrasyonu (20 Ekim 2026):** feature/b24-unified-gameplay dalında [resmî Linux Vita3K 4206 komut satırı SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39379800659). G280 otomatik emülatör açılış ortamı testidir, Iron Man 2 Vita oyununun boot/FPS/gerçek donanım kabulü değildir; VPK üretilmedi. Manuel eski G161 test akışı [G280 workflow](.github/workflows/g280-vita3k-isolated-emulator-smoke-NO-NEW-VPK.yml) üzerinde isteğe bağlıdır. [G280 teknik rapor (feature dalı)](https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/G280_VITA3K_GITHUB_ACTIONS_EMULATOR_TEST_2026-10-20_TR.md).
 
 
