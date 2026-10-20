@@ -57,9 +57,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          echo 'G293 installed Vulkan ICD manifests:'
+          find /usr/share/vulkan/icd.d -maxdepth 1 -type f -name '*.json' -print || :
+          ICD="$(find /usr/share/vulkan/icd.d -maxdepth 1 -type f -iname '*lvp*.json' | head -n 1)"
+          if test -z "$ICD"; then
+            echo 'G293 Lavapipe manifest not found on this runner. Software-Vulkan candidate unverified.'
+            exit 1
+          fi
           # Unset DISPLAY in ordinary GitHub runner, so run Vulkan loader inside Xvfb.
-          export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          export VK_ICD_FILENAMES="$ICD"
           export XDG_RUNTIME_DIR="$RUNNER_TEMP/g291_vulkan_runtime"
           mkdir -p "$XDG_RUNTIME_DIR"
           chmod 700 "$XDG_RUNTIME_DIR"
