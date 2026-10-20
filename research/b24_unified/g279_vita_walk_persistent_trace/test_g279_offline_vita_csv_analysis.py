@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix="g279_vita_csv_parser_host_") as t:
  report=a.summary(loaded)
  assert "10.070" in report and "kamera" in report
  assert "özgün G66C pencere sonu zemin=EVET" in report
- assert "zemin_Zup=2.8296" in report
+ assert f"zemin_Zup={float(moving['native_floor_z']):.4f}" in report
  assert "cihaz kaynağı ayrıca doğrulanmalı" in report
  blocked=dict(moving)
  blocked["frame"]="240";blocked["b14_path"]="10.0";blocked["resolved_path"]="0.0"
