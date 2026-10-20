@@ -1,0 +1,78 @@
+name: G283 actual G161 Vita3K first run Welcome-OK acknowledgment screenshot probe NO NEW VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - '.github/workflows/g283-vita3k-acknowledge-first-run-welcome-G161-NO-VPK.yml'
+      - 'research/b24_unified/g282_vita3k_screen_diagnostic/**'
+      - '.github/workflows/g283-vita3k-acknowledge-first-run-welcome-G161-NO-VPK.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  existing_g161_real_screen_evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      G283_LOGS: g283-welcome-evidence
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install graphics and virtual X screenshot tools for actual Vita3K UI evidence
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb xauth openbox scrot xdotool x11-utils mesa-vulkan-drivers libgl1 libegl1 libvulkan1 imagemagick
+          mkdir -p "$G283_LOGS"
+      - name: Validate exact official emulator binary SHA256 and bounded old-G161 archive rules
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g280_vita3k_ci/test_g280_vita3k_bootstrap_contract.py
+          python3 research/b24_unified/g280_vita3k_ci/test_g280_existing_archive_validation.py
+          python3 research/b24_unified/g280_vita3k_ci/g280_prepare_pinned_vita3k.py --out "$RUNNER_TEMP/g282-official-vita3k" | tee "$G283_LOGS/vita3k_binary_sha256.txt"
+      - name: Restore ONLY previous private G161 VPK already authorized (no build step)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39053725183
+          name: G161_IronMan2_iOS_Original_StarkExpo_G160_Road_G156_Walls_G106_Sky_Flight_OneDevice_TEST_VPK
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g282-old-G161
+      - name: Observe actual Vita3K G161 screen at 10,25,43 seconds and bounded startup errors
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 960x544x24' sh -c '
+            openbox --sm-disable >/dev/null 2>&1 &
+            python3 research/b24_unified/g282_vita3k_screen_diagnostic/g282_capture_historic_G161_vita3k.py \
+              --app "$RUNNER_TEMP/g282-official-vita3k/squashfs-root/AppRun" \
+              --folder "$RUNNER_TEMP/g282-old-G161" \
+              --out "$G283_LOGS" --acknowledge-welcome
+          '
+          test -s "$G283_LOGS/g282_report.json"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('g283-welcome-evidence/g282_report.json').read_text())
+          assert d['new_vpk_built'] is False
+          assert d['physical_vita_confirmed'] is False
+          assert d['gameplay_frame_confirmed'] is False
+          print("G283 welcome click:",d["welcome_acknowledgement"])
+          print('G283 post-Welcome screen frames captured:',[(x['time_requested_seconds'],x['screenshot_captured'],x['screenshot_bytes'],x['mapped_vita3k_window_name']) for x in d['screen_evidence']])
+          PY
+          for img in "$G283_LOGS"/vita3k_display_*.png; do
+            if test -f "$img"; then identify -format 'G282 image %f size=%wx%h mean=%[fx:mean] standard_deviation=%[fx:standard_deviation]\n' "$img"; fi
+          done
+      - name: Ensure only screenshots and diagnostics uploaded, no original title payload
+        if: always()
+        run: |
+          mkdir -p "$G283_LOGS"
+          test -z "$(find "$G283_LOGS" -type f \( -name '*.vpk' -o -name '*.ipa' -o -name '*.pup' -o -name '*.im2v' -o -name '*.c1g2' \) -print -quit)"
+          echo 'SCREEN/CODE/LOG is not a gameplay pass. G161 historic game only. No new VPK.' > "$G283_LOGS/README_DIAG.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: G283_VITA3K_G161_AFTER_WELCOME_3_SCREENSHOTS_NO_VPK
+          path: g283-welcome-evidence/
+          if-no-files-found: warn
+          retention-days: 7
