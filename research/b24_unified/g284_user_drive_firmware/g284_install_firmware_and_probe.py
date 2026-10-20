@@ -71,6 +71,7 @@ def initialize_first_run(app, env, out):
                         clicked=p.returncode==0
                 time.sleep(.35)
         finally:
+            process_exit_before_forced_shutdown=proc.poll()
             if proc.poll() is None:
                 try:os.killpg(proc.pid,signal.SIGTERM)
                 except ProcessLookupError:pass
@@ -81,6 +82,31 @@ def initialize_first_run(app, env, out):
                     proc.wait(timeout=3)
     return {"welcome_ok_clicked":clicked,"process_return":proc.returncode,
             "config_candidates":[str(p.relative_to(Path(env["HOME"]))) for p in Path(env["HOME"]).rglob("config.yml")][:15]}
+
+def bounded_emulator_logger_diagnostic(private,out):
+    """Collect only bounded TEXT diagnostic log lines, no PUP/VPK/firmware bytes."""
+    paths=[]
+    dirs=[private/"cache"/"Vita3K",private/"home"/".local/share/Vita3K"/"log",
+          private/"config"/"Vita3K"]
+    for folder in dirs:
+        if folder.is_dir():
+            for ext in ("*.log","*.txt"):
+                paths.extend(p for p in folder.glob(ext) if p.is_file() and p.stat().st_size<=4*1024*1024)
+    signal=re.compile(r"error|fatal|fail|vulkan|instance|device|shader|render|exception|panic|gpu|init|abort|driver|unsupported|module|screen",re.I)
+    safe_lines=[]
+    for path in sorted(set(paths))[:14]:
+        try:
+            for line in path.read_text(encoding="utf-8",errors="replace").splitlines()[-3000:]:
+                if signal.search(line):
+                    # Avoid embedding temp filesystem names from user-owned paths.
+                    line=re.sub(r"/home/runner/[^ ]+", "[CI runner local path]",line)
+                    safe_lines.append(path.name[:100]+" "+line[:380])
+        except OSError:
+            pass
+    safe_lines=safe_lines[-240:]
+    (out/"g294_filtered_vita3k_backend_diagnostics.txt").write_text("\\n".join(safe_lines)+"\\n",encoding="utf-8")
+    return {"log_files_checked":len(set(paths)),"matching_lines":len(safe_lines),
+            "last_errors":safe_lines[-36:]}
 
 def probe(app,pup,vpk,out,private):
     if not os.getenv("DISPLAY"):raise RuntimeError("G284 requires private Xvfb display")
@@ -121,7 +147,7 @@ def probe(app,pup,vpk,out,private):
     else:
         env.pop("VK_ICD_FILENAMES",None)
     boot_cmd=[str(app),"--console","--backend-renderer","Vulkan",str(vpk)]
-    start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False;update_modal_attempts=0;font_modal_attempts=0
+    start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False;update_modal_attempts=0;font_modal_attempts=0;process_exit_before_forced_shutdown=None
     with (out/"g284_G161_launch.log").open("wb") as log:
         proc=subprocess.Popen(boot_cmd,env=env,stdout=log,stderr=subprocess.STDOUT,
                               start_new_session=True)
@@ -195,7 +221,10 @@ def probe(app,pup,vpk,out,private):
                     try:os.killpg(proc.pid,signal.SIGKILL)
                     except ProcessLookupError:pass
                     proc.wait(timeout=3)
+    emu_diagnostics=bounded_emulator_logger_diagnostic(private,out)
     status={
+        "emulator_exit_before_timeout":process_exit_before_forced_shutdown,
+        "emulator_diagnostics":emu_diagnostics,
         "probe":"G291_USER_SUPPLIED_PSVUPDAT_MAIN_FW_G161_VULKAN_LAVAPIPE",
         "renderer_probe":"Vulkan lavapipe, no physical PS Vita GPU",
         "firmware":pup_check,
@@ -212,6 +241,7 @@ def probe(app,pup,vpk,out,private):
         "caveat":"Screenshots must be manually reviewed. Private firmware/VPK not uploaded. Old G161 lacks G279."
     }
     (out/"g284_report.json").write_text(json.dumps(status,indent=2)+"\n")
+    print("G294 renderer exit-before-stop=",process_exit_before_forced_shutdown,"backend-log",emu_diagnostics["last_errors"][-6:])
     print("G285 first-run initialized",first_run,"PUP install process",install_status,
           "source G161 detected",vpk_check["title_id"],"partitions",len(partitions),
           "screenshots",[(x["second"],x["image_captured"],x["image_bytes"]) for x in samples],
