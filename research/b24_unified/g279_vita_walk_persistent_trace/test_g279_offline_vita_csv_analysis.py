@@ -19,7 +19,8 @@ def specimen(phase,frame,verdict):
  r.update(phase=phase,frame=str(frame),ms=str(frame*17),verdict=verdict)
  if phase=="WALK120":
   r.update(active_stick="120",b14_path="10.0702",resolved_path="10.0702",
-           world_dy="10.0702",camera_dy="10.0691")
+           world_dy="10.0702",camera_dy="10.0691",
+           has_native_floor="1",native_floor_z="2.82955")
  return r
 
 def make(path,rows,header=None):
@@ -38,13 +39,17 @@ with tempfile.TemporaryDirectory(prefix="g279_vita_csv_parser_host_") as t:
  assert a.assess_window(loaded[-1])=="GERCEK_DUNYA_HAREKETI_VAR"
  report=a.summary(loaded)
  assert "10.070" in report and "kamera" in report
+ assert "özgün G66C pencere sonu zemin=EVET" in report
+ assert "zemin_Zup=2.8296" in report
  assert "cihaz kaynağı ayrıca doğrulanmalı" in report
  blocked=dict(moving)
  blocked["frame"]="240";blocked["b14_path"]="10.0";blocked["resolved_path"]="0.0"
  blocked["collision_reject"]="120"
+ blocked["has_native_floor"]="0";blocked["native_floor_z"]="0"
  blocked["verdict"]="COLLISION_REJECTS_GROUND_MOTION"
  make(r,[boot,blocked])
  assert a.assess_window(a.parse_csv(r)[-1])=="C1L1_CARPISMA_HAREKETI_KESIYOR"
+ assert "özgün G66C pencere sonu zemin=HAYIR, zemin_Zup=YOK" in a.summary(a.parse_csv(r))
  noinput=dict(blocked);noinput["active_stick"]="0"
  make(r,[boot,noinput])
  assert a.assess_window(a.parse_csv(r)[-1])=="YETERLI_GIRDI_YOK"
@@ -58,10 +63,11 @@ with tempfile.TemporaryDirectory(prefix="g279_vita_csv_parser_host_") as t:
  poison=dict(moving);poison["active_stick"]="999";fail([boot,poison])
  poison=dict(moving);poison["verdict"]="MALICIOUS,COMMA";fail([boot,poison])
  poison=dict(moving);poison["world_x"]="inf";fail([boot,poison])
+ poison=dict(moving);poison["native_floor_z"]="nan";fail([boot,poison])
  poison=dict(moving);poison["frame"]="0";fail([boot,poison])
  poison=dict(moving);poison["resolved_path"]="-1";fail([boot,poison])
  poison=dict(moving);poison["has_native_floor"]="2";fail([boot,poison])
  poison=dict(moving);poison["phase"]="BOOT";fail([boot,poison])
  make(r,[boot])
  assert "Yeterli ardışık yerde yürüyüş kaydı yok" in a.summary(a.parse_csv(r))
-print("G279 PASS 31-column Turkish offline Vita evidence analyzer: valid source window, blocked collision, insufficient stick, missing 120 frame and 9 negative/adversarial cases; NO device claim NO VPK")
+print("G296 PASS G279 31-column Turkish offline analyzer: real-source floor present/absent at window endpoint, collision, insufficient stick and adversarial data; synthetic fixture only; NO device claim, NO VPK")
