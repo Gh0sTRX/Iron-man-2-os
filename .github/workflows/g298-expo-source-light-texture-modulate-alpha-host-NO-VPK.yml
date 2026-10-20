@@ -1,0 +1,37 @@
+name: G298 Expo four-Sun candidate VitaGL textured ambient modulation and source alpha smoke NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g298-expo-source-light-texture-modulate-alpha-host-NO-VPK.yml"
+      - "research/b24_unified/b24_gpu_g68_city.c"
+      - "research/b24_unified/g298_expo_ambient_vitagl/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g298_source_city_vitagl_light_alpha_no_packaging:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and execute ACTUAL G68 VitaGL city renderer with mocked GPU and synthetic atlas
+        shell: bash
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=1 \
+            -DB24_G71_ALPHA_PASSES=1 \
+            -I research/b24_unified/g298_expo_ambient_vitagl/mock \
+            -I research/b24_unified \
+            research/b24_unified/b24_gpu_g68_city.c \
+            research/b24_unified/g298_expo_ambient_vitagl/test_g298_real_city_renderer_texture_env_alpha.c \
+            -lm -o /tmp/g298_native_city_renderer_light_alpha
+          /tmp/g298_native_city_renderer_light_alpha
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified/g75_device_qa \
+            research/b24_unified/g75_device_qa/test_g75_sun_light_host.c \
+            -lm -o /tmp/g298_authored_source_four_sun_candidate_math
+          /tmp/g298_authored_source_four_sun_candidate_math
+          test -z "$(find research/b24_unified/g298_expo_ambient_vitagl -type f \( -name '*.vpk' -o -name '*.ipa' -o -name '*.pup' \) -print -quit)"
+          echo 'G298 PASS: source city shader color modulation and alpha/depth isolation, ZERO original game binary copied, NO VPK. Device lighting remains unverified.'
