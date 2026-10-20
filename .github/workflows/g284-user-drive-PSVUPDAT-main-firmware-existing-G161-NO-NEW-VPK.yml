@@ -58,8 +58,19 @@ jobs:
         run: |
           set -euo pipefail
           test -f /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
-          vulkaninfo --summary > "$G284_LOGS/G291_vulkaninfo.txt" 2>&1
-          grep -Ei 'driverName|deviceName|apiVersion|lavapipe|llvmpipe' "$G284_LOGS/G291_vulkaninfo.txt" | head -12
+          # Unset DISPLAY in ordinary GitHub runner, so run Vulkan loader inside Xvfb.
+          export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          export XDG_RUNTIME_DIR="$RUNNER_TEMP/g291_vulkan_runtime"
+          mkdir -p "$XDG_RUNTIME_DIR"
+          chmod 700 "$XDG_RUNTIME_DIR"
+          if xvfb-run -a -s '-screen 0 960x544x24' vulkaninfo --summary > "$G284_LOGS/G291_vulkaninfo.txt" 2>&1; then
+            grep -Ei 'driverName|deviceName|apiVersion|lavapipe|llvmpipe' "$G284_LOGS/G291_vulkaninfo.txt" | head -12 || :
+            echo 'G291_NATIVE_VULKAN_LOADER_AVAILABLE' | tee "$G284_LOGS/G291_vulkan_loader_status.txt"
+          else
+            cat "$G284_LOGS/G291_vulkaninfo.txt" | tail -100
+            echo 'G291_NATIVE_VULKAN_LOADER_UNAVAILABLE_ON_RUNNER' | tee "$G284_LOGS/G291_vulkan_loader_status.txt"
+            exit 1
+          fi
       - name: Install user's MAIN PSVUPDAT firmware in temporary isolated Vita3K and attempt G161 graphical boot
         shell: bash
         run: |
