@@ -133,7 +133,7 @@ def summary(rows:list[WalkRow])->str:
    f"B14 yol={row['b14_path']:.3f}, C1L1 çözülmüş yol={row['resolved_path']:.3f}, "
    f"çarpışma reddi={row['collision_reject']}, GPU hata karesi={row['gpu_root_mismatch']}, "
    f"özgün G66C pencere sonu zemin={'EVET' if row['has_native_floor'] else 'HAYIR'}"
-   f", zemin_Zup={row['native_floor_z']:.4f} (yalnız mevcutsa anlamlı), "
+   f", zemin_Zup={format(row['native_floor_z'], '.4f') if row['has_native_floor'] else 'YOK'}, "
    f"dünya Δ=({row['world_dx']:.3f},{row['world_dy']:.3f}), "
    f"kamera Δ=({row['camera_dx']:.3f},{row['camera_dy']:.3f}), "
    f"tanı={assess_window(row)}"
