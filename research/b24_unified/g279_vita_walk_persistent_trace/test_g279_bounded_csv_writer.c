@@ -30,6 +30,9 @@ int main(void) {
  walk.b14_path=10.0702f;walk.accepted_path=10.0702f;
  walk.active_stick=120u;walk.coll_reject=0u;walk.root_mismatch=0u;
  walk.wall_reject=0u;walk.missing_floor=0u;walk.step_reject=0u;
+ /* G296: true 2010 source G66C floor at 120-frame endpoint,
+  * distinct from initial rendered boot frame floor .0725. */
+ walk.has_native_floor=1u;walk.native_floor_z=2.82955f;
  walk.net_world_dx=0.f;walk.net_world_dy=10.0702f;
  walk.net_camera_dx=0.f;walk.net_camera_dy=10.0691f;
  walk.verdict="WORLD_AND_CAMERA_POSITIONS_TRANSLATE_TOGETHER";
@@ -52,7 +55,7 @@ int main(void) {
  assert(bootcols==cols);
  assert(fgets(row,sizeof(row),f));
  assert(strstr(row,"WALK120,120,2000,") == row);
- assert(strstr(row,",10.07020,10.07020,"));
+ assert(strstr(row,",10.07020,10.07020,2.82955,120,"));
  assert(strstr(row,"WORLD_AND_CAMERA_POSITIONS_TRANSLATE_TOGETHER"));
  assert(strstr(row,",0.00000,10.07020,0.00000,10.06910,"));
  unsigned walkcols=1;
@@ -61,6 +64,6 @@ int main(void) {
  assert(!fgets(row,sizeof(row),f));
  assert(!fclose(f));
  assert(!remove(path));
- puts("G279 PASS optional Vita diagnostic csv: correct 31 columns, 3-frame boot and 120-frame walk layout, 120-input, original collision data, nonfinite/phase error rejection, no duplicate opener, NO VPK");
+ puts("G296 PASS G279 31-column optional Vita diagnostic: distinct BOOT .0725 and WALK120 2.82955 original-source floor, 120-frame input, no CSV injection/duplicate opener, NO VPK");
  return 0;
 }
