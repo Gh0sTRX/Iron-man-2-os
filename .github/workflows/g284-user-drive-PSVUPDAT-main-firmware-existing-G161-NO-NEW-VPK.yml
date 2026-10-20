@@ -24,7 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends xvfb xauth openbox scrot xdotool x11-utils mesa-vulkan-drivers libgl1 libegl1 libvulkan1 imagemagick
+          sudo apt-get install -y --no-install-recommends xvfb xauth openbox scrot xdotool x11-utils mesa-vulkan-drivers vulkan-tools libgl1 libegl1 libvulkan1 imagemagick
           python3 -m pip install --user 'gdown==5.2.0'
           mkdir -p "$G284_LOGS" "$RUNNER_TEMP/g284-private"
       - name: Download THIS USER'S shared PSVUPDAT.PUP to ephemeral GitHub runner ONLY, never repo/artifact
@@ -53,6 +53,13 @@ jobs:
           name: G161_IronMan2_iOS_Original_StarkExpo_G160_Road_G156_Walls_G106_Sky_Flight_OneDevice_TEST_VPK
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/g284-historic-G161
+      - name: Verify Vulkan software-GPU lavapipe ICD before attempting historic G161
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          vulkaninfo --summary > "$G284_LOGS/G291_vulkaninfo.txt" 2>&1
+          grep -Ei 'driverName|deviceName|apiVersion|lavapipe|llvmpipe' "$G284_LOGS/G291_vulkaninfo.txt" | head -12
       - name: Install user's MAIN PSVUPDAT firmware in temporary isolated Vita3K and attempt G161 graphical boot
         shell: bash
         run: |
