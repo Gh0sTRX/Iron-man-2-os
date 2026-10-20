@@ -109,7 +109,12 @@ def probe(app,pup,vpk,out,private):
     partitions=firmware_modules(private)
     # Historical source VPK only; the LAST valid release is still on source branch.
     # Main-firmware install may still miss separate fonts; only dismiss observed warning.
-    boot_cmd=[str(app),"--console","--backend-renderer","OpenGL",str(vpk)]
+    # G290 real error: the GitHub Xvfb/OpenGL driver cannot create the
+    # requested minimum GL4.4 context. Native Vita3K Vulkan renderer through
+    # Mesa lavapipe is an independent software-GPU smoke path; do not claim
+    # it models physical Vita performance.
+    env["VK_ICD_FILENAMES"]="/usr/share/vulkan/icd.d/lvp_icd.x86_64.json"
+    boot_cmd=[str(app),"--console","--backend-renderer","Vulkan",str(vpk)]
     start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False;update_modal_attempts=0;font_modal_attempts=0
     with (out/"g284_G161_launch.log").open("wb") as log:
         proc=subprocess.Popen(boot_cmd,env=env,stdout=log,stderr=subprocess.STDOUT,
@@ -185,7 +190,8 @@ def probe(app,pup,vpk,out,private):
                     except ProcessLookupError:pass
                     proc.wait(timeout=3)
     status={
-        "probe":"G284_USER_SUPPLIED_PSVUPDAT_MAIN_FW_G161",
+        "probe":"G291_USER_SUPPLIED_PSVUPDAT_MAIN_FW_G161_VULKAN_LAVAPIPE",
+        "renderer_probe":"Vulkan lavapipe, no physical PS Vita GPU",
         "firmware":pup_check,
         "first_run_bootstrap":first_run,
         "firmware_install_process":install_status,
