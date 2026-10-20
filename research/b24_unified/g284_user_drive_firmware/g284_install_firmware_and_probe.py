@@ -142,7 +142,7 @@ def probe(app,pup,vpk,out,private):
                             u_id=update.stdout.strip().splitlines()[-1]
                             subprocess.run(["xdotool","windowactivate",u_id],capture_output=True,
                                            text=True,timeout=3,check=False)
-                            ack=subprocess.run(["xdotool","mousemove","548","375","click","1"],
+                            ack=subprocess.run(["xdotool","mousemove","--window",u_id,"100","135","click","1"],
                                                capture_output=True,text=True,timeout=3,check=False)
                             clicks.append({"type":"dismiss_exact_Update_Available_without_upgrading",
                                            "attempt":update_modal_attempts,"return_code":ack.returncode})
@@ -155,7 +155,7 @@ def probe(app,pup,vpk,out,private):
                                 focus=subprocess.run(["xdotool","windowactivate",wid],
                                     timeout=3,capture_output=True,text=True,check=False)
                                 time.sleep(.2)
-                                click=subprocess.run(["xdotool","mousemove","575","395","click","1"],
+                                click=subprocess.run(["xdotool","mousemove","--window",wid,"98","175","click","1"],
                                     timeout=3,capture_output=True,text=True,check=False)
                                 clicks.append({"type":"acknowledge_optional_missing_Font_package_only",
                                     "attempt":font_modal_attempts,"tool_return_code":click.returncode,
