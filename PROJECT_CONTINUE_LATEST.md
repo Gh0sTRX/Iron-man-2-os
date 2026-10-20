@@ -1,3 +1,11 @@
+## 2026-10-20 G280 — Vita3K Github Actions integration, official Linux emulator CLI SUCCESS, no new VPK
+
+- Branch feature/b24-unified-gameplay has new G280 pinned upstream Vita3K Build 4206 AppImage Linux/Xvfb/Mesa official SHA256 verified on GitHub Actions. CI actual PASS https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39379800659, Vita3K v0.2.1 4206-287accff.
+- G280 workflow copied into default main branch to expose workflow_dispatch UI; manual optional existing-G161 historic private Actions artifact 39053725183, no new game package and no proprietary VPK upload; vendor firmware not installed in automatic CI.
+- Actual Iron Man 2 native game boot, G171 current walk, G279 telemetry capture, VitaGL frames/FPS, and real PS Vita hardware all NOT verified by emulator CLI. No invented claims.
+- Detailed technical source: https://github.com/Gh0sTRX/Iron-man-2-os/blob/feature/b24-unified-gameplay/research/b24_unified/G280_VITA3K_GITHUB_ACTIONS_EMULATOR_TEST_2026-10-20_TR.md
+- Previous 7-gate, lighting priority 5, and one-final-VPK restriction unchanged.
+
 ## 2026-10-20 G279 VERIFIED — SOURCE ONLY, NO VPK
 - Actual G279 single Vita game C11 CSV and full original G171/G278 Vita ARM ELF SUCCESS: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569016
 - G279 C11 fast host negative tests SUCCESS: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39341569074
