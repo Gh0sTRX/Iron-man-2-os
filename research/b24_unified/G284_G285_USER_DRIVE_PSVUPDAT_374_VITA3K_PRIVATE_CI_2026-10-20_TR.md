@@ -31,3 +31,23 @@ Tarih: 20 Ekim 2026. Önceki G280–G283 testleri: resmî Vita3K 4206 Xvfb/Linux
 4. G171/G279 ve orijinal combat/anim/ışık/misyon iş sırası tamamlandıktan sonra **planlanan tek birleşik final VPK** → hem Vita3K hem fiziksel Vita test.
 
 Kaynak bilgi: Vita3K desteklenen firmware kurulumunda `--firmware PSVUPDAT.PUP` CLI ve başlangıç kurulumunda ikinci font PUP gerekebileceği: https://vita3k.org/quickstart.html
+
+## G290–G295: GAMEPLAY DEĞİL, RESMÎ VITA3K GPU BAŞLATMA ENGELİ (20 Ekim 2026)
+
+G290 gerçek CI: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39483088867.
+- PS Vita 3.74 PUP kurulu, G161 title ID `IM2G16101`, G161 paket doğrulaması geçti.
+- İlk kez `Iron Man 2 - B24 G70 Merge (IM2G16101) | Loading...` penceresi X11 window tree'de belirdi.
+- Gerçek ekranda `Could not create OpenGL context. Does your GPU support at least OpenGL 4.4?` hatası görüldü. Bu HOST Linux/GPU koşuludur; özgün G161 engine collision/render defect çıkarılamaz.
+
+G291–G294, OpenGL yerine Vulkan yazılım sürücüsüne yöneldi.
+- GitHub Ubuntu 24.04 runner x86_64, resmî Vita3K 4206 AppImage, ayrı `mesa-vulkan-drivers` lavapipe.
+- G293 Vulkan host komutu **PASS**: `vulkaninfo` Vulkan Instance 1.3.275, mesa driver 25.2.8, `llvmpipe LLVM 20.1.2`, GPU type `PHYSICAL_DEVICE_TYPE_CPU`, Vulkan `apiVersion 1.4.318`.
+- Ancak `--backend-renderer Vulkan` ile açılan Vita3K uygulaması yeni G161 GPU penceresini oluşturamadan kapanıyor. **G294** filtered original app `vita3k.log` açıkça şu iki satırı verdi:
+  - `[enumerate_vulkan_devices]: Vulkan device enumeration failed: vk::Instance::enumeratePhysicalDevices: ErrorInitializationFailed`
+  - `Unhandled C++ exception. vk::Instance::enumeratePhysicalDevices: ErrorInitializationFailed`
+- G294 çalışması: https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39484581491. Sistem firmware gerçek kurulum `exit=0`, fakat Vita3K game boot **YOK**. Bu emülatör AppImage/driver/VM uyumluluk engelidir, özgün oyun motorunun başarısı veya başarısızlığı değildir.
+
+**G295** pipeline artık Vita3K C++ GPU hata satırı görülürse **job FAIL** verir, böylece GitHub yeşil teşhis yüklemesini yanlış gameplay PASS göstermeyecektir. `if: always()` ile yalnız log/görüntü artifact saklanır, PUP/VPK kaynakları derhal ephemeral runner'dan silinir. G295'nin GUI projesini yenen bir yapay ilerleme olmadığını açıkça ayırır.
+
+**İleri rota:** G171/G279 source regression testleri ve Vita ARM ELF hâlâ ayrı CI'larda PASS. Şu an github.com tarafından sağlanan `ubuntu-24.04` runner **GPU emülasyonuna uygun değil**. Vita3K gerçek sahne testi için uygun fizikî veya GPU sanallaştırması destekleyen self-hosted runner/yerel PC ve Vita3K tam firmware/font kurulumu gerekir; emülatörde başarı bile PS Vita donanım başarısının kanıtı değildir. Kullanıcının yeni VPK hazırlamama kuralı sürüyor. Ardı ardına dummy GitHub VPK üretmek yerine orijinal asset/movement/combat/lighting iş sırası değişmiyor.
+
