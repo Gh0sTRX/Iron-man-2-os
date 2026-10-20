@@ -92,6 +92,20 @@ jobs:
           '
           test -s "$G284_LOGS/g284_report.json"
           cat "$G284_LOGS/g284_report.json"
+          # A successful diagnostics upload is NOT a successful Vita3K game test.
+          # G294 actual crash: host has Vulkan llvmpipe, AppImage's Vulkan
+          # enumeratePhysicalDevices still throws ErrorInitializationFailed.
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("g284-diagnostics/g284_report.json").read_text())
+          lines=report.get("emulator_diagnostics",{}).get("last_errors",[])
+          if any("enumeratePhysicalDevices: ErrorInitializationFailed" in s for s in lines):
+              print("::error title=G295 Vita3K software GPU blocker::Vulkan host driver present, Vita3K device enumeration failed before original G161 rendering.")
+              raise SystemExit(7)
+          if report.get("gameplay_confirmed") is not True:
+              print("::warning title=G295 gameplay still unverified::Firmware installed; no authenticated Iron Man 2 frame. Do not classify diagnostic job as gameplay pass.")
+          PY
           for img in "$G284_LOGS"/g284_G161_after_main_fw_*.png; do
             if test -f "$img"; then identify -format 'G284 actual Vita3K image %f %wx%h grayscale_mean=%[fx:mean] grayscale_sd=%[fx:standard_deviation]\n' "$img"; fi
           done
