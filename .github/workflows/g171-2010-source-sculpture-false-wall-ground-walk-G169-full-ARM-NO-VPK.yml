@@ -20,6 +20,8 @@ on:
       - "research/b24_unified/g277_vita_real_ground_collision_reason_counter/**"
       - "research/b24_unified/g278_vita_true_rendered_world_boot_xyz_source_floor/**"
       - "research/b24_unified/g279_vita_walk_persistent_trace/**"
+      - "research/b24_unified/g299_suit_environment_vitagl/**"
+      - "research/b24_unified/b24_gpu_suit_vitagl.c"
       - "research/b24_unified/g169_authentic_2010_unibeam_actor/**"
       - "research/b24_unified/g170_original_scene_initial_collision_authority/**"
       - "research/b24_unified/g168_original_model_origin_source_physics/**"
@@ -267,6 +269,9 @@ jobs:
             -lm -o /tmp/g279_host_csv_writer
           /tmp/g279_host_csv_writer
           python3 research/b24_unified/g279_vita_walk_persistent_trace/g279_install_file_trace_after_G278_one_Vita_game_NO_VPK.py
+          python3 research/b24_unified/g299_suit_environment_vitagl/g299_install_suit_light_after_G168_G279_NO_VPK.py
+          grep -q "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" work/CMakeLists.txt
+          grep -q "g299_prior_texture_env" work/b24/b24_unified/b24_gpu_suit_vitagl.c
           grep -q 'B24_G279_WALK_TRACE_FILE' work/CMakeLists.txt
           grep -q 'g279_win.phase="WALK120"' work/src/main.c
           grep -q 'ux0:data/ironman2_g279_walk.csv' work/src/main.c
@@ -1133,6 +1138,7 @@ jobs:
               -DB24_G68_CITY_BACKEND=ON \
               -DB24_G75_SOURCE_CAPSULE=ON \
               -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=ON \
+              -DB24_G299_SUIT_ENVIRONMENT_CANDIDATE=ON \
               -DB24_G71_ALPHA_PASSES=ON \
               -DB24_G73_REAL_SKY=ON \
               -DB24_G106_SOURCE_FLY_ATTACK_MARKV=ON \
