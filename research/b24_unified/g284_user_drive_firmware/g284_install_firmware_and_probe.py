@@ -110,7 +110,7 @@ def probe(app,pup,vpk,out,private):
     # Historical source VPK only; the LAST valid release is still on source branch.
     # Main-firmware install may still miss separate fonts; only dismiss observed warning.
     boot_cmd=[str(app),"--console","--backend-renderer","OpenGL",str(vpk)]
-    start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False
+    start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False;update_modal_attempts=0;font_modal_attempts=0
     with (out/"g284_G161_launch.log").open("wb") as log:
         proc=subprocess.Popen(boot_cmd,env=env,stdout=log,stderr=subprocess.STDOUT,
                               start_new_session=True)
@@ -132,30 +132,34 @@ def probe(app,pup,vpk,out,private):
                                 clicks.append({"type":"welcome_uncheck_show_next_time_then_OK",
                                                "tool_return_code":int(not welcome_dismissed)})
                                 time.sleep(.5)
-                        search=subprocess.run(["xdotool","search","--name","Missing Firmware"],
-                                              capture_output=True,text=True,timeout=3,check=False)
-                        # G286 proves only the optional Font package remains. The first click
-                        # can merely activate this Qt modal on Openbox/Xvfb; focus the measured
-                        # named window explicitly, then click the documented Launch Anyway UI.
-                        if search.returncode==0 and not any(x["type"]=="acknowledge_missing_firmware_warning_only" for x in clicks):
-                            wid=search.stdout.strip().splitlines()[-1]
-                            focus=subprocess.run(["xdotool","windowactivate",wid],
-                                timeout=3,capture_output=True,text=True,check=False)
-                            time.sleep(.3)
-                            c1=subprocess.run(["xdotool","mousemove","575","395","click","1"],
-                                timeout=3,capture_output=True,text=True,check=False)
-                            time.sleep(.45)
-                            check=subprocess.run(["xdotool","search","--name","Missing Firmware"],
-                                timeout=3,capture_output=True,text=True,check=False)
-                            if check.returncode==0:
-                                c2=subprocess.run(["xdotool","mousemove","575","395","click","1"],
+                        # Observed G288 Vita3K "Update Available" obstructs the
+                        # already installed old-G161's Font warning. NEVER upgrade
+                        # pinned Build4206; click only informational OK x548,y376.
+                        update=subprocess.run(["xdotool","search","--onlyvisible","--name","Update Available"],
+                            capture_output=True,text=True,timeout=3,check=False)
+                        if update.returncode==0 and update_modal_attempts<3:
+                            update_modal_attempts+=1
+                            u_id=update.stdout.strip().splitlines()[-1]
+                            subprocess.run(["xdotool","windowactivate",u_id],capture_output=True,
+                                           text=True,timeout=3,check=False)
+                            ack=subprocess.run(["xdotool","mousemove","548","375","click","1"],
+                                               capture_output=True,text=True,timeout=3,check=False)
+                            clicks.append({"type":"dismiss_exact_Update_Available_without_upgrading",
+                                           "attempt":update_modal_attempts,"return_code":ack.returncode})
+                        else:
+                            search=subprocess.run(["xdotool","search","--onlyvisible","--name","Missing Firmware"],
+                                                  capture_output=True,text=True,timeout=3,check=False)
+                            if search.returncode==0 and font_modal_attempts<3:
+                                font_modal_attempts+=1
+                                wid=search.stdout.strip().splitlines()[-1]
+                                focus=subprocess.run(["xdotool","windowactivate",wid],
                                     timeout=3,capture_output=True,text=True,check=False)
-                            else:
-                                c2=None
-                            clicks.append({"type":"acknowledge_missing_firmware_warning_only",
-                                           "tool_return_code":c1.returncode,
-                                           "focus_return_code":focus.returncode,
-                                           "second_click_if_dialog_persisted":c2 is not None})
+                                time.sleep(.2)
+                                click=subprocess.run(["xdotool","mousemove","575","395","click","1"],
+                                    timeout=3,capture_output=True,text=True,check=False)
+                                clicks.append({"type":"acknowledge_optional_missing_Font_package_only",
+                                    "attempt":font_modal_attempts,"tool_return_code":click.returncode,
+                                    "focus_return_code":focus.returncode})
                     time.sleep(.5)
                 path=out/f"g284_G161_after_main_fw_{t:02d}s.png"
                 if shutil.which("scrot"):
