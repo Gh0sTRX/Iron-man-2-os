@@ -139,7 +139,7 @@ def probe(app,pup,vpk,out,private):
                         # named window explicitly, then click the documented Launch Anyway UI.
                         if search.returncode==0 and not any(x["type"]=="acknowledge_missing_firmware_warning_only" for x in clicks):
                             wid=search.stdout.strip().splitlines()[-1]
-                            focus=subprocess.run(["xdotool","windowactivate","--sync",wid],
+                            focus=subprocess.run(["xdotool","windowactivate",wid],
                                 timeout=3,capture_output=True,text=True,check=False)
                             time.sleep(.3)
                             c1=subprocess.run(["xdotool","mousemove","575","395","click","1"],
