@@ -1,0 +1,89 @@
+name: G284 user-authorized PS Vita main firmware install Vita3K + existing G161 NO NEW VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - '.github/workflows/g284-user-drive-PSVUPDAT-main-firmware-existing-G161-NO-NEW-VPK.yml'
+      - 'research/b24_unified/g284_user_drive_firmware/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  install_user_owned_PS_Vita_firmware_then_old_G161:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      G284_LOGS: g284-diagnostics
+      G284_DRIVE_FILE_ID: 1b11nNPariK9Iy-RpiulR9hH46gbe1M0D
+    steps:
+      - uses: actions/checkout@v4
+      - name: Isolated user-allowed firmware download dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends xvfb xauth openbox scrot xdotool x11-utils mesa-vulkan-drivers libgl1 libegl1 libvulkan1 imagemagick
+          python3 -m pip install --user 'gdown==5.2.0'
+          mkdir -p "$G284_LOGS" "$RUNNER_TEMP/g284-private"
+      - name: Download THIS USER'S shared PSVUPDAT.PUP to ephemeral GitHub runner ONLY, never repo/artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m gdown --id "$G284_DRIVE_FILE_ID" --output "$RUNNER_TEMP/g284-private/PSVUPDAT.PUP" --no-cookies --quiet
+          python3 - <<'PY'
+          import importlib.util,os
+          from pathlib import Path
+          p=Path('research/b24_unified/g284_user_drive_firmware/g284_install_firmware_and_probe.py')
+          spec=importlib.util.spec_from_file_location('G284',p);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+          result=m.verify_firmware(Path(os.environ['RUNNER_TEMP'])/'g284-private/PSVUPDAT.PUP')
+          print('G284 USER PUP OK',result,'original firmware never committed or uploaded')
+          PY
+      - name: Verify official pinned Vita3K Build 4206 against upstream SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g280_vita3k_ci/g280_prepare_pinned_vita3k.py --out "$RUNNER_TEMP/g284-pinned-vita3k" | tee "$G284_LOGS/g284_official_emulator_digest.txt"
+          test -x "$RUNNER_TEMP/g284-pinned-vita3k/squashfs-root/AppRun"
+      - name: Fetch authorized HISTORIC G161 package, use only in CI temp, never build or upload new VPK
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39053725183
+          name: G161_IronMan2_iOS_Original_StarkExpo_G160_Road_G156_Walls_G106_Sky_Flight_OneDevice_TEST_VPK
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/g284-historic-G161
+      - name: Install user's MAIN PSVUPDAT firmware in temporary isolated Vita3K and attempt G161 graphical boot
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a -s '-screen 0 960x544x24' sh -c '
+            openbox --sm-disable >/dev/null 2>&1 &
+            python3 research/b24_unified/g284_user_drive_firmware/g284_install_firmware_and_probe.py \
+              --app "$RUNNER_TEMP/g284-pinned-vita3k/squashfs-root/AppRun" \
+              --pup "$RUNNER_TEMP/g284-private/PSVUPDAT.PUP" \
+              --folder "$RUNNER_TEMP/g284-historic-G161" \
+              --out "$G284_LOGS" \
+              --private "$RUNNER_TEMP/g284-private/installed-vita3k"
+          '
+          test -s "$G284_LOGS/g284_report.json"
+          cat "$G284_LOGS/g284_report.json"
+          for img in "$G284_LOGS"/g284_G161_after_main_fw_*.png; do
+            if test -f "$img"; then identify -format 'G284 actual Vita3K image %f %wx%h grayscale_mean=%[fx:mean] grayscale_sd=%[fx:standard_deviation]\n' "$img"; fi
+          done
+      - name: Clean original PUP and historical VPK from GitHub runner temp immediately
+        if: always()
+        shell: bash
+        run: |
+          rm -rf "$RUNNER_TEMP/g284-private" "$RUNNER_TEMP/g284-historic-G161"
+          mkdir -p "$G284_LOGS"
+          test -z "$(find "$G284_LOGS" -type f \( -name '*.pup' -o -name '*.vpk' -o -name '*.ipa' -o -name '*.suprx' \) -print -quit)"
+          echo 'PUP stored only briefly in private CI temporary disk and deleted. No game assets uploaded. Real Vita game boot requires screenshot review.' >> "$G284_LOGS/g284_notes.txt"
+      - name: Upload ONLY text diagnostics and screenshots, never PUP/VPK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: G284_USER_MAIN_FIRMWARE_VITA3K_G161_3_SCREENSHOTS_NO_PUP_NO_VPK
+          path: g284-diagnostics/
+          if-no-files-found: warn
+          retention-days: 7
