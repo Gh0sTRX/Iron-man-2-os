@@ -17,6 +17,7 @@ import shutil
 import signal
 import subprocess
 import time
+import tempfile
 from typing import Any
 
 from sys import path as sys_path
@@ -53,9 +54,11 @@ def run(app:Path,vpk:Path,out:Path)->dict[str,Any]:
     if not shutil.which("scrot") or not shutil.which("xwininfo"):
         raise FileNotFoundError("G282 requires scrot/xwininfo to observe actual X display")
     out.mkdir(parents=True,exist_ok=True)
-    home=out/"isolated_home"
+    # Private emulator state deliberately lives OUTSIDE report/artifact path.
+    private_root=Path(tempfile.mkdtemp(prefix="G282_private_Vita3K_"))
+    home=private_root/"isolated_home"
     home.mkdir(exist_ok=True)
-    runtime=out/"xdg_runtime"
+    runtime=private_root/"xdg_runtime"
     runtime.mkdir(exist_ok=True,mode=0o700)
     runtime.chmod(0o700)
     env=os.environ.copy()
@@ -101,6 +104,7 @@ def run(app:Path,vpk:Path,out:Path)->dict[str,Any]:
                     except ProcessLookupError:pass
                     proc.wait(timeout=3)
             exit_code=proc.returncode
+    shutil.rmtree(private_root,ignore_errors=True)  # Never upload old-G161 installed filesystem.
     report={
         "probe":"G282_REAL_OLD_G161_VITA3K_SCREEN_AND_STARTUP",
         "package":{"historic_title_id":meta["title_id"],"members":meta["files"],"size_bytes":meta["bytes"]},
