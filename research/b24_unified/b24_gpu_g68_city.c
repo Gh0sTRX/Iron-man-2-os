@@ -176,6 +176,16 @@ int b24_g68_city_draw(const B24G68City *m){
  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 #endif
  glColor4f(1.f,1.f,1.f,1.f);
+#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
+ /* G298: G95 source-position CPU illumination lives in VBO vertex RGB,
+  * not the original PVRTC/G66T pixels. Fixed-function GL_REPLACE ignores
+  * those colors entirely, so explicitly request GL_MODULATE for this
+  * ONE textured city pass. Keep the old texture env for HUD/armor later.
+  * This is experimental light math, not recovered 2010 shader semantics. */
+ GLint g298_previous_texture_env=GL_MODULATE;
+ glGetTexEnviv(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,&g298_previous_texture_env);
+ glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+#endif
  glBindBuffer(GL_ARRAY_BUFFER,(GLuint)m->vbo);
  glEnableClientState(GL_VERTEX_ARRAY);
  glVertexPointer(3,GL_FLOAT,sizeof(G68Vtx),(const void *)(uintptr_t)0);
@@ -214,6 +224,9 @@ int b24_g68_city_draw(const B24G68City *m){
  glDisable(GL_TEXTURE_2D);
  glBindBuffer(GL_ARRAY_BUFFER,0);
  glColor4f(1.f,1.f,1.f,1.f);
+#ifdef B24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE
+ glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,g298_previous_texture_env);
+#endif
  return glGetError()==GL_NO_ERROR;
 }
 /* The old B24 owner still dictates scene -> animated armor -> B24 HUD -> ONE
