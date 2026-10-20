@@ -1,0 +1,35 @@
+name: G299 authentic suit GPU one-renderer opt-in C1L1 four-source-Sun ambient source only NO VPK
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths:
+      - ".github/workflows/g299-suit-source-ambient-original-four-sun-no-vpk.yml"
+      - "research/b24_unified/b24_gpu_suit_vitagl.c"
+      - "research/b24_unified/g299_suit_environment_vitagl/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  g299_suit_env_gl_alpha_original_foot_regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - name: G299 actual VitaGL suit renderer host candidate source plus synthetic alpha and G168 foot guards
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile research/b24_unified/g299_suit_environment_vitagl/g299_install_suit_light_after_G168_G279_NO_VPK.py research/b24_unified/g299_suit_environment_vitagl/test_g299_install_guarded_original_source.py
+          python3 research/b24_unified/g299_suit_environment_vitagl/test_g299_install_guarded_original_source.py
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G75_ORIGINAL_SUN_LIGHTING_CANDIDATE=1 \
+            -DB24_G299_SUIT_ENVIRONMENT_CANDIDATE=1 \
+            -I research/b24_unified/g299_suit_environment_vitagl/mock \
+            -I research/b24_unified/g75_device_qa \
+            -I research/b24_unified \
+            research/b24_unified/b24_gpu_suit_vitagl.c \
+            research/b24_unified/g299_suit_environment_vitagl/test_g299_real_suit_source_light_alpha.c \
+            -lm -o /tmp/g299_original_gpu_suit_light_alpha
+          /tmp/g299_original_gpu_suit_light_alpha
+          test -z "$(find research/b24_unified/g299_suit_environment_vitagl -type f \( -name '*.vpk' -o -name '*.ipa' -o -name '*.pup' \) -print -quit)"
+          echo 'G299 genuine G168 native foot renderer candidate armor response to original CLARA Sun positions: HOST ONLY, NO SHADER PARITY CLAIM, NO VPK.'
