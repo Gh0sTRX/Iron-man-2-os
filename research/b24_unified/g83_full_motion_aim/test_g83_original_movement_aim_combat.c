@@ -26,6 +26,37 @@ static void route(B24G83Input in,const char *want,int oneshot){
 }
 int main(void){
  B24G83Input in=mk();
+ /* G297: Stage2 and Rush source steering may select authentic IM2V
+  * motions but are NOT a second weapon hit. Accepted B16 shot belongs
+  * solely to its existing weapon owner, not a guessed flight hit frame. */
+ B24G83Selection flight={0};
+ in.aim=B24G83_AIM_HAND;in.accepted_weapon_event=1;
+ in.motion=B24G83_FLIGHT;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_fly_f"));
+ assert(!flight.needs_2010_hit_event);
+ in.motion=B24G83_RUSH;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_fly_f_rush"));
+ assert(!flight.needs_2010_hit_event);
+ in.motion=B24G83_FLIGHT;in.previous_flight_dir=B24G83_DIR_F;
+ in.axis_x=-1.f;in.axis_y=0.f;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_fly_ftol"));
+ assert(flight.one_shot_not_looping&&!flight.needs_2010_hit_event);
+ in.transition=B24G83_EVENT_DODGE_RIGHT;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_fly_right_dodge"));
+ assert(!flight.needs_2010_hit_event);
+ in.transition=B24G83_EVENT_NONE;
+ in.motion=B24G83_GROUND;in.axis_x=0.f;in.axis_y=1.f;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_aim_ground_move_f_att"));
+ assert(flight.needs_2010_hit_event);
+ in.aim=B24G83_AIM_NONE;
+ assert(b24_g83_select_original_motion(&in,&flight));
+ assert(!flight.needs_2010_hit_event);
+ in=mk();
  route(in,"ironman_ironman_walk_f",0);
  in.axis_y=-.5f;
  route(in,"ironman_ironman_walk_b",0);
@@ -104,6 +135,6 @@ int main(void){
  b24_g82_request_melee(&combat,1006,1,0);
  assert(b24_g83_select_combined(&combat,1266,&in,&o));
  assert(!strcmp(o.stem,"ironman_ironman_ground_combo_2"));
- printf("PASS G83 all original source locomotion+aim tests: 4way walk / run / aimed move+fire / dual+left / M (unclassified) / relaxed hover / directional fly-turn / RUSH / land guard / WM native clips / G82 combo wins / unsupported suit safe fallback. No source hit frame invented; NO VPK.\n");
+ printf("PASS G297 original flight/rush/steering/dodge no duplicate hit event, ground accepted aim still routes; G83 full original source locomotion/aim/WM/G82 tests; NO VPK.\n");
  return 0;
 }
