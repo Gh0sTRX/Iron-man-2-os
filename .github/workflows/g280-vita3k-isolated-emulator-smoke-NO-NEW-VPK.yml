@@ -37,6 +37,9 @@ jobs:
       - name: Test exact official release contract and SHA256 pin validation logic
         shell: bash
         run: python3 research/b24_unified/g280_vita3k_ci/test_g280_vita3k_bootstrap_contract.py
+      - name: Validate optional historical G161 archive safety using synthetic ZIP only
+        shell: bash
+        run: python3 research/b24_unified/g280_vita3k_ci/test_g280_existing_archive_validation.py
       - name: Fetch OFFICIAL Vita3K Build 4206 AppImage (SHA256 verified before running)
         shell: bash
         run: |
