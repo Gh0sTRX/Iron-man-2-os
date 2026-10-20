@@ -113,7 +113,13 @@ def probe(app,pup,vpk,out,private):
     # requested minimum GL4.4 context. Native Vita3K Vulkan renderer through
     # Mesa lavapipe is an independent software-GPU smoke path; do not claim
     # it models physical Vita performance.
-    env["VK_ICD_FILENAMES"]="/usr/share/vulkan/icd.d/lvp_icd.x86_64.json"
+    # Ubuntu/Mesa 25 may install lavapipe manifests under different names.
+    # Only set explicit ICD when an actual verified manifest exists.
+    icd_paths=sorted(Path("/usr/share/vulkan/icd.d").glob("*lvp*.json"))
+    if icd_paths:
+        env["VK_ICD_FILENAMES"]=str(icd_paths[0])
+    else:
+        env.pop("VK_ICD_FILENAMES",None)
     boot_cmd=[str(app),"--console","--backend-renderer","Vulkan",str(vpk)]
     start=time.monotonic();clicks=[];samples=[];welcome_dismissed=False;update_modal_attempts=0;font_modal_attempts=0
     with (out/"g284_G161_launch.log").open("wb") as log:
