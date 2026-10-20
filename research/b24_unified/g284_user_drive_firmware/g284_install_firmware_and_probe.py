@@ -50,6 +50,38 @@ def run_cmd(cmd,env,limit,log):
         except subprocess.TimeoutExpired:
             return "timeout="+str(limit)
 
+def initialize_first_run(app, env, out):
+    """Vita3K GUI first-run must create config in the same isolated HOME,
+    otherwise --firmware on a clean Linux profile throws boost create_directories
+    Invalid argument before any real PUP install. No arbitrary dialog acceptance.
+    """
+    start=time.monotonic()
+    with (out/"g285_first_run_bootstrap.log").open("wb") as log:
+        proc=subprocess.Popen([str(app)],env=env,stdout=log,stderr=subprocess.STDOUT,
+                              start_new_session=True)
+        clicked=False
+        try:
+            while time.monotonic()-start<11 and proc.poll() is None:
+                if not clicked and time.monotonic()-start>3 and shutil.which("xdotool"):
+                    d=subprocess.run(["xdotool","search","--name","Welcome to Vita3K"],
+                                     timeout=3,capture_output=True,text=True,check=False)
+                    if d.returncode==0:
+                        p=subprocess.run(["xdotool","mousemove","135","407","click","1"],
+                                         timeout=3,capture_output=True,text=True,check=False)
+                        clicked=p.returncode==0
+                time.sleep(.35)
+        finally:
+            if proc.poll() is None:
+                try:os.killpg(proc.pid,signal.SIGTERM)
+                except ProcessLookupError:pass
+                try:proc.wait(timeout=4)
+                except subprocess.TimeoutExpired:
+                    try:os.killpg(proc.pid,signal.SIGKILL)
+                    except ProcessLookupError:pass
+                    proc.wait(timeout=3)
+    return {"welcome_ok_clicked":clicked,"process_return":proc.returncode,
+            "config_candidates":[str(p.relative_to(Path(env["HOME"]))) for p in Path(env["HOME"]).rglob("config.yml")][:15]}
+
 def probe(app,pup,vpk,out,private):
     if not os.getenv("DISPLAY"):raise RuntimeError("G284 requires private Xvfb display")
     app=app.resolve();pup=pup.resolve();vpk=vpk.resolve()
@@ -65,6 +97,7 @@ def probe(app,pup,vpk,out,private):
     env.update({"HOME":str(home),"XDG_RUNTIME_DIR":str(runtime),
                 "LIBGL_ALWAYS_SOFTWARE":"1","GALLIUM_DRIVER":"llvmpipe",
                 "SDL_AUDIODRIVER":"dummy","MESA_LOADER_DRIVER_OVERRIDE":"llvmpipe"})
+    first_run=initialize_first_run(app,env,out)
     install_cmd=[str(app),"--firmware",str(pup)]
     install_status=run_cmd(install_cmd,env,90,out/"g284_firmware_install.log")
     partitions=firmware_modules(private)
@@ -114,6 +147,7 @@ def probe(app,pup,vpk,out,private):
     status={
         "probe":"G284_USER_SUPPLIED_PSVUPDAT_MAIN_FW_G161",
         "firmware":pup_check,
+        "first_run_bootstrap":first_run,
         "firmware_install_process":install_status,
         "firmware_partition_directories":partitions,
         "legacy_vpk":{"title_id":vpk_check["title_id"],"members":vpk_check["files"]},
@@ -126,7 +160,7 @@ def probe(app,pup,vpk,out,private):
         "caveat":"Screenshots must be manually reviewed. Private firmware/VPK not uploaded. Old G161 lacks G279."
     }
     (out/"g284_report.json").write_text(json.dumps(status,indent=2)+"\n")
-    print("G284 actual PUP hash verified, install process",install_status,
+    print("G285 first-run initialized",first_run,"PUP install process",install_status,
           "source G161 detected",vpk_check["title_id"],"partitions",len(partitions),
           "screenshots",[(x["second"],x["image_captured"],x["image_bytes"]) for x in samples],
           "gameplay UNVERIFIED; NO NEW VPK")
