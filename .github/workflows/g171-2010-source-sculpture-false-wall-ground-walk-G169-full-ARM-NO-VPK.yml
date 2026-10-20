@@ -6,6 +6,7 @@ on:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
       - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
+      - "research/b24_unified/g83_full_motion_aim/**"
       - "research/b24_unified/g251_real_source_16_spawn_collision_matrix/**"
       - "research/b24_unified/g172_native_warmachine_ground_m/**"
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
@@ -97,6 +98,19 @@ jobs:
             research/b24_unified/g83_full_motion_aim/test_g83_authentic_timed_route.c \
             -lm -o /tmp/g88_g83_router
           /tmp/g88_g83_router
+          # G297: original flight/rush/steering/dodge is source animation
+          # routing only. Never infer a second weapon hit event or invent
+          # iOS Stage2/Rush firing permission from B16 accepted input.
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -I research/b24_unified \
+            research/b24_unified/b24_g8_melee_source_chain.c \
+            research/b24_unified/g76_original_combat/b24_g76_original_native_damage_math.c \
+            research/b24_unified/g77_original_weapon_db/b24_g77_melee_source_radius.c \
+            research/b24_unified/g82_original_combat/b24_g82_original_combat_coordinator.c \
+            research/b24_unified/g83_full_motion_aim/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g83_full_motion_aim/test_g83_original_movement_aim_combat.c \
+            -lm -o /tmp/g297_g83_original_flight_hit_isolation
+          /tmp/g297_g83_original_flight_hit_isolation
       - name: Source-authored previous G10 G11 static dummy diagnostic host C11 test ONLY
         run: |
           set -euo pipefail
