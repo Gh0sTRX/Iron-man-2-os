@@ -24,6 +24,7 @@ jobs:
             -DB24_G71_ALPHA_PASSES=1 \
             -I research/b24_unified/g298_expo_ambient_vitagl/mock \
             -I research/b24_unified \
+            -I research/b24_unified/g75_device_qa \
             research/b24_unified/b24_gpu_g68_city.c \
             research/b24_unified/g298_expo_ambient_vitagl/test_g298_real_city_renderer_texture_env_alpha.c \
             -lm -o /tmp/g298_native_city_renderer_light_alpha
