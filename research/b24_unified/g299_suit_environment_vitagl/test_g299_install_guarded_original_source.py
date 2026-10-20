@@ -56,6 +56,23 @@ with tempfile.TemporaryDirectory(prefix="g299_synthetic_G168_source_") as d:
  assert "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in (root/"work/CMakeLists.txt").read_text()
  try:mod.install(root);raise AssertionError("duplicate G299 must fail")
  except ValueError as e:assert "duplicate" in str(e)
+# Real G70 work can already contain G299 source from repository, with
+# G168 genuine bind_min applied later. That is valid and only needs CMake.
+with tempfile.TemporaryDirectory(prefix="g299_G70_preexisting_source_") as d:
+ root=Path(d);dest=make(root)
+ existing=reference.replace(
+  ' if(!b24_gpu_suit_matrix(root,pose,src->center_z))return 0;',
+  '''#ifdef B24_G168_ORIGINAL_SUIT_RENDER_FOOT
+ if(!isfinite(src->native_bind_min_z))return 0;
+ if(!b24_gpu_suit_matrix(root,pose,src->native_bind_min_z))return 0;
+#else
+ if(!b24_gpu_suit_matrix(root,pose,src->center_z))return 0;
+#endif''')
+ assert existing.count("src->native_bind_min_z")==2
+ dest.write_text(existing)
+ mod.install(root)
+ assert dest.read_text()==existing
+ assert "B24_G299_SUIT_ENVIRONMENT_CANDIDATE" in (root/"work/CMakeLists.txt").read_text()
 with tempfile.TemporaryDirectory(prefix="g299_missing_original_root_") as d:
  root=Path(d);dest=make(root)
  dest.write_text(dest.read_text().replace("src->native_bind_min_z","NOT_SOURCE_FOOT"))
