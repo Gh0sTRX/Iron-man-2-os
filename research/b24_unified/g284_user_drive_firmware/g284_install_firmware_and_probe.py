@@ -134,12 +134,28 @@ def probe(app,pup,vpk,out,private):
                                 time.sleep(.5)
                         search=subprocess.run(["xdotool","search","--name","Missing Firmware"],
                                               capture_output=True,text=True,timeout=3,check=False)
-                        # One warning dismissal after verified "Missing Firmware" title only.
+                        # G286 proves only the optional Font package remains. The first click
+                        # can merely activate this Qt modal on Openbox/Xvfb; focus the measured
+                        # named window explicitly, then click the documented Launch Anyway UI.
                         if search.returncode==0 and not any(x["type"]=="acknowledge_missing_firmware_warning_only" for x in clicks):
-                            click=subprocess.run(["xdotool","mousemove","586","402","click","1"],
-                                                 capture_output=True,text=True,timeout=3,check=False)
+                            wid=search.stdout.strip().splitlines()[-1]
+                            focus=subprocess.run(["xdotool","windowactivate","--sync",wid],
+                                timeout=3,capture_output=True,text=True,check=False)
+                            time.sleep(.3)
+                            c1=subprocess.run(["xdotool","mousemove","575","395","click","1"],
+                                timeout=3,capture_output=True,text=True,check=False)
+                            time.sleep(.45)
+                            check=subprocess.run(["xdotool","search","--name","Missing Firmware"],
+                                timeout=3,capture_output=True,text=True,check=False)
+                            if check.returncode==0:
+                                c2=subprocess.run(["xdotool","mousemove","575","395","click","1"],
+                                    timeout=3,capture_output=True,text=True,check=False)
+                            else:
+                                c2=None
                             clicks.append({"type":"acknowledge_missing_firmware_warning_only",
-                                           "tool_return_code":click.returncode})
+                                           "tool_return_code":c1.returncode,
+                                           "focus_return_code":focus.returncode,
+                                           "second_click_if_dialog_persisted":c2 is not None})
                     time.sleep(.5)
                 path=out/f"g284_G161_after_main_fw_{t:02d}s.png"
                 if shutil.which("scrot"):
