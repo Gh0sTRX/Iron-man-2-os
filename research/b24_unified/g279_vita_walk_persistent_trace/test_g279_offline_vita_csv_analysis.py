@@ -36,12 +36,30 @@ with tempfile.TemporaryDirectory(prefix="g279_vita_csv_parser_host_") as t:
  make(r,[boot,moving])
  loaded=a.parse_csv(r)
  assert len(loaded)==2
- assert a.assess_window(loaded[-1])=="GERCEK_DUNYA_HAREKETI_VAR"
+ assert a.assess_window(loaded[-1])=="DUNYA_KOKU_NET_YER_DEGISTIRIYOR"
  report=a.summary(loaded)
  assert "10.070" in report and "kamera" in report
+ assert "net XY=10.070" in report
  assert "özgün G66C pencere sonu zemin=EVET" in report
  assert f"zemin_Zup={float(moving['native_floor_z']):.4f}" in report
  assert "cihaz kaynağı ayrıca doğrulanmalı" in report
+ # Real G229 may accumulate 10m of accepted back-and-forth path but end
+ # at the same XY. This MUST NOT be called net world displacement.
+ roundtrip=dict(moving)
+ roundtrip["frame"]="240"
+ roundtrip["world_dx"]="0.0";roundtrip["world_dy"]="0.0"
+ roundtrip["camera_dx"]="0.0";roundtrip["camera_dy"]="0.0"
+ roundtrip["verdict"]="WORLD_MOVED_BUT_NET_SMALL_OR_REVERSED"
+ make(r,[boot,roundtrip])
+ assert a.assess_window(a.parse_csv(r)[-1])=="YOL_VAR_NET_YER_DEGISTIRME_KUCUK_VEYA_TERS"
+ assert "net XY=0.000" in a.summary(a.parse_csv(r))
+ # Match G229 source-only net 0.15 threshold, not a recovered iOS constant.
+ near=dict(roundtrip);near["world_dx"]="0.14"
+ make(r,[boot,near])
+ assert a.assess_window(a.parse_csv(r)[-1])=="YOL_VAR_NET_YER_DEGISTIRME_KUCUK_VEYA_TERS"
+ near["world_dx"]="0.16"
+ make(r,[boot,near])
+ assert a.assess_window(a.parse_csv(r)[-1])=="DUNYA_KOKU_NET_YER_DEGISTIRIYOR"
  blocked=dict(moving)
  blocked["frame"]="240";blocked["b14_path"]="10.0";blocked["resolved_path"]="0.0"
  blocked["collision_reject"]="120"
@@ -70,4 +88,4 @@ with tempfile.TemporaryDirectory(prefix="g279_vita_csv_parser_host_") as t:
  poison=dict(moving);poison["phase"]="BOOT";fail([boot,poison])
  make(r,[boot])
  assert "Yeterli ardışık yerde yürüyüş kaydı yok" in a.summary(a.parse_csv(r))
-print("G296 PASS G279 31-column Turkish offline analyzer: real-source floor present/absent at window endpoint, collision, insufficient stick and adversarial data; synthetic fixture only; NO device claim, NO VPK")
+print("G279 PASS offline G229 31-column analyzer: accumulated path vs net XY displacement, roundtrip and threshold, original G66C endpoint floor, collision and malformed CSV; synthetic host only; NO Vita claim, NO VPK")

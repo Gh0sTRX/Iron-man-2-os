@@ -103,7 +103,12 @@ def assess_window(row:WalkRow)->str:
  if row["collision_reject"]>=80 and row["resolved_path"]<.1:
   return "C1L1_CARPISMA_HAREKETI_KESIYOR"
  if row["resolved_path"]>=.5:
-  return "GERCEK_DUNYA_HAREKETI_VAR"
+  # Accumulated path can be a round trip; it is NOT net world displacement.
+  # Match G229 source-only net XY threshold (diagnostic, not 2010 physics).
+  net_xy=math.hypot(row["world_dx"],row["world_dy"])
+  if net_xy<.15:
+   return "YOL_VAR_NET_YER_DEGISTIRME_KUCUK_VEYA_TERS"
+  return "DUNYA_KOKU_NET_YER_DEGISTIRIYOR"
  return "KESIN_DEGIL"
 
 def summary(rows:list[WalkRow])->str:
@@ -135,6 +140,7 @@ def summary(rows:list[WalkRow])->str:
    f"özgün G66C pencere sonu zemin={'EVET' if row['has_native_floor'] else 'HAYIR'}"
    f", zemin_Zup={format(row['native_floor_z'], '.4f') if row['has_native_floor'] else 'YOK'}, "
    f"dünya Δ=({row['world_dx']:.3f},{row['world_dy']:.3f}), "
+   f"net XY={math.hypot(row['world_dx'],row['world_dy']):.3f}, "
    f"kamera Δ=({row['camera_dx']:.3f},{row['camera_dy']:.3f}), "
    f"tanı={assess_window(row)}"
   )
