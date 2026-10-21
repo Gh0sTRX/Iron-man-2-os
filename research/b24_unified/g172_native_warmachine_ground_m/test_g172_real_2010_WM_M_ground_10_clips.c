@@ -21,7 +21,12 @@ static void test_one(int fire,unsigned dir,const char *expected,unsigned ms){
  assert(out.original_source_duration_ms==ms);
  assert(out.source_authored_name==1);
  assert(out.one_shot_not_looping==!!fire);
- assert(out.needs_2010_hit_event==!!fire);
+ /* G304 authenticity correction: real authored _att IM2V pose and source
+  * AttackType 25 are NOT a verified 2010 iOS native hit/contact event.
+  * This test used to equate a fire-animation selection with a second
+  * native hit request. Preserve the genuine M-ground 10-clip duration
+  * verification while refusing guessed hit timestamp/damage semantics. */
+ assert(out.needs_2010_hit_event==0);
  assert(out.input_semantics_verified_original_ios==0);
  assert(b24_g172_wm_m_ground_duration(out.stem)==ms);
 }
