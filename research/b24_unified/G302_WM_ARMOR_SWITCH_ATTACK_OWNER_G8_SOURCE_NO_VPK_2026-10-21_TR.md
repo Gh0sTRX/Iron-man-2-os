@@ -13,3 +13,9 @@
 **Test düzeyi:** Host gerçek renderer-animator kod yolu, *sentetik* klip byte'ları, ardından aynı kaynaktan Vita ARM ELF-only bütünleşik oyun build; bu gerçek PS Vita veya 2010 iOS input semantiği değildir. CI bitmeden PASS demiyoruz. Orijinal MW/WM muhtemel native Missile, Aim_M/Gatling anlamları çözüldü demiyoruz. Bütün G255 pre-VPK kaynak kapıları açık değil; VPK üretmeyin.
 
 **Sonraki:** War Machine gerçek 2010 1292-vertex ground/hover/flight geçiş bankası ve input/weapon anlamını kaynakla ayır; sonra mevcut gameplay/combat ve Expo **LIGHTING/sky/shadows/alpha**, Mission000/audio, 7/7 gate + tek VPK. Fiziksel G171 yürüyüş/initial world root kanıtı bekliyor.
+
+## 21 Ekim 2026 — gerçek CI / başarı kanıtı
+
+- [G302 tam **G171** kaynak birleşimi ve VitaSDK ARM `im2_beta` **ELF-only SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39558787652), kaynak commit [`ef4ffe8`](https://github.com/Gh0sTRX/Iron-man-2-os/commit/ef4ffe89116eb6cb83737d52d5338d688a1c4975).
+- Aynı kaynak koşusunda **G302 yeni gerçek G8 streamer C11 sentetik IM2V fixture testi PASS**, G174 mevcut **10/10 orijinal 1292-vertex WM Aim_M_Ground IM2V** test adımı PASS ve final birleştirilmiş Vita ARM game ELF build PASS. 61 workflow step + cleanup tamamlandı; job success.
+- Bu, gerçek orijinal WM animasyonlarının tüm hareket/weapon anlamının çözüldüğünü veya fiziksel PS Vita görüntüsünü kanıtlamaz. **Yeni VPK yok**, fiziksel G171/G302 PS Vita oynanış testi hâlâ yapılmadı. G255 7/7 henüz açık değil.
