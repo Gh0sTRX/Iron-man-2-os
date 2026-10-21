@@ -18,3 +18,9 @@
 Push ile mevcut `.github/workflows/g83-original-full-movement-aim-combat-no-vpk.yml` kaynak-host/ARM nesne CI koşar; sonuçları gerçekten gözlemlemeden PASS yazılmamalı. Birleştirilmiş gerçek B24 Vita ELF için ayrıca G171 workflow gerekir. **VPK yok.**
 
 Ana 7 aşamalı sıra korunur: 1 orijinal spawn/yürüme cihaz kanıtı açık; **2 hover/Stage2/Rush** bu çalışmanın odağı; 3 G8/War Machine; 4 combat; **5 orijinal Expo çevresel ışık/gölge/sky/alpha**; 6 görev/ses; 7 aynı kaynaktan tüm kapılar geçince tek VPK. G255 pre-VPK 7/7 gate hâlâ kapalıdır.
+
+## 21 Ekim 2026 — gerçek CI sonucu, kesin kanıt düzeyi
+
+- [G83 orijinal klip isim doğrulama, hareket/aim/combat C11 host, G300 yeni Stage2/Rush ve iki yönlü zırh değişimi testleri, Vita ARM .o — **SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39556711267).
+- [G171 aynı commit gerçek tek oyun yeniden kurulum ve tam VitaSDK ARM **im2_beta ELF-only — SUCCESS**](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39556712665). **60/60 CI adımı başarılı**; G84 optional authored-moveset route CMake ana Vita ELF derlemesinde **ON**. G299 deneysel çevresel ışık da aynı ARM kaynak entegrasyonu içinde yer alır.
+- Doğrulanan kaynak commit: [`e9c8e55`](https://github.com/Gh0sTRX/Iron-man-2-os/commit/e9c8e55ccbd17007258f3621e9d937ae7567388d). Bu host/ARM kanıtı **G171/G300'ün PS Vita GPU görünümü/FPS, gerçek Stage2→Rush input davranışı ve kaynak-iOS parity için cihaz kabulü değildir**. G295 Vita3K renderer engeli de çözülmedi. VPK üretilmedi.
