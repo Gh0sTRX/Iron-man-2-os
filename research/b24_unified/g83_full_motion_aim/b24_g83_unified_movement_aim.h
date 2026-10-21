@@ -42,6 +42,13 @@ typedef struct {
  int input_semantics_verified_original_ios; /* always false so far */
  int needs_2010_hit_event;    /* no synthetic hits */
 } B24G83Selection;
+/* G301: actual B14 flight controller analog direction BEFORE G83 selection.
+ * A pinned one-shot may carry OLD selected->direction (e.g. fly_ftol).
+ * G84 must NOT feed that visual direction back into next-frame physics.
+ * In HOVER/RUSH/GROUND there is no Stage2 flight turn history.
+ * This is a routing helper, NOT a second movement integrator. */
+B24G83Dir b24_g83_physical_flight_dir(B24G83Mode mode,
+                                      float axis_x,float axis_y);
 /* Safe result 0 on invalid input. Unsupported source rig/action = stem NULL.
  * Gameplay uses G8 IM2V stream/mesh ownership; this only selects filenames. */
 int b24_g83_select_original_motion(const B24G83Input *in,

@@ -85,6 +85,13 @@ static B24G83Dir classify(float x,float y){
  if(fabsf(x)>fabsf(y))return x<0?B24G83_DIR_L:B24G83_DIR_R;
  return y<0?B24G83_DIR_B:B24G83_DIR_F;
 }
+B24G83Dir b24_g83_physical_flight_dir(B24G83Mode mode,
+                                      float axis_x,float axis_y){
+ if(mode!=B24G83_FLIGHT || !isfinite(axis_x)||!isfinite(axis_y)||
+    fabsf(axis_x)>1.01f||fabsf(axis_y)>1.01f)
+  return B24G83_DIR_IDLE;
+ return classify(axis_x,axis_y);
+}
 static int valid(const B24G83Input *p){
  return p&&isfinite(p->axis_x)&&isfinite(p->axis_y)&&
     fabsf(p->axis_x)<=1.01f&&fabsf(p->axis_y)<=1.01f&&

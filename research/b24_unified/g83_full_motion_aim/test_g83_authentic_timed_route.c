@@ -102,6 +102,62 @@ int main(void){
  assert(out.stem&&!strcmp(out.stem,"ironman_ironman_aim_float_move_f"));
  assert(!switcher.has_pinned_one_shot&&switcher.interrupted_one_shots==3u);
  assert(switcher.completed_one_shots==0u);
+ /* G301: real G84/Stage2 physical-axis history can diverge from
+  * selected->direction while an authenticated 800ms IM2V turn is pinned.
+  * Enforce physical analog history, avoiding stale ltof/ftol after Rush. */
+ B24G83Timeline physical={0};
+ B24G83Input flight_axis={0};
+ B24G83Dir physical_previous=B24G83_DIR_IDLE;
+ flight_axis.suit_index=B24G83_MARKVI;
+ flight_axis.motion=B24G83_FLIGHT;
+ flight_axis.axis_y=1.f;
+ flight_axis.previous_flight_dir=physical_previous;
+ assert(b24_g83_timeline_tick(&physical,NULL,7000,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_f"));
+ physical_previous=b24_g83_physical_flight_dir(
+   flight_axis.motion,flight_axis.axis_x,flight_axis.axis_y);
+ assert(physical_previous==B24G83_DIR_F);
+ flight_axis.axis_y=0.f;flight_axis.axis_x=-1.f;
+ flight_axis.previous_flight_dir=physical_previous;
+ assert(b24_g83_timeline_tick(&physical,NULL,7010,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_ftol"));
+ physical_previous=b24_g83_physical_flight_dir(
+   flight_axis.motion,flight_axis.axis_x,flight_axis.axis_y);
+ assert(physical_previous==B24G83_DIR_L);
+ flight_axis.axis_x=0.f;flight_axis.axis_y=1.f;
+ flight_axis.previous_flight_dir=physical_previous;
+ assert(b24_g83_timeline_tick(&physical,NULL,7020,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_ftol"));
+ assert(out.direction==B24G83_DIR_L); /* pinned visual LEFT */
+ physical_previous=b24_g83_physical_flight_dir(
+   flight_axis.motion,flight_axis.axis_x,flight_axis.axis_y);
+ assert(physical_previous==B24G83_DIR_F); /* B14 now physically FORWARD */
+ flight_axis.previous_flight_dir=physical_previous;
+ assert(b24_g83_timeline_tick(&physical,NULL,7810,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_f")); /* no phantom ltof */
+ assert(physical.completed_one_shots==1u);
+ flight_axis.motion=B24G83_RUSH;flight_axis.axis_x=-1.f;flight_axis.axis_y=0.f;
+ assert(b24_g83_timeline_tick(&physical,NULL,7900,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_f_rush"));
+ physical_previous=b24_g83_physical_flight_dir(
+   flight_axis.motion,flight_axis.axis_x,flight_axis.axis_y);
+ assert(physical_previous==B24G83_DIR_IDLE); /* Rush clears Stage2 history */
+ flight_axis.motion=B24G83_FLIGHT;
+ flight_axis.previous_flight_dir=physical_previous;
+ assert(b24_g83_timeline_tick(&physical,NULL,7920,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_l"));
+ flight_axis.axis_x=0.f;flight_axis.axis_y=1.f;
+ flight_axis.previous_flight_dir=B24G83_DIR_L;
+ assert(b24_g83_timeline_tick(&physical,NULL,7930,&flight_axis,&out));
+ assert(!strcmp(out.stem,"ironman_ironman_fly_ltof"));
+ flight_axis.motion=B24G83_HOVER;
+ assert(b24_g83_timeline_tick(&physical,NULL,7940,&flight_axis,&out));
+ physical_previous=b24_g83_physical_flight_dir(
+   flight_axis.motion,flight_axis.axis_x,flight_axis.axis_y);
+ assert(physical_previous==B24G83_DIR_IDLE);
+ assert(b24_g83_physical_flight_dir(B24G83_GROUND,-1.f,0.f)==B24G83_DIR_IDLE);
+ assert(b24_g83_physical_flight_dir(B24G83_FLIGHT,0.f,0.f)==B24G83_DIR_IDLE);
+ assert(b24_g83_physical_flight_dir(B24G83_FLIGHT,2.f,0.f)==B24G83_DIR_IDLE);
  puts("PASS G83 original 2010 animation duration timeline: moving attack 866ms, flight steering 800ms, dodge 699ms, landing 633ms, G82 three-hit priority; paused, no invented hit frame, no repeated weapon fire, NO VPK");
  return 0;
 }

@@ -91,7 +91,14 @@ static B24G83Dir g84_last_flight_dir=B24G83_DIR_IDLE;
           B24G83Selection g84_route={0};
           if(!b24_g83_timeline_tick(&g84_time,NULL,(uint32_t)now,
                 &g84_input,&g84_route)){running=0;break;}
-          g84_last_flight_dir=world.flying?g84_route.direction:B24G83_DIR_IDLE;
+          /* G301: the visual G83 selection may be a pinned authored
+             800ms fly_ftol while B14's stick has already turned again.
+             Keep the next transition input in PHYSICAL Stage2 input
+             space; never inherit a stale visual clip direction.
+             HOVER/RUSH are separate flight modes with no Stage2
+             turn history. A single B14 world tick remains sole owner. */
+          g84_last_flight_dir=b24_g83_physical_flight_dir(
+                g84_input.motion,g84_input.axis_x,g84_input.axis_y);
           if(!b24_g8_motion_tick_g84(&b24_original_motion,
                 "app0:animations",model.vertices,sizeof(IM2Vertex),
                 model.nv,idx,original_stage,move_x,move_y,
@@ -104,6 +111,8 @@ static B24G83Dir g84_last_flight_dir=B24G83_DIR_IDLE;
  assert game.count("b24_g8_motion_melee_trigger(")==1
  assert game.count("b24_g8_motion_repulsor_trigger(")==1
  assert game.count("b24_g83_timeline_tick(")==1
+ assert game.count("g84_last_flight_dir=b24_g83_physical_flight_dir(")==1
+ assert "g84_route.direction" not in game
  originals=[
  ("g76_original_combat","b24_g76_original_native_damage_math.c"),
  ("g76_original_combat","b24_g76_original_native_damage_math.h"),
