@@ -13,7 +13,9 @@ int main(void){
  assert(out.stem&&!strcmp(out.stem,"ironman_ironman_aim_ground_move_f_att"));
  assert(out.original_source_duration_ms==866u);
  assert(out.one_shot_not_looping);
- assert(out.needs_2010_hit_event==1);
+ /* G304: 866ms is authentic animation duration, not authenticated
+  * original StateTrack hit-frame/target/missile event. */
+ assert(out.needs_2010_hit_event==0);
  in.accepted_weapon_event=0;in.axis_y=-1.f;
  assert(b24_g83_timeline_tick(&t,NULL,1800,&in,&out));
  assert(!strcmp(out.stem,"ironman_ironman_aim_ground_move_f_att"));
@@ -56,6 +58,10 @@ int main(void){
  assert(!strcmp(out.stem,"ironman_ironman_ground_combo_1"));
  assert(!t.has_pinned_one_shot);
  assert(out.original_source_duration_ms==266u);
+ /* G304 source gate: even G82 native-looking combo phase must not
+  * claim a second original 2010 hit, regardless of its authored 266ms
+  * animation duration or current port melee input. */
+ assert(!out.needs_2010_hit_event);
 
  /* G300 regression: original fly_ftol is a legitimate 800ms one-shot,
   * but it cannot visually mask a newer B14 Rush state or change rigs.

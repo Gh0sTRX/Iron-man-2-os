@@ -203,15 +203,17 @@ int b24_g83_select_original_motion(const B24G83Input *p,
  out->source_authored_name=stem!=NULL;
  out->one_shot_not_looping=oneshot || (fire && aim!=B24G83_AIM_NONE && (ground||hover));
  out->original_source_duration_ms=b24_g83_authentic_source_duration(stem);
- /* G297: one confirmed ranged input is NOT evidence of a source hit
-  * event when the chosen authored clip is only directional flight, rush,
-  * transition, unsupported rig or no-aim locomotion. This does NOT mute
-  * B16's own accepted shot: it prevents a spurious SECOND G83 hit request.
-  * Hit timing and original iOS permission are still unknown. */
+ /* G304 original-2010 source correction, not a cosmetic rename.
+  * G213B/G217 recovered actual StateData AttackType rows and raw
+  * StateTrack::attack event fields; G221/G222 recovered native dispatch
+  * provenance, NOT proof of a Vita weapon hit, original controller
+  * mapping, native event time-unit or target. A source _att IM2V name
+  * alone is insufficient to request ANY additional game hit. Earlier
+  * G83 code set this flag for every accepted aimed attack and could
+  * be read as authorising an unverified SECOND damage path.
+  * B16/G82 remain the sole separately gated port events. */
  out->input_semantics_verified_original_ios=0;
- out->needs_2010_hit_event=fire && stem!=NULL &&
-     p->transition==B24G83_EVENT_NONE && (ground||hover) &&
-     aim!=B24G83_AIM_NONE;
+ out->needs_2010_hit_event=0;
  return 1;
 }
 int b24_g83_select_combined(B24G82Combat *combat,uint32_t time_ms,
@@ -228,7 +230,9 @@ int b24_g83_select_combined(B24G82Combat *combat,uint32_t time_ms,
     out->source_authored_name=1;
     out->one_shot_not_looping=1;
     out->original_source_duration_ms= combat->clip.phase==1?266u:combat->clip.phase==2?300u:500u;
-    out->needs_2010_hit_event=1;
+    /* G304: an original combo clip is proven animation, not proven
+     * native hit contact. G82 validates actual source contact separately. */
+    out->needs_2010_hit_event=0;
    }
   }
  }

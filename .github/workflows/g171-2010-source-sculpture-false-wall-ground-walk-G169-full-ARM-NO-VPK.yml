@@ -9,6 +9,7 @@ on:
       - "research/b24_unified/b24_g8_live_original_motion.c"
       - "research/b24_unified/g302_g8_suit_attack_owner/**"
       - "research/b24_unified/g303_wm_motion_repulsor_once/**"
+      - "research/b24_unified/g304_original_ios_hit_provenance/**"
       - "research/b24_unified/b24_g8_live_original_motion.h"
       - "research/b24_unified/g298_expo_ambient_vitagl/**"
       - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
@@ -1098,6 +1099,23 @@ jobs:
             -lm -o /tmp/g303_real_g8_wm_motion_one_shot
           /tmp/g303_real_g8_wm_motion_one_shot
           test -z "$(find research/b24_unified/g303_wm_motion_repulsor_once -name '*.vpk' -print -quit)"
+      - name: G304 original 2010 iOS G217 StateTrack and native AttackType reject G83 guessed extra hit event NO VPK
+        run: |
+          set -euo pipefail
+          test -s work/b24/b24_unified/b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=1 \
+            -DB24_G172_WM_NATIVE_M_GROUND_BANK=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g76_original_native_damage_math.c \
+            work/b24/b24_unified/b24_g77_melee_source_radius.c \
+            work/b24/b24_unified/b24_g82_original_combat_coordinator.c \
+            work/b24/b24_unified/b24_g83_unified_movement_aim.c \
+            research/b24_unified/g304_original_ios_hit_provenance/test_g304_true_G217_StateTrack_vs_G83_guessed_secondary_hit.c \
+            -lm -o /tmp/g304_2010_real_states_no_fake_hit
+          /tmp/g304_2010_real_states_no_fake_hit
+          test -z "$(find research/b24_unified/g304_original_ios_hit_provenance -name '*.vpk' -print -quit)"
       - name: G174 load all ten genuine 2010 1292 vertex War Machine M Ground IM2V poses through G172 G83 and sole G8 stream, native weapon semantics not guessed
         run: |
           set -euo pipefail

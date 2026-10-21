@@ -40,7 +40,9 @@ typedef struct {
  int one_shot_not_looping;    /* use clip's ORIGINAL IM2V duration */
  uint32_t original_source_duration_ms; /* 2010 authored, 0=unmapped */
  int input_semantics_verified_original_ios; /* always false so far */
- int needs_2010_hit_event;    /* no synthetic hits */
+ int needs_2010_hit_event;    /* G304 legacy field, MUST remain 0 until true source
+                                 StateTrack time-unit+actor contact+attack permission
+                                 are runtime-verified; _att/combo != hit. */
 } B24G83Selection;
 /* G301: actual B14 flight controller analog direction BEFORE G83 selection.
  * A pinned one-shot may carry OLD selected->direction (e.g. fly_ftol).

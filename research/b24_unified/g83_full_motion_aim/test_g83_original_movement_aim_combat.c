@@ -23,6 +23,7 @@ static void route(B24G83Input in,const char *want,int oneshot){
          in.transition==B24G83_EVENT_NONE));
  if(want)assert(out.original_source_duration_ms>0);
  assert(!out.input_semantics_verified_original_ios);
+ assert(!out.needs_2010_hit_event); /* source names cannot dispatch native hit */
 }
 int main(void){
  B24G83Input in=mk();
@@ -52,7 +53,9 @@ int main(void){
  in.motion=B24G83_GROUND;in.axis_x=0.f;in.axis_y=1.f;
  assert(b24_g83_select_original_motion(&in,&flight));
  assert(flight.stem&&!strcmp(flight.stem,"ironman_ironman_aim_ground_move_f_att"));
- assert(flight.needs_2010_hit_event);
+ /* G304 source audit: G217 has attack tracks, but clip name alone
+  * does NOT prove an original iOS hit event. */
+ assert(!flight.needs_2010_hit_event);
  in.aim=B24G83_AIM_NONE;
  assert(b24_g83_select_original_motion(&in,&flight));
  assert(!flight.needs_2010_hit_event);
@@ -131,10 +134,10 @@ int main(void){
  in.paused=0;in.aim=B24G83_AIM_HAND;in.accepted_weapon_event=1;
  assert(b24_g83_select_combined(&combat,1005,&in,&o));
  assert(o.stem&&!strcmp(o.stem,"ironman_ironman_ground_combo_1"));
- assert(o.one_shot_not_looping&&o.needs_2010_hit_event);
+ assert(o.one_shot_not_looping&&!o.needs_2010_hit_event);
  b24_g82_request_melee(&combat,1006,1,0);
  assert(b24_g83_select_combined(&combat,1266,&in,&o));
  assert(!strcmp(o.stem,"ironman_ironman_ground_combo_2"));
- printf("PASS G297 original flight/rush/steering/dodge no duplicate hit event, ground accepted aim still routes; G83 full original source locomotion/aim/WM/G82 tests; NO VPK.\n");
+ printf("PASS G304 original iOS state/attack provenance: NO secondary native hit flag for ANY original _att/combo clip; G83 motion and G82 accepted source rules remain; NO VPK.\n");
  return 0;
 }
