@@ -16,3 +16,10 @@ Daha önce G213B'den kurtarılan özgün 2010 `StateData` / `StateTrack` bilgile
 Kaynak G197 jump-table ve G217 AttackType **authentic**; B14/G75 hareket hızları, G11 stage2/Rush ateş kısıtları ve WM G165 Rush source posture bizim homebrew davranışıdır. İlk bölümün özgün Lua `SetAttackTypeEnabled` değerlerinin etkisi native StateMgr runtime ile eşleştirilmeden bunları “2010 motor kuralı” diye sunamayız. C1L1 orijinal Attack / Weapon kayıtlarının dosya adı/ofset sırası `WeaponDB[0/1/4]` kesin sıra değildir (G241–G247). G305 canlı silah semantiğini icat etmez, gösterilebilir kanıtın taşıyabileceği sınırı yükseltir.
 
 **VPK YOK.** G255 7/7 kapılar kapalı. Bu kodun host C11 ve Vita ARM ELF kaynak testlerinin başarılı sonuçları, fiziksel PS Vita 60 FPS, gerçek in-game silah isabeti, yürüyüş, Expo ay/gölge/ışık ya da native Mission000 ilerlemesi kanıtı değildir.
+
+## Doğrulanmış kaynak/derleme testleri, 21 Ekim 2026
+
+- Kaynak düzeltme commit [`826a3dd`](https://github.com/Gh0sTRX/Iron-man-2-os/commit/826a3dda98a8d7029f416e5b82bab9a4a44831cb), dar G218 host include-path düzeltmesi [`747e45d`](https://github.com/Gh0sTRX/Iron-man-2-os/commit/747e45da27560484e5b7817469c1b2cdb4dc8321).
+- **[G218+G305 CI — SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39582453239)**: orijinal G217 4×194 `StateData`, statik G197 `DoAttack` ARM 26 kolu, WM `25↔Mark VI 2` ve WM `18↔Mark VI 1` aynı statik branch, 60 render karelik tek G8 klip için tek ham StateTrack kayıt gözlemi, kaynak dışı ve missing fail-closed doğrulandı.
+- **[G171 tam oyun Vita ARM ELF-only — SUCCESS](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39582416284)** (aynı G305 source commit `826a3dd`): G218 gerçek Vita main entegrasyonunun G197 kaynak tablosunu doğru şekilde taşıması, diğer G171 kaynak/world/combat/animator/lighting adayları ve son birleşik VitaSDK `im2_beta` link testi geçti. VPK üretilmedi.
+- Bu sonuçlar **native iOS WeaponDB index → WM missile/gatling veya gerçek hit zamanı mapping çözüldü** demiyor; statik dal hedefi, özgün gözlenen runtime olay değil. Fiziksel PS Vita/grafik/60FPS/yürüyüş/fotoğraf kanıtı yok. G255 source 7/7 gate hâlâ false.
