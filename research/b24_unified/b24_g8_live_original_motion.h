@@ -25,6 +25,7 @@ typedef struct {
  char selected[128];
  uint32_t started_ms,previous_ms,repulsor_started_ms;
  int active,repulsor_pending,whole_body_repulsor_active;
+ int repulsor_domain; /* 0=none, 1=ground, 2=hover; pin one B16-owned IM2V shot */
  unsigned transitions,misses,successful_frames;
 } B24G8LiveOriginalMotion;
 void b24_g8_motion_release(B24G8LiveOriginalMotion *a);

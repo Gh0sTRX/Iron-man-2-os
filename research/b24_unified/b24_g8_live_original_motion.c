@@ -3,6 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* A shot's SOURCE animation is owned by ground or hover, not by the
+ * next-frame analog direction. WM ground<->hover must not hallucinate
+ * another _att pose from the one accepted B16 event. Flight/Rush have
+ * no authenticated original repulsor _att dispatch in this port. */
+static int repulsor_domain(B24MotionStage mode){
+ if(mode==B24M_IDLE||mode==B24M_WALK)return 1;
+ if(mode==B24M_HOVER||mode==B24M_DRIFT)return 2;
+ return 0;
+}
 static int stage_direction(float x,float y) {
  /* 0 stationary, 1 forward, 2 back, 3 left, 4 right, in PLAYER space.
     Uses same values already consumed by the authoritative B14 movement. */
@@ -162,13 +171,36 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
     (uint32_t)(now-a->repulsor_started_ms)>=a->stream.duration_ms){
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
  }
+ /* G303: source-authored repulsor _Att duration remains owned by the
+  * ONE successful B16 event. Once G8 actually opened the source shot,
+  * the movement stick may turn without restarting an unrelated _Att
+  * stream on every analog direction. An actual B14 ground-to-hover
+  * switch cancels that old pose instead of morphing a ground attack
+  * into an unrequested hover attack; Stage2/Rush likewise cancel.
+  * This changes ONLY full-body pose playback, never B16's damage. */
+ const int current_repulsor_domain=repulsor_domain(mode);
+ if(a->repulsor_pending&&a->whole_body_repulsor_active){
+   if(!current_repulsor_domain||
+      a->repulsor_domain!=current_repulsor_domain){
+     a->repulsor_pending=0;
+     a->whole_body_repulsor_active=0;
+   }else if(a->active&&a->stream.file&&a->selected[0]){
+     shot=a->selected; /* pin the already opened real IM2V clip */
+   }
+ }
  /* Original melee has priority over aim/repulsor _Att; the right-arm
     B16 mask must not fight a full-body 2010 punch pose. */
  const char *melee=NULL;
  if(suit==0 && mode<=B24M_RUN)
     melee=b24_g8_melee_tick(&a->melee,now);
  else a->melee=(B24G8MeleeChain){0};
- if(melee)desired=melee;
+ if(melee){
+   /* A later accepted melee owns this pose. Never re-enter an earlier
+    * repulsor merely because its old source-duration timer is live. */
+   a->repulsor_pending=0;
+   a->whole_body_repulsor_active=0;
+   desired=melee;
+ }
  else if(a->repulsor_pending&&shot)desired=shot;
  else if(a->repulsor_pending&&!shot){
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
@@ -207,6 +239,8 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
   a->active=!a->missing;
   a->whole_body_repulsor_active=(a->active&&a->repulsor_pending&&shot&&
                                  desired==shot&&!melee);
+  if(a->whole_body_repulsor_active)
+     a->repulsor_domain=current_repulsor_domain;
   if(a->missing&&a->repulsor_pending){
     /* Preserve B16 single right-palm attack if source file missing. */
     a->repulsor_pending=0;a->whole_body_repulsor_active=0;
