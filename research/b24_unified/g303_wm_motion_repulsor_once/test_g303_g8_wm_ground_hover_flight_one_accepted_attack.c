@@ -71,8 +71,8 @@ int main(void){
  tick(&a,v,1292u,2,B24M_WALK,0.f,-1.f,1082,wg_b,wg_b);
  b24_g8_motion_repulsor_trigger(&a,1090);
  tick(&a,v,1292u,2,B24M_WALK,0.f,1.f,1098,wg_f,wg_f_att);
- tick(&a,v,1292u,2,B24M_WALK,0.f,-1.f,1297,wg_b,wg_f_att);
- tick(&a,v,1292u,2,B24M_WALK,0.f,-1.f,1298,wg_b,wg_b);
+ tick(&a,v,1292u,2,B24M_WALK,0.f,-1.f,1289,wg_b,wg_f_att);
+ tick(&a,v,1292u,2,B24M_WALK,0.f,-1.f,1290,wg_b,wg_b);
  assert(!a.repulsor_pending&&!a.whole_body_repulsor_active);
  /* A WM hover shot may not survive flight Stage2/Rush. */
  tick(&a,v,1292u,2,B24M_DRIFT,0.f,1.f,1330,wh_f,wh_f);
