@@ -53,7 +53,13 @@ static B24G169Beam b24_g169_l1_source_beam_actor={0};
                  &b24_g169_l1_source_beam_actor,idx,world.flying!=0,
                  (uint32_t)now);
 #endif''',"accepted_attack")
- anchor="g84_last_flight_dir=world.flying?g84_route.direction:B24G83_DIR_IDLE;"
+ # G301 retains the original 2010 Beam priority between G83 selection
+ # and the sole G8 renderer, but G84 no longer feeds back the pinned
+ # VISUAL clip direction into physical Stage2 steering history.
+ # Never restore the stale old feedback as a convenient insertion anchor.
+ if "g84_last_flight_dir=world.flying?g84_route.direction" in s or "g84_route.direction" in s:
+  raise ValueError("G169 refuses stale G84 visual-to-physical flight feedback")
+ anchor="g84_last_flight_dir=b24_g83_physical_flight_dir("
  s=one(s,anchor,'''#ifdef B24_G169_AUTHENTIC_BEAM_3_PHASE
            /* One REAL G83/G8 source streaming owner, no second animated
             * model: accepted weapon event routes through normal motion

@@ -215,6 +215,10 @@ jobs:
           assert len(data)==1048596 and struct.unpack_from('<4sIIII',data)==(b'C1TX',1,512,512,0)
           print('G145 VERIFIED original prebuilt G9 real iOS vehicle PNG-derived C1TX 512x512 original source reused',hashlib.sha256(data).hexdigest())
           PY
+      - name: G301 fast G169 source insertion respects G84 actual Stage2 physical steering, no VPK
+        run: |
+          set -euo pipefail
+          python3 research/b24_unified/g169_authentic_2010_unibeam_actor/test_g301_g169_after_physical_stage2_direction.py
       - name: Rebuild original B24 real game world and G88 safe combat source NO VPK
         run: |
           set -euo pipefail
