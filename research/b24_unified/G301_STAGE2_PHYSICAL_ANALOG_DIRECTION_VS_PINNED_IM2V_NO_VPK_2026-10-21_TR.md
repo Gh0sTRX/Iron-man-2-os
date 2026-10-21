@@ -23,3 +23,12 @@ Yeni `b24_g83_physical_flight_dir(mode,axis_x,axis_y)` G83'ün mevcut 0.18 deadz
 G169 yaması, eski görsel→fiziksel geri beslemeyi geri getirmek yerine, yeni `b24_g83_physical_flight_dir(` ankrajını bekleyecek şekilde düzeltildi. Böylece gerçek G169 kaynak Beam klibi G83 seçiminden **sonra**, G8 tek animasyon oyuncusundan **önce** yerleşir. Kaynak tek B14 integratörü, G169 original Beam1..3 ve savaş/çarpışma korunur. `test_g301_g169_after_physical_stage2_direction.py` sentetik B24 fixture'da pozitif ekleme, yerleşim sırası, duplicate rejection, eski hatalı G84 anchor rejection ve VPK yokluğunu kontrol eder; tam Vita derlemesinin yerine geçmez.
 
 G171 workflow'un tam büyük kaynak birleştirme adımından önce yeni hızlı fail-closed sentetik G169 kaynağı kontrol adımı eklendi. Yeni G171 run sonucu ayrıca doğrulanmalı; başarılı sayılmadan rapor edilmeyecek.
+
+## G301 son doğrulanmış CI sonucu — SUCCESS, NO VPK
+
+- **G83 C11 kaynak klip yön, timed G300/G301 flight history regresyonu + Vita ARM nesne SUCCESS:** https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39557446825
+- **G84 ana Vita B24 game loop kaynak bağlama Vita ARM nesne SUCCESS:** https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39557446767
+- **G169 orijinal Mark V/VI Beam1/2/3 aktarımı ve Vita ARM ELF-only SUCCESS (düzeltilmiş anchor):** https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39557837034
+- **G171 G301 + G169 aynı commit üzerinde tam orijinal oyun Vita ARM ELF-only: 60/60 adım SUCCESS:** https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39557837059
+- Kod commitleri: G301 physical source router `d1dcd6f0bbe9e01ba23d2b5d747bd943d630eaa3`; G169 kaynak yama uyum onarımı ve sentetik negatif guard `bfac2c522a27659ed5b3b1d3cb13deede77c80a4`.
+- Kanıt seviyesi **source-only host + Vita ARM ELF derlemesi**. Vita3K GPU, PS Vita cihazında gerçek Stage2 Rush flight, animasyon kalitesi, FPS ve orijinal iOS flight switch davranışı **doğrulanmadı**. G255 7/7 VPK kaynak gate kapalı; VPK üretilmedi.
