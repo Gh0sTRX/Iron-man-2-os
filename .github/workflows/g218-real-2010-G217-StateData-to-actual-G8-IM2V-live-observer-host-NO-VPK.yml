@@ -31,6 +31,7 @@ jobs:
           gcc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -I/tmp/g218_verified_2010_owner_authored \
             -Iresearch/b24_unified/g218_source_live_state_bridge \
+            -Iresearch/b24_unified/g197_source2010_attack_dispatch \
             research/b24_unified/g218_source_live_state_bridge/test_g218_exact_original_2010_loaded_G8_to_G217_StateData_host.c \
             -o /tmp/g218_real_2010_source_data_bridge
           /tmp/g218_real_2010_source_data_bridge
