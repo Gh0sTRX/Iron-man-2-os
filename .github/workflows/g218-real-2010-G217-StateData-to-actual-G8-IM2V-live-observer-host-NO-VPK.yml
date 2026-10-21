@@ -34,6 +34,19 @@ jobs:
             research/b24_unified/g218_source_live_state_bridge/test_g218_exact_original_2010_loaded_G8_to_G217_StateData_host.c \
             -o /tmp/g218_real_2010_source_data_bridge
           /tmp/g218_real_2010_source_data_bridge
+      - name: G305 ensure original native ARM G197 dispatch table is present and source-only observer copied safely
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('research/b24_unified/g218_source_live_state_bridge/g218_attach_G217_native_source_state_to_REAL_G8_animation_owner_NO_VPK.py').read_text()
+          h=Path('research/b24_unified/g218_source_live_state_bridge/b24_g218_live_authentic_2010_state_observer.h').read_text()
+          assert 'shutil.copyfile(ORIGINAL_ARM_DISPATCH,D/ORIGINAL_ARM_DISPATCH_HEADER)' in p
+          assert 'b24_g197_original_source_attack_entry' in h
+          assert 'if(newly_loaded_clip)++obs->native_raw_attack_event_rows_observed;' in h
+          assert not list(Path('.').rglob('*.vpk'))
+          print('G305 original G197 authenticated ARM dispatch read-only, G8 event log deduplicated per source clip edge, no VPK')
+          PY
       - name: Verify G218 source observer is passive, never creates second physics or combat event or Vita VPK
         run: |
           set -euo pipefail

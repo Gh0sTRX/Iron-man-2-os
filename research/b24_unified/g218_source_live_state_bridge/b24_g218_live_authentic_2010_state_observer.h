@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h"
+#include "b24_g197_original_2010_attack_dispatch_reference.h"
 
 typedef struct {
   uint32_t source_animation_frames_observed;
@@ -22,6 +23,13 @@ typedef struct {
   uint16_t source_suit_group;
   uint16_t source_native_state_index;
   uint32_t source_authored_AttackType_or_UNKNOWN;
+  /* G305 original ARM jump table is SOURCE STATIC, attached to an IM2V
+   * filename-correspondence CANDIDATE, never selected native StateMgr. */
+  uint32_t source_candidate_original_DoAttack_ARM_entry_VM_or_UNKNOWN;
+  uint32_t source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN;
+  uint8_t source_static_DoAttack_ARM_branch_proven_FOR_CANDIDATE_ONLY;
+  uint8_t source_native_DoAttack_runtime_event_proven; /* always zero */
+  uint8_t source_WeaponDB_runtime_index_or_weapon_identity_proven; /* always zero */
   uint32_t source_authored_next_state_or_UNKNOWN; /* exact original StateData next_state, not auto-executed */
   uint32_t source_authored_type_or_UNKNOWN;       /* original type, weapon semantics unproven */
   uint32_t source_authored_loop_or_UNKNOWN;       /* original loop flag, no new G8 timing */
@@ -32,6 +40,13 @@ typedef struct {
   uint8_t source_state_index_correlated_by_filename_ONLY;
   uint8_t actual_2010_StateMgr_runtime_state_PROVEN; /* always zero */
   uint8_t actual_2010_melee_hit_or_projectile_event_PROVEN; /* always zero */
+  /* G305: old native_raw_attack_event_rows_observed incorrectly rose once
+   * per RENDERED FRAME on a held G8 clip, not once on a loaded-clip edge.
+   * Track the last actually active IM2V so one original read-only raw row
+   * cannot masquerade as 60+ repeated native attacks at 60 FPS. */
+  uint8_t last_observed_G8_clip_valid;
+  int last_observed_Vita_suit;
+  char last_observed_G8_clip[128];
 } B24G218LiveObserver;
 
 static inline int b24_g218_owner_group_for_Vita_suit(int suit){
@@ -93,6 +108,11 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->source_state_name_correspondence_ONLY=NULL;
   obs->selected_actual_G8_IM2V_clip=NULL;
   obs->source_authored_AttackType_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_candidate_original_DoAttack_ARM_entry_VM_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN=B24G217_UNKNOWN_U32;
+  obs->source_static_DoAttack_ARM_branch_proven_FOR_CANDIDATE_ONLY=0;
+  obs->source_native_DoAttack_runtime_event_proven=0;
+  obs->source_WeaponDB_runtime_index_or_weapon_identity_proven=0;
   obs->source_authored_next_state_or_UNKNOWN=B24G217_UNKNOWN_U32;
   obs->source_authored_type_or_UNKNOWN=B24G217_UNKNOWN_U32;
   obs->source_authored_loop_or_UNKNOWN=B24G217_UNKNOWN_U32;
@@ -101,8 +121,25 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->actual_2010_StateMgr_runtime_state_PROVEN=0;
   obs->actual_2010_melee_hit_or_projectile_event_PROVEN=0;
   if(!actual_G8_clip||!actual_G8_clip[0]||
-     !G8_animation_active||G8_source_missing)return 0;
+     !G8_animation_active||G8_source_missing){
+    obs->last_observed_G8_clip_valid=0; /* next valid reentry is a new edge */
+    return 0;
+  }
   ++obs->source_animation_frames_observed;
+  const size_t clip_len=strlen(actual_G8_clip);
+  if(clip_len>=sizeof(obs->last_observed_G8_clip)){
+    ++obs->unmapped_source_clip_frames;
+    obs->last_observed_G8_clip_valid=0;
+    return 0;
+  }
+  const int newly_loaded_clip=!obs->last_observed_G8_clip_valid||
+     obs->last_observed_Vita_suit!=suit||
+     strcmp(obs->last_observed_G8_clip,actual_G8_clip)!=0;
+  if(newly_loaded_clip){
+    memcpy(obs->last_observed_G8_clip,actual_G8_clip,clip_len+1u);
+    obs->last_observed_Vita_suit=suit;
+    obs->last_observed_G8_clip_valid=1;
+  }
   const int group=b24_g218_owner_group_for_Vita_suit(suit);
   const char *state=b24_g218_known_state_name_from_real_G8_stem(suit,actual_G8_clip);
   if(group<0||!state){
@@ -130,6 +167,18 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
   obs->source_suit_group=(uint16_t)group;
   obs->source_native_state_index=src->native_source_state_index;
   obs->source_authored_AttackType_or_UNKNOWN=src->original_AttackType_or_UNKNOWN;
+  /* Original G197 ARM 0..25 jump table proven, but correspondence to
+   * THIS loaded G8 file is only via the G218 guessed native StateData
+   * name. No WeaponDB row, missile, gatling or repulsor inferred. */
+  if(src->original_AttackType_or_UNKNOWN<26u){
+    const B24G197OriginalAttackEntry native=
+       b24_g197_original_source_attack_entry(src->original_AttackType_or_UNKNOWN);
+    obs->source_candidate_original_DoAttack_ARM_entry_VM_or_UNKNOWN=
+        native.original_ARM_jump_table_entry_VM;
+    obs->source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN=
+        native.original_ARM_branch_target_VM;
+    obs->source_static_DoAttack_ARM_branch_proven_FOR_CANDIDATE_ONLY=1;
+  }
   obs->source_authored_next_state_or_UNKNOWN=src->original_next_state_or_UNKNOWN;
   obs->source_authored_type_or_UNKNOWN=src->original_state_type_or_UNKNOWN;
   obs->source_authored_loop_or_UNKNOWN=src->original_loop_or_UNKNOWN;
@@ -150,7 +199,9 @@ static inline int b24_g218_observe_actually_loaded_G8_clip(
        * it is NOT verified original runtime current-index selection, and
        * must never spawn any attack or cause damage here. */
       obs->source_attack_event_third_u32_UNCLASSIFIED=e->raw_original_2010_third_field_UNCLASSIFIED;
-      ++obs->native_raw_attack_event_rows_observed;
+      /* Original event record is immutable. Observing 60 rendered frames
+       * of this ONE clip is not evidence of 60 native attack callbacks. */
+      if(newly_loaded_clip)++obs->native_raw_attack_event_rows_observed;
       break;
     }
   }

@@ -19,6 +19,7 @@ on:
       - "research/b24_unified/g173_unibeam_single_animator_priority/**"
       - "research/b24_unified/g174_warmachine_true_native_ground_stream/**"
       - "research/b24_unified/g218_source_live_state_bridge/**"
+      - "research/b24_unified/g197_source2010_attack_dispatch/b24_g197_original_2010_attack_dispatch_reference.h"
       - "research/b24_unified/g226_vita_original_ground_render_root_audit/**"
       - "research/b24_unified/g227_vita_walk_world_collision_gpu_qa/**"
       - "research/b24_unified/g229_vita_ground_motion_window/**"

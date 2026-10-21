@@ -18,12 +18,15 @@ D=W/"b24/b24_unified"
 HERE=Path(__file__).resolve().parent
 NATIVE_HEADER="b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h"
 OBSERVER="b24_g218_live_authentic_2010_state_observer.h"
+ORIGINAL_ARM_DISPATCH_HEADER="b24_g197_original_2010_attack_dispatch_reference.h"
+ORIGINAL_ARM_DISPATCH=R/"research/b24_unified/g197_source2010_attack_dispatch"/ORIGINAL_ARM_DISPATCH_HEADER
 def one(s,old,new,label):
  n=s.count(old)
  if n!=1:raise ValueError("G218 strict ORIGINAL one-owner "+label+" source drift count="+str(n))
  return s.replace(old,new,1)
 def apply(source_g217_header:Path):
- for p in (source_g217_header,HERE/OBSERVER,M,CM,D/"b24_g8_live_original_motion.c"):
+ for p in (source_g217_header,HERE/OBSERVER,ORIGINAL_ARM_DISPATCH,M,CM,
+          D/"b24_g8_live_original_motion.c"):
   if not p.is_file():raise FileNotFoundError("G218 authentic original source prerequisite absent: "+str(p))
  if source_g217_header.name!=NATIVE_HEADER:
   raise ValueError("G218 owner source header must be original G217 known file")
@@ -87,6 +90,7 @@ endif()
 '''
  if list(W.rglob("*.vpk")):raise RuntimeError("G218 never accept/create VPK")
  shutil.copyfile(source_g217_header,D/NATIVE_HEADER)
+ shutil.copyfile(ORIGINAL_ARM_DISPATCH,D/ORIGINAL_ARM_DISPATCH_HEADER)
  shutil.copyfile(HERE/OBSERVER,D/OBSERVER)
  M.write_text(main);CM.write_text(cm)
  assert main.count("b24_g218_observe_actually_loaded_G8_clip(")==1

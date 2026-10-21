@@ -17,6 +17,24 @@ static int original(int suit,const char *real_im2v,const char *state,int native_
  REQ(g.source_state_name_correspondence_ONLY!=NULL);
  REQ(!strcmp(g.source_state_name_correspondence_ONLY,state));
  REQ(g.source_authored_AttackType_or_UNKNOWN==source_attack_type);
+ /* G305: static original ARM DoAttack dispatch for the corresponding
+  * StateData AttackType is source PROOF, but only a candidate for the
+  * G8 filename. Never call that a confirmed Vita missile/gatling/shot. */
+ if(source_attack_type!=B24G217_UNKNOWN_U32){
+   const B24G197OriginalAttackEntry e=
+      b24_g197_original_source_attack_entry(source_attack_type);
+   REQ(g.source_static_DoAttack_ARM_branch_proven_FOR_CANDIDATE_ONLY);
+   REQ(g.source_candidate_original_DoAttack_ARM_entry_VM_or_UNKNOWN==
+       e.original_ARM_jump_table_entry_VM);
+   REQ(g.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+       e.original_ARM_branch_target_VM);
+ }else{
+   REQ(!g.source_static_DoAttack_ARM_branch_proven_FOR_CANDIDATE_ONLY);
+   REQ(g.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+       B24G217_UNKNOWN_U32);
+ }
+ REQ(!g.source_native_DoAttack_runtime_event_proven);
+ REQ(!g.source_WeaponDB_runtime_index_or_weapon_identity_proven);
  REQ(g.source_attack_event_start_raw_UNCLASSIFIED==original_attack_raw);
  /* Validate exact owner-native StateTrack third-u32 actual source metadata.
   * G221/G222 establish C++ argument provenance, NOT animation runtime
@@ -48,6 +66,9 @@ static int original(int suit,const char *real_im2v,const char *state,int native_
  REQ(b24_g218_observe_actually_loaded_G8_clip(&g,suit,real_im2v,0,0)==0);
  REQ(g.source_state_index_correlated_by_filename_ONLY==0);
  REQ(g.source_state_name_correspondence_ONLY==NULL);
+ REQ(g.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+     B24G217_UNKNOWN_U32);
+ REQ(!g.source_WeaponDB_runtime_index_or_weapon_identity_proven);
  REQ(g.actual_2010_melee_hit_or_projectile_event_PROVEN==0);
  REQ(b24_g218_observe_actually_loaded_G8_clip(&g,suit,real_im2v,1,1)==0);
  REQ(g.source_state_index_correlated_by_filename_ONLY==0);
@@ -112,8 +133,53 @@ int main(void){
  REQ(native.source_authored_next_state_or_UNKNOWN==B24G217_UNKNOWN_U32);
  REQ(native.source_authored_loop_or_UNKNOWN==B24G217_UNKNOWN_U32);
  REQ(native.source_attack_event_third_u32_UNCLASSIFIED==B24G217_UNKNOWN_U32);
+ B24G218LiveObserver im={0},wm={0};
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &im,0,"ironman_ironman_aim_m_ground_idle",1,0));
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &wm,2,"warmachine_warmachine_aim_m_ground_idle",1,0));
+ REQ(im.source_authored_AttackType_or_UNKNOWN==2u);
+ REQ(wm.source_authored_AttackType_or_UNKNOWN==25u);
+ REQ(im.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+     0x000F6648u);
+ REQ(wm.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+     0x000F6648u);
+ REQ(!im.source_WeaponDB_runtime_index_or_weapon_identity_proven);
+ REQ(!wm.source_WeaponDB_runtime_index_or_weapon_identity_proven);
+ B24G218LiveObserver im_aim={0},wm_aim={0};
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &im_aim,0,"ironman_ironman_aim_float_idle",1,0));
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &wm_aim,2,"warmachine_warmachine_aim_float_idle",1,0));
+ REQ(im_aim.source_authored_AttackType_or_UNKNOWN==1u);
+ REQ(wm_aim.source_authored_AttackType_or_UNKNOWN==18u);
+ REQ(im_aim.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+     0x000F6930u);
+ REQ(wm_aim.source_candidate_original_DoAttack_ARM_target_VM_or_UNKNOWN==
+     0x000F6930u);
+ REQ(!wm_aim.source_native_DoAttack_runtime_event_proven);
+ B24G218LiveObserver clip={0};
+ const char *original_held="ironman_ironman_ground_combo_1";
+ for(int frame=0;frame<60;frame++){
+   REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &clip,0,original_held,1,0));
+   REQ(clip.source_attack_event_start_raw_UNCLASSIFIED==300u);
+ }
+ REQ(clip.source_animation_frames_observed==60u);
+ REQ(clip.successfully_correlated==60u);
+ /* G218 old implementation counted all 60 as 60 attack events. Source
+  * has ONE raw track row, observed through one loaded-clip edge. */
+ REQ(clip.native_raw_attack_event_rows_observed==1u);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &clip,0,original_held,0,0)==0);
+ REQ(!clip.last_observed_G8_clip_valid);
+ REQ(b24_g218_observe_actually_loaded_G8_clip(
+      &clip,0,original_held,1,0));
+ REQ(clip.native_raw_attack_event_rows_observed==2u);
+ REQ(!clip.actual_2010_melee_hit_or_projectile_event_PROVEN);
+ REQ(!clip.source_native_DoAttack_runtime_event_proven);
  b24_g218_observer_reset(&w);
  REQ(w.source_animation_frames_observed==0u);
- puts("G218 PASS actual 2010 G8 original IM2V filename -> 4 source armor 194 StateData/AttackType + raw true StateTrack event telemetry, 0 damage, no guesses and NO VPK");
+ puts("G305 PASS original G197/G217 ARM source DoAttack crosswalk, WM 25 vs VI 2 and WM 18 vs VI 1 share static branches but NO proven native weapon, 60 rendered frames ONE track-row observation, never duplicate hit; NO VPK");
  return 0;
 }
