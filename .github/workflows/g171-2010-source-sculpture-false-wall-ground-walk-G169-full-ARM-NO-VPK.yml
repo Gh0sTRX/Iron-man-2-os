@@ -6,6 +6,8 @@ on:
       - ".github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml"
       - "research/b24_unified/g171_authored_vs_visual_sculpture_walls/**"
       - "research/b24_unified/b24_gpu_g68_city.c"
+      - "research/b24_unified/b24_g8_live_original_motion.c"
+      - "research/b24_unified/g302_g8_suit_attack_owner/**"
       - "research/b24_unified/g298_expo_ambient_vitagl/**"
       - "research/b24_unified/g248_original_vita_ground_8dir_source_replay/**"
       - "research/b24_unified/g83_full_motion_aim/**"
@@ -1066,6 +1068,20 @@ jobs:
           path: /tmp/g226_source/
           retention-days: 21
           if-no-files-found: error
+      - name: G302 G8 current Vita game source must not carry old Mark VI repulsor into WM on armor swap NO VPK
+        run: |
+          set -euo pipefail
+          cc -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DB24_G85_NATIVE_MARKV_629=1 -DB24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY=1 \
+            -I work/b24/b24_unified \
+            work/b24/b24_unified/b24_original_im2v_stream.c \
+            work/b24/b24_unified/b24_hover_pose_blend.c \
+            work/b24/b24_unified/b24_g8_melee_source_chain.c \
+            work/b24/b24_unified/b24_g8_live_original_motion.c \
+            research/b24_unified/g302_g8_suit_attack_owner/test_g302_no_old_suit_repulsor_on_wm_switch.c \
+            -lm -o /tmp/g302_g8_wm_suit_attack_owner
+          /tmp/g302_g8_wm_suit_attack_owner
+          test -z "$(find research/b24_unified/g302_g8_suit_attack_owner -name '*.vpk' -print -quit)"
       - name: G174 load all ten genuine 2010 1292 vertex War Machine M Ground IM2V poses through G172 G83 and sole G8 stream, native weapon semantics not guessed
         run: |
           set -euo pipefail

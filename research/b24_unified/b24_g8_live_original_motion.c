@@ -147,6 +147,13 @@ int b24_g8_motion_tick(B24G8LiveOriginalMotion *a,const char *dir,
                        B24MotionStage mode,float left_x,float forward,
                        uint32_t now){
  if(!a||!dir||!vertices||stride<3*sizeof(float))return 0;
+ /* G302: source full-body repulsor is an event owned by the suit that
+  * accepted it. Drop that suit's old pending shot/one-shot/IM2V BEFORE
+  * selecting the new suit's _att clip. Previously fresh() ran AFTER
+  * desired was chosen, so an old Mark VI shot could select a War
+  * Machine attack pose on its very first frame (or vice versa).
+  * No new B16 event, damage, movement, fake 2010 clip, or physics. */
+ if(a->nv && a->suit_index!=suit)b24_g8_motion_release(a);
  const char *desired=b24_g8_motion_route(suit,mode,left_x,forward);
  /* Only an ACCEPTED B16 repulsor shot can request an original _Att clip.
     The source IM2V duration is authoritative; never auto-fire a projectile. */
