@@ -56,6 +56,52 @@ int main(void){
  assert(!strcmp(out.stem,"ironman_ironman_ground_combo_1"));
  assert(!t.has_pinned_one_shot);
  assert(out.original_source_duration_ms==266u);
+
+ /* G300 regression: original fly_ftol is a legitimate 800ms one-shot,
+  * but it cannot visually mask a newer B14 Rush state or change rigs.
+  * This proves route ownership, not physical Vita animation playback. */
+ B24G83Timeline switcher={0};
+ B24G83Input stage={0};
+ stage.suit_index=B24G83_MARKVI;
+ stage.motion=B24G83_FLIGHT;
+ stage.axis_x=-1.f;
+ stage.previous_flight_dir=B24G83_DIR_F;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6000,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"ironman_ironman_fly_ftol"));
+ assert(switcher.has_pinned_one_shot);
+ stage.motion=B24G83_RUSH;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6030,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"ironman_ironman_fly_f_rush"));
+ assert(!switcher.has_pinned_one_shot);
+ assert(switcher.completed_one_shots==0u&&switcher.interrupted_one_shots==1u);
+ stage.motion=B24G83_FLIGHT;
+ stage.previous_flight_dir=B24G83_DIR_IDLE;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6050,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"ironman_ironman_fly_l"));
+ stage.motion=B24G83_GROUND;
+ stage.axis_x=0.f;stage.axis_y=1.f;
+ stage.aim=B24G83_AIM_HAND;
+ stage.accepted_weapon_event=1;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6100,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"ironman_ironman_aim_ground_move_f_att"));
+ assert(switcher.has_pinned_one_shot);
+ stage.suit_index=B24G83_WARMACHINE;
+ stage.accepted_weapon_event=0;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6110,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"warmachine_warmachine_aim_ground_move_f"));
+ assert(!switcher.has_pinned_one_shot);
+ assert(switcher.completed_one_shots==0u&&switcher.interrupted_one_shots==2u);
+ stage.motion=B24G83_HOVER;
+ stage.accepted_weapon_event=1;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6200,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"warmachine_warmachine_aim_float_move_f_att"));
+ assert(switcher.has_pinned_one_shot);
+ stage.suit_index=B24G83_MARKVI;
+ stage.accepted_weapon_event=0;
+ assert(b24_g83_timeline_tick(&switcher,NULL,6220,&stage,&out));
+ assert(out.stem&&!strcmp(out.stem,"ironman_ironman_aim_float_move_f"));
+ assert(!switcher.has_pinned_one_shot&&switcher.interrupted_one_shots==3u);
+ assert(switcher.completed_one_shots==0u);
  puts("PASS G83 original 2010 animation duration timeline: moving attack 866ms, flight steering 800ms, dodge 699ms, landing 633ms, G82 three-hit priority; paused, no invented hit frame, no repeated weapon fire, NO VPK");
  return 0;
 }

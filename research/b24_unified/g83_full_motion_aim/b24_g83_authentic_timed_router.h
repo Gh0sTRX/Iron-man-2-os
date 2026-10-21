@@ -10,6 +10,9 @@ typedef struct {
  B24G83Selection pinned;
  uint32_t pinned_since_ms;
  uint32_t completed_one_shots;
+ uint32_t interrupted_one_shots; /* original duration not reached: mode/rig/event preemption */
+ B24G83Mode pinned_mode;      /* B14 motion owner at one-shot start */
+ int pinned_suit_index;       /* prevent a Mark VI clip leaking to WM or another suit */
  int has_pinned_one_shot;
 } B24G83Timeline;
 void b24_g83_timeline_reset(B24G83Timeline *state);
