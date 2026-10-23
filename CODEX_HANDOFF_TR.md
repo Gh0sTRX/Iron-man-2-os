@@ -33,6 +33,21 @@ günlükler için gereken belirli depolama hostları ortam taslağına eklendi.
 Eski B16E ELF başarısını güncel tam G171 oyun derlemesiyle karıştırma;
 ilgili commit'in gerçek son ELF adımının tamamlandığını ayrıca kontrol et.
 
+**Tam doğrulama sonucu:** Kaynak commit `df9a1687a762396cd0466bac967816b9a637af41`
+için [G171 tam kaynak/ELF CI](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39944848054)
+ve [G229 CI](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39944848051)
+başarılıdır; zorunlu adım atlanmadı. İsteğe bağlı G226 raporu kota nedeniyle
+yüklenemedi. Aynı kaynağın 50 zorunlu shell adımı bulut makinesinde de geçti;
+`work/build-G171-ELF-ONLY/im2_beta` ARM ELF olarak bağlandı. G248 mevcut
+prototip boot `(0,0,0)` noktasından +Y yönünde 120/120 kabul edilen kare ve
+yaklaşık `10.0702` yol ölçüyor; bu, özgün hikâye başlangıcını veya cihazdaki
+SDL/GPU davranışını kanıtlamaz. En erken açık kaynak bağı, orijinal MC
+parent/world başlangıç dönüşümüdür. Güncel ana döngüde B14 → G75 → world XYZ
+→ camera.player XYZ → GPU frame_pose arasında kaybolan bir öteleme
+kanıtlanmadı. Gerçek cihaz verisi olmadan tarihî G161 yerinde-yürüme
+sorununun çözüldüğünü söyleme; G279 kaydının eski G161 paketinde bulunduğunu
+varsayma. Yeni VPK üretilmedi, kaynak kabul kapıları değiştirilmedi.
+
 ## 0. Senin rolün / çalışma biçimi
 
 Sen yalnızca plan üreten veya sohbet eden bir AI değilsin: **repo içinde çalışan, kod değiştiren, tersine mühendislik kanıtlarını denetleyen, kendi testlerini yazan, CI sonuçlarını okuyup gerektiğinde kendi değişikliğini düzelten baş geliştirici ajan** olarak davran.
