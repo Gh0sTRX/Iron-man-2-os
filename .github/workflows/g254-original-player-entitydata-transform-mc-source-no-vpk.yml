@@ -18,7 +18,9 @@ jobs:
       - name: Validate G254 2010 native player/PositionData source code
         run: python3 -m py_compile research/b24_unified/g254_original_mc_player_source_transform/g254_original_2010_MC_LoadFromFile_Init_and_true_GamePlay_constructor_ARM.py
       - name: Install original ARM owner source reader
-        run: python3 -m pip install -q capstone gdown
+        run: python3 -m pip install -q capstone==5.0.6 gdown
+      - name: Synthetic reader identity, call-chain and output-bound regressions (not original native proof)
+        run: python3 -B research/b24_unified/g254_original_mc_player_source_transform/test_g254_root_consumer_source_guards.py
       - uses: actions/download-artifact@v4
         with:
           name: G253_TRUE_ORIGINAL_MAINCHARACTER_ACTOR_INITIALIZATION_CPP_NO_VPK
@@ -38,13 +40,29 @@ jobs:
           python3 research/b24_unified/g254_original_mc_player_source_transform/g254_original_2010_MC_LoadFromFile_Init_and_true_GamePlay_constructor_ARM.py \
             --ipa /tmp/g254_private_owner/owner.ipa \
             --g253 /tmp/g254_original_previous/G253_2010_NATIVE_MAINCHARACTER_GS_GAMEPLAY_PLAYER_BOOTSTRAP_CPP_METHODS.json \
-            --out /tmp/g254_native/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json
+            --out /tmp/g254_native/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json \
+            --emit-root-bodies
           python3 - <<'PY'
           from pathlib import Path
           import json
           d=json.loads(Path('/tmp/g254_native/G254_REAL_2010_MAINCHARACTER_ENTITYDATA_POSITION_LOADER_ARM_SOURCE.json').read_text())
           assert d['source_direct_GamePlay_LoadEntities_BL_MainCharacter_ctor_VM']=='0xc36fc'
-          assert len(d['true_original_native_constructor_MainCharacter_LoadFromFile_and_Init_methods'])==8
+          methods=d['true_original_native_constructor_MainCharacter_LoadFromFile_and_Init_methods']
+          assert len(methods)==11
+          assert d['original_executable_SHA256_verified']
+          assert d['original_iOS_MachO_SHA256']=='3ba6337a23ab7e08f2e025ec9731c53a7990e8d611b59eac07ba00cb63acc629'
+          assert d['source_Actor_Init_to_Entity3D_Init_call_VM']=='0xdbbf4'
+          assert d['source_Actor_Init_to_WCollision_Init_call_VM']=='0xdbcbc'
+          assert len(d['genuine_GetAbsolutePosition_symbol_candidates'])<=32
+          assert isinstance(d['genuine_GetAbsolutePosition_symbol_inventory_truncated'],bool)
+          for vm,name in {'0x139f0':'Entity3D::Init()',
+                          '0xa54fc':'WCollision::Init(Actor*, PositionData*)',
+                          '0x12ea4':'Entity3D::GetPosition()'}.items():
+            m=methods[vm]
+            assert m['original_cpp']==name
+            assert 0<m['source_window_emitted_instructions']<=512
+            assert m['source_window_emitted_instructions']==len(m['native_original_source_active_constructor_or_data_window'])
+            assert not m['actual_iOS_L1_player_spawn_runtime_trace']
           assert not d['original_Mission000_initial_player_position_globalXYZ_proven']
           assert not d['original_MC_local_entity_transform_equals_real_player_feet_world_xyz_proven']
           assert not d['Vita_B14_ground_start_player_root_changes']
@@ -55,8 +73,10 @@ jobs:
       - name: Delete original user-owned copyrighted IPA
         if: always()
         run: rm -rf /tmp/g254_private_owner
-      - uses: actions/upload-artifact@v4
+      - name: Upload optional bounded G254 native-source diagnostics (nonblocking)
+        uses: actions/upload-artifact@v4
         if: success()
+        continue-on-error: true
         with:
           name: G254_TRUE_ORIGINAL_MC_ENTITYDATA_PLAYER_INITIALIZATION_SOURCE_NO_VPK
           path: /tmp/g254_native/
