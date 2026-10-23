@@ -26,6 +26,12 @@ replace(
  "if(e.cbutton.button==SDL_CONTROLLER_BUTTON_BACK){",
  "if(!b24_unified_paused(&b24_game) && e.cbutton.button==SDL_CONTROLLER_BUTTON_BACK){"
 )
+# Circle resumes/backtracks the B21 pause menu. Its SDL event must not
+# also toggle the B14 flight mode or overwrite the landing timestamp.
+replace(
+ "if(e.cbutton.button==SDL_CONTROLLER_BUTTON_B){",
+ "if(!b24_unified_paused(&b24_game) && e.cbutton.button==SDL_CONTROLLER_BUTTON_B){"
+)
 # SDL controller events can be much shorter than heavy frame times.
 # Latch pause menu keys exactly like the known-working C2 START event;
 # the unified input decoder remains the only UI state owner.
@@ -46,4 +52,4 @@ replace(needle,needle+'''
 assert "b24_buttons|=b24_input_latched;" in s
 assert "b24_unified_tick(&b24_game,&b24_obs)" in s
 p.write_text(s)
-print("PASS G5 real B24 input bridge: START+pause action keys event-latched, paused suit/weapon mutation blocked, B21 state owner retained")
+print("PASS G5 real B24 input bridge: START+pause action keys event-latched, paused suit/weapon/flight mutation blocked, B21 state owner retained")
