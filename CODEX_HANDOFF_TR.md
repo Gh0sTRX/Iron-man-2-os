@@ -48,6 +48,38 @@ kanıtlanmadı. Gerçek cihaz verisi olmadan tarihî G161 yerinde-yürüme
 sorununun çözüldüğünü söyleme; G279 kaydının eski G161 paketinde bulunduğunu
 varsayma. Yeni VPK üretilmedi, kaynak kabul kapıları değiştirilmedi.
 
+**Circle / duraklatma ve özgün başlatma tüketicileri:** `c224822` kaynak
+düzeltmesi, duraklatılmış menüde Circle ile devam ederken B14 uçuş/iniş
+durumunun da değişmesini engeller. G5'in gerçek üretilmiş olay yolu, gerçek
+B21 menü denetimiyle beş host senaryosunda ve ASan/UBSan altında doğrulandı;
+normal oynanıştaki kalkış/iniş davranışı korunur. `d2f57ca` için
+[tam G171 CI](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39947952911)
+bu regresyonu ve tam Vita ARM ELF derlemesini geçti; yerelde de 51 zorunlu
+shell adımı geçti. Bu, tarihî G161 cihaz yürüyüşünün düzeldiği kanıtı değildir.
+
+[G254 özgün kaynak taraması](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39948307708)
+`5e06a63` üzerinde özgün yürütülebilir SHA-256'sını doğrulayıp üç eksik
+tüketicinin sembol-sınırlı ARM çözümlemesini aldı: `Entity3D::Init` (`0x139F0`),
+`Entity3D::GetPosition` (`0x12EA4`) ve `WCollision::Init` (`0xA54FC`). Sonuncu
+512 kayıt sınırını aştığı için sınır 1024'e çıkarıldı; artık üç pencere de
+kesilmeden alınıyor. Bu doğrusal çözümleme literal havuzlarını da komut gibi
+çözebilir; her satırı yürütülmüş komut veya runtime izi sayma.
+
+Özgün getter, model varsa `Model::GetPosition()` sonucunu döndürüyor;
+model yoksa PositionData `+4/+8/+0xC` alanlarını kopyalıyor. Entity3D init,
+model yolu üzerinde PositionData konumunu Object3D sanal slot `+0x10`'a
+iletiyor; slotun tam hedefini yalnız bu argüman akışından uydurma.
+Actor `+0x3D4` alanının `CollisionData` nesnesi olduğu, özgün ctor çağrısı
+`0xDABDC` ve pointer yazımı `0xDABF0` ile bağlandı. WCollision init, bu pointer
+varsa CollisionData `+0x18/+0x1C/+0x20` değerlerini PositionData konumuna ekleyip
+collision primitive kurucusuna iletiyor. Bunlar doğrulanmış bellek/veri
+akışlarıdır; alanların CLARA adları, MC'ye özgü değerleri, model/world/feet
+eşdeğerliği ve sonraki hareket callback'leri henüz kanıtlanmadı. Oyun
+başlangıcını `25.054` veya başka bir katmana taşıma. Entity3D/Actor/MainCharacter
+dar sembol envanterinde `GetAbsolutePosition` bulunmadı; bunu bütün motorda
+mutlak dönüşüm olmadığı şeklinde yorumlama. Sıradaki dar kaynak hedefi,
+model konumu/sanal setter ve MC CollisionData alanlarının özgün bağını çözmek.
+
 ## 0. Senin rolün / çalışma biçimi
 
 Sen yalnızca plan üreten veya sohbet eden bir AI değilsin: **repo içinde çalışan, kod değiştiren, tersine mühendislik kanıtlarını denetleyen, kendi testlerini yazan, CI sonuçlarını okuyup gerektiğinde kendi değişikliğini düzelten baş geliştirici ajan** olarak davran.
