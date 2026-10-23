@@ -17,12 +17,21 @@ ASan/UBSan altında başarılıdır. G229 installer ve G279 kaynak/CSV testleri 
 geçti. İki teşhis test programı VitaSDK ile ARM ELF olarak derlenip bağlandı;
 ARM testleri cihazda çalıştırılmadı. G229 dar CI aynı kontrolleri içerir.
 Fizik, çarpışma, kamera, mesh dönüşümü ve CSV biçimi değiştirilmedi.
-**Gerçek Vita yerinde-yürüme nedeni hâlâ açık; yeni VPK yok.** Bu oturumda
-güncel tam G171 oyun derlemesi yapılmadı: gereken tarihî kaynak artifact'ları
-için GitHub Actions API erişimi ağ proxy'sinde reddedildi. `api.github.com`
-izin eklemesi ortam taslağına kaydedildi; uygulandıktan sonra mevcut
-kimlik doğrulamasıyla artifact erişimi ve aynı commit'in CI sonucu kontrol
-edilmeli. Eski B16E ELF başarısını bu güncel oyun derlemesiyle karıştırma.
+**Gerçek Vita yerinde-yürüme nedeni hâlâ açık; yeni VPK yok.** `d752c82`
+için [G229](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39941485764)
+ve [G279](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39941485758)
+CI başarılıdır. Aynı commit'in
+[G171 akışı](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39941485761)
+dokuz özgün kaynak girdisini geri yükledi ve G226 dahil kontrolleri geçti;
+ara teşhis yüklemesi depo artifact kotasına takılınca kalan yedi zorunlu
+kontrol/ELF adımı **çalışmadı**. G171'in isteğe bağlı rapor yüklemesi bu yüzden
+tüm zorunlu kontrollerden sonraya taşındı ve yükleme hatası engelleyici
+olmaktan çıkarıldı. Kod testleri ve ELF derleme komutları zorunlu kalır.
+Yeni standart-kütüphane regresyonu bu sırayı ve hata ayrımını korur.
+GitHub API erişimi artık çalışıyor; yerel artifact indirme ve ayrıntılı
+günlükler için gereken belirli depolama hostları ortam taslağına eklendi.
+Eski B16E ELF başarısını güncel tam G171 oyun derlemesiyle karıştırma;
+ilgili commit'in gerçek son ELF adımının tamamlandığını ayrıca kontrol et.
 
 ## 0. Senin rolün / çalışma biçimi
 

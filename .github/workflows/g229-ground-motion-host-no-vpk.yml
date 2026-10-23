@@ -7,6 +7,7 @@ on:
       - 'research/b24_unified/g227_vita_walk_world_collision_gpu_qa/**'
       - 'research/b24_unified/g229_vita_ground_motion_window/**'
       - '.github/workflows/g229-ground-motion-host-no-vpk.yml'
+      - '.github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml'
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,6 +17,8 @@ jobs:
     timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
+      - name: Required full-game checks precede optional diagnostic delivery
+        run: python3 -B research/b24_unified/g229_vita_ground_motion_window/test_g171_optional_diagnostics_order.py
       - name: G228 actual G227 one-frame source classifier regression
         shell: bash
         run: |

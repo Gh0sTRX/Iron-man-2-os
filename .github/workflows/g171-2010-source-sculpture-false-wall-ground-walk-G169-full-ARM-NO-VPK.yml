@@ -1065,13 +1065,6 @@ jobs:
           assert d['NO_VPK']
           print('PASS G226 actual 2010 Vita main root B14->G66C/G108->GPU render C1L1 source locations, no guessing walk fixed')
           PY
-      - uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: G226_REAL_CURRENT_VITA_B14_ROOT_ACTOR_RENDER_WALK_STILL_SOURCE_TRACE_NO_VPK
-          path: /tmp/g226_source/
-          retention-days: 21
-          if-no-files-found: error
       - name: G302 G8 current Vita game source must not carry old Mark VI repulsor into WM on armor swap NO VPK
         run: |
           set -euo pipefail
@@ -1232,3 +1225,12 @@ jobs:
             test -z "$(find work -type f -name "*.vpk" -print -quit)"
             echo "PASS G165 Vita ARM one game ELF: WM source grounded/rush fallback opt-in, G163 aim on, authentic G73 sky view fixed and original scale unchanged, G161 aim facing ground/hover fix, original road source CSR indexed, 60k old-vs-new C11 native support parity, G75 source/gameplay and G156 walls preserved, no runtime Vita fps measurements yet, NO VPK"
           '
+      - name: Upload optional G226 source diagnostics (nonblocking)
+        uses: actions/upload-artifact@v4
+        if: success()
+        continue-on-error: true
+        with:
+          name: G226_REAL_CURRENT_VITA_B14_ROOT_ACTOR_RENDER_WALK_STILL_SOURCE_TRACE_NO_VPK
+          path: /tmp/g226_source/
+          retention-days: 21
+          if-no-files-found: error
