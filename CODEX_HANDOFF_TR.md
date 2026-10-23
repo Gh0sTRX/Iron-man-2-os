@@ -1,5 +1,34 @@
 # CODEX DEVİR VE ÇALIŞMA TALİMATNAMESİ — Iron Man 2 iOS (2010) → PS Vita
 
+**23 Ekim 2026 — kullanıcının mevcut-durum cihaz testi kapsam onayı:**
+Yedi kapı açık olduğu belirtilerek sorulan soruya kullanıcı “şimdiye kadar
+çözdüğümüz her şeyi test edelim” yanıtını verdi. Bu, AGENTS.md'de kayıtlı
+**tek tanılama VPK'sı** istisnasıdır; tam-port kapıları değiştirilmedi.
+`55f3392` kaynak/paketleme commit'i üzerinden güncel ELF tekrar başarıyla
+derlendi. Circle gerçek olay regresyonu (5 senaryo) ve G279 CSV analiz testi
+tekrar geçti. `tools/device_test/build.py`, eski eksik CMake VPK hedefi yerine
+beş zırh dahil 669 güncel runtime varlığını paketledi; ZIP CRC, tam dosya kümesi,
+tüm varlık SHA-256'ları, SELF ve SFO kimliği doğrulandı.
+
+- Paket: `work/device-test/IronMan2_Current_Device_Test.vpk`, 94.734.243 bayt.
+- SHA-256: `c35443c1796544d9c371e07ca0147989be50629b770f347743fdc76a7a9596ec`.
+- Ayrı kimlik: `IM2DG0001`, `Iron Man 2 - Device Test`, `00.01`.
+- Manifest: `work/device-test/manifest.json`; test sırası: `tools/device_test/README_TR.md`.
+- Fiziksel Vita kurulumu/çalışması yapılmadı. Kaynak başlangıcı/yürüyüş, tam
+  görev/savaş/ses, özgün ışık ve FPS hâlâ cihaz/kaynak kabulü bekliyor.
+- Özel GitHub draft release ID `421792594`, tag `device-test-2026-10-23-55f3392`
+  oluşturuldu; **asset yüklemesi başarısız, release boş**. `uploads.github.com`
+  ağ erişimi reddedildi. Alan adı mevcut özel izin listesine eklenerek ortam
+  taslağı kaydedildi; kullanıcı ayarlardan kaydedip yayımlayana kadar etkinleştiği
+  iddia edilemez. Etkinleşince aynı paketi `gh release upload` ile yükle;
+  yeni VPK üretme, eski artifact'ları silme, draft'ı genel sürüm diye yayımlama.
+- `/mnt/data` bu makinede yok; oluşturma/kopyalama Unix dosya izni yüzünden
+  başarısız. Sohbet indirme eki teslim edildiğini iddia etme. Dosya gerçek ortak
+  çalışma alanında mevcut. VPK hedefi için tekrar kullanıcı onayı isteme.
+- Yerel/saklanan ELF derleme komutunun VPK yokluk kontrolü artık yalnız önceden
+  yetkilendirilmiş `work/device-test` çıktı dizinini dışlar; hedef hâlâ `im2_beta`.
+  Ortam başlangıç talimatına bu istisna eklendi; yayımlama kullanıcıya aittir.
+
 **Belge tarihi:** 23 Ekim 2026  
 **Proje sahibi hedefi:** Gameloft'un orijinal **Iron Man 2 iOS 1.0.0/1.0.3** oyununu PS Vita için aslına sadık, gerçekten oynanabilir bir sürüm olarak yeniden çalıştırmak/portlamak. Ana öncelik Chapter 1 / Stark Expo'nun orijinal açılışı ve mekanikleridir.  
 **Özel depo:** `Gh0sTRX/Iron-man-2-os`  
