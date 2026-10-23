@@ -16,7 +16,9 @@ from g76_2010_native_arm_combat_method_provenance import parse_macho
 ORIGINAL_EXE_BYTES=7480208
 ORIGINAL_EXE_SHA256="3ba6337a23ab7e08f2e025ec9731c53a7990e8d611b59eac07ba00cb63acc629"
 MAX_METHOD_BYTES=30000
-ROOT_BODY_LIMIT=512
+# The verified WCollision::Init body has 619 instructions. Keep a bounded
+# window that includes its tail; do not infer missing writes from truncation.
+ROOT_BODY_LIMIT=1024
 ABSOLUTE_SYMBOL_LIMIT=32
 ROOT_METHODS={
  0x139f0:"Entity3D::Init()",

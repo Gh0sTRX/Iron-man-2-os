@@ -73,9 +73,9 @@ class SyntheticRootReaderTests(unittest.TestCase):
    reader.method_span(vm,name,{vm:{name}},[(vm,reader.MAX_METHOD_BYTES+4,0,"__text")])
 
  def test_new_body_window_is_bounded_and_legacy_selection_remains(self):
-  rows=[SimpleNamespace(address=0xc3600+i*4) for i in range(700)]
+  rows=[SimpleNamespace(address=0xc3600+i*4) for i in range(reader.ROOT_BODY_LIMIT+188)]
   for vm in reader.ROOT_METHODS:
-   self.assertEqual(len(reader.select_window(vm,rows)),512)
+   self.assertEqual(len(reader.select_window(vm,rows)),reader.ROOT_BODY_LIMIT)
   self.assertEqual(len(reader.select_window(0xdbbe0,rows)),260)
   self.assertIs(reader.select_window(0xec2cc,rows),rows)
   window=reader.select_window(0xc2e8c,rows)
@@ -112,7 +112,7 @@ class SyntheticRootReaderTests(unittest.TestCase):
  def test_private_log_records_have_bounded_parseable_source_fields(self):
   methods={}
   for vm in reader.ROOT_METHODS:
-   methods[hex(vm)]={"source_actual_ARM_instruction_count":700,
+   methods[hex(vm)]={"source_actual_ARM_instruction_count":reader.ROOT_BODY_LIMIT+188,
     "source_window_emitted_instructions":reader.ROOT_BODY_LIMIT,
     "source_window_truncated":True,
     "native_original_source_active_constructor_or_data_window":[

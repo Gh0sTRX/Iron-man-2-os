@@ -60,7 +60,7 @@ jobs:
                           '0x12ea4':'Entity3D::GetPosition()'}.items():
             m=methods[vm]
             assert m['original_cpp']==name
-            assert 0<m['source_window_emitted_instructions']<=512
+            assert 0<m['source_window_emitted_instructions']<=1024
             assert m['source_window_emitted_instructions']==len(m['native_original_source_active_constructor_or_data_window'])
             assert not m['actual_iOS_L1_player_spawn_runtime_trace']
           assert not d['original_Mission000_initial_player_position_globalXYZ_proven']
