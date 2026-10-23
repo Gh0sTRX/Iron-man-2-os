@@ -4,6 +4,14 @@ This is the **existing** private Iron Man 2 iOS-to-PS Vita preservation/port pro
 
 ## Non-negotiable scope
 
+- **2026-10-23 scoped user override:** after asking about the seven open gates,
+  the user explicitly requested testing everything fixed so far ("şimdiye kadar
+  çözdüğümüz her şeyi test edelim"). One current-state diagnostic VPK is authorized,
+  with separate title ID `IM2DG0001`, existing source assets and G279 trace.
+  This does not authorize firmware, IPA, device installation, a general release,
+  additional VPK variants, or changing any source readiness gate to true.
+  Preserve the old installed application. See `tools/device_test/README_TR.md`.
+
 - Port/reconstruct **original** Gameloft Iron Man 2 iOS 1.0.0/1.0.3 gameplay. Original-source data beats plausible guesses. Mark every unverified rule, animation, hit window, collision, spawn, rendering property and native call as **unknown**. Never turn a synthetic host fixture into proof of hardware gameplay.
 - Work order stays: **1. true initial world root/ground walking -> 2. hover/Stage2 flight/rush -> 3. G8 player and War Machine original animations -> 4. authentic original weapon/combat/damage -> 5. original Stark Expo city, character/car scale, environment LIGHTING/shadows, sky/moon, texture alpha, HUD/camera -> 6. Mission000/QTE/NPC/cutscene/audio -> 7. same-commit integrated host QA + Vita ARM ELF, then only one authorized VPK.** Lighting is mandatory and must not be dropped or reordered.
 - User explicitly asks for **NO NEW VPK** until pre-VPK acceptance gates pass. Do not package, publish, upload or install any VPK, IPA, proprietary game assets or PS Vita firmware. Keep CI artifacts source/diagnostics only. `source/IronMan2_Vita_GitHub_Ready_CI_R2.zip` and previous GitHub Actions build artifacts are historical source inputs, not proof of a finished port.
