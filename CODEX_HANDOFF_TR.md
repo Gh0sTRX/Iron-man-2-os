@@ -6,6 +6,24 @@
 **TEK AKTİF geliştirme dalı:** `feature/b24-unified-gameplay`; eski `main` üzerinde çalışıp güncel değişiklikleri ezme.  
 **Bu devir anında dal HEAD:** `e1de61940e57db4bf9ad722eb8761cdf21c5963b` — G305 devir raporu, yalnızca doküman güncellemesi. İlk görevde `git fetch` yap, gerçek HEAD'i tekrar kontrol et; burada yazan SHA'yı ileride güncel sanma.
 
+**23 Ekim 2026 — yürüyüş teşhisinde XYZ düzeltmesi:** G227 tek-kare ve G229
+120-kare gözlemcileri GPU kökü ile çözülmüş dünya kökü farkını yalnız XY'de
+ölçüyordu. Eşit XY, dünya Z=`0.07250`, GPU Z=`2.82955` sentetik regresyonu eski
+başlıklarda yanlışlıkla uyumlu sayılıyordu. Fark artık XYZ'de ölçülüyor; mevcut
+eşik ve tanı öncelikleri korunuyor. `world.z → camera.player_z → frame_pose.z`
+aynı köktür; G168 `native_bind_min_z` düzeltmesi sonraki mesh matrisindedir.
+İki regresyon eski kaynakta başarısız, düzeltilmiş kaynakta strict C11 ve
+ASan/UBSan altında başarılıdır. G229 installer ve G279 kaynak/CSV testleri de
+geçti. İki teşhis test programı VitaSDK ile ARM ELF olarak derlenip bağlandı;
+ARM testleri cihazda çalıştırılmadı. G229 dar CI aynı kontrolleri içerir.
+Fizik, çarpışma, kamera, mesh dönüşümü ve CSV biçimi değiştirilmedi.
+**Gerçek Vita yerinde-yürüme nedeni hâlâ açık; yeni VPK yok.** Bu oturumda
+güncel tam G171 oyun derlemesi yapılmadı: gereken tarihî kaynak artifact'ları
+için GitHub Actions API erişimi ağ proxy'sinde reddedildi. `api.github.com`
+izin eklemesi ortam taslağına kaydedildi; uygulandıktan sonra mevcut
+kimlik doğrulamasıyla artifact erişimi ve aynı commit'in CI sonucu kontrol
+edilmeli. Eski B16E ELF başarısını bu güncel oyun derlemesiyle karıştırma.
+
 ## 0. Senin rolün / çalışma biçimi
 
 Sen yalnızca plan üreten veya sohbet eden bir AI değilsin: **repo içinde çalışan, kod değiştiren, tersine mühendislik kanıtlarını denetleyen, kendi testlerini yazan, CI sonuçlarını okuyup gerektiğinde kendi değişikliğini düzelten baş geliştirici ajan** olarak davran.

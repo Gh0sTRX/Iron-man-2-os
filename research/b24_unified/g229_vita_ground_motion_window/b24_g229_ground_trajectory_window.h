@@ -77,8 +77,13 @@ static inline int b24_g229_window_push(B24G229WalkWindow *w,
                               (double)q->proposed_world_y-q->old_world_y);
   const double resolved=hypot((double)q->resolved_world_x-q->old_world_x,
                               (double)q->resolved_world_y-q->old_world_y);
-  const double root_error=hypot((double)q->gpu_actor_world_x-q->resolved_world_x,
-                                (double)q->gpu_actor_world_y-q->resolved_world_y);
+  /* The rendered pose root has the same XYZ reference as resolved
+   * world. G168's native-bind offset belongs to the mesh matrix, not
+   * this pose; a Z-only mismatch must count in the 120-frame evidence. */
+  const double root_error=hypot(
+    hypot((double)q->gpu_actor_world_x-q->resolved_world_x,
+          (double)q->gpu_actor_world_y-q->resolved_world_y),
+    (double)q->gpu_actor_world_z-q->resolved_world_z);
   w->active_stick_frames++;
   w->b14_path_xy+=proposed;
   w->resolved_path_xy+=resolved;

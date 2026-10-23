@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef enum {FOLLOW=0,STATIC_CAM,STUCK_B14,COLLISION,GPU_ERROR,NO_INPUT,REVERSAL} Scenario;
+typedef enum {FOLLOW=0,STATIC_CAM,STUCK_B14,COLLISION,GPU_ERROR,NO_INPUT,REVERSAL,GPU_Z_ERROR,GPU_Z_WITHIN_TOLERANCE} Scenario;
 static B24G229WindowVerdict simulate(Scenario kind){
  B24G229WalkWindow w={0};
  B24G227GroundProbe q={0};
@@ -19,6 +19,9 @@ static B24G229WindowVerdict simulate(Scenario kind){
   q.resolved_world_y=(kind==COLLISION)?world:world+step;
   world=q.resolved_world_y;
   q.gpu_actor_world_y=world+((kind==GPU_ERROR)?.3f:0.f);
+  q.proposed_world_z=q.resolved_world_z=.0725f;
+  q.gpu_actor_world_z=(kind==GPU_Z_ERROR)?2.82955f:
+                       q.resolved_world_z+((kind==GPU_Z_WITHIN_TOLERANCE)?.004f:0.f);
   q.camera_target_y=(kind==STATIC_CAM)?-3.f:world-4.f;
   if(i+1u<B24_G229_WINDOW_FRAMES)
     assert(!b24_g229_window_push(&w,&q,i*17u));
@@ -26,6 +29,11 @@ static B24G229WindowVerdict simulate(Scenario kind){
  }
  assert(w.samples==120u);
  assert(w.last_tick_ms-w.first_tick_ms==119u*17u);
+ if(kind==GPU_Z_ERROR){
+  assert(w.root_mismatch_frames==120u);
+  assert(fabs(w.max_gpu_root_error-(2.82955-.0725))<.00001);
+ }
+ if(kind==GPU_Z_WITHIN_TOLERANCE)assert(w.root_mismatch_frames==0u);
  return b24_g229_window_classify(&w);
 }
 int main(void){
@@ -34,6 +42,8 @@ int main(void){
  assert(simulate(STUCK_B14)==B24_G229_B14_NO_MOTION);
  assert(simulate(COLLISION)==B24_G229_COLLISION_REJECTS_MOTION);
  assert(simulate(GPU_ERROR)==B24_G229_GPU_ROOT_DIVERGES_FROM_WORLD);
+ assert(simulate(GPU_Z_ERROR)==B24_G229_GPU_ROOT_DIVERGES_FROM_WORLD);
+ assert(simulate(GPU_Z_WITHIN_TOLERANCE)==B24_G229_WORLD_AND_CAMERA_TRANSLATE_TOGETHER);
  assert(simulate(NO_INPUT)==B24_G229_INSUFFICIENT_STICK_INPUT);
  assert(simulate(REVERSAL)==B24_G229_WORLD_PATH_NET_SMALL_TURNS);
  B24G229WalkWindow w={0};
@@ -74,6 +84,6 @@ int main(void){
  assert(fabsf(height.min_world_z-.0725f)<.00001f);
  assert(fabsf(height.max_world_z-2.82955f)<.00001f);
  printf("G256 HOST PASS original G249 low/mid source Z-up telemetry (synthetic fixture, NOT real Vita).\n");
- printf("G229 HOST PASS: 7 original-path synthetic scenarios, discontinuity/flight/pause/NaN resets; READ-ONLY; no VPK.\n");
+ printf("G229 HOST PASS: 9 original-path synthetic scenarios including GPU Z-only root mismatch and tolerance, discontinuity/flight/pause/NaN resets; READ-ONLY; no VPK.\n");
  return 0;
 }

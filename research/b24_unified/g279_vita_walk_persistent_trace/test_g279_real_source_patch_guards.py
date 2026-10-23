@@ -10,6 +10,17 @@ spec=importlib.util.spec_from_file_location("g279",HERE/"g279_install_file_trace
 mod=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
 
+# Root XYZ is observed before G168's mesh-only native-bind adjustment.
+# Guard the real dataflow establishing that G227/G229 compare the same
+# coordinate space, rather than comparing an adjusted matrix translation.
+runtime=(HERE.parent/"b24_gpu_runtime.c").read_text()
+assert runtime.count("r->frame_pose=(B24GpuSuitPose){c->player_x,c->player_y,c->player_z,")==1
+probe_installer=(HERE.parent/"g227_vita_walk_world_collision_gpu_qa"/
+    "g227_install_passive_real_main_Vita_world_actor_root_diagnostic.py").read_text()
+assert 'camera.player_x=world.x;camera.player_y=world.y;camera.player_z=world.z;' in probe_installer
+assert 'b24_g227_probe.resolved_world_z=world.z;' in probe_installer
+assert 'b24_g227_probe.gpu_actor_world_z=b24_gpu_rt.frame_pose.z;' in probe_installer
+
 def fixtures(root:Path):
  work=root/"work";(work/"src").mkdir(parents=True)
  (work/"b24/b24_unified").mkdir(parents=True)
@@ -50,6 +61,8 @@ with tempfile.TemporaryDirectory(prefix="g279_exact_vita_no_vpk_") as t:
  assert after.count("g279_win.has_native_floor=")==1
  assert after.count("b24_g74_near_original_floor(&b24_original_walls,")==1
  assert "world.x,world.y,world.z,&g279_win.native_floor_z" in after
+ assert "g279_win.z=world.z;" in after
+ assert "g279_win.gpu_z=b24_gpu_rt.frame_pose.z;" in after
  assert 'B24_G279_WALK_TRACE_FILE' in (root/"work/CMakeLists.txt").read_text()
  assert (root/"work/b24/b24_unified/b24_g279_walk_trace.h").is_file()
  assert not list((root/"work").rglob("*.vpk"))

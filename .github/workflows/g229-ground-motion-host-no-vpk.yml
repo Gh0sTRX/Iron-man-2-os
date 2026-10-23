@@ -4,6 +4,7 @@ on:
     branches:
       - feature/b24-unified-gameplay
     paths:
+      - 'research/b24_unified/g227_vita_walk_world_collision_gpu_qa/**'
       - 'research/b24_unified/g229_vita_ground_motion_window/**'
       - '.github/workflows/g229-ground-motion-host-no-vpk.yml'
   workflow_dispatch:
@@ -40,6 +41,23 @@ jobs:
           d=research/b24_unified/g229_vita_ground_motion_window
           python3 -m py_compile "$d/g229_install_window_into_real_vita_main.py" "$d/test_g229_installer.py"
           python3 "$d/test_g229_installer.py"
+      - name: Compile and link read-only diagnostic harnesses for Vita ARM (no game or VPK)
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --rm --network none -v "$GITHUB_WORKSPACE:/workspace:ro" -w /workspace \
+            vitasdk/vitasdk@sha256:8227da1b596d981f4513cd9b36bda1e43857f6dae5bcf4312c1cd40167f7d9bb sh -lc '
+              set -eu
+              arm-vita-eabi-gcc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+                research/b24_unified/g227_vita_walk_world_collision_gpu_qa/test_g227_ground_world_root_qa_C11.c \
+                -lm -o /tmp/g227-vita.elf
+              arm-vita-eabi-gcc -std=c11 -Wall -Wextra -Werror -pedantic -O2 \
+                -Iresearch/b24_unified/g227_vita_walk_world_collision_gpu_qa \
+                research/b24_unified/g229_vita_ground_motion_window/test_g229_ground_trajectory_window.c \
+                -lm -o /tmp/g229-vita.elf
+              test -s /tmp/g227-vita.elf
+              test -s /tmp/g229-vita.elf
+            '
       - name: No hardware or VPK claims
         run: |
-          echo "G229 READ-ONLY HOST TESTS; synthetic input, original project G227 header. No VitaSDK build, no Vita device test and no VPK."
+          echo "G229 READ-ONLY HOST TESTS and Vita ARM diagnostic harness link; synthetic input, project G227 header. No full game build, ARM test execution, Vita device test or VPK."

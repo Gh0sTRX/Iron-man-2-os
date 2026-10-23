@@ -69,8 +69,13 @@ static inline B24G227WalkVerdict b24_g227_qa_classify(
  if(b14_d<.0001f)return B24_G227_B14_TICK_DID_NOT_MOVE;
  if(solved_d<.0001f)
   return B24_G227_COLLISION_REJECTED_B14_DELTA;
- const float root_err=hypotf(q->gpu_actor_world_x-q->resolved_world_x,
-                             q->gpu_actor_world_y-q->resolved_world_y);
+ /* frame_pose is copied from camera.player XYZ before the renderer's
+  * native-bind mesh offset. All three root coordinates must agree with
+  * the resolved world; an incorrect Z layer must not appear synced. */
+ const float root_err=hypotf(
+   hypotf(q->gpu_actor_world_x-q->resolved_world_x,
+          q->gpu_actor_world_y-q->resolved_world_y),
+   q->gpu_actor_world_z-q->resolved_world_z);
  /* Third-person CAMERA POSITION is supposed to be metres away.
   * In one frame, only world <-> GPU root agreement can be measured.
   * A time series, not this snapshot, is needed to infer camera tracking. */

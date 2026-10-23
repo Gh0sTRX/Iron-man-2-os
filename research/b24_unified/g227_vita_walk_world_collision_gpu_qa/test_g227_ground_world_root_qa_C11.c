@@ -20,6 +20,16 @@ int main(void){
  q.gpu_actor_world_y=1.10f;
  assert(b24_g227_qa_classify(&q)==B24_G227_GPU_ROOT_TRANSFORM_MISMATCH);
  q.gpu_actor_world_y=1.15f;
+ /* GPU frame_pose copies camera.player XYZ, which copies resolved B14
+  * world XYZ. G168's bind-foot adjustment happens later in the model
+  * matrix and must not excuse an unequal GPU root Z. Synthetic only. */
+ q.resolved_world_z=.0725f;q.gpu_actor_world_z=2.82955f;
+ assert(b24_g227_qa_classify(&q)==B24_G227_GPU_ROOT_TRANSFORM_MISMATCH);
+ q.gpu_actor_world_z=q.resolved_world_z-.02f;
+ assert(b24_g227_qa_classify(&q)==B24_G227_GPU_ROOT_TRANSFORM_MISMATCH);
+ q.gpu_actor_world_z=q.resolved_world_z+.004f;
+ assert(b24_g227_qa_classify(&q)==B24_G227_WORLD_MOVING_GPU_ROOT_SYNCED);
+ q.gpu_actor_world_z=q.resolved_world_z;
  q.camera_target_y=1.15f;
  q.resolved_world_y=1.1f;q.gpu_actor_world_y=1.1f;
  assert(b24_g227_qa_classify(&q)==B24_G227_COLLISION_REJECTED_B14_DELTA);
@@ -34,6 +44,6 @@ int main(void){
  assert(b24_g227_qa_classify(&q)==B24_G227_NONFINITE_RUNTIME_STATE);
  q.gpu_actor_world_x=0.f;q.recorded=0;
  assert(b24_g227_qa_classify(&q)==B24_G227_NOT_SAMPLED);
- puts("G228 PASS: G227 source runtime telemetry separates analog/B14/collision/GPU root mismatch, does NOT infer camera lag from third-person camera position; no Vita ground bug fix, NO VPK.");
+ puts("G227 PASS: source runtime telemetry separates analog/B14/collision/GPU XYZ root mismatch including original-floor-height Z-only discrepancies; no camera-lag inference or Vita ground bug fix, NO VPK.");
  return 0;
 }
