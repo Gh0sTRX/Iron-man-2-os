@@ -130,6 +130,7 @@ int main(void){
     command = shlex.split(os.environ.get("CC", "cc")) + [
         "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", "-O2",
         *["-I" + str(path) for path in includes], str(test),
+        str(ROOT / "work/src/b14_world.c"),
         str(ROOT / "research/b21_controls/b21_control_lab.c"), "-lm", "-o", str(binary)]
     subprocess.run(command, check=True)
     subprocess.run([str(binary)], check=True)

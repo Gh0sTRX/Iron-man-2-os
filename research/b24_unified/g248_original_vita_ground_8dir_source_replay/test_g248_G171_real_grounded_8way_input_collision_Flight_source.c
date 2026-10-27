@@ -48,6 +48,12 @@ static G248Result replay(const B24C1OriginalCollision *original,
   if(proposed>.0001f && accepted<.0001f)s.rejects++;
   s.proposed_path+=proposed;s.accepted_path+=accepted;
   w.x=ax;w.y=ay;w.z=az;
+#ifdef B14_WORLD_HEIGHT_SUPPORT
+  /* Match current main's post-reconciliation support acknowledgment. */
+  float support=0.f;
+  const int supported=!w.flying&&b24_g75_support_at(original,w.x,w.y,w.z,&support);
+  b14_world_accept_ground_support(&w,supported,support);
+#endif
  }
  s.fx=w.x;s.fy=w.y;s.fz=w.z;
  printf("G248 ORIGINAL-C1L1 B14+G75+G159+G171 source replay %s %s stick=(%.3f,%.3f) B14_proposed=%u G75_accepted=%u G75_rejected=%u path_B14=%.4f path_resolved=%.4f start=(%.3f,%.3f,%.3f) end=(%.3f,%.3f,%.3f)\n",

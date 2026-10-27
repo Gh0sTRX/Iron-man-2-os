@@ -4,6 +4,12 @@ This is the **existing** private Iron Man 2 iOS-to-PS Vita preservation/port pro
 
 ## Non-negotiable scope
 
+- **2026-10-28 latest user direction:** continue development without any Vita
+  installation. Work on source, host regressions and ARM ELF only. The earlier
+  one-time diagnostic VPK has already been built and contains NONE of the newer
+  world-height fixes. Do not generate or deliver another package as part of this
+  task; see `research/b24_unified/world_height/README_TR.md` for current progress.
+
 - **2026-10-23 scoped user override:** after asking about the seven open gates,
   the user explicitly requested testing everything fixed so far ("şimdiye kadar
   çözdüğümüz her şeyi test edelim"). One current-state diagnostic VPK is authorized,
