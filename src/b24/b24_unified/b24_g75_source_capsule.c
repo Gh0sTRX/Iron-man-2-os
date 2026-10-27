@@ -194,6 +194,7 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
   for(int candidate=0;candidate<3;candidate++){
    const float nx=candidate==2?x:tx;
    const float ny=candidate==1?y:ty;
+   float candidate_z=nextz;
    if(!wall_clear(world,nx,ny,nextz,radius,height)){
 #ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
     ++g277_last.candidate_wall_reject;
@@ -216,9 +217,21 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
 #endif
       continue;
      }
-     nextz=h;
+     candidate_z=h;
+     /* The floor adjustment changes the body's vertical interval. A wall
+      * clear at the proposed Z may intersect head/feet at accepted floor Z.
+      * Preserve the existing conservative proposal check above, then test
+      * the ACTUAL candidate before accepting it. Failed candidates must
+      * not leak their floor height into the following slide candidate. */
+     if(candidate_z!=nextz &&
+        !wall_clear(world,nx,ny,candidate_z,radius,height)){
+#ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
+      ++g277_last.candidate_wall_reject;
+#endif
+      continue;
+     }
    }
-   x=nx;y=ny;
+   x=nx;y=ny;nextz=candidate_z;
 #ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
    ++g277_last.candidate_accepted;
 #endif
@@ -241,7 +254,8 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
       * .35-.50 gap between the step guard and near-floor search.
       * Keep descending at the existing bounded rate; never pass through
       * that actual surface, move upwards to a roof, or delete a wall. */
-     z=fmax2(nextz,original_support);
+     const float supported_z=fmax2(nextz,original_support);
+     if(wall_clear(world,x,y,supported_z,radius,height))z=supported_z;
    }
   }
  }

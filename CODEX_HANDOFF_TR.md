@@ -1,5 +1,33 @@
 # CODEX DEVİR VE ÇALIŞMA TALİMATNAMESİ — Iron Man 2 iOS (2010) → PS Vita
 
+**28 Ekim 2026 — zemine oturtulan son gövdenin duvar kontrolü:**
+`src/b24/b24_unified/b24_g75_source_capsule.c` önerilen Z'de duvarı kontrol edip
+sonra zemin yüksekliğini değiştiriyor, bu son pozda baş/ayak temasını kontrol
+etmeden kabul ediyordu. Yeni sentetik regresyon eski kodda başarısız oldu:
+0.4 birimlik adım kabul edildiğinde gövde üstteki duvara girebiliyordu. Bu,
+özgün haritada veya cihazda yeniden üretilmiş bir sorun diye sunulmaz.
+Çözücü artık mevcut erken duvar kontrolünü koruyup son zemin Z'sini de sınar;
+reddedilen adayın yüksekliği sonraki X/Y kayma adayına sızmaz. İnişin destek
+yüksekliği de son pozunda kontrol edilir. Eşikler, çap/yükseklik, 1910 yüz,
+wall 715 ve tek B14/G75 sahipliği değişmedi; spawn değişikliği yapılmadı.
+
+`tests/test_ground_contact_height.c`: 32 sentetik adım yukarı/aşağı, güvenli
+kayma, pozitif/negatif ötelenmiş Z ve açık/engelli kontrol vakası. Ek native
+G66C kontrolü, geçerli zemin merkezlerinden 1752 son-pozu doğrular; bu kontrol
+eski kodda da geçiyordu. Güncel CTest **13/13**, ASan/UBSan **13/13**, assetsiz
+**9/9** geçti. Eski kalkış/iniş döngüleri de geçiyor. Tam Vita ARM ELF linki
+başarılı; SHA-256 `14a07a6fde5e22dfa5e8cda37be7096ce17d1e7ea7cfb1ab7e69cdf6184df7fe`.
+Yerel günlükler `/workspace/im2-dev-checks/contact-height/` altındadır.
+
+Özgün başlangıç incelemesindeki gerçek eksik bağlar daha net: kayıtlı
+`MainCharacter::MainCharacter()` `0xEC108` yalnız 4 baytlık `B 0xEBAE8`
+trampoline'ıdır; kurucu gövdesi eldeki kayıtta yok. MainCharacter::Init
+penceresi 721 komutun yalnız ilk 260'ını içerir. Entity3D init'in Object3D
+sanal `+0x10` konum setter hedefi ve MC CollisionData alanlarının özgün
+değerleri de yoktur. Bu eksiklerden özgün world/feet spawn çıkarma. GitHub
+API erişimi Forbidden olduğundan daha ileri özgün kaynak/uzak CI sonucu
+bağımsız alınamadı. Yedi kabul kapısı false; fiziksel Vita sonucu/VPK yok.
+
 **28 Ekim 2026 — tek kaynak ağacı ve ölçülebilir zaman kaydı (`064ab11`):**
 Kullanıcı Claude raporundan sonra önerilen kaynak sadeleştirme ve tutarlı zaman/
 performans kaydı işini açıkça istedi. **Artık asıl kaynak `src/main.c` ve

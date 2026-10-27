@@ -6,12 +6,16 @@ G171 reconstruction pipeline are historical references, not source owners.
 
 - Source-floor-relative takeoff and the 45 cm landing stall were reproduced
   and fixed in `ee346c9`; both fixes are preserved in canonical source.
+- Grounded wall clearance now also checks the accepted floor height, so a
+  legal step cannot place head/feet into a wall that was clear at proposal Z.
+  Safe sliding and existing step limits are preserved in host regressions.
 - The complete game compiles to a Vita ARM ELF without game assets or patchers.
 - Current host tests cover world height, pause/control timing, animation suit
   ownership, external-table validation, bounded telemetry and offline analysis.
-- 181 of the 191 imported code files match the previous source byte for byte.
-  Eight changed files contain relocated includes, external-data interfaces
-  and passive time observations; two only remove trailing whitespace. `cmake/migration-baseline.json` records origin.
+- At migration, 181 of 191 imported code files matched the previous source byte
+  for byte; eight changed interfaces/includes/observations and two only removed
+  trailing whitespace. `cmake/migration-baseline.json` records that origin;
+  subsequent source fixes are tracked normally in Git.
 - Two original data tables were removed from the source payload. All 1028 rows
   match after conversion through the new external asset format and C reader.
 - G279 walking trace remains compatible. A separate frame/dt/phase/clock CSV
