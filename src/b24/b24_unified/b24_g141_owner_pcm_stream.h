@@ -6,7 +6,8 @@
 /* G141: read PCM decoded from real user-original 2010 RIFF/WAVE .www
  * to 48kHz / S16LE / interleaved stereo via FFmpeg offline. This IS
  * a new Vita backend format, NOT the original 2010 iOS sound mixer.
- * Actual 2010 Lua ID88=>.www track identity remains unverified. */
+ * Lua ID88/320 identities are verified; other IDs require the external
+ * native-table-validated catalog. Gameplay event binding is separate. */
 typedef struct {
  FILE *file;
  uint32_t source_bytes;

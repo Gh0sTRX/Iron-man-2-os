@@ -49,58 +49,38 @@ def riff_info(data):
 
 
 def sound_ordinals(exe,names):
-    """Find the 803x40 native NAME-pointer lane using both proven anchors.
+    """Recover the native 803x40 inline-name records, never alphabetical IDs.
 
-    Does not claim the other fields' semantics or that every ID has a bound
-    gameplay event. Requires every pointer to resolve to one original WAV.
+    G140/G142 native LoadMusic refers to VM 0x473700. Two identical inline
+    string tables exist in the verified executable; these are NOT pointers.
+    Each candidate must match both proven IDs and every original WAV name.
     """
     if len(exe)<28 or struct.unpack_from('<I',exe)[0]!=0xfeedface:
         raise ValueError('Expected verified 32-bit Mach-O')
-    ncmds,command_bytes=struct.unpack_from('<II',exe,16)
-    if ncmds>256 or 28+command_bytes>len(exe):raise ValueError('Bad Mach-O load commands')
-    segments=[];at=28
-    for _ in range(ncmds):
-        if at+8>28+command_bytes:raise ValueError('Truncated load command')
-        cmd,size=struct.unpack_from('<II',exe,at)
-        if size<8 or at+size>28+command_bytes:raise ValueError('Bad command size')
-        if cmd==1:
-            if size<56:raise ValueError('Bad segment')
-            vm,vmsize,offset,filesize=struct.unpack_from('<4I',exe,at+24)
-            if offset+filesize>len(exe):raise ValueError('Bad segment bounds')
-            if filesize:segments.append((vm,offset,filesize))
-        at+=size
-    if at!=28+command_bytes:raise ValueError('Load command size mismatch')
-    by_pointer={}
-    for name in names:
-        for spelling in (name,name.removesuffix('.www')):
-            needle=spelling.encode('ascii')+b'\0';pos=0
-            while True:
-                pos=exe.find(needle,pos)
-                if pos<0:break
-                for vm,offset,filesize in segments:
-                    if offset<=pos and pos+len(needle)<=offset+filesize:
-                        address=vm+pos-offset
-                        if address in by_pointer and by_pointer[address]!=name:
-                            raise ValueError('Ambiguous sound string')
-                        by_pointer[address]=name
-                pos+=1
-    candidates={}
-    for pointer,name in by_pointer.items():
-        if name!='m_pre_cutscene_intro.www':continue
-        needle=struct.pack('<I',pointer);pos=0
-        while True:
-            pos=exe.find(needle,pos)
-            if pos<0:break
-            first=pos-87*40;pos+=1
-            if first<0 or first%4 or first+802*40+4>len(exe):continue
-            rows=[by_pointer.get(struct.unpack_from('<I',exe,first+i*40)[0]) for i in range(803)]
-            if rows[319]!='vfx_intro_level1_jarvis_1.www' or any(n is None for n in rows):continue
-            if len(set(rows))!=803 or set(rows)!=set(names):continue
-            if not any(offset<=first and first+802*40+4<=offset+size for _,offset,size in segments):continue
-            candidates[first]=rows
-    if len(candidates)!=1:raise ValueError('Native 803x40 sound-name lane is absent or ambiguous')
-    first,rows=next(iter(candidates.items()))
-    return rows,first
+    anchor=b'm_pre_cutscene_intro\0';pos=0;candidates={}
+    expected=set(names)
+    if len(names)!=803 or len(expected)!=803:raise ValueError('Invalid original sound inventory')
+    while True:
+        pos=exe.find(anchor,pos)
+        if pos<0:break
+        first=pos-87*40;pos+=1
+        if first<0 or first+803*40>len(exe):continue
+        rows=[]
+        for index in range(803):
+            record=exe[first+index*40:first+(index+1)*40]
+            end=record.find(b'\0')
+            if end<1:break
+            try:name=record[:end].decode('ascii')+'.www'
+            except UnicodeDecodeError:break
+            if name not in expected:break
+            rows.append(name)
+        if len(rows)!=803 or len(set(rows))!=803:continue
+        if rows[319]!='vfx_intro_level1_jarvis_1.www':continue
+        candidates[first]=rows
+    if not candidates or len({tuple(rows) for rows in candidates.values()})!=1:
+        raise ValueError('Native 803x40 inline sound-name tables are absent or disagree')
+    first=min(candidates)
+    return candidates[first],first
 
 
 def catalog(rows):
@@ -136,6 +116,8 @@ def prepare(ipa,asset_root):
         if any(not re.fullmatch(r'[A-Za-z0-9_\-]{1,119}\.www',name) for name in names):
             raise ValueError('Unsafe original audio basename')
         rows,first=sound_ordinals(exe,names)
+        if first!=4663040 or exe[first:first+803*40]!=exe[4695160:4695160+803*40]:
+            raise ValueError('Previously native-referenced duplicate sound table mismatch')
         by_name={x.filename[len(owner):]:x for x in entries}
         for index,name in enumerate(rows):
             if by_name[name].file_size>64*1024*1024:raise ValueError('Source audio exceeds size bound')
@@ -170,7 +152,7 @@ def prepare(ipa,asset_root):
             raise ValueError('Refusing to overwrite a different audio catalog')
         pending=output.with_suffix('.im2a.part');pending.write_bytes(payload);pending.replace(output)
     print(json.dumps({'verified_sounds':len(done),'catalog_sha256':hashlib.sha256(payload).hexdigest(),
-                      'native_name_pointer_lane_file_offset':first,'device_playback_verified':False}))
+                      'native_inline_name_table_file_offset':first,'device_playback_verified':False}))
 
 
 if __name__=='__main__':

@@ -16,11 +16,13 @@ G171 reconstruction pipeline are historical references, not source owners.
 - Audio catalog/conversion tooling and native music + voice + four effect
   channels are implemented. User pause covers all channels; worker lifecycle
   flags use atomics. Authentic gameplay effect bindings and fade units remain open.
+- Empty/truncated looping PCM now terminates instead of hanging audio-worker
+  shutdown; regression reproduced a five-second timeout before the fix.
 - Suit texture upload failures now release the failed texture and permit retry.
   Current city/suit alpha and lighting-state tests preserve original alpha and
   texture state; they do not establish original lighting or shadows.
-- Local checks: 20/20 with external original geometry/tables, 20/20 with ASan/
-  UBSan, 15/15 source-only; full 89-translation-unit Vita ARM ELF links. No new
+- Local checks: 21/21 with external original geometry/tables, 21/21 with ASan/
+  UBSan, 16/16 source-only; full 89-translation-unit Vita ARM ELF links. No new
   package or physical device test. CI owner-source inspection is pending.
 - Current host tests cover world height, pause/control timing, animation suit
   ownership, external-table validation, bounded telemetry and offline analysis.

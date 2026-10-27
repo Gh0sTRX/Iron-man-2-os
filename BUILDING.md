@@ -97,7 +97,7 @@ These are sampled CPU/frame observations, not GPU occupancy or continuous FPS.
 ## Authorized original audio (external data only)
 
 `tools/prepare_audio_assets.py` validates the original executable SHA256, the
-803-entry native sound-name pointer lane and both previously proven Lua IDs,
+803-entry native inline sound-name table and both previously proven Lua IDs,
 then converts the original WAV data to 48 kHz stereo signed 16-bit PCM using
 FFmpeg. It writes an external catalog and resumable hash manifest. It does not
 infer gameplay event timing or fabricate button-to-sound mappings.

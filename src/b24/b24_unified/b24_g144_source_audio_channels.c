@@ -6,7 +6,7 @@ const char *b24_g144_original_source_pcm_filename(int id){
  const char *catalog_name=im2_audio_catalog_pcm(id);
  if(catalog_name)return catalog_name;
  /* External catalog is produced only after verified executable + native
-  * 803x40 name-pointer validation. Without it, retain only two proven IDs. */
+  * 803x40 inline-name table validation. Without it, retain only two proven IDs. */
  switch(id){
   case 88:return "m_pre_cutscene_intro.pcm";
   case 320:return "vfx_intro_level1_jarvis_1.pcm";

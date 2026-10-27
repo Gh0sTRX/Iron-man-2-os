@@ -86,7 +86,10 @@ def inspect(ipa):
             immediate_values=sorted(set(constants))[:80],
             semantics_verified=False))
         if len(rows)>220:raise ValueError('Evidence method bound exceeded')
-    return dict(executable_sha256=module.hashlib.sha256(raw).hexdigest(),
+    related=collections.Counter(name.split('::',1)[0] for name in names
+        if '::' in name and re.search(r'(Light|Shadow|Sound|Audio|Vox)',name))
+    return dict(inspection_schema=2,related_native_class_counts=dict(related.most_common(160)),
+                executable_sha256=module.hashlib.sha256(raw).hexdigest(),
                 native_symbol_count=parsed['nsyms'],methods=rows,
                 native_lighting_or_event_semantics_verified=False)
 
@@ -116,6 +119,12 @@ def main(output):
                     report[label]['status']='passed'
                 except Exception as error:
                     report[label]=dict(status='failed',error_class=type(error).__name__)
+                    known=('Native 803x40 inline sound-name tables are absent or disagree',
+                        'Previously native-referenced duplicate sound table mismatch',
+                        'Unexpected source audio bank','RIFF size mismatch',
+                        'Original WAV decoding failed','Unsafe original audio basename',
+                        'Evidence method bound exceeded')
+                    if str(error) in known:report[label]['diagnostic']=str(error)
     payload=json.dumps(report,indent=2)+'\n'
     if len(payload)>1500000 or 'https://' in payload or 'http://' in payload:
         raise ValueError('Report output policy exceeded')

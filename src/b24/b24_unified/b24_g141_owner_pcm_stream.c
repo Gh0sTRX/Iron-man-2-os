@@ -22,16 +22,18 @@ size_t b24_g141_pcm_fill(B24G141PcmStream *s,void *buffer,size_t frames){
  if(!s||!s->file||s->paused||s->finished)return 0;
  uint8_t *out=(uint8_t*)buffer;
  size_t have=0;
+ int rewound_without_data=0;
  while(have<wanted){
   size_t n=fread(out+have,1,wanted-have,s->file);
   have+=n;
   s->bytes_read+=(uint32_t)n;
-  if(n>0)continue;
+  if(n>0){rewound_without_data=0;continue;}
   if(ferror(s->file)){s->finished=1;break;}
-  if(!s->loop){s->finished=1;break;}
+  if(!s->loop||rewound_without_data){s->finished=1;break;}
   clearerr(s->file);
   if(fseek(s->file,0,SEEK_SET)!=0){s->finished=1;break;}
   s->bytes_read=0;
+  rewound_without_data=1;
  }
  return have/4u;
 }
