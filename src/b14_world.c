@@ -51,7 +51,7 @@ w->y=cl(w->y+w->authored_move_vy*dt,-773.1599487f,586.3453125f);
 w->y=cl(w->y+w->authored_move_vy*dt,-351.f,254.f);
 #endif
   if(w->flying)
-     
+
 #ifdef B24_G75_SOURCE_CAPSULE
      /* Existing prototype hover/travel range, relative to actual takeoff
       * feet. A high/negative source floor must not force flight toward Z=0. */
@@ -60,7 +60,7 @@ w->y=cl(w->y+w->authored_move_vy*dt,-351.f,254.f);
 #else
      w->target_z=cl(w->target_z+vertical*6.0f*dt,.35f,36.f);
 #endif /* 33.925 original rooftop source max */
-  
+
   else
 #ifdef B24_G75_SOURCE_CAPSULE
   /* B14_WORLD_HEIGHT_SUPPORT: remain on accepted source support, or

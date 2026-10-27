@@ -55,7 +55,7 @@ int b24_gpu_c1_load(B24GpuC1Mesh *mesh,const char *path){
       for(size_t k=0;k<nix&&ok;k++)if(candidate.indices[k]>=nverts)ok=0;
       for(size_t k=0;k<nverts&&ok;k++){
         const B24GpuC1Vertex *v=&candidate.vertices[k];
-        if(!isfinite(v->x)||!isfinite(v->y)||!isfinite(v->z)|| 
+        if(!isfinite(v->x)||!isfinite(v->y)||!isfinite(v->z)||
            fabsf(v->x)>100000.f||fabsf(v->y)>100000.f||fabsf(v->z)>100000.f)ok=0;
       }
     }

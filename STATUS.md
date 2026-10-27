@@ -9,9 +9,9 @@ G171 reconstruction pipeline are historical references, not source owners.
 - The complete game compiles to a Vita ARM ELF without game assets or patchers.
 - Current host tests cover world height, pause/control timing, animation suit
   ownership, external-table validation, bounded telemetry and offline analysis.
-- 183 of the 191 imported code files match the previous source byte for byte.
-  The eight changed files contain relocated includes, external-data interfaces
-  and passive time observations. `cmake/migration-baseline.json` records origin.
+- 181 of the 191 imported code files match the previous source byte for byte.
+  Eight changed files contain relocated includes, external-data interfaces
+  and passive time observations; two only remove trailing whitespace. `cmake/migration-baseline.json` records origin.
 - Two original data tables were removed from the source payload. All 1028 rows
   match after conversion through the new external asset format and C reader.
 - G279 walking trace remains compatible. A separate frame/dt/phase/clock CSV
