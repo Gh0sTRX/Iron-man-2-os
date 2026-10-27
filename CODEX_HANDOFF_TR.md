@@ -1,5 +1,68 @@
 # CODEX DEVİR VE ÇALIŞMA TALİMATNAMESİ — Iron Man 2 iOS (2010) → PS Vita
 
+**28 Ekim 2026 — tek kaynak ağacı ve ölçülebilir zaman kaydı (`064ab11`):**
+Kullanıcı Claude raporundan sonra önerilen kaynak sadeleştirme ve tutarlı zaman/
+performans kaydı işini açıkça istedi. **Artık asıl kaynak `src/main.c` ve
+`src/b24/`, derleme kökteki `CMakeLists.txt` dosyasıdır.** Bu bölüm eski `work/`
+ve G171 yönergelerinin önündedir. Doğrudan bu kaynakları düzenle; eski patcher
+zincirini bu ağaca uygulama veya üretilmiş `work` ile üzerine yazma.
+
+- `BUILDING.md` komutları, `STATUS.md` kısa durum, `archive/README.md` eski
+  araştırma/patcher dizininin yerinde korunmuş tarihî indeksidir. G171'in push
+  tetikleyicisi kaldırıldı; yalnız elle tarihî yeniden üretim olarak tutuldu.
+- Yeni `source-build.yml`, arşiv veya oyun girdisi indirmeden host testlerini
+  (sanitizer OFF/ON) ve tam Vita ARM ELF'i doğrudan tracked kaynaktan derler.
+  Asset, ELF veya VPK upload yok; CMake SELF/VPK hedefi içermiyor.
+- 191 port kod dosyası gerçek, son doğrulanmış üretilmiş kaynaktan alındı.
+  `cmake/migration-baseline.json` kaynak hash'lerini tutar. 181 dosya byte olarak
+  aynı; sekizinde include yolu, haricî tablo arayüzü ve salt ölçüm alanları;
+  ikisinde yalnız miras kalan satır-sonu boşluk temizliği vardır (`36283bd`).
+  B14/G75 fiziği, G8 zamanlama matematiği, geometriler ve ölçekler korunur.
+- G217 özgün state/track başlığı ve üretilmiş Mission000 Lua tablosu commit'e
+  ALINMADI. `tools/export_original_tables.py` mevcut yetkili yerel girdileri
+  haricî `data/source_tables.im2d` dosyasına dönüştürür. C okuyucu sınırları,
+  indeksleri, string sonlarını, Lua sıra/aralıklarını doğrulayıp atomik yayımlar.
+  Eksik/bozuk veri özgün görev/observer kabulü üretmez; boot trace'e yazılır.
+- 4 suit adı + 776 state + 224 track + 24 Lua satırı = **1028 satırın bütün
+  alanları**, özgün initializer ile bağımsız C decoder çıktısında eşleşti.
+  Yeni haricî dosya SHA-256:
+  `e68d328a31636aeac5fc6347a69cda4f15a2a7fc20ac7094b35f90e9c48ea42a`.
+- Özgün 669 runtime varlığının hash'leri tekrar aynı bulundu. Klasörler
+  `/workspace/im2-private-assets/{models,animations,maps,assets,data}` altına
+  korundu; eski `work` varlık yolları uyumluluk symlink'leridir. Varlık payload'u
+  yeni source/test ağacına veya yeni CI'ya eklenmedi. Eski Git geçmişindeki
+  varlık/gizlilik konusu bu kaynak refactor'üyle temizlenmiş sayılmaz.
+- Yeni isteğe bağlı `ux0:data/ironman2_frame_profile.csv`: ilk 3 ve her 60'ıncı
+  başarılı kare, en çok 4096 satır, tamponlu/ara flush. Ham interval; gerçekten
+  çalıştırılmış B14 dt, unified kontrol dt, G8 **blend** dt; CPU frame wall ve
+  altı CPU submission/swap fazı; world/GPU XYZ; pause; okunan CPU/GPU/BUS/XBAR.
+  Saatler değiştirilmez, zaman politikası/sabit-adım fiziği yeniden yazılmaz.
+  `gpu_busy_available=0`; cihaz FPS sonucu yok. G279 CSV biçimi değişmedi;
+  aynı `frame` anahtarıyla eşleştirilebilir. Analiz: `tools/analyze_frame_trace.py`.
+
+**Gerçek doğrulama:**
+- `tools/test_host.sh` kaynak/özgün veri ile **11/11** test başarılı.
+- Aynı 11 test ASan/UBSan altında başarılı. Gerçek kaynak yükseklik testleri
+  (130 kalkış/iniş döngüsü), B21 dt/pause, G8 suit/tek olay, haricî veri parser,
+  eksik observer/görev verisi, zaman CSV ve analiz kontrolleri dahildir.
+- Özgün veri verilmeden **8/8** kaynak-only test başarılı. `src/cmake/tests/tools`
+  temiz bir kopyasında, `work`, ZIP, orijinal asset ve patch zinciri olmadan da
+  derleme + aynı sekiz test tamamlandı.
+- Tam oyun **88 ARM translation unit** ile VitaSDK ELF olarak bağlandı;
+  compile dependency dosyalarında eski `/workspace/work/` yolu yok.
+  Çıktı `build-vita/im2_beta` ARM EABI5 statik ELF32.
+  SHA-256 `617369b99a410b4c438a747cdc3ad22fb6ea12184982390801c9016efbe0efa2`.
+- `/workspace/im2-current/install-canonical.sh` gerçek makinede baştan sona
+  çalıştırıldı: kaynak-only host testleri ve tam Vita ARM ELF başarılı.
+  Günlükler aynı dizinde `canonical-*.log`. Kaynak-only temiz kopya
+  `/workspace/im2-dev-checks/canonical-clean`; Git checkout değildir.
+- GitHub API hâlâ CONNECT Forbidden verdi; yeni uzak CI sonucu doğrulanamadı.
+  Yerel başarılı derlemeyi uzak CI veya fiziksel Vita başarısı diye sunma.
+
+Yeni VPK yok, cihaz kurulumu yok, yedi kabul kapısı false. Sonraki gerçek
+oynanış engeli özgün MC başlangıç model/world/feet dönüşümüdür. Bu geçiş onu
+çözdüğü veya cihazdaki tarihî yerinde-yürümenin düzeldiği iddiası değildir.
+
 **28 Ekim 2026 — gerçek kaynak yolunda kalkış ve iniş düzeltmesi:**
 Kullanıcının son talimatı **Vita kurulumu yapmadan kaynak geliştirmeye devam**
 etmektir. `ee346c9` bu kapsamda iki gerçek hareket hatasını düzeltir:
