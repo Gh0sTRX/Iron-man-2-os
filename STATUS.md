@@ -25,6 +25,10 @@ G171 reconstruction pipeline are historical references, not source owners.
 - Local checks: 21/21 with external original geometry/tables, 21/21 with ASan/
   UBSan, 16/16 source-only; full 89-translation-unit Vita ARM ELF links. No new
   package or physical device test. CI owner-source inspection is pending.
+- Remote CI run [40604417762](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/40604417762)
+  passed both host configurations and the full ARM ELF for source `05d9206`.
+  Source-only receipt: branch `evidence/source-checks-40604417762`,
+  `diagnostics/source-checks.json`; it explicitly records no device test/package.
 - Current host tests cover world height, pause/control timing, animation suit
   ownership, external-table validation, bounded telemetry and offline analysis.
 - At migration, 181 of 191 imported code files matched the previous source byte
@@ -47,8 +51,9 @@ such. The seven full-port readiness gates remain false.
 
 **Next gameplay blocker:** establish the original MC initial world/feet transform
 from native/source evidence. Device root/FPS claims require actual telemetry.
-Fresh remote CI results require working GitHub API access; local validation
-must not be described as a remote green run.
+GitHub API is blocked in the current environment. Exact-commit remote CI
+results can now be read through the source-only receipt branches using Git;
+local validation alone must not be described as a remote green run.
 
 Repository visibility is not assumed private. Original assets and private
 links must not be added to the canonical tree or CI outputs. Historical
@@ -58,3 +63,10 @@ The owner authorized Drive IPA extraction for remaining assets. Cloud proxy
 currently blocks that download; the local 803-sound conversion has therefore
 not run on original input. A separate ephemeral CI inspection attempts the
 provided input and publishes structural diagnostics only, without asset data.
+
+Runtime network diagnosis: the managed instance reports current observations,
+restricted policy enforced and no custom allowed hosts. Drive hosts are saved
+in the configuration draft, not active in this runtime. Setup/start instructions
+and the canonical repository revision were refreshed and exercised locally;
+environment publication remains a user action. Source build/test automation runs
+on matching pushes; it does not represent a developer running after chat ends.
