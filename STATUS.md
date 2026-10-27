@@ -10,6 +10,18 @@ G171 reconstruction pipeline are historical references, not source owners.
   legal step cannot place head/feet into a wall that was clear at proposal Z.
   Safe sliding and existing step limits are preserved in host regressions.
 - The complete game compiles to a Vita ARM ELF without game assets or patchers.
+- Mark IV and Stealth now use the geometry-verified 802-vertex original VI
+  animation bank throughout movement/aim/beam selection; their event ownership
+  stays separate. Three geometry payloads match exactly; textures remain distinct.
+- Audio catalog/conversion tooling and native music + voice + four effect
+  channels are implemented. User pause covers all channels; worker lifecycle
+  flags use atomics. Authentic gameplay effect bindings and fade units remain open.
+- Suit texture upload failures now release the failed texture and permit retry.
+  Current city/suit alpha and lighting-state tests preserve original alpha and
+  texture state; they do not establish original lighting or shadows.
+- Local checks: 20/20 with external original geometry/tables, 20/20 with ASan/
+  UBSan, 15/15 source-only; full 89-translation-unit Vita ARM ELF links. No new
+  package or physical device test. CI owner-source inspection is pending.
 - Current host tests cover world height, pause/control timing, animation suit
   ownership, external-table validation, bounded telemetry and offline analysis.
 - At migration, 181 of 191 imported code files matched the previous source byte
@@ -38,3 +50,8 @@ must not be described as a remote green run.
 Repository visibility is not assumed private. Original assets and private
 links must not be added to the canonical tree or CI outputs. Historical
 repository cleanup/visibility changes are outside this source migration.
+
+The owner authorized Drive IPA extraction for remaining assets. Cloud proxy
+currently blocks that download; the local 803-sound conversion has therefore
+not run on original input. A separate ephemeral CI inspection attempts the
+provided input and publishes structural diagnostics only, without asset data.

@@ -13,6 +13,8 @@
 #include "b14_world.h"
 #include "b24/b24_unified/im2_original_tables.h"
 #include "b24/b24_unified/im2_frame_trace.h"
+#include "b24/b24_unified/im2_suit_profile.h"
+#include "b24/b24_unified/im2_audio_catalog.h"
 #include "b16_action.h"
 #include "b24/b24_unified/b24_unified.h"
 #ifdef B24_GPU_ENGINE
@@ -356,6 +358,7 @@ int main(int argc,char **argv) {
     /* Optional original tables are owner-supplied assets, never code payload. */
     const int original_tables_ready=im2_original_tables_load("app0:data/source_tables.im2d");
     (void)original_tables_ready;
+    (void)im2_audio_catalog_load("app0:data/audio_catalog.im2a");
 #ifdef B24_GPU_ENGINE
     (void)b24_gpu_boot_trace_mark(original_tables_ready?
         "13 ORIGINAL_TABLES_LOADED":"13 ORIGINAL_TABLES_MISSING_OR_INVALID");
@@ -718,6 +721,11 @@ int main(int argc,char **argv) {
          * PC914/927 input enable or PC935 MissionResume. */
 #endif
 
+#ifdef B24_G145_SOURCE_MISSION_AUDIO
+        if(g137_real_source_initialized)
+          (void)b24_g144_source_audio_pause(&g145_original_vita_channels,
+                                           b24_unified_paused(&b24_game));
+#endif
 #ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
         /* Exactly ONE debug target; initially invalid until ORIGINAL 2010
            G68 collision surface proves placement. Never fake an invisible
@@ -740,7 +748,7 @@ int main(int argc,char **argv) {
         }
         if(g92_debug_floor_found &&
            !b24_unified_paused(&b24_game)&&!world.flying&&
-           (idx==0||idx==4)&&g92_debug_accepted_melee_edge){
+           (im2_suit_uses_802_bank(idx)||idx==4)&&g92_debug_accepted_melee_edge){
            (void)b24_g11_practice_melee_hit(&g92_debug_feedback,
              &b24_gpu_rt.g92_practice_dummy,
              world.x,world.y,world.z,(uint32_t)now,1,1);
@@ -755,10 +763,10 @@ int main(int argc,char **argv) {
 #ifdef B24_G85_NATIVE_MARKV_629
          /* G85_NATIVE_MARKV_629: retain ONE existing user combo button
             owner, now valid also for 629v original Mark V suit index 4. */
-        if(!b24_unified_paused(&b24_game) && (idx==0||idx==4) &&
+        if(!b24_unified_paused(&b24_game) && (im2_suit_uses_802_bank(idx)||idx==4) &&
            !world.flying && b24_unified_should_melee(&b24_game))
 #else
-        if(!b24_unified_paused(&b24_game) && idx==0 &&
+        if(!b24_unified_paused(&b24_game) && im2_suit_uses_802_bank(idx) &&
            !world.flying && b24_unified_should_melee(&b24_game))
 #endif
           {
@@ -867,7 +875,7 @@ int main(int argc,char **argv) {
         }
 #ifdef B24_GPU_ENGINE
         /* B14 has already computed SINGLE authoritative world pose and B13
-           59-bank fallback. Only source-compatible Mark VI / War Machine
+           59-bank fallback. Only geometry-verified VI/IV/Stealth / War Machine
            get genuine streamed 2010 motion; failure leaves fallback intact.
            IMPORTANT: do this BEFORE B16 right-palm-only repulsor blending,
            never replace the original B16 attack mask/muzzle direction. */
@@ -1295,6 +1303,10 @@ int main(int argc,char **argv) {
 #else
     SDL_DestroyTexture(display);SDL_DestroyRenderer(sdl);SDL_DestroyWindow(window);
 #endif
+#ifdef B24_G145_SOURCE_MISSION_AUDIO
+    if(g137_real_source_initialized)b24_g144_source_audio_release(&g145_original_vita_channels);
+#endif
+    im2_audio_catalog_close();
     im2_original_tables_close();
     SDL_Quit();return 0;
 }

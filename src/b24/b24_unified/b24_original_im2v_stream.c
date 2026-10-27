@@ -12,7 +12,7 @@ static uint32_t rdle(const unsigned char *p) {
  return ((uint32_t)p[0])|((uint32_t)p[1]<<8)|((uint32_t)p[2]<<16)|
         ((uint32_t)p[3]<<24);
 }
-static int basename_ok(const char *s) {
+int b24_original_im2v_name_valid(const char *s) {
  size_t n=0;
  if(!s)return 0;
  while(s[n]) {
@@ -40,7 +40,7 @@ static int read_frame(FILE *f,uint32_t index,uint32_t nv,float *dst) {
 int b24_original_im2v_open(B24OriginalIM2VStream *s,
                            const char *root_dir,const char *basename,
                            uint32_t expected_vertices) {
- if(!s||!root_dir||!basename_ok(basename)||
+ if(!s||!root_dir||!b24_original_im2v_name_valid(basename)||
     expected_vertices<3||expected_vertices>16000)return 0;
  char path[512];
  int nc=snprintf(path,sizeof(path),"%s/%s.im2v",root_dir,basename);

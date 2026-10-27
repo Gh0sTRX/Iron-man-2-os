@@ -23,7 +23,8 @@ if(IM2_BUILD_VITA)
   endif()
   include(cmake/VitaSources.cmake)
   add_executable(im2_beta ${IM2_VITA_SOURCES}
-    src/b24/b24_unified/im2_original_tables.c src/b24/b24_unified/im2_frame_trace.c)
+    src/b24/b24_unified/im2_original_tables.c src/b24/b24_unified/im2_frame_trace.c
+    src/b24/b24_unified/im2_audio_catalog.c)
   target_include_directories(im2_beta PRIVATE ${IM2_INCLUDE_DIRS})
   target_compile_definitions(im2_beta PRIVATE ${IM2_VITA_DEFINITIONS})
   if(IM2_FRAME_DIAGNOSTICS)
@@ -59,6 +60,9 @@ else()
   add_library(im2_tables STATIC src/b24/b24_unified/im2_original_tables.c
     src/b24/b24_unified/b24_g137_source_mission000_intro.c)
   target_include_directories(im2_tables PUBLIC ${IM2_MODULE_DIR})
+  add_library(im2_audio STATIC src/b24/b24_unified/im2_audio_catalog.c
+    src/b24/b24_unified/b24_g141_owner_pcm_stream.c)
+  target_include_directories(im2_audio PUBLIC ${IM2_MODULE_DIR})
   add_library(im2_trace STATIC src/b24/b24_unified/im2_frame_trace.c
     src/b24/b24_unified/b24_gpu_cpu_profile.c)
   target_include_directories(im2_trace PUBLIC ${IM2_MODULE_DIR})
@@ -76,6 +80,13 @@ else()
   add_library(im2_motion STATIC src/b24/b24_unified/b24_original_im2v_stream.c
     src/b24/b24_unified/b24_hover_pose_blend.c src/b24/b24_unified/b24_g8_melee_source_chain.c
     src/b24/b24_unified/b24_g8_live_original_motion.c)
+  target_sources(im2_motion PRIVATE
+    src/b24/b24_unified/b24_g83_unified_movement_aim.c
+    src/b24/b24_unified/b24_g82_original_combat_coordinator.c
+    src/b24/b24_unified/b24_g76_original_native_damage_math.c
+    src/b24/b24_unified/b24_g77_melee_source_radius.c
+    src/b24/b24_unified/b24_g169_native_source_unibeam.c
+    src/b24/b24_unified/b24_g11_original_unibeam_sequence.c)
   target_include_directories(im2_motion PUBLIC ${IM2_INCLUDE_DIRS})
   target_compile_definitions(im2_motion PUBLIC B24_G85_NATIVE_MARKV_629=1
     B24_G165_WM_SOURCE_DIRECTIONAL_FALLBACK=1 B24_G172_WM_NATIVE_M_GROUND_BANK=1

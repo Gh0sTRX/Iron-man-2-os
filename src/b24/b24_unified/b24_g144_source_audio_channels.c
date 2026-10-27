@@ -1,9 +1,12 @@
 #include "b24_g144_source_audio_channels.h"
+#include "im2_audio_catalog.h"
 #include <string.h>
 #include <stdio.h>
 const char *b24_g144_original_source_pcm_filename(int id){
- /* Only genuine original 803*40 sound table entries verified with
-  * code refs; no fake full audio-ID database or fallback guesses. */
+ const char *catalog_name=im2_audio_catalog_pcm(id);
+ if(catalog_name)return catalog_name;
+ /* External catalog is produced only after verified executable + native
+  * 803x40 name-pointer validation. Without it, retain only two proven IDs. */
  switch(id){
   case 88:return "m_pre_cutscene_intro.pcm";
   case 320:return "vfx_intro_level1_jarvis_1.pcm";
@@ -41,27 +44,39 @@ void b24_g144_source_audio_init(B24G144NativeAudio *a){
  memset(a,0,sizeof(*a));
  a->current_native_music_index=-1;
  a->current_native_voice_index=-1;
+ atomic_init(&a->music_output.output_open,0);atomic_init(&a->music_output.music_paused,0);
+ atomic_init(&a->voice_output.output_open,0);atomic_init(&a->voice_output.music_paused,0);
  a->music_output.port=-1;
  a->voice_output.port=-1;
  a->music_worker.thread_id=-1;
  a->voice_worker.thread_id=-1;
+ for(unsigned i=0;i<4;i++){
+  a->effect_output[i].port=-1;a->effect_worker[i].thread_id=-1;
+  atomic_init(&a->effect_output[i].output_open,0);
+  atomic_init(&a->effect_output[i].music_paused,0);
+ }
 }
 void b24_g144_source_audio_release(B24G144NativeAudio *a){
  if(!a)return;
  if(a->music_running)b24_g141_vita_stop(&a->music_worker);
  if(a->voice_running)b24_g141_vita_stop(&a->voice_worker);
+ for(unsigned i=0;i<4;i++){
+  if(a->effect_running[i])b24_g141_vita_stop(&a->effect_worker[i]);
+  a->effect_running[i]=0;b24_g139_music_close(&a->effect_output[i]);
+ }
  a->music_running=a->voice_running=0;
  b24_g139_music_close(&a->voice_output);
  b24_g139_music_close(&a->music_output);
  a->current_native_music_index=a->current_native_voice_index=-1;
+ a->pause_state=0;
 }
 static int start_music(void *ctx,int native_index,int loop,float fade){
  B24G144NativeAudio *a=(B24G144NativeAudio*)ctx;
- char path[140];
+ char path[256];
  /* Lua ID88 equals zero-based native 87, and 0.0f default fade.
   * Do not substitute a background song or a random audio asset. */
- if(!a||native_index!=87||fade!=0.0f||
-    !b24_g144_original_source_pcm_vita_path(88,path,sizeof(path)))
+ if(!a||native_index<0||native_index>=803||fade!=0.0f||
+    !b24_g144_original_source_pcm_vita_path(native_index+1,path,sizeof(path)))
   return 0;
  if(a->music_running){
   b24_g141_vita_stop(&a->music_worker);
@@ -71,7 +86,8 @@ static int start_music(void *ctx,int native_index,int loop,float fade){
     !b24_g139_music_init(&a->music_output,
                           b24_g139_native_vita_audio_backend()))
   return 0;
- if(!b24_g139_music_resume(&a->music_output))return 0;
+ if(!(a->pause_state?b24_g139_music_pause(&a->music_output):
+                     b24_g139_music_resume(&a->music_output)))return 0;
  if(!b24_g141_vita_start(&a->music_worker,&a->music_output,path,loop))
   return 0;
  a->music_running=1;
@@ -80,9 +96,9 @@ static int start_music(void *ctx,int native_index,int loop,float fade){
 }
 static int start_voice(void *ctx,int native_index){
  B24G144NativeAudio *a=(B24G144NativeAudio*)ctx;
- char path[140];
- if(!a||native_index!=319||
-   !b24_g144_original_source_pcm_vita_path(320,path,sizeof(path)))
+ char path[256];
+ if(!a||native_index<0||native_index>=803||
+   !b24_g144_original_source_pcm_vita_path(native_index+1,path,sizeof(path)))
   return 0;
  if(a->voice_running){
   b24_g141_vita_stop(&a->voice_worker);
@@ -92,12 +108,45 @@ static int start_voice(void *ctx,int native_index){
   B24G139AudioBackend backend={a,voice_open,voice_volume,voice_close};
   if(!b24_g139_music_init(&a->voice_output,backend))return 0;
  }
- if(!b24_g139_music_resume(&a->voice_output))return 0;
+ if(!(a->pause_state?b24_g139_music_pause(&a->voice_output):
+                     b24_g139_music_resume(&a->voice_output)))return 0;
  if(!b24_g141_vita_start(&a->voice_worker,&a->voice_output,path,0))
   return 0;
  a->voice_running=1;
  a->current_native_voice_index=native_index;
  return 1;
+}
+int b24_g144_source_play_effect(B24G144NativeAudio *a,int id){
+ char path[256];
+ if(!a||!im2_audio_catalog_pcm(id)||
+    !b24_g144_original_source_pcm_vita_path(id,path,sizeof(path)))return 0;
+ for(unsigned i=0;i<4;i++){
+  if(a->effect_running[i]&&!a->effect_worker[i].stream_end)continue;
+  if(a->effect_running[i]){
+   b24_g141_vita_stop(&a->effect_worker[i]);a->effect_running[i]=0;
+  }
+  if(!a->effect_output[i].output_open){
+   B24G139AudioBackend backend={a,voice_open,voice_volume,voice_close};
+   if(!b24_g139_music_init(&a->effect_output[i],backend))return 0;
+  }
+  if(!(a->pause_state?b24_g139_music_pause(&a->effect_output[i]):
+                       b24_g139_music_resume(&a->effect_output[i])))return 0;
+  if(!b24_g141_vita_start(&a->effect_worker[i],&a->effect_output[i],path,0))return 0;
+  a->effect_running[i]=1;return 1;
+ }
+ return 0;
+}
+int b24_g144_source_audio_pause(B24G144NativeAudio *a,int pause){
+ if(!a)return 0;
+ pause=!!pause;if(a->pause_state==pause)return 1;
+ B24G139Music *outputs[]={&a->music_output,&a->voice_output,
+  &a->effect_output[0],&a->effect_output[1],&a->effect_output[2],&a->effect_output[3]};
+ int ok=1;
+ for(unsigned i=0;i<6;i++)if(outputs[i]->output_open){
+  if(!(pause?b24_g139_music_pause(outputs[i]):b24_g139_music_resume(outputs[i])))ok=0;
+ }
+ if(ok)a->pause_state=pause;
+ return ok;
 }
 static int stop_music(void *ctx,int native_index,float original_arg){
  B24G144NativeAudio *a=(B24G144NativeAudio*)ctx;

@@ -1,4 +1,5 @@
 #include "b24_g83_unified_movement_aim.h"
+#include "im2_suit_profile.h"
 #include "b24_g83_authentic_2010_source_durations.h"
 #ifdef B24_G172_WM_NATIVE_M_GROUND_BANK
 #include "b24_g172_wm_ground_m_source.h"
@@ -107,7 +108,7 @@ int b24_g83_select_original_motion(const B24G83Input *p,
  B24G83Selection *out){
  if(!out||!valid(p))return 0;
  memset(out,0,sizeof(*out));
- const int markvi=p->suit_index==B24G83_MARKVI;
+ const int markvi=im2_suit_uses_802_bank(p->suit_index);
  const int wm=p->suit_index==B24G83_WARMACHINE;
 #ifdef B24_G85_NATIVE_MARKV_629
  /* These same original 2010 IronMan joint tracks are rebaked from genuine
@@ -268,7 +269,7 @@ int b24_g83_select_combined(B24G82Combat *combat,uint32_t time_ms,
   if(melee){
    /* Original G8 combo has priority over walk/aim/etc when grounded. */
    if(in->motion==B24G83_GROUND&&
-      (in->suit_index==B24G83_MARKVI
+      (im2_suit_uses_802_bank(in->suit_index)
 #ifdef B24_G85_NATIVE_MARKV_629
        ||in->suit_index==B24G83_MARKV
 #endif

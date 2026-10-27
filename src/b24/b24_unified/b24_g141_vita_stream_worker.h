@@ -12,9 +12,9 @@ typedef struct {
  B24G139Music *out;
  B24G141PcmStream pcm;
  SceUID thread_id;
- volatile int running;
+ atomic_int running;
  int output_last_error;
- int stream_end;
+ atomic_int stream_end;
 } B24G141VitaWorker;
 int b24_g141_vita_start(B24G141VitaWorker *w,B24G139Music *out,
  const char *original_audio_pcm_path,int loop);

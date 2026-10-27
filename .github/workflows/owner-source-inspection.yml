@@ -1,0 +1,37 @@
+name: Authorized original source inspection — no assets or packages
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: ['tools/inspect_owner_source.py', '.github/workflows/owner-source-inspection.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install bounded inspection and audio tools
+        run: |
+          python3 -m pip install -q capstone==5.0.6 gdown==5.2.0
+          command -v ffmpeg
+      - name: Inspect authorized input in an automatically deleted temporary directory
+        run: python3 tools/inspect_owner_source.py /tmp/im2-evidence/owner-source.json
+      - name: Save only the source diagnostic report on its own branch
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('/tmp/im2-evidence/owner-source.json')
+          d=json.loads(p.read_text())
+          assert d['source_only'] is True and d['owner_assets_published'] is False
+          assert p.stat().st_size < 1500000
+          PY
+          git switch --orphan evidence/owner-input-${{ github.run_id }}
+          git rm -rf --cached . >/dev/null
+          mkdir -p diagnostics
+          cp /tmp/im2-evidence/owner-source.json diagnostics/owner-source.json
+          git add --force diagnostics/owner-source.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Record bounded owner-input inspection; no asset payloads'
+          git push origin HEAD:refs/heads/evidence/owner-input-${{ github.run_id }}

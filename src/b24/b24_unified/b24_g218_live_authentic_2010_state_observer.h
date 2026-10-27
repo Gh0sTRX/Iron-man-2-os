@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include "im2_suit_profile.h"
 #include "im2_original_tables.h"
 #include "b24_g197_original_2010_attack_dispatch_reference.h"
 
@@ -51,14 +52,14 @@ typedef struct {
 
 static inline int b24_g218_owner_group_for_Vita_suit(int suit){
   /* Genuine native asset bank player StateSet names, NOT original touch IDs.
-   * Only the 0,2,4 fully source-streamed suits are audited. */
-  return suit==0?0:suit==4?1:suit==2?2:-1;
+   * VI/IV/Stealth share verified geometry; WM/MKV retain separate banks. */
+  return (suit==0||suit==1)?0:suit==4?1:suit==2?2:suit==3?3:-1;
 }
 static inline const char *b24_g218_known_state_name_from_real_G8_stem(
     int suit,const char *stem){
   if(!stem)return NULL;
   const char *s=NULL;
-  if(suit==0){
+  if(im2_suit_uses_802_bank(suit)){
     if(strncmp(stem,"ironman_ironman_",16)!=0)return NULL;
     s=stem+16;
   }else if(suit==4){

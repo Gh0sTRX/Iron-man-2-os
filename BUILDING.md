@@ -93,3 +93,35 @@ python3 tools/analyze_frame_trace.py /path/to/ironman2_frame_profile.csv
 
 These are sampled CPU/frame observations, not GPU occupancy or continuous FPS.
 `gpu_busy_available=0`; host clock frequencies are unknown (`-1`).
+
+## Authorized original audio (external data only)
+
+`tools/prepare_audio_assets.py` validates the original executable SHA256, the
+803-entry native sound-name pointer lane and both previously proven Lua IDs,
+then converts the original WAV data to 48 kHz stereo signed 16-bit PCM using
+FFmpeg. It writes an external catalog and resumable hash manifest. It does not
+infer gameplay event timing or fabricate button-to-sound mappings.
+
+```bash
+python3 tools/prepare_audio_assets.py --ipa /external/owner.ipa --asset-root /external/assets
+```
+
+Runtime catalog: `app0:data/audio_catalog.im2a`; PCM:
+`ux0:data/ironman2/audio/`. Missing catalog keeps only the two previously verified
+music/voice IDs. The native backend has separate music, voice and four effect
+channels; the effect API requires a validated catalog. Channel tests use mocks,
+not physical audio output. Original effect events and fade units remain open.
+
+For an authorized Drive input, keep the supplied link in an external text file;
+install `gdown==5.2.0` into the Python environment, then use the existing refresh
+pipeline. It downloads only when needed, verifies inputs, prepares audio, runs
+host checks with sanitizers and builds the ARM ELF. It never creates a package.
+
+```bash
+bash tools/refresh_owner_audio.sh --ipa /external/owner.ipa --asset-root /external/assets --drive-link-file /external/owner-link.txt
+```
+
+`owner-source-inspection.yml` temporarily reads the already supplied owner input
+and deletes it on exit. Only bounded native method structure and audio conversion
+counts/hashes can be saved on its separate evidence branch. No original bank,
+PCM, model, IPA, binary or package is published.

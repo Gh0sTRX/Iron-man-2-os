@@ -1,6 +1,7 @@
 #ifndef B24_ORIGINAL_IM2V_STREAM_H
 #define B24_ORIGINAL_IM2V_STREAM_H
 #include <stdint.h>
+int b24_original_im2v_name_valid(const char *name);
 #include <stdio.h>
 #include <stddef.h>
 /* Streaming original 2010 owner-source frames for G8+ motion bank.

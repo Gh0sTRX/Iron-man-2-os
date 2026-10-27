@@ -7,6 +7,8 @@ int b24_g139_music_init(B24G139Music *m,B24G139AudioBackend b){
  if(!m||!b.open_music_output||!b.set_music_stereo_volume||
     !b.close_music_output)return 0;
  memset(m,0,sizeof(*m));
+ atomic_init(&m->output_open,0);
+ atomic_init(&m->music_paused,0);
  m->port=-1;m->backend=b;
  int port=b.open_music_output(b.ctx,512,48000);
  if(port<0)return 0;

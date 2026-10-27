@@ -1,4 +1,5 @@
 #include "b24_g8_live_original_motion.h"
+#include "im2_suit_profile.h"
 #ifdef B24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY
 #include "b24_g173_authored_beam_priority.h"
 #endif
@@ -45,9 +46,9 @@ static const char * const wm_float[]={
 const char *b24_g8_motion_route(int suit,B24MotionStage mode,float x,float y){
  const int d=stage_direction(x,y);
  if(d<0||mode>B24M_LAND)return NULL;
- /* G8 suit order: Mark VI 0, War Machine 2. Never load 802v Mark VI
-    on differently skinned Mark IV, Stealth, Mark V or Underwater. */
- if(suit==0){
+ /* Mark VI/IV/Stealth share verified identical 802v pose layouts.
+    WM1292 and MarkV629 retain their own original streams and owner IDs. */
+ if(im2_suit_uses_802_bank(suit)){
   switch(mode){
    case B24M_IDLE:return mark6_walk[0];
    case B24M_WALK:return mark6_walk[d?d:1];
@@ -108,7 +109,7 @@ static const char *const wm_ground_fire[]={
 const char *b24_g8_motion_repulsor_clip(int suit,B24MotionStage stage,float x,float y){
  int d=stage_direction(x,y);
  if(d<0)return NULL;
- if(suit==0){
+ if(im2_suit_uses_802_bank(suit)){
   if(stage==B24M_HOVER||stage==B24M_DRIFT)return mk6_hover_fire[d];
   if(stage==B24M_WALK||stage==B24M_IDLE)return mk6_ground_fire[d];
  }else if(suit==2){
@@ -126,9 +127,9 @@ void b24_g8_motion_repulsor_trigger(B24G8LiveOriginalMotion *a,uint32_t now){
 void b24_g8_motion_melee_trigger(B24G8LiveOriginalMotion *a,uint32_t now){
  if(!a||!a->nv)return;
 #ifdef B24_G85_NATIVE_MARKV_629
- if(a->suit_index!=0&&a->suit_index!=4)return;
+ if(!im2_suit_uses_802_bank(a->suit_index)&&a->suit_index!=4)return;
 #else
- if(a->suit_index!=0)return;
+ if(!im2_suit_uses_802_bank(a->suit_index))return;
 #endif
  b24_g8_melee_press(&a->melee,now);
 }
@@ -164,6 +165,8 @@ int b24_g8_motion_tick_g84(B24G8LiveOriginalMotion *a,const char *dir,
                        B24MotionStage mode,float left_x,float forward,
                        uint32_t now,const char *g84_source_clip){
  if(!a||!dir||!vertices||stride<3*sizeof(float))return 0;
+ /* Reject invalid caller routes before changing suit/stream/shot state. */
+ if(g84_source_clip&&!b24_original_im2v_name_valid(g84_source_clip))return 0;
  /* G302: source full-body repulsor is an event owned by the suit that
   * accepted it. Drop that suit's old pending shot/one-shot/IM2V BEFORE
   * selecting the new suit's _att clip. Previously fresh() ran AFTER
@@ -228,7 +231,7 @@ int b24_g8_motion_tick_g84(B24G8LiveOriginalMotion *a,const char *dir,
  /* Original melee has priority over aim/repulsor _Att; the right-arm
     B16 mask must not fight a full-body 2010 punch pose. */
  const char *melee=NULL;
- if((suit==0
+ if((im2_suit_uses_802_bank(suit)
 #ifdef B24_G85_NATIVE_MARKV_629
        ||suit==4
 #endif
@@ -287,7 +290,7 @@ int b24_g8_motion_tick_g84(B24G8LiveOriginalMotion *a,const char *dir,
 #endif
   }
 #endif
- if(!desired|| (suit==0&&nv!=802u) || (suit==2&&nv!=1292u)
+ if(!desired|| (im2_suit_uses_802_bank(suit)&&nv!=802u) || (suit==2&&nv!=1292u)
 #ifdef B24_G85_NATIVE_MARKV_629
    || (suit==4&&nv!=629u)
 #endif

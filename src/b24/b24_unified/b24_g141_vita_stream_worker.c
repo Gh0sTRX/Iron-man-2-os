@@ -22,12 +22,15 @@ static int b24_g141_worker_entry(SceSize args,void *argp){
   int rc=sceAudioOutOutput(worker->out->port,block);
   if(rc<0){worker->output_last_error=rc;break;}
  }
+ worker->stream_end=1; /* reusable effect slot on both EOF and output error */
  return 0;
 }
 int b24_g141_vita_start(B24G141VitaWorker *w,B24G139Music *out,
  const char *path,int loop){
  if(!w||!out||!out->output_open||!path)return 0;
  memset(w,0,sizeof(*w));
+ atomic_init(&w->running,0);
+ atomic_init(&w->stream_end,0);
  w->out=out;w->thread_id=-1;
  if(!b24_g141_pcm_open(&w->pcm,path,loop))return 0;
  SceUID tid=sceKernelCreateThread("im2_source_audio",b24_g141_worker_entry,

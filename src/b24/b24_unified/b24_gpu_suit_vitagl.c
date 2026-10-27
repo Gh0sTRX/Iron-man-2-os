@@ -70,6 +70,9 @@ int b24_gpu_suit_prepare(B24GpuSuit *s,const B24GpuSuitSource *src){
     never upload the entire CPU-rendered 480x272 framebuffer per frame. */
  glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,(GLsizei)src->tw,(GLsizei)src->th,
              0,GL_RGBA,GL_UNSIGNED_BYTE,src->texture_rgba);
+ /* A generated texture ID does not prove atlas storage succeeded. In
+  * particular, do not claim a prepared original suit after VRAM exhaustion. */
+ if(glGetError()!=GL_NO_ERROR){glDeleteTextures(1,&texture);return 0;}
  s->texture_id=texture;s->nv=src->nv;s->nt=src->nt;
  s->tw=src->tw;s->th=src->th;s->prepared=1;
  return 1;

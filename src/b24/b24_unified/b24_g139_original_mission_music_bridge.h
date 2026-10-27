@@ -1,6 +1,7 @@
 #ifndef B24_G139_ORIGINAL_MISSION_MUSIC_BRIDGE_H
 #define B24_G139_ORIGINAL_MISSION_MUSIC_BRIDGE_H
 #include <stdint.h>
+#include <stdatomic.h>
 #include "b24_g137_source_mission000_intro.h"
 /* G139: NEW PS Vita audio backend, ORIGINAL 2010 author Lua event
  * PauseMusic PC3. Not original 2010 SoundManager engine or codec.
@@ -16,8 +17,8 @@ typedef struct {
 typedef struct {
  B24G139AudioBackend backend;
  int port;
- uint8_t output_open;
- uint8_t music_paused;
+ atomic_uchar output_open;
+ atomic_uchar music_paused;
  uint8_t native_output_volume_applied;
  uint8_t original_2010_sound_ID88_track_mapped;
  uint32_t pause_call_count;

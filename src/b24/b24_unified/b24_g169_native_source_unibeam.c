@@ -1,4 +1,5 @@
 #include "b24_g169_native_source_unibeam.h"
+#include "im2_suit_profile.h"
 #include "b24_g11_original_unibeam_sequence.h"
 #include <stddef.h>
 static const char *const suitcase_ground[3]={
@@ -18,7 +19,7 @@ static const char *const native_markvi_hover[3]={
  "ironman_ironman_aim_float_beam2",
  "ironman_ironman_aim_float_beam3"};
 int b24_g169_native_beam_begin(B24G169Beam *actor,int suit,int hover,uint32_t at_ms){
- if(!actor||!(suit==0||suit==4)||!(hover==0||hover==1))return 0;
+ if(!actor||!(im2_suit_uses_802_bank(suit)||suit==4)||!(hover==0||hover==1))return 0;
  actor->suit=suit;actor->hover=hover;actor->began_ms=at_ms;actor->active=1;
  return 1;
 }

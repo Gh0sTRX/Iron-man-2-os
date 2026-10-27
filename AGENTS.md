@@ -25,6 +25,15 @@ This is the **existing** Iron Man 2 iOS-to-PS Vita preservation/port project. Do
 
 ## Non-negotiable scope
 
+- **2026-10-28 latest owner authorization:** the user explicitly requests
+  autonomous completion of lighting, animation, sound effects and other missing
+  port elements, and authorizes retrieving missing original inputs from the
+  already provided Drive IPA. Local read/extraction is authorized; keep the IPA
+  and derived assets outside Git/CI outputs. Do not request this authorization
+  again. Preserve source provenance and unknowns. This does not authorize
+  firmware/device installation, public asset distribution or inventing original
+  behavior; the existing no-new-VPK acceptance requirements remain in force.
+
 - **2026-10-28 latest user direction:** continue development without any Vita
   installation. Work on source, host regressions and ARM ELF only. The earlier
   one-time diagnostic VPK has already been built and contains NONE of the newer

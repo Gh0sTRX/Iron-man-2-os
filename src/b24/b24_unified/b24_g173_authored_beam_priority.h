@@ -1,13 +1,14 @@
 #ifndef B24_G173_AUTHORED_BEAM_PRIORITY_H
 #define B24_G173_AUTHORED_BEAM_PRIORITY_H
 #include <string.h>
+#include "im2_suit_profile.h"
 /* Names below are EXACT authored iOS 2010 G169 original IM2V names.
  * We only correct a Vita source animation-selection conflict; these
  * identifiers DO NOT recover Gameloft's input/weapon/damage event mapping.
  * Verified G169 actor phase has already been gated by the accepted
  * existing B16 Unibeam event. The G8 owner must not create another event. */
 static inline int b24_g173_is_authored_beam(int suit,const char *name){
- const char *prefix=suit==0?"ironman_ironman_aim_":
+ const char *prefix=im2_suit_uses_802_bank(suit)?"ironman_ironman_aim_":
                     suit==4?"suitcase_ironman_aim_":0;
  if(!prefix||!name)return 0;
  const size_t length=strlen(prefix);
