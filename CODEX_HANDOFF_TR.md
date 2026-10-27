@@ -1,5 +1,58 @@
 # CODEX DEVİR VE ÇALIŞMA TALİMATNAMESİ — Iron Man 2 iOS (2010) → PS Vita
 
+**28 Ekim 2026 — gerçek kaynak yolunda kalkış ve iniş düzeltmesi:**
+Kullanıcının son talimatı **Vita kurulumu yapmadan kaynak geliştirmeye devam**
+etmektir. `ee346c9` bu kapsamda iki gerçek hareket hatasını düzeltir:
+
+1. Gerçek yol `Z=2.693700` üzerindeyken mevcut SDL Circle hedefi mutlak `0.8`
+   yapıyordu. Gerçek B14 `2.577033` öneriyor, G75 yüzeyi koruyarak karakteri
+   zeminde tutuyordu. Aynı negatif regresyon eski kaynakta başarısız oldu.
+   Yeni gerçek olay yolu `3.493700` hedefleyip ilk karede `2.810367` kabul eder.
+2. G75 inişte 0.35 adım düşüş sınırı ile 0.50 yakın-yüzey araması arasında
+   boşluk bırakıyordu. Eski kaynakta iniş `Z=3.143699` yani zeminin 0.450000
+   üzerinde takıldı. Aynı test düzeltilmiş kaynakta tam `2.693700` üzerine iner.
+
+Kalıcı kaynak sahibi `research/b24_unified/world_height/` içindedir. Patcher
+G171 resmi yeniden üretiminde G299'dan sonra çalışır. B14 tek integratör ve
+G75 tek çarpışma çözücüsü kalır. Kalkış düzlemi, gerçekten kabul edilmiş
+ayak/yüzey teması ve sınırlı iniş birleştirildi; yeni spawn seçilmedi. G75
+kapalı B14 alanının eski Z=0 davranışı ayrı uyumluluk testiyle korunur.
+Eski prototip hız/hover/tavan sabitleri özgün Gameloft keşfi olarak sunulmaz.
+
+**Bu kaynak için doğrulama:**
+- 48 güncel G171 shell doğrulama adımı yerelde geçti. İki girdi kontrolü yeni
+  çalıştırılmış sayılmaz: /tmp temizlenince eski G9 kaynak VPK kabı ve G251
+  16-spawn başlığı kayboldu. Araç dokusunun önceki doğrulanmış hash'i ve mevcut
+  669 runtime varlığının tamamının snapshot hash'leri tekrar eşleşti.
+- Yeni gerçek kaynak entegrasyon testi: 12 özgün veri + 6 açıkça sentetik
+  Z-öteleme senaryo grubu, her çalışmada 130 kalkış/hover/iniş döngüsü,
+  beş zaman adımı; strict C11 ve ASan/UBSan altında başarılı. Sentetik
+  ötelemeler orijinal dünya/spawn dönüşümü değildir. Gerçek yolda yürüme,
+  seyir, rush, daha alçak yüzeye iniş ve duraklatmada değişmezlik geçti.
+- G248'in mevcut G75 bayrağı ve post-reconcile destek köprüsüyle 96 yön/mod
+  vakası; G5 gerçek B21 duraklatma olayları; G279 kaynak/CSV testleri geçti.
+- Temiz eski beş runtime dosyasına patcher uygulanıp güncel üretilmiş
+  dosyalarla byte düzeyinde eşleştiği doğrulandı. Geliştirme ağacının üzerine
+  bütün eski yeniden üretim zinciri çalıştırılmadı.
+- Son **tam oyun VitaSDK ARM ELF link** başarılı:
+  `work/build-G171-ELF-ONLY/im2_beta`, ARM EABI5 statik ELF32.
+  SHA-256 `db7aa0b00121ef7040e4f8fb762578d0b8cd7cdac938b62896058a3697bfcb50`.
+  Günlük `/workspace/im2-current/world-height-final-arm-build.log`.
+- Kod commit'i özel dala push edildi. Yeni CI entegrasyonu eklendi, fakat
+  GitHub API bu makinede CONNECT 403 verdiği için uzak CI sonucu **doğrulanmadı**.
+  CI'ya başarı atfetme; yerel ARM ve host kanıtıyla karıştırma.
+
+Detaylar: `research/b24_unified/world_height/README_TR.md`, yerel günlükler:
+`/workspace/im2-dev-checks/world-height/` (`baseline-takeoff.log`,
+`baseline-landing.log`, `strict.log`, `sanitizers.log`, `g248-final.log`,
+`runtime-hashes.json`, `regression-results.json`). Özgün başlangıç ve tarihî
+G161 cihazda yerinde-yürüme sorunu hâlâ açık; cihaz/FPS kanıtı yok. Yedi kabul
+kapısı false kalır. **Yeni VPK üretilmedi.** Eski `55f3392` tanılama paketi bu
+düzeltmeyi içermez; `/workspace/im2-current/authorized-device-test-55f3392/`
+altına korunarak taşındı, eski `work/device-test` yolu uyumluluk symlink'idir.
+Kullanıcı tekrar istemeden o eski paketin teslim/yükleme işini sürdürme.
+Sonraki kaynak hedefi hâlâ gerçek MC model/world/CollisionData başlangıç bağıdır.
+
 **23 Ekim 2026 — kullanıcının mevcut-durum cihaz testi kapsam onayı:**
 Yedi kapı açık olduğu belirtilerek sorulan soruya kullanıcı “şimdiye kadar
 çözdüğümüz her şeyi test edelim” yanıtını verdi. Bu, AGENTS.md'de kayıtlı
