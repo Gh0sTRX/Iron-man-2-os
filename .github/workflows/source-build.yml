@@ -36,3 +36,35 @@ jobs:
           file build-vita/im2_beta
           test -s build-vita/im2_beta
           test -z "$(find build-vita -type f -name '*.vpk' -print -quit)"
+  source-check-receipt:
+    if: ${{ always() && github.event_name == 'push' }}
+    needs: [host, vita-elf]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Save bounded source-only CI results, without binaries or owner data
+        env:
+          IM2_HOST_RESULT: '${{ needs.host.result }}'
+          IM2_VITA_RESULT: '${{ needs.vita-elf.result }}'
+          IM2_SOURCE_SHA: '${{ github.sha }}'
+          IM2_RUN_ID: '${{ github.run_id }}'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path('/tmp/im2-ci-receipt.json')
+          p.write_text(json.dumps(dict(source_commit=os.environ['IM2_SOURCE_SHA'],
+            run_id=os.environ['IM2_RUN_ID'],host_with_and_without_sanitizers=os.environ['IM2_HOST_RESULT'],
+            full_vita_arm_elf=os.environ['IM2_VITA_RESULT'],owner_data_used=False,
+            package_created=False,device_tested=False),indent=2)+'\n')
+          PY
+          git checkout --orphan evidence/source-checks-${{ github.run_id }}
+          git rm -rf --cached . >/dev/null
+          mkdir -p diagnostics
+          cp /tmp/im2-ci-receipt.json diagnostics/source-checks.json
+          git add --force diagnostics/source-checks.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Record source-only host and ARM build results'
+          git push origin HEAD:refs/heads/evidence/source-checks-${{ github.run_id }}

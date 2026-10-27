@@ -138,14 +138,19 @@ int b24_g144_source_play_effect(B24G144NativeAudio *a,int id){
 }
 int b24_g144_source_audio_pause(B24G144NativeAudio *a,int pause){
  if(!a)return 0;
- pause=!!pause;if(a->pause_state==pause)return 1;
+ pause=!!pause;
  B24G139Music *outputs[]={&a->music_output,&a->voice_output,
   &a->effect_output[0],&a->effect_output[1],&a->effect_output[2],&a->effect_output[3]};
+ int settled=a->pause_state==pause;
+ for(unsigned i=0;i<6;i++)if(outputs[i]->output_open&&outputs[i]->music_paused!=pause)settled=0;
+ /* Remember desired user state even if one port fails; retry unsettled ports
+  * and let newly started sounds inherit the requested pause state. */
+ a->pause_state=pause;
+ if(settled)return 1;
  int ok=1;
  for(unsigned i=0;i<6;i++)if(outputs[i]->output_open){
   if(!(pause?b24_g139_music_pause(outputs[i]):b24_g139_music_resume(outputs[i])))ok=0;
  }
- if(ok)a->pause_state=pause;
  return ok;
 }
 static int stop_music(void *ctx,int native_index,float original_arg){

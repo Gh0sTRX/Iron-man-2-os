@@ -96,7 +96,7 @@ These are sampled CPU/frame observations, not GPU occupancy or continuous FPS.
 
 ## Authorized original audio (external data only)
 
-`tools/prepare_audio_assets.py` validates the original executable SHA256, the
+`tools/prepare_audio_assets.py` validates the complete original IPA and executable SHA256, the
 803-entry native inline sound-name table and both previously proven Lua IDs,
 then converts the original WAV data to 48 kHz stereo signed 16-bit PCM using
 FFmpeg. It writes an external catalog and resumable hash manifest. It does not
@@ -125,3 +125,8 @@ bash tools/refresh_owner_audio.sh --ipa /external/owner.ipa --asset-root /extern
 and deletes it on exit. Only bounded native method structure and audio conversion
 counts/hashes can be saved on its separate evidence branch. No original bank,
 PCM, model, IPA, binary or package is published.
+
+The source-build workflow also saves a small `diagnostics/source-checks.json`
+receipt on `evidence/source-checks-<run-id>`. It identifies the exact source
+commit and host/ARM job results, without uploading a binary. A receipt is not
+device playback, native lighting parity or a readiness-gate acceptance.

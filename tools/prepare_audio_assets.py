@@ -15,6 +15,7 @@ import subprocess
 import tempfile
 import zipfile
 
+IPA_SHA='4c338c71cdd2817afb10099b90834c911d3c82e94adc477f24a9f9f4e0479c94'
 EXE_SHA='3ba6337a23ab7e08f2e025ec9731c53a7990e8d611b59eac07ba00cb63acc629'
 
 
@@ -98,6 +99,7 @@ def prepare(ipa,asset_root):
     if asset_root.is_relative_to(repo):raise ValueError('Keep owner assets outside the checkout')
     if not shutil.which('ffmpeg'):raise ValueError('ffmpeg is required for original audio decoding')
     if ipa.stat().st_size!=248613763:raise ValueError('Unexpected original IPA size/version')
+    if sha_file(ipa)!=IPA_SHA:raise ValueError('Original IPA SHA256 mismatch')
     dest=asset_root/'audio';dest.mkdir(parents=True,exist_ok=True)
     metadata=asset_root/'data';metadata.mkdir(exist_ok=True)
     manifest_file=metadata/'audio_manifest.json'

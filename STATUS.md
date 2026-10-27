@@ -14,7 +14,8 @@ G171 reconstruction pipeline are historical references, not source owners.
   animation bank throughout movement/aim/beam selection; their event ownership
   stays separate. Three geometry payloads match exactly; textures remain distinct.
 - Audio catalog/conversion tooling and native music + voice + four effect
-  channels are implemented. User pause covers all channels; worker lifecycle
+  channels are implemented. User pause covers all channels and recovers from
+  individual port failures; worker lifecycle
   flags use atomics. Authentic gameplay effect bindings and fade units remain open.
 - Empty/truncated looping PCM now terminates instead of hanging audio-worker
   shutdown; regression reproduced a five-second timeout before the fix.

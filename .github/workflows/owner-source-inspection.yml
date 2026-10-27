@@ -12,6 +12,9 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Install bounded inspection and audio tools
         run: |
           python3 -m pip install -q capstone==5.0.6 gdown==5.2.0
@@ -28,7 +31,7 @@ jobs:
           assert d['source_only'] is True and d['owner_assets_published'] is False
           assert p.stat().st_size < 1500000
           PY
-          git switch --orphan evidence/owner-input-${{ github.run_id }}
+          git checkout --orphan evidence/owner-input-${{ github.run_id }}
           git rm -rf --cached . >/dev/null
           mkdir -p diagnostics
           cp /tmp/im2-evidence/owner-source.json diagnostics/owner-source.json

@@ -3,7 +3,7 @@
 #include "b24_g144_source_audio_channels.h"
 #include "im2_audio_catalog.h"
 #include "audio_fixture.h"
-static int next_port=1,open_ports,volume_calls,started,stopped;
+static int next_port=1,open_ports,volume_calls,started,stopped,fail_volume_port;
 int sceAudioOutOpenPort(int kind,int frames,int hz,int mode){
  assert((kind==0||kind==1)&&frames==512&&hz==48000&&mode==0);
  open_ports++;return next_port++;
@@ -11,7 +11,9 @@ int sceAudioOutOpenPort(int kind,int frames,int hz,int mode){
 int sceAudioOutSetVolume(int port,int flags,int *volume){
  assert(port>0&&flags==3&&volume);
  assert((volume[0]==0||volume[0]==32768)&&volume[0]==volume[1]);
- volume_calls++;return 0;
+ volume_calls++;
+ if(port==fail_volume_port){fail_volume_port=0;return -1;}
+ return 0;
 }
 int sceAudioOutReleasePort(int port){assert(port>0&&open_ports);open_ports--;return 0;}
 int b24_g141_vita_start(B24G141VitaWorker *w,B24G139Music *out,const char *path,int loop){
@@ -51,6 +53,14 @@ int main(void){
  assert(a.effect_output[0].music_paused&&started==7&&stopped==1&&open_ports==6);
  assert(b24_g144_source_audio_pause(&a,0));
  assert(!a.music_output.music_paused&&!a.voice_output.music_paused);
+ /* One failed OS volume operation must not leave successful channels
+  * permanently paused when the user immediately resumes. */
+ fail_volume_port=a.voice_output.port;
+ assert(!b24_g144_source_audio_pause(&a,1));
+ assert(a.music_output.music_paused&&!a.voice_output.music_paused);
+ assert(b24_g144_source_audio_pause(&a,0));
+ assert(!a.music_output.music_paused&&!a.voice_output.music_paused);
+ for(unsigned i=0;i<4;i++)assert(!a.effect_output[i].music_paused);
  assert(!b24_g144_source_play_effect(&a,804));
  b24_g144_source_audio_release(&a);
  assert(open_ports==0&&stopped==started);

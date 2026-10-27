@@ -24,14 +24,16 @@ def drive_id(value):
 
 
 def verify(path):
-    from prepare_audio_assets import EXE_SHA,sha_file
+    from prepare_audio_assets import EXE_SHA,IPA_SHA,sha_file
     if path.stat().st_size!=248613763:raise ValueError('Wrong source IPA size/version')
+    ipa_sha=sha_file(path)
+    if ipa_sha!=IPA_SHA:raise ValueError('Original IPA SHA256 mismatch')
     with zipfile.ZipFile(path) as archive:
         exe=archive.read('Payload/IronMan2.app/IronMan2')
         if len(exe)!=7480208 or hashlib.sha256(exe).hexdigest()!=EXE_SHA:
             raise ValueError('Original executable SHA256 mismatch')
         if archive.testzip() is not None:raise ValueError('Source archive CRC failure')
-    return dict(ipa_bytes=path.stat().st_size,ipa_sha256=sha_file(path),executable_sha256=EXE_SHA)
+    return dict(ipa_bytes=path.stat().st_size,ipa_sha256=ipa_sha,executable_sha256=EXE_SHA)
 
 
 def fetch(link_file,output):
