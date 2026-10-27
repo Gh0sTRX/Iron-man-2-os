@@ -1,8 +1,16 @@
 # Claude Code handoff — Iron Man 2 iOS -> PS Vita
 
+**28 October 2026 source migration:** current code is `src/main.c` + `src/b24/`;
+build root `CMakeLists.txt` directly. Read `BUILDING.md` and `STATUS.md` first.
+Do not apply historical source patchers to this tree. New `source-build.yml`
+compiles the whole game ELF without archives, owner assets or data downloads.
+G171 and the generated `work/` snapshot below are historical references.
+Original state/Lua tables are now external runtime data, not committed payload.
+Current source-only work requires no Vita installation and creates no VPK.
+
 **First read [AGENTS.md](AGENTS.md), in full.** It is the canonical, source-grounded engineering contract shared with Codex and other autonomous agents. Do not work before applying its NO-VPK, authenticity, source-evidence, security and stage-order rules.
 
-Repository: private `Gh0sTRX/Iron-man-2-os`; development branch `feature/b24-unified-gameplay`, not lagging `main`. User temporarily has only the ChatGPT mobile app and will move to a PC/Claude Code in a few days; do not require a local PC from the user for ordinary source audits or GitHub CI.
+Repository: `Gh0sTRX/Iron-man-2-os`; development branch `feature/b24-unified-gameplay`, not lagging `main`. User temporarily has only the ChatGPT mobile app and will move to a PC/Claude Code in a few days; do not require a local PC from the user for ordinary source audits or GitHub CI.
 
 **First task when starting:** inspect `research/b24_unified/g279_vita_walk_persistent_trace/` (G296 authentic ground-at-120-frame fix) and the latest G171 + G279 GitHub Actions runs; locate the earliest *real failing* gameplay-source integration gate and fix that with source-only regression, NOT another free-floating audit. G161 physical Vita user report was walk-in-place; newer G171/G279/G296 are not physically Vita tested. G295 Vita3K GitHub CPU Vulkan device initialization remains blocked; don't rerun unchanged.
 

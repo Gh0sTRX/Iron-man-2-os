@@ -1,3 +1,8 @@
+> **Current source (28 October 2026):** `src/main.c`, `src/b24/`, and root
+> `CMakeLists.txt` build directly. Start with [STATUS.md](STATUS.md) and
+> [BUILDING.md](BUILDING.md). The older stage-by-stage material below is
+> historical; it does not replace current source ownership or device evidence.
+
 # Iron Man 2 (2010) iOS → PS Vita — Tersine Mühendislik ve Port Projesi
 
 > **G295 (20 Ekim): Kullanıcının gerçek PSVUPDAT.PUP 3.74 sistem dosyası GitHub runner içindeki Vita3K 4206'ya başarıyla kuruldu** (SHA256 pinli, yazılım/fizikî oyun dosyaları repoya girmez). Eski G161 emülatör `Loading...` penceresine ulaştı fakat host OpenGL4.4 context kuramadı; Vulkan llvmpipe hostta doğrulandıysa da Vita3K native C++ `enumeratePhysicalDevices: ErrorInitializationFailed` ile kapanıyor. **Oyun hâlâ açılmış/oynanabilir değil; yeni VPK yok.** [Tam G295 raporu](research/b24_unified/G284_G285_USER_DRIVE_PSVUPDAT_374_VITA3K_PRIVATE_CI_2026-10-20_TR.md). Oyun kaynak testleri/G171/G279 ve ışıklandırma sırası değişmedi.

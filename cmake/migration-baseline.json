@@ -1,0 +1,773 @@
+{
+  "baseline_commit": "ee346c9",
+  "files": {
+    "src/b24/b18_gpu_probe/b17_input_landing_gate.c": {
+      "generated_path": "b24/b18_gpu_probe/b17_input_landing_gate.c",
+      "baseline_sha256": "608c6462eaa15c0001e6df5aa18310fe756c252a73af01740a6a8e931e4bde2d"
+    },
+    "src/b24/b18_gpu_probe/b17_input_landing_gate.h": {
+      "generated_path": "b24/b18_gpu_probe/b17_input_landing_gate.h",
+      "baseline_sha256": "534a73218e94e38ddc0f244bc319f65badbfb48ef84a7906111aca02df3de993"
+    },
+    "src/b24/b18_gpu_probe/gpu_floor_mesh.c": {
+      "generated_path": "b24/b18_gpu_probe/gpu_floor_mesh.c",
+      "baseline_sha256": "7c117d3de94c97bc5084c124678c7da2a12958a1594ea77af7f78066c3967179"
+    },
+    "src/b24/b18_gpu_probe/gpu_floor_mesh.h": {
+      "generated_path": "b24/b18_gpu_probe/gpu_floor_mesh.h",
+      "baseline_sha256": "e4acfe3dd75528d67a068bdb3178f430ec96539846559ddf3bd91bf84af8689c"
+    },
+    "src/b24/b19/host_gameplay/b19_gameplay_core.c": {
+      "generated_path": "b24/b19/host_gameplay/b19_gameplay_core.c",
+      "baseline_sha256": "0f30f1ac4e151e4dbe61f2e432b9d2c9a6264a3e5708e1d8298b91774252f2b9"
+    },
+    "src/b24/b19/host_gameplay/b19_gameplay_core.h": {
+      "generated_path": "b24/b19/host_gameplay/b19_gameplay_core.h",
+      "baseline_sha256": "9d3072a1bc4be78c5f60324857f75b08d0a2fcb604c55e77a4aeb0e34e9e6272"
+    },
+    "src/b24/b19/host_gameplay/b19_hit_geometry.c": {
+      "generated_path": "b24/b19/host_gameplay/b19_hit_geometry.c",
+      "baseline_sha256": "c7e4c636dc85436bb0360e56253e63f84f190cdf5cb61e67aeff827d93788935"
+    },
+    "src/b24/b19/host_gameplay/b19_hit_geometry.h": {
+      "generated_path": "b24/b19/host_gameplay/b19_hit_geometry.h",
+      "baseline_sha256": "38f35892d3b0603177f960dafb988a1610d32d9eeca3df9d5f28cb97045b6e2a"
+    },
+    "src/b24/b21_controls/b21_control_lab.c": {
+      "generated_path": "b24/b21_controls/b21_control_lab.c",
+      "baseline_sha256": "85b030570161018f9917c11a008fa13a7d87d2b2401a83a3baa452393e8694fa"
+    },
+    "src/b24/b21_controls/b21_control_lab.h": {
+      "generated_path": "b24/b21_controls/b21_control_lab.h",
+      "baseline_sha256": "19f4c1612075554f4d7ba7e01e9c7c1ba1a92b0bcd6cce9bf9b492e269ec85e0"
+    },
+    "src/b24/b21_controls/b21_hud_canvas.c": {
+      "generated_path": "b24/b21_controls/b21_hud_canvas.c",
+      "baseline_sha256": "2a920351b9f67f25ebc13d6afabf7aa3dcee532dfb4aa677ebb2b104ff513ad9"
+    },
+    "src/b24/b21_controls/b21_hud_canvas.h": {
+      "generated_path": "b24/b21_controls/b21_hud_canvas.h",
+      "baseline_sha256": "7496e73ef5f4957972747fd63d70c0ee9a64ee321dcd5552c5421e9bdbd1aa7d"
+    },
+    "src/b24/b22_4_6/im2_melee_focus.c": {
+      "generated_path": "b24/b22_4_6/im2_melee_focus.c",
+      "baseline_sha256": "1383fa5be34f9f97bb6dea42a26318d18fb98898f3748ee0c2a876b58454c162"
+    },
+    "src/b24/b22_4_6/im2_melee_focus.h": {
+      "generated_path": "b24/b22_4_6/im2_melee_focus.h",
+      "baseline_sha256": "2d4e60ceb31855b2313693ddfd12872d469e80f5c621e7f6f785c5a65701689d"
+    },
+    "src/b24/b22_4_6/im2_speed_fx.c": {
+      "generated_path": "b24/b22_4_6/im2_speed_fx.c",
+      "baseline_sha256": "72d4eb9a986263d8271f98fb81f880917fa582e1d13982c7667a5eb82dd78af2"
+    },
+    "src/b24/b22_4_6/im2_speed_fx.h": {
+      "generated_path": "b24/b22_4_6/im2_speed_fx.h",
+      "baseline_sha256": "0a33ffae165e928f73833e8df7f81af63d120feb4529c2ced22c3da4e0cb495d"
+    },
+    "src/b24/b22_4_6/im2_thruster.c": {
+      "generated_path": "b24/b22_4_6/im2_thruster.c",
+      "baseline_sha256": "40e04d21b550b747562665de8ad493766edd8f8e26eb24066f149d69a4f11a18"
+    },
+    "src/b24/b22_4_6/im2_thruster.h": {
+      "generated_path": "b24/b22_4_6/im2_thruster.h",
+      "baseline_sha256": "f6bee32c11cc482681ac1caa9fcb5b631549232862c89e21ca596341373fe971"
+    },
+    "src/b24/b22_camera/im2_camera.c": {
+      "generated_path": "b24/b22_camera/im2_camera.c",
+      "baseline_sha256": "f8458f96e274a13e09864d98a3f15c557ae2e6e420ae29bcc42a6cb7f28567da"
+    },
+    "src/b24/b22_camera/im2_camera.h": {
+      "generated_path": "b24/b22_camera/im2_camera.h",
+      "baseline_sha256": "0cf23658d205da6b0e9184168d557a7a0b94f9c790c364e2180d11cbdeac3295"
+    },
+    "src/b24/b22_flight/im2_flight.c": {
+      "generated_path": "b24/b22_flight/im2_flight.c",
+      "baseline_sha256": "3807b79e6f1b9b5a94ed139794706a5a3ffb408f10f0ac87f2420d0200c50601"
+    },
+    "src/b24/b22_flight/im2_flight.h": {
+      "generated_path": "b24/b22_flight/im2_flight.h",
+      "baseline_sha256": "13e34191e84acb10aeccc4ddeb759a993ca733cdba7ccef1a0e72a81af2da8b1"
+    },
+    "src/b24/b22_hud/b22_visor.c": {
+      "generated_path": "b24/b22_hud/b22_visor.c",
+      "baseline_sha256": "54f1e1b348b32ee6766885d0f94159de0ca44c6903a723edc9b957f70373887e"
+    },
+    "src/b24/b22_hud/b22_visor.h": {
+      "generated_path": "b24/b22_hud/b22_visor.h",
+      "baseline_sha256": "19aa271eb86266d04b6872ebdcc3ee54add8b9495e3a34b881d107ae78b3243b"
+    },
+    "src/b24/b23_missile_lock/b23_missile_lock.c": {
+      "generated_path": "b24/b23_missile_lock/b23_missile_lock.c",
+      "baseline_sha256": "2ec4f4682af217aafdd77a0914c3e2c806bcf5cb99acc26261b8f14f722acf35"
+    },
+    "src/b24/b23_missile_lock/b23_missile_lock.h": {
+      "generated_path": "b24/b23_missile_lock/b23_missile_lock.h",
+      "baseline_sha256": "4c3871ab1cb9c83cde1427bdb4866000f966fe94cece5e4e859767dc90509a3a"
+    },
+    "src/b24/b24_unified/b24_c1_2010_diffuse_bank.h": {
+      "generated_path": "b24/b24_unified/b24_c1_2010_diffuse_bank.h",
+      "baseline_sha256": "7a3d6258d6275cbdf0909c87a868f136b860c94c6cdf6d050cc80d53a03f88e2"
+    },
+    "src/b24/b24_unified/b24_c1_gpu_mesh.c": {
+      "generated_path": "b24/b24_unified/b24_c1_gpu_mesh.c",
+      "baseline_sha256": "f2ea3f770f372b63035444a6c7776cc9e34a177fe52dda33035cb5cf367b5400"
+    },
+    "src/b24/b24_unified/b24_c1_gpu_mesh.h": {
+      "generated_path": "b24/b24_unified/b24_c1_gpu_mesh.h",
+      "baseline_sha256": "667dcb1c720976cf5d7225b7bcc783278ba95350d3998a43a67e5976c5c69a52"
+    },
+    "src/b24/b24_unified/b24_c1_gpu_uv.c": {
+      "generated_path": "b24/b24_unified/b24_c1_gpu_uv.c",
+      "baseline_sha256": "77e7108186aaa43f51e34e439e1f282f4f78b49239a0dc0295ee95bb9d72669c"
+    },
+    "src/b24/b24_unified/b24_c1_gpu_uv.h": {
+      "generated_path": "b24/b24_unified/b24_c1_gpu_uv.h",
+      "baseline_sha256": "ecadc86fa48abb368aeb28717eb4a743a3cd44862246040f459cc89f6e0b98a8"
+    },
+    "src/b24/b24_unified/b24_c1_gpu_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_c1_gpu_vitagl.c",
+      "baseline_sha256": "d372f93c0a5bedfaf550bee9a673bbdb6d77583ddbdeb2999dcd667de5c6dace"
+    },
+    "src/b24/b24_unified/b24_c1_material_batches.h": {
+      "generated_path": "b24/b24_unified/b24_c1_material_batches.h",
+      "baseline_sha256": "a1f53df3dc49364d13ee41982371ee7a86e6ab6cc2ee742cad7e224e5e6c1708"
+    },
+    "src/b24/b24_unified/b24_c1_material_source.c": {
+      "generated_path": "b24/b24_unified/b24_c1_material_source.c",
+      "baseline_sha256": "74599e83511c6403160c5d43eaa81cf58bdb783691a8e2e26192163806a8e09b"
+    },
+    "src/b24/b24_unified/b24_c1_material_source.h": {
+      "generated_path": "b24/b24_unified/b24_c1_material_source.h",
+      "baseline_sha256": "762b459076b901557fbd73694065340944fbf97092887e5f3ee8a291ce9ef85f"
+    },
+    "src/b24/b24_unified/b24_c1_original_collision.c": {
+      "generated_path": "b24/b24_unified/b24_c1_original_collision.c",
+      "baseline_sha256": "08ccf085fb9e70a5327eb762bbac8b8844c73027b923427801a995481852a5b4"
+    },
+    "src/b24/b24_unified/b24_c1_original_collision.h": {
+      "generated_path": "b24/b24_unified/b24_c1_original_collision.h",
+      "baseline_sha256": "a2d8e4cae48d042c98d9dd4e9903c4976a5a674a064e8f9cd1c6f99db8c83d21"
+    },
+    "src/b24/b24_unified/b24_c1_true_source_floor.h": {
+      "generated_path": "b24/b24_unified/b24_c1_true_source_floor.h",
+      "baseline_sha256": "ab1fc8a4d868bcbf910bec3aea547e0b42fd579dffacff57faa5c231b2a8d391"
+    },
+    "src/b24/b24_unified/b24_c1_wall_index.h": {
+      "generated_path": "b24/b24_unified/b24_c1_wall_index.h",
+      "baseline_sha256": "791538d7daff825780899ecd9405615a8c59fed124d4062d36721f8d058bb148"
+    },
+    "src/b24/b24_unified/b24_c1l1_map.c": {
+      "generated_path": "b24/b24_unified/b24_c1l1_map.c",
+      "baseline_sha256": "7b06673def1bfd4b243c65a2282ed96b2f80db5e69e79152b270882e1642088d"
+    },
+    "src/b24/b24_unified/b24_c1l1_map.h": {
+      "generated_path": "b24/b24_unified/b24_c1l1_map.h",
+      "baseline_sha256": "80ac0c41b7f558569aa368a7b09a35a78ed6764091f1f0d30675d4103f30debe"
+    },
+    "src/b24/b24_unified/b24_camera_recenter.c": {
+      "generated_path": "b24/b24_unified/b24_camera_recenter.c",
+      "baseline_sha256": "177e7f103cb6ddaa14bdbfecaa3042dbbcf55a111dce635aa8db819bd1538fd9"
+    },
+    "src/b24/b24_unified/b24_camera_recenter.h": {
+      "generated_path": "b24/b24_unified/b24_camera_recenter.h",
+      "baseline_sha256": "c7c1bf063f9dab09b48c8e4776b8637c5a4820a61a70d24da1f529bf673e63d3"
+    },
+    "src/b24/b24_unified/b24_g103_verified_original_actor_attack_classification.c": {
+      "generated_path": "b24/b24_unified/b24_g103_verified_original_actor_attack_classification.c",
+      "baseline_sha256": "40b3cdf82678c7259c512d18b17e024e25f6d2b71055a5d833950acf85af0c16"
+    },
+    "src/b24/b24_unified/b24_g103_verified_original_actor_attack_classification.h": {
+      "generated_path": "b24/b24_unified/b24_g103_verified_original_actor_attack_classification.h",
+      "baseline_sha256": "f7245d48a9be44b638fcbd66dd74950e9fd66a752245eb9062886dcb4c3f3386"
+    },
+    "src/b24/b24_unified/b24_g108_visible_original_wall_grid.c": {
+      "generated_path": "b24/b24_unified/b24_g108_visible_original_wall_grid.c",
+      "baseline_sha256": "84bfa8efaa0c4ae740d4a7eade5ec8a6d9c51e42a0a92846e4c1a00d498f56e6"
+    },
+    "src/b24/b24_unified/b24_g108_visible_original_wall_grid.h": {
+      "generated_path": "b24/b24_unified/b24_g108_visible_original_wall_grid.h",
+      "baseline_sha256": "53041b71a6a114c84e291c62f4fcb2f7dc08c048336e0d0db0ce631dca25fc30"
+    },
+    "src/b24/b24_unified/b24_g10_original_foot_contact.h": {
+      "generated_path": "b24/b24_unified/b24_g10_original_foot_contact.h",
+      "baseline_sha256": "26cbd1523b34a7ba38abf8b8980a7e804d9b1623f6512b5571e6932c53e3501b"
+    },
+    "src/b24/b24_unified/b24_g10_practice_target.c": {
+      "generated_path": "b24/b24_unified/b24_g10_practice_target.c",
+      "baseline_sha256": "ac95b6957c5567ea4eca38279013d82b4aa3a21e76e2f4897797ed8a545dfaf8"
+    },
+    "src/b24/b24_unified/b24_g10_practice_target.h": {
+      "generated_path": "b24/b24_unified/b24_g10_practice_target.h",
+      "baseline_sha256": "40d129d4963f0b4a914b71ecf2ddfecddbd9a0a707425e6fadf9370790dbdc47"
+    },
+    "src/b24/b24_unified/b24_g10_practice_target_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_g10_practice_target_vitagl.c",
+      "baseline_sha256": "65af03b9f0323719f306c522ed1f004d887aa7bfdef92ff6d516a9a31740351a"
+    },
+    "src/b24/b24_unified/b24_g111_original_source_entitydata_and_combat_permission.c": {
+      "generated_path": "b24/b24_unified/b24_g111_original_source_entitydata_and_combat_permission.c",
+      "baseline_sha256": "ae5c7adb77e51aecfd394a4c653efd12c1e64de6ae19bf61a38915e883ae65ea"
+    },
+    "src/b24/b24_unified/b24_g111_original_source_entitydata_and_combat_permission.h": {
+      "generated_path": "b24/b24_unified/b24_g111_original_source_entitydata_and_combat_permission.h",
+      "baseline_sha256": "5a46f099423bde34a9a1deea74937fcf5aef0c9d89fa8bf2a813704dec23b6f2"
+    },
+    "src/b24/b24_unified/b24_g11_combat_stage_policy.h": {
+      "generated_path": "b24/b24_unified/b24_g11_combat_stage_policy.h",
+      "baseline_sha256": "31325c6d8b9d0552fbfa81838dfc2403d93aa86d21923accd41eb519cba20dd4"
+    },
+    "src/b24/b24_unified/b24_g11_original_unibeam_sequence.c": {
+      "generated_path": "b24/b24_unified/b24_g11_original_unibeam_sequence.c",
+      "baseline_sha256": "bde6cb6c7502ddfc97d065dff166cb3a1149724a81265f0e4794f21df62079c9"
+    },
+    "src/b24/b24_unified/b24_g11_original_unibeam_sequence.h": {
+      "generated_path": "b24/b24_unified/b24_g11_original_unibeam_sequence.h",
+      "baseline_sha256": "b5095ff5e179bbd2466a9831ce6be42a3c2c840ef258b3fe08e23f783b1ac4f3"
+    },
+    "src/b24/b24_unified/b24_g11_practice_melee_feedback.c": {
+      "generated_path": "b24/b24_unified/b24_g11_practice_melee_feedback.c",
+      "baseline_sha256": "e9c52e0fa0c966d7a641bcf71b6c33e95f7eba5af58fe67f5d6e472bc5271ad6"
+    },
+    "src/b24/b24_unified/b24_g11_practice_melee_feedback.h": {
+      "generated_path": "b24/b24_unified/b24_g11_practice_melee_feedback.h",
+      "baseline_sha256": "61959b2f15c0f6c27ade2565704f3cc3243141fdae63fa196225bf8b3cefce5c"
+    },
+    "src/b24/b24_unified/b24_g11_target_camera_follow.h": {
+      "generated_path": "b24/b24_unified/b24_g11_target_camera_follow.h",
+      "baseline_sha256": "7d89a8eb11c2e07677630c92d3f1e1d7a06737bc66046ef0f5d91c7d87809a61"
+    },
+    "src/b24/b24_unified/b24_g124_real_original_NPC_source_state.c": {
+      "generated_path": "b24/b24_unified/b24_g124_real_original_NPC_source_state.c",
+      "baseline_sha256": "fa480aec3595bc1c1e34f0c6b868f46025c19c01a708e2d62804f6fbe1edfb19"
+    },
+    "src/b24/b24_unified/b24_g124_real_original_NPC_source_state.h": {
+      "generated_path": "b24/b24_unified/b24_g124_real_original_NPC_source_state.h",
+      "baseline_sha256": "8de258ac8e6f46d58a0a5cd950a88df00e9bc5aeacc9044031fd1e9d07f26a1d"
+    },
+    "src/b24/b24_unified/b24_g127_authentic_2010_states_mgr.c": {
+      "generated_path": "b24/b24_unified/b24_g127_authentic_2010_states_mgr.c",
+      "baseline_sha256": "5d075a85651ee240b48841143e5c57a84ce52051982ab78734a5bc7157cfe7e4"
+    },
+    "src/b24/b24_unified/b24_g127_authentic_2010_states_mgr.h": {
+      "generated_path": "b24/b24_unified/b24_g127_authentic_2010_states_mgr.h",
+      "baseline_sha256": "e163fd7a69e5d3ef2a55c5f8bd59b4e8bb170d3cc653cdc3f0533aba246d3f59"
+    },
+    "src/b24/b24_unified/b24_g137_source_mission000_intro.c": {
+      "generated_path": "b24/b24_unified/b24_g137_source_mission000_intro.c",
+      "baseline_sha256": "78cfe8837ceaca95c0f357a7044be917e4bd5aa55492e6af9d3db6556eec5b6e"
+    },
+    "src/b24/b24_unified/b24_g137_source_mission000_intro.h": {
+      "generated_path": "b24/b24_unified/b24_g137_source_mission000_intro.h",
+      "baseline_sha256": "da8de2a78a7779ba6562b25b922b0839f82ce90ec488e1a13f431f330f94a246"
+    },
+    "src/b24/b24_unified/b24_g139_original_mission_music_bridge.c": {
+      "generated_path": "b24/b24_unified/b24_g139_original_mission_music_bridge.c",
+      "baseline_sha256": "7930ba4362018b535c1e01ac1452f1eafd99336da496a19a5cb6a772783250c7"
+    },
+    "src/b24/b24_unified/b24_g139_original_mission_music_bridge.h": {
+      "generated_path": "b24/b24_unified/b24_g139_original_mission_music_bridge.h",
+      "baseline_sha256": "fb305d836352b3553cf7bf488df2a23991820708f780460df14f1c93d0004e5c"
+    },
+    "src/b24/b24_unified/b24_g141_owner_pcm_stream.c": {
+      "generated_path": "b24/b24_unified/b24_g141_owner_pcm_stream.c",
+      "baseline_sha256": "97ca073a0ac139b72c2e8e607887f80ab358d84bff6db3e77a8b7f53c8fd2f59"
+    },
+    "src/b24/b24_unified/b24_g141_owner_pcm_stream.h": {
+      "generated_path": "b24/b24_unified/b24_g141_owner_pcm_stream.h",
+      "baseline_sha256": "e0c3a3dfed5622360672ebf640873ce84b456fd028f471282153f0eb292190b4"
+    },
+    "src/b24/b24_unified/b24_g141_vita_stream_worker.c": {
+      "generated_path": "b24/b24_unified/b24_g141_vita_stream_worker.c",
+      "baseline_sha256": "6930a7e7822def95563f02f382e6c4e7291d29ffc1ebe4f0d035b91c1dd3a643"
+    },
+    "src/b24/b24_unified/b24_g141_vita_stream_worker.h": {
+      "generated_path": "b24/b24_unified/b24_g141_vita_stream_worker.h",
+      "baseline_sha256": "b53336130b3047e1ccddbe3c2ca5e77947c5b36bb61a754f9866f9c4aa9d9424"
+    },
+    "src/b24/b24_unified/b24_g142_native_sound_source_truth.c": {
+      "generated_path": "b24/b24_unified/b24_g142_native_sound_source_truth.c",
+      "baseline_sha256": "b8a147a2a983fb731489f65662ca86f1d219cca85d5822f283691d4fa002653d"
+    },
+    "src/b24/b24_unified/b24_g142_native_sound_source_truth.h": {
+      "generated_path": "b24/b24_unified/b24_g142_native_sound_source_truth.h",
+      "baseline_sha256": "ecbcb7b1a046ad4477d592e3fb0c1dcd549eddd705031d19368b751474736e61"
+    },
+    "src/b24/b24_unified/b24_g144_source_audio_channels.c": {
+      "generated_path": "b24/b24_unified/b24_g144_source_audio_channels.c",
+      "baseline_sha256": "e20e855dc8b4314812a3172a48c8e4f3f9d8884e81a4558fe46372fbd84f3393"
+    },
+    "src/b24/b24_unified/b24_g144_source_audio_channels.h": {
+      "generated_path": "b24/b24_unified/b24_g144_source_audio_channels.h",
+      "baseline_sha256": "314d5fed210f35831fda3556bb98292179aed4d67d5410300c746c5dae279308"
+    },
+    "src/b24/b24_unified/b24_g146_true_2010_QTE_actor.c": {
+      "generated_path": "b24/b24_unified/b24_g146_true_2010_QTE_actor.c",
+      "baseline_sha256": "88525d9f64bec5715269ece1967e464eb79ac0a00b0f3af8759b309248583118"
+    },
+    "src/b24/b24_unified/b24_g146_true_2010_QTE_actor.h": {
+      "generated_path": "b24/b24_unified/b24_g146_true_2010_QTE_actor.h",
+      "baseline_sha256": "9f8151bf5220e1b600e0373e568faab73305162d1db831ceb40fb924863acec3"
+    },
+    "src/b24/b24_unified/b24_g147_authentic_tutorial_actor.c": {
+      "generated_path": "b24/b24_unified/b24_g147_authentic_tutorial_actor.c",
+      "baseline_sha256": "df3f956d9de20da58d272af86f6a08b8a644f0306a9036729067f57c4eca52dc"
+    },
+    "src/b24/b24_unified/b24_g147_authentic_tutorial_actor.h": {
+      "generated_path": "b24/b24_unified/b24_g147_authentic_tutorial_actor.h",
+      "baseline_sha256": "88086473696e732592bc98958ab2c5ed14c4289cd2c1cdf9ac080633eb235991"
+    },
+    "src/b24/b24_unified/b24_g149_native_lua_bool_return.c": {
+      "generated_path": "b24/b24_unified/b24_g149_native_lua_bool_return.c",
+      "baseline_sha256": "99a198e3d27880119475767fa34259e552c06c9c14c8e485aebaba1ba40d9f56"
+    },
+    "src/b24/b24_unified/b24_g149_native_lua_bool_return.h": {
+      "generated_path": "b24/b24_unified/b24_g149_native_lua_bool_return.h",
+      "baseline_sha256": "6486e688cb87b9a180ed7d1ce6b67025721f52e6af28316a7bfd862502a93702"
+    },
+    "src/b24/b24_unified/b24_g152_source_tutorial_loop.c": {
+      "generated_path": "b24/b24_unified/b24_g152_source_tutorial_loop.c",
+      "baseline_sha256": "3f3e6bbc394940383e928d91913f7d154ec88845062603ba454bd5df88c22a1e"
+    },
+    "src/b24/b24_unified/b24_g152_source_tutorial_loop.h": {
+      "generated_path": "b24/b24_unified/b24_g152_source_tutorial_loop.h",
+      "baseline_sha256": "27b1d727e7f2ff1880fa5e6a3366e3f6c59b0d8cdb83dc360247ae8e4a75f5cd"
+    },
+    "src/b24/b24_unified/b24_g156_exact_vertical_triangle_contact.h": {
+      "generated_path": "b24/b24_unified/b24_g156_exact_vertical_triangle_contact.h",
+      "baseline_sha256": "9ee38b92ea920de39182bd683781345e11c073b2517b48fc49548ca6c77a433a"
+    },
+    "src/b24/b24_unified/b24_g159_real_source_road.c": {
+      "generated_path": "b24/b24_unified/b24_g159_real_source_road.c",
+      "baseline_sha256": "1a92c3d2bf72bb54a4c54289d029df2eeecac0eb12bdccb6a9fcac9603fe4714"
+    },
+    "src/b24/b24_unified/b24_g159_real_source_road.h": {
+      "generated_path": "b24/b24_unified/b24_g159_real_source_road.h",
+      "baseline_sha256": "d364f6cefc50d22dcb4c8f5731ea923679a348530a86168b7e9085363ac37487"
+    },
+    "src/b24/b24_unified/b24_g160_original_road_spatial.c": {
+      "generated_path": "b24/b24_unified/b24_g160_original_road_spatial.c",
+      "baseline_sha256": "d2475b746bab9b320ec1fdbe8d01ad53c49b467f146caee03da4fe93955bd38e"
+    },
+    "src/b24/b24_unified/b24_g160_original_road_spatial.h": {
+      "generated_path": "b24/b24_unified/b24_g160_original_road_spatial.h",
+      "baseline_sha256": "6648092e61679788d2bfce344da2e21747c2cb943752abcbfbeed57e2509f8f1"
+    },
+    "src/b24/b24_unified/b24_g163_aim_facing.c": {
+      "generated_path": "b24/b24_unified/b24_g163_aim_facing.c",
+      "baseline_sha256": "85ce42624464232948dce148926ccaf8f9835f6b9acb58be61d4766ec944d00b"
+    },
+    "src/b24/b24_unified/b24_g163_aim_facing.h": {
+      "generated_path": "b24/b24_unified/b24_g163_aim_facing.h",
+      "baseline_sha256": "397a37744343b10b541c7999282ea32a85ead6a3ea8bb74db4db83d5d9016504"
+    },
+    "src/b24/b24_unified/b24_g164_camera_sky_framing.c": {
+      "generated_path": "b24/b24_unified/b24_g164_camera_sky_framing.c",
+      "baseline_sha256": "cb80c03844ae948996b6866f1b5e506d28ac1eb35aba4855edc7e6ba6671ef29"
+    },
+    "src/b24/b24_unified/b24_g164_camera_sky_framing.h": {
+      "generated_path": "b24/b24_unified/b24_g164_camera_sky_framing.h",
+      "baseline_sha256": "10575dda877c4f6d094605cfa2accb5950061d55abf8da72df6ef556d80e7254"
+    },
+    "src/b24/b24_unified/b24_g169_native_source_unibeam.c": {
+      "generated_path": "b24/b24_unified/b24_g169_native_source_unibeam.c",
+      "baseline_sha256": "30b159669855b406bfa26f03daf168d5ddc1215696fe96f761d3e08be805be9c"
+    },
+    "src/b24/b24_unified/b24_g169_native_source_unibeam.h": {
+      "generated_path": "b24/b24_unified/b24_g169_native_source_unibeam.h",
+      "baseline_sha256": "7c6a9acc9c81fcab9993d133c57f2ff9afecc9d080090614ed109716c1c5b66d"
+    },
+    "src/b24/b24_unified/b24_g172_wm_ground_m_source.h": {
+      "generated_path": "b24/b24_unified/b24_g172_wm_ground_m_source.h",
+      "baseline_sha256": "8b2453675055f2629aa523a08276dbcde8167b585cc19c045bcb6f82ced94f81"
+    },
+    "src/b24/b24_unified/b24_g173_authored_beam_priority.h": {
+      "generated_path": "b24/b24_unified/b24_g173_authored_beam_priority.h",
+      "baseline_sha256": "d74e2b0fa99a70e49fee096710713cebb10c398e0a6cb6f0cc44ed826897ee27"
+    },
+    "src/b24/b24_unified/b24_g197_original_2010_attack_dispatch_reference.h": {
+      "generated_path": "b24/b24_unified/b24_g197_original_2010_attack_dispatch_reference.h",
+      "baseline_sha256": "feaf71f60c4ca287346f3f608988223a26e5e4f1b6fce364dd671f1c64c17379"
+    },
+    "src/b24/b24_unified/b24_g218_live_authentic_2010_state_observer.h": {
+      "generated_path": "b24/b24_unified/b24_g218_live_authentic_2010_state_observer.h",
+      "baseline_sha256": "accff946c1d7676e25d76b33001c7cf20ae83c7e0ac5a44466b7c4f9905c56ae"
+    },
+    "src/b24/b24_unified/b24_g227_vita_ground_world_render_probe.h": {
+      "generated_path": "b24/b24_unified/b24_g227_vita_ground_world_render_probe.h",
+      "baseline_sha256": "be8922986e471163d997690ffa7bd9f943532662b95c8e1bfc83b9636714dd10"
+    },
+    "src/b24/b24_unified/b24_g229_ground_trajectory_window.h": {
+      "generated_path": "b24/b24_unified/b24_g229_ground_trajectory_window.h",
+      "baseline_sha256": "822f67fdfb41e3028893a901d479e822aed07448bb752b24da69807c18932387"
+    },
+    "src/b24/b24_unified/b24_g277_real_c1l1_ground_reject_reasons.h": {
+      "generated_path": "b24/b24_unified/b24_g277_real_c1l1_ground_reject_reasons.h",
+      "baseline_sha256": "e609e6fec12811c674482cb725788fc02d03e9843ba3dc29f38e812bc8a48fba"
+    },
+    "src/b24/b24_unified/b24_g279_walk_trace.h": {
+      "generated_path": "b24/b24_unified/b24_g279_walk_trace.h",
+      "baseline_sha256": "61c057f2841b1ba3440049b12075ae745b27b6a26b92ede520246f75d77869c8"
+    },
+    "src/b24/b24_unified/b24_g75_original_sun_lighting_candidate.h": {
+      "generated_path": "b24/b24_unified/b24_g75_original_sun_lighting_candidate.h",
+      "baseline_sha256": "f9b9acb3d52fa182f9c232b662a8e83a236d427734ce7e07e6f00054f921ee3e"
+    },
+    "src/b24/b24_unified/b24_g75_source_capsule.c": {
+      "generated_path": "b24/b24_unified/b24_g75_source_capsule.c",
+      "baseline_sha256": "b00ef49e9061eb84c9b1d74a6510706c807347305f8885505fe5fae359b5f36c"
+    },
+    "src/b24/b24_unified/b24_g75_source_capsule.h": {
+      "generated_path": "b24/b24_unified/b24_g75_source_capsule.h",
+      "baseline_sha256": "44811ec6b425892e910569d2823c83fbb985a4cdbb018c7bb52fc314308d0a27"
+    },
+    "src/b24/b24_unified/b24_g76_original_native_damage_math.c": {
+      "generated_path": "b24/b24_unified/b24_g76_original_native_damage_math.c",
+      "baseline_sha256": "bc5ae937a0cb176f11152d96cbf2dd8f3806b8d4ba932f62d626acb9c02842a4"
+    },
+    "src/b24/b24_unified/b24_g76_original_native_damage_math.h": {
+      "generated_path": "b24/b24_unified/b24_g76_original_native_damage_math.h",
+      "baseline_sha256": "cb956484b3c19974401e495e03076c34df04c7a0c5a1bdff94404f874c0ba0c4"
+    },
+    "src/b24/b24_unified/b24_g77_melee_source_radius.c": {
+      "generated_path": "b24/b24_unified/b24_g77_melee_source_radius.c",
+      "baseline_sha256": "33ac65031148466e0b5004851adb1a0ec2b9c60d5d22e4316a9da2d5cf810a02"
+    },
+    "src/b24/b24_unified/b24_g77_melee_source_radius.h": {
+      "generated_path": "b24/b24_unified/b24_g77_melee_source_radius.h",
+      "baseline_sha256": "74e9d98395d1db5e40f0eaccb2afaf3e0791451aa9cd14c36546d14f4162595f"
+    },
+    "src/b24/b24_unified/b24_g82_original_combat_coordinator.c": {
+      "generated_path": "b24/b24_unified/b24_g82_original_combat_coordinator.c",
+      "baseline_sha256": "e7c97696ea0adb4dd268530654d5a492ea187810bcf139eac4c6d8b95f7c1611"
+    },
+    "src/b24/b24_unified/b24_g82_original_combat_coordinator.h": {
+      "generated_path": "b24/b24_unified/b24_g82_original_combat_coordinator.h",
+      "baseline_sha256": "13422025919c49b25e116909f143da88fb8648efd0ba58a476c27650e57a9f9a"
+    },
+    "src/b24/b24_unified/b24_g83_authentic_2010_source_durations.h": {
+      "generated_path": "b24/b24_unified/b24_g83_authentic_2010_source_durations.h",
+      "baseline_sha256": "066b7f5ec2b6074f33f1de1ad9262a1ca81011506042a214577dd6152a863904"
+    },
+    "src/b24/b24_unified/b24_g83_authentic_timed_router.c": {
+      "generated_path": "b24/b24_unified/b24_g83_authentic_timed_router.c",
+      "baseline_sha256": "d108500f55fc7d9e078d11eedd42ded669be81d05c2a3c905df446418afe3dcb"
+    },
+    "src/b24/b24_unified/b24_g83_authentic_timed_router.h": {
+      "generated_path": "b24/b24_unified/b24_g83_authentic_timed_router.h",
+      "baseline_sha256": "14c020184f2e9955a44a5ca8bf2a9d7c97886fc4ccf924641864622480775aa2"
+    },
+    "src/b24/b24_unified/b24_g83_unified_movement_aim.c": {
+      "generated_path": "b24/b24_unified/b24_g83_unified_movement_aim.c",
+      "baseline_sha256": "af0d9a7d19ae5ea71a1b868f82c80e2f8c702e328c78385c8ef7935d3b3f0094"
+    },
+    "src/b24/b24_unified/b24_g83_unified_movement_aim.h": {
+      "generated_path": "b24/b24_unified/b24_g83_unified_movement_aim.h",
+      "baseline_sha256": "a76b18d79d146c8f8da1c2001a65c7f4e1a1bf87dc22e974d051d72e297a2001"
+    },
+    "src/b24/b24_unified/b24_g87_transition_events.c": {
+      "generated_path": "b24/b24_unified/b24_g87_transition_events.c",
+      "baseline_sha256": "0c6090c5737abb5e27dde04a14a608fd770f3582e1eb824a4c7a774b44c9c080"
+    },
+    "src/b24/b24_unified/b24_g87_transition_events.h": {
+      "generated_path": "b24/b24_unified/b24_g87_transition_events.h",
+      "baseline_sha256": "7046ab9356c92e9e0e2c67a4deb50cf6da29f437b9b5a1082da3a03700a1f954"
+    },
+    "src/b24/b24_unified/b24_g89_real_2010_melee_state_predicates.c": {
+      "generated_path": "b24/b24_unified/b24_g89_real_2010_melee_state_predicates.c",
+      "baseline_sha256": "c18c6494da8d6ba24dad6e479ed860e523c331bd18c2f07afbf3ee5c0da36e38"
+    },
+    "src/b24/b24_unified/b24_g89_real_2010_melee_state_predicates.h": {
+      "generated_path": "b24/b24_unified/b24_g89_real_2010_melee_state_predicates.h",
+      "baseline_sha256": "f9207f66a4b5cb838a13ea36192a038376a2daaeb47449d77bb794012b3ddddf"
+    },
+    "src/b24/b24_unified/b24_g8_live_original_motion.c": {
+      "generated_path": "b24/b24_unified/b24_g8_live_original_motion.c",
+      "baseline_sha256": "abad55d75ffb25a7915f0128d7231710d7950c82080fb56bea23d5824f374d00"
+    },
+    "src/b24/b24_unified/b24_g8_live_original_motion.h": {
+      "generated_path": "b24/b24_unified/b24_g8_live_original_motion.h",
+      "baseline_sha256": "fc8f011813e022cf2c325872447651d9e79e4940aa2caaf8eae956184270defb"
+    },
+    "src/b24/b24_unified/b24_g8_melee_source_chain.c": {
+      "generated_path": "b24/b24_unified/b24_g8_melee_source_chain.c",
+      "baseline_sha256": "9e40ae86fc9ce4003fd68e90c4f03eaeaed1f4e78f779c0942745b79c82a38d3"
+    },
+    "src/b24/b24_unified/b24_g8_melee_source_chain.h": {
+      "generated_path": "b24/b24_unified/b24_g8_melee_source_chain.h",
+      "baseline_sha256": "cd299f21d75679abb449d91b3a1549a2d14479304d4110b6db3674bf765cb4bb"
+    },
+    "src/b24/b24_unified/b24_g8_wm_shoulder_gameplay.c": {
+      "generated_path": "b24/b24_unified/b24_g8_wm_shoulder_gameplay.c",
+      "baseline_sha256": "271ce8314acde1445aa7bb52efdf8a81350c1c796deb708b3a7e102f2c40ad3c"
+    },
+    "src/b24/b24_unified/b24_g8_wm_shoulder_gameplay.h": {
+      "generated_path": "b24/b24_unified/b24_g8_wm_shoulder_gameplay.h",
+      "baseline_sha256": "b9c934d54ea8e0e699f4aca1d44a38004e7ec0d535a112f9a9a5c3ba900c6dcf"
+    },
+    "src/b24/b24_unified/b24_gpu_boot_trace.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_boot_trace.c",
+      "baseline_sha256": "9d5d4f7f0862beec8752fd9bc3cf8bf2a5f2d5cb097fe109f4d4ebbeebc02480"
+    },
+    "src/b24/b24_unified/b24_gpu_boot_trace.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_boot_trace.h",
+      "baseline_sha256": "d9948d30f29313876a1ba32d0cfc9f4e714658d23f29268e7f38fc2cecfc2d52"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_2010_diffuse_upload.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_2010_diffuse_upload.h",
+      "baseline_sha256": "21a4b87002a7c2a0c03eb869e7714254859e9460eccc1518abaa55a94b75fead"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_2010_textured_material.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_2010_textured_material.h",
+      "baseline_sha256": "28b9a13d29d00f9612a385728ac2b748a2bd1f13a34357f6f26459125eaad33d"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_material.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_material.h",
+      "baseline_sha256": "acaf46a388f2ae2f12244cdba14f5312c3192b4004e7fc3d69ddef4b29d0f394"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_material_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_material_vitagl.c",
+      "baseline_sha256": "644f4ddd89a2821e8ebd6c31688d7691ae51d8139751992a1e521806a90ca59b"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_vehicle_texture.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_vehicle_texture.h",
+      "baseline_sha256": "a9d6fd5b5727ee066f611bf1af4b0f411199d5a48c3aa343ea6c5e75496df5b6"
+    },
+    "src/b24/b24_unified/b24_gpu_c1_vehicle_texture_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_c1_vehicle_texture_vitagl.c",
+      "baseline_sha256": "3ec28bb97f2af382c150b80676417882687f2968b240970a961a141ee6df9a42"
+    },
+    "src/b24/b24_unified/b24_gpu_camera.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_camera.c",
+      "baseline_sha256": "19176652e1766698b7e42e8acd6eca9e9798a1c10cf6f2b9f7102b42c43f88c2"
+    },
+    "src/b24/b24_unified/b24_gpu_camera.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_camera.h",
+      "baseline_sha256": "3d47da241092872d4d3c0c4268c3f4843aed6d50f714cc1074c9b4cad1848f78"
+    },
+    "src/b24/b24_unified/b24_gpu_cpu_profile.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_cpu_profile.c",
+      "baseline_sha256": "fffeb4043c68d14bca5c80a377929bcb0450f56232c7387b2c01966abdfd0c5f"
+    },
+    "src/b24/b24_unified/b24_gpu_cpu_profile.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_cpu_profile.h",
+      "baseline_sha256": "8551ce7c47ba3de29480d4b0175ccace3efd5031fe264e36d14c4bc66a7e36bd"
+    },
+    "src/b24/b24_unified/b24_gpu_g68_city.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_g68_city.c",
+      "baseline_sha256": "63ac7fd93bab56b6fc737757c33ce996900208b1bbaa8118f3f41df1aae799be"
+    },
+    "src/b24/b24_unified/b24_gpu_g68_city.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_g68_city.h",
+      "baseline_sha256": "efe556d035d2a0aecc0f6e93bfbbc2edac2104805a7e259b7dbb7bca559d1ac1"
+    },
+    "src/b24/b24_unified/b24_gpu_g68_collision.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_g68_collision.c",
+      "baseline_sha256": "d20b61b02bdaac342cedeaacd482f566e0f1133133530061fe9f6f357df47bd2"
+    },
+    "src/b24/b24_unified/b24_gpu_g68_collision.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_g68_collision.h",
+      "baseline_sha256": "b8460f1e143ca36ac8e8dcc6b18cc0367925c064ad3e4df91d0d84c37a41d340"
+    },
+    "src/b24/b24_unified/b24_gpu_g72_light.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_g72_light.h",
+      "baseline_sha256": "a26ec96a10ccf249e46eb50e457c426ee313c9b594985ece03ea1848a98ee44b"
+    },
+    "src/b24/b24_unified/b24_gpu_g72_sky.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_g72_sky.h",
+      "baseline_sha256": "83f02f03206f5de88f7a9721a7d93d7978754d16a6e5a76086670044d9ca5fe7"
+    },
+    "src/b24/b24_unified/b24_gpu_g73_sky.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_g73_sky.h",
+      "baseline_sha256": "a405949dfe7df5718133435b042c761c479cc774802a15e49554a8fa6a7075fc"
+    },
+    "src/b24/b24_unified/b24_gpu_g73_sky_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_g73_sky_vitagl.c",
+      "baseline_sha256": "7f2389bc6e84b8120c54a7184e186e40e4efa9c1877b40f5b948290f701be01d"
+    },
+    "src/b24/b24_unified/b24_gpu_hud_bridge.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_hud_bridge.h",
+      "baseline_sha256": "e86837c2752b8a985f23f0723d8fbc7433b78d14e748004f64de1734488fd09e"
+    },
+    "src/b24/b24_unified/b24_gpu_hud_bridge_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_hud_bridge_vitagl.c",
+      "baseline_sha256": "c417dd702441632ba2420d24245797aff3d33a5ca494051b3a30fea5fbd5022c"
+    },
+    "src/b24/b24_unified/b24_gpu_hud_native.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_hud_native.c",
+      "baseline_sha256": "ac4c2244c0821cf2d4496372ea466ff3627efe15cfdb1a30e19fba3d54079ee5"
+    },
+    "src/b24/b24_unified/b24_gpu_hud_native.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_hud_native.h",
+      "baseline_sha256": "83f49a5b26a6dbe334ab127ff78e13f267173c5fc58f686168cf3d35fc5554cd"
+    },
+    "src/b24/b24_unified/b24_gpu_hud_native_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_hud_native_vitagl.c",
+      "baseline_sha256": "158a8fb6661e5ff815b6c9c62a1b65678ef8c821e441a62922a6137c2657c885"
+    },
+    "src/b24/b24_unified/b24_gpu_owner.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_owner.h",
+      "baseline_sha256": "efc0afaf6535b6711b2642318ac72329a40d01a6deb838f56bbe2bb4854422e6"
+    },
+    "src/b24/b24_unified/b24_gpu_owner_c1_material.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_owner_c1_material.c",
+      "baseline_sha256": "ba1a0e0f2788a69f7c5a83e38b6fd907e8e6a7c282ce215425c4952ddad5fd8e"
+    },
+    "src/b24/b24_unified/b24_gpu_owner_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_owner_vitagl.c",
+      "baseline_sha256": "4ac12c6531696891281a5ca11afb071ab4e6eda358f49803acda78db73de3c95"
+    },
+    "src/b24/b24_unified/b24_gpu_reticle.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_reticle.c",
+      "baseline_sha256": "9738bb2003cddd16002f73982dd53d26ddb26d72691a4c56b02521edfe2b9bff"
+    },
+    "src/b24/b24_unified/b24_gpu_reticle.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_reticle.h",
+      "baseline_sha256": "d42d4d51252954732f8788df5684e77f2cc4f98d75593dcb895064115a84e8c1"
+    },
+    "src/b24/b24_unified/b24_gpu_runtime.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_runtime.c",
+      "baseline_sha256": "ea2c86c8b6e6dd1e3992628d8aade0d82731eea47cb042b31f4998a6a2cf8992"
+    },
+    "src/b24/b24_unified/b24_gpu_runtime.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_runtime.h",
+      "baseline_sha256": "0be53118e8fec1fc28f5e1b55cd66d635a22bf10f0bf841414783ca142572f27"
+    },
+    "src/b24/b24_unified/b24_gpu_suit.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_suit.h",
+      "baseline_sha256": "9f37c834b9a5d772da489ce428800d841351bc92a64740b79baebf440e7ea8ac"
+    },
+    "src/b24/b24_unified/b24_gpu_suit_im2_adapter.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_suit_im2_adapter.c",
+      "baseline_sha256": "3b6cc8eef47fa8467a68ea0309d6d2cb8ea0a0cafec41caf1e8bad21216a9fc2"
+    },
+    "src/b24/b24_unified/b24_gpu_suit_im2_adapter.h": {
+      "generated_path": "b24/b24_unified/b24_gpu_suit_im2_adapter.h",
+      "baseline_sha256": "824574604ff4edf1a223fd5dbfd0eabe4f40528a35ff737b7c9e38afd2cf2c12"
+    },
+    "src/b24/b24_unified/b24_gpu_suit_vitagl.c": {
+      "generated_path": "b24/b24_unified/b24_gpu_suit_vitagl.c",
+      "baseline_sha256": "1ae38ecff9c74039a595ec7e70db4a74633c4cf7d3f7fa51f8cc6dd2276746d6"
+    },
+    "src/b24/b24_unified/b24_hover_pose_blend.c": {
+      "generated_path": "b24/b24_unified/b24_hover_pose_blend.c",
+      "baseline_sha256": "dfe401a1d7cbd42d4b779ea01361ca3b2185f8de60bba14914140831c30a6260"
+    },
+    "src/b24/b24_unified/b24_hover_pose_blend.h": {
+      "generated_path": "b24/b24_unified/b24_hover_pose_blend.h",
+      "baseline_sha256": "3be8a6dc382fc908a56c30d98e0e77573a047a107376e17d2641c39a3532abad"
+    },
+    "src/b24/b24_unified/b24_original_im2v_stream.c": {
+      "generated_path": "b24/b24_unified/b24_original_im2v_stream.c",
+      "baseline_sha256": "382f23b9ae6839dcbe2e3684baf0c8188401b71314f85718c3aa93a66a8bc55a"
+    },
+    "src/b24/b24_unified/b24_original_im2v_stream.h": {
+      "generated_path": "b24/b24_unified/b24_original_im2v_stream.h",
+      "baseline_sha256": "dcb017aea7741eac99726da86a3f0de22df5477548f8f8f3abd8126a423834ee"
+    },
+    "src/b24/b24_unified/b24_unified.c": {
+      "generated_path": "b24/b24_unified/b24_unified.c",
+      "baseline_sha256": "f54a59a178582e362bc7d30f93d526ee84a7e2056a91da6123b97e299681c741"
+    },
+    "src/b24/b24_unified/b24_unified.h": {
+      "generated_path": "b24/b24_unified/b24_unified.h",
+      "baseline_sha256": "90b3685ecb6093eac2e407e8ac284c46366620d6ed0960942622c7cbd20be0c8"
+    },
+    "src/b24/b24_unified/b24_weapon_aim.h": {
+      "generated_path": "b24/b24_unified/b24_weapon_aim.h",
+      "baseline_sha256": "219db9f289236e37858ea13f3b041d4420cafaebf38215c5dfb4d9c51737886b"
+    },
+    "src/b24/b24_unified/b24_wm_2010_gun_stream.c": {
+      "generated_path": "b24/b24_unified/b24_wm_2010_gun_stream.c",
+      "baseline_sha256": "f82ddaf4064f141d091609c25bfe66ed9792ecdb5307125445c78c99c88a46cb"
+    },
+    "src/b24/b24_unified/b24_wm_2010_gun_stream.h": {
+      "generated_path": "b24/b24_unified/b24_wm_2010_gun_stream.h",
+      "baseline_sha256": "98004ee4cab02d3be5ec0606dc3c80cb1615b621ec2bceec6eafe2fdccdb894f"
+    },
+    "src/b24/b24_unified/b24_wm_original_marker_g8_world.c": {
+      "generated_path": "b24/b24_unified/b24_wm_original_marker_g8_world.c",
+      "baseline_sha256": "b1d54ee3c4902bfd33f512972fbf9e679aff485257bce334a13cd55b069ef3cd"
+    },
+    "src/b24/b24_unified/b24_wm_original_marker_g8_world.h": {
+      "generated_path": "b24/b24_unified/b24_wm_original_marker_g8_world.h",
+      "baseline_sha256": "dec729888b586bd1629515c7994c1669ff4bae634cf6a84d415ec5906dd64073"
+    },
+    "src/b24/b24_unified/b24_wm_original_rigid_sync.c": {
+      "generated_path": "b24/b24_unified/b24_wm_original_rigid_sync.c",
+      "baseline_sha256": "0bdaa3a6275ac51a97f8e013e5c74876d1718274795c49421287c93eba84d234"
+    },
+    "src/b24/b24_unified/b24_wm_original_rigid_sync.h": {
+      "generated_path": "b24/b24_unified/b24_wm_original_rigid_sync.h",
+      "baseline_sha256": "bbe09d812ccde0ac59e6afc42c0ef6eb76d9b7d54cbbf34d4bb6b7a4ff480693"
+    },
+    "src/b10_profile.h": {
+      "generated_path": "src/b10_profile.h",
+      "baseline_sha256": "4233e4e31b3060e5783ae424b13792c683b6b778904d0bd6975cc7cd25b1ff7a"
+    },
+    "src/b13_motion.c": {
+      "generated_path": "src/b13_motion.c",
+      "baseline_sha256": "16ea1e54119559e7a3ee311ffbec6331287c04d57b09aae1bce2db101d2734c1"
+    },
+    "src/b13_motion.h": {
+      "generated_path": "src/b13_motion.h",
+      "baseline_sha256": "f066173bd38362ec37eddb70288ea23eb4e39864ffe37e7fb380c8872ae7dcc0"
+    },
+    "src/b14_pose.c": {
+      "generated_path": "src/b14_pose.c",
+      "baseline_sha256": "121626fbdb83cfa3e622ce4075a356139098b642b7db35f3676231cc22bdb1f2"
+    },
+    "src/b14_pose.h": {
+      "generated_path": "src/b14_pose.h",
+      "baseline_sha256": "39a75f7727490e8fc6cb29553277ea8a56cf6ddfbdd63f3498dfaf3ce398681c"
+    },
+    "src/b14_world.c": {
+      "generated_path": "src/b14_world.c",
+      "baseline_sha256": "102e29cec7a0a66398b2b612c89441992b098db49482a8bcbe9a8a90d94741e0"
+    },
+    "src/b14_world.h": {
+      "generated_path": "src/b14_world.h",
+      "baseline_sha256": "8975d19de2750b7d34e33fbe2906a55f0d330bc2e6845209f82d973bcb85bcd9"
+    },
+    "src/b16_action.c": {
+      "generated_path": "src/b16_action.c",
+      "baseline_sha256": "e00af525e996cf9e439caa9905449d8b40ca435de96e95d1d3574cfb6eaa6212"
+    },
+    "src/b16_action.h": {
+      "generated_path": "src/b16_action.h",
+      "baseline_sha256": "79a739261bce4c712749107dca171ff473df6fab90f281a13a21c29d09b46965"
+    },
+    "src/b7_anim.c": {
+      "generated_path": "src/b7_anim.c",
+      "baseline_sha256": "d0f93bc616a1e7ec7f6b0ba016731aae3e82b69b6b9647ae4b3654fe30dbcd17"
+    },
+    "src/b7_anim.h": {
+      "generated_path": "src/b7_anim.h",
+      "baseline_sha256": "d3c53e3b49838b1e134cd62f79e3ede122f97a17ea00faec7c078a5be98c919c"
+    },
+    "src/b8_combat.c": {
+      "generated_path": "src/b8_combat.c",
+      "baseline_sha256": "d312370f27eb54fa755b4c8bbfe336ebef8c60f0d47ee78be53e98cd745678e9"
+    },
+    "src/b8_combat.h": {
+      "generated_path": "src/b8_combat.h",
+      "baseline_sha256": "2627abd3d5f5f5de8e159692e1a3235e589ec5bdd986b1b113b5351c869435e6"
+    },
+    "src/main.c": {
+      "generated_path": "src/main.c",
+      "baseline_sha256": "ae23bab64ef8b4ec86779410a8e9bf5d2de1f262597c0c56cc75206afbb462ed"
+    },
+    "src/renderer.c": {
+      "generated_path": "src/renderer.c",
+      "baseline_sha256": "cbf6dc11d38ae2f10b39fd00339c6a7b491c0f7a0f328c8a7307957483087c1b"
+    },
+    "src/renderer.h": {
+      "generated_path": "src/renderer.h",
+      "baseline_sha256": "56051a81f03af22f4aeb53f3038e05ba8d9a93bdaac8acef9d5876750dadb965"
+    }
+  },
+  "externalized": [
+    "b24/b24_unified/b24_g137_mission000_owner_original_generated.c",
+    "b24/b24_unified/b24_g217_AUTHENTIC_original_2010_iOS_source_states_ONLY_NO_VPK.h"
+  ]
+}

@@ -1,0 +1,38 @@
+name: Canonical source — host checks and full Vita ARM ELF
+on:
+  push:
+    branches: [feature/b24-unified-gameplay]
+    paths: ['src/**', 'cmake/**', 'tests/**', 'tools/**', 'CMakeLists.txt', '.github/workflows/source-build.yml']
+  pull_request:
+    paths: ['src/**', 'cmake/**', 'tests/**', 'tools/**', 'CMakeLists.txt', '.github/workflows/source-build.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        sanitizers: ['OFF', 'ON']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Source-only host checks; synthetic data, no owner assets
+        env:
+          IM2_SANITIZERS: '${{ matrix.sanitizers }}'
+        run: bash tools/test_host.sh
+  vita-elf:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the pinned SDK only
+        run: docker pull vitasdk/vitasdk@sha256:8227da1b596d981f4513cd9b36bda1e43857f6dae5bcf4312c1cd40167f7d9bb
+      - name: Build the complete canonical source directly; no original assets or patchers
+        run: bash tools/build_vita.sh
+      - name: Confirm output and no package
+        run: |
+          set -euo pipefail
+          file build-vita/im2_beta
+          test -s build-vita/im2_beta
+          test -z "$(find build-vita -type f -name '*.vpk' -print -quit)"

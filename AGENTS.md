@@ -1,6 +1,27 @@
 # Iron Man 2 (Gameloft iOS 2010) -> PS Vita — engineering agents
 
-This is the **existing** private Iron Man 2 iOS-to-PS Vita preservation/port project. Work inside this repository, on `feature/b24-unified-gameplay` unless explicitly instructed otherwise. The user currently operates from the ChatGPT mobile app and expects concrete commits/tests, not repetitive status reports.
+This is the **existing** Iron Man 2 iOS-to-PS Vita preservation/port project. Do not assume repository visibility is private. Work inside this repository, on `feature/b24-unified-gameplay` unless explicitly instructed otherwise. The user currently operates from the ChatGPT mobile app and expects concrete commits/tests, not repetitive status reports.
+
+## Current source ownership — 28 October 2026
+
+- **Canonical source is `src/main.c` and `src/b24/`, with root `CMakeLists.txt`.**
+  Edit these directly. Do not apply historical reconstruction patchers to them,
+  or overwrite them with generated `work/` files. Earlier generated-source
+  references below are historical context, superseded by this section.
+- Build/test instructions are `BUILDING.md`; concise current state is `STATUS.md`.
+  `source-build.yml` builds source-only host checks and the complete Vita ARM ELF.
+  G171 is now manual-only historical reconstruction; its old success does not
+  establish the state of the new tree. No VPK target exists in the new build.
+- `tools/test_host.sh` needs no original assets. For original geometry tests,
+  set `IM2_ASSET_ROOT` to the external authorized asset directory. Full Vita
+  compilation also needs no original data: `bash tools/build_vita.sh`.
+- Original models, poses, textures and generated original state/Lua tables stay
+  outside tracked source. Runtime data bank: `app0:data/source_tables.im2d`;
+  convert authorized local inputs with `tools/export_original_tables.py` once.
+  Missing/corrupt data must remain unacknowledged, never fabricate gameplay.
+- Frame telemetry observes existing dt differences and clocks; it changes no
+  physics policy, source animation timing or clock frequencies. CPU phase time
+  is not GPU busy or physical-device performance proof.
 
 ## Non-negotiable scope
 
@@ -32,7 +53,7 @@ This is the **existing** private Iron Man 2 iOS-to-PS Vita preservation/port pro
 - G279/G296 authoritative source: `research/b24_unified/g279_vita_walk_persistent_trace/`; offline analyzer is `g279_analyze_Vita_walk_trace_TR.py`; original boot and source tests are `research/b24_unified/G279_REAL_VITA_FIRST_RENDERED_WALK_EVIDENCE_CSV_SOURCE_ONLY_2026-10-20_TR.md`, `research/b24_unified/G276_G278_REAL_EXPO_Z_LAYER_WALK_COLLISION_AND_VITA_FIRST_RENDERED_WORLD_BOOT_TR_2026-10-19.md`.
 - Source readiness gates are **all currently false** in `research/b24_unified/g255_single_integrated_VPK_acceptance_gate/SOURCE_PRE_VPK_READINESS.json`; do not relax them to ship.
 - Historical G161 was located and loaded as an archive in Vita3K. Vita3K official 3.74 main firmware was installed in ephemeral GitHub CI. **G295** fails in stock GitHub Ubuntu CPU Vulkan with `vk::Instance::enumeratePhysicalDevices: ErrorInitializationFailed`; earlier OpenGL needed 4.4. This is an **emulator host GPU blocker**, not proof that the game boots into playable world. Do not burn cycles rerunning the same default GitHub runner without a new supported graphics hypothesis or GPU-capable machine.
-- The complete native PS Vita ELF integration workflow (no VPK) is `.github/workflows/g171-2010-source-sculpture-false-wall-ground-walk-G169-full-ARM-NO-VPK.yml`; reconstructs transient `work/src/main.c` in CI, not a directly committed `src/main.c`. Avoid editing imaginary root source trees.
+- The complete native PS Vita ELF workflow is now `.github/workflows/source-build.yml`, using tracked `src/main.c`. The G171 workflow preserves the historical generated `work/src/main.c` recipe for reference only.
 
 ## Immediately repeatable no-VPK tests
 
