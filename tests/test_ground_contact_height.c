@@ -51,6 +51,29 @@ static void step_case(float base,float delta,int obstructed,int diagonal){
  }
 }
 
+/* Enter a source floor's XY footprint during the same descending step.
+ * A floor query at old XY alone misses the newly crossed support. */
+static void descending_edge(float base,int blocked,int diagonal){
+ B24C1OriginalCollisionFace faces[2];
+ const float floor[]={0,-10,base,10,-10,base,0,10,base};
+ make_face(&faces[0],floor,0);
+ const float ceiling[]={.4f,-10,base+2.2f,.4f,10,base+2.2f,.4f,0,base+4.f};
+ make_face(&faces[1],ceiling,1);
+ B24C1OriginalCollision city={0};city.ready=1;city.faces=faces;city.count=blocked?2u:1u;
+ const float x0=-.01f,y0=0.f,z0=base+.1f;
+ assert(!wall_hit(&city,x0,y0,z0));
+ float x=x0,y=y0,z=z0;const float target_y=diagonal?.1f:0.f;
+ assert(b24_g75_capsule_reconcile(&city,x0,y0,z0,.15f,target_y,base-.1f,
+                                 0,.35f,2.24f,&x,&y,&z));
+ if(blocked){
+  assert(fabsf(x-x0)<.0001f); /* accepted floor must also clear head */
+  assert(fabsf(y-target_y)<.0001f&&!wall_hit(&city,x,y,z));
+ }else{
+  if(z<base-.0001f)fprintf(stderr,"missed descending floor entry: base=%.4f final=(%.4f,%.4f,%.4f)\n",base,x,y,z);
+  assert(fabsf(x-.15f)<.0001f&&fabsf(y-target_y)<.0001f&&fabsf(z-base)<.0001f);
+ }
+}
+
 static void original_geometry(const char *path){
  B24C1OriginalCollision city={0};assert(b24_g70_g68_collision_load(&city,path));
  assert(city.count==1910 && city.wall_count==1690 && city.faces[715].wall);
@@ -81,6 +104,9 @@ int main(int argc,char **argv){
    step_case(base[i],.4f,obstructed,diagonal);
    step_case(base[i],-.3f,obstructed,diagonal);
   }
+ for(unsigned i=0;i<4;i++)for(int blocked=0;blocked<=1;blocked++)
+  for(int diagonal=0;diagonal<=1;diagonal++)descending_edge(base[i],blocked,diagonal);
+ puts("PASS 16 synthetic airborne floor-edge entries: crossed floor and final head clearance, shifted Z");
  puts("PASS 32 synthetic ground-contact cases: step up/down, final body clearance, safe slide, shifted Z");
  return 0;
 }

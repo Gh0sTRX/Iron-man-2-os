@@ -201,6 +201,15 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
 #endif
     continue;
    }
+   if(!grounded&&stepz<0.f){
+     /* A descending actor can enter a source platform's XY footprint in
+      * this very substep. Old-XY floor queries alone miss that edge and
+      * can leave the accepted feet below the platform. Query each actual
+      * candidate independently, including slide candidates. */
+     float crossed=0.f;
+     if(b24_g75_floor_crossed(world,nx,ny,z,z+stepz,&crossed))
+       candidate_z=fmax2(candidate_z,crossed);
+   }
    if(grounded){
      float h=0.f;
      /* Ground cannot pass through tall ledges. The G67 original
@@ -218,18 +227,17 @@ int b24_g75_capsule_reconcile(const B24C1OriginalCollision *world,
       continue;
      }
      candidate_z=h;
-     /* The floor adjustment changes the body's vertical interval. A wall
-      * clear at the proposed Z may intersect head/feet at accepted floor Z.
-      * Preserve the existing conservative proposal check above, then test
-      * the ACTUAL candidate before accepting it. Failed candidates must
-      * not leak their floor height into the following slide candidate. */
-     if(candidate_z!=nextz &&
-        !wall_clear(world,nx,ny,candidate_z,radius,height)){
+   }
+   /* Ground steps and airborne floor catches both change the body's
+    * vertical interval. Preserve the proposal check, then verify the
+    * accepted feet/head. A rejected candidate must not leak its floor
+    * height into the following slide candidate. */
+   if(candidate_z!=nextz &&
+      !wall_clear(world,nx,ny,candidate_z,radius,height)){
 #ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
-      ++g277_last.candidate_wall_reject;
+    ++g277_last.candidate_wall_reject;
 #endif
-      continue;
-     }
+    continue;
    }
    x=nx;y=ny;nextz=candidate_z;
 #ifdef B24_G227_WALK_ROOT_DIAGNOSTIC
