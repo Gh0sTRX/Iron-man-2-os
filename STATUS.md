@@ -102,3 +102,23 @@ are external in `/workspace/im2-current/pause-gameplay-*.log`.
 The remote branch's four Mach-O feasibility commits were merged without source
 replacement; its seven synthetic parser tests remain separate compatibility
 research. A static parser is not an original engine loader or boot proof.
+
+## Produced current diagnostic — 28 October 2026
+
+After the pause gameplay fixes, one package was built from `bccac1c`:
+`/workspace/im2-current/source-test-2026-10-28/IronMan2_Source_Test_00.02.vpk`.
+Title IM2DG0001 / 00.02; 94,835,736 bytes; 670 verified resource files.
+SHA256 `b32029e2af3f7314ab66e8cb5769bdd57637bbee6960d802b3bd2b8338abe856`.
+The packaging pipeline reran 24/24 original-data CTest checks plus seven separate
+synthetic Mach-O checks, repeated with ASan/UBSan, and built the full ARM ELF.
+SDK SELF/SFO, ZIP CRC, full inventory, every resource hash and identity passed.
+Source-only 19/19 CTest plus seven Mach-O checks also passed. Native lighting,
+original audio bank, initial story-world root and device boot remain unverified.
+
+No original asset or package was pushed to Git or CI. The package, full manifest,
+SHA256SUMS and logs remain outside the checkout. Actual chat attachment delivery
+is not available through current tools; `/mnt/data` does not exist and its parent
+is not writable. The active proxy excludes GitHub upload/API/Drive destinations;
+those destinations are saved only in the unpublished configuration draft. Do not
+claim a workspace path is a delivered attachment or create another VPK merely
+to retry delivery. Preserve both this package and the earlier 00.01 diagnostic.

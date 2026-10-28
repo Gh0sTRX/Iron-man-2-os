@@ -58,3 +58,15 @@ bulunsa da özgün efekt olayları ve fade süreleri tamamlanmış değildir. G2
 
 Bu paket host/derleme doğrulamalı bir cihaz tanılamasıdır. Fiziksel Vita açılışı,
 gerçek GPU görünümü, FPS, özgün görev/QTE/savaş tamamlanması test edilmedi.
+
+## Bu oturumun doğrulanmış çıktısı
+
+`/workspace/im2-current/source-test-2026-10-28/IronMan2_Source_Test_00.02.vpk`
+94.835.736 bayt, kaynak `bccac1c`, 670 kaynak varlık.
+SHA256: `b32029e2af3f7314ab66e8cb5769bdd57637bbee6960d802b3bd2b8338abe856`.
+24/24 host kontrolü + 7 Mach-O birim testi ve ASan/UBSan tekrarı; tam ARM ELF,
+SELF/SFO ve paket bütünlük doğrulaması geçti. Fiziksel cihaz sonucu yok.
+Manifest ve bütün günlükler aynı dış dizinde. Bu paketi yeniden üretmeden koru.
+Sohbet eki teslimi mevcut araçlarla doğrulanamadı; çalışma alanı yolu bir ek
+indirildiği anlamına gelmez. Ağ taslağındaki GitHub API/yükleme izinleri hâlen
+çalışan ortamda etkin değil. Herkese açık dağıtım yapma.
