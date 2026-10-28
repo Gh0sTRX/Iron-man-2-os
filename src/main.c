@@ -925,15 +925,16 @@ int main(int argc,char **argv) {
           g84_input.previous_flight_dir=g84_last_flight_dir;
           g84_input.accepted_weapon_event=0; /* sole accepted B16->G8 */
           #ifdef B24_G87_REAL_TRANSITION_EVENTS
-          /* Physics and floor contact from the SAME G75/G68 original
-             triangle world. Flight mode OFF alone proves no landing.
+          /* Use EXACT accepted support from the SAME G75 authority as
+             movement (native first, existing optional road fallback). A
+             nearby surface is not physical foot contact. Flight mode OFF alone
+             proves no landing.
              Never sample made-up ground height or teleport into floors. */
           float g87_source_floor=0.f;
 #ifdef B24_G75_SOURCE_CAPSULE
           g84_input.grounded_contact_verified=(!world.flying &&
-               b24_g74_near_original_floor(&b24_original_walls,
-                world.x,world.y,world.z,&g87_source_floor) &&
-               fabsf(world.z-g87_source_floor)<=.08f);
+               b24_g75_support_at(&b24_original_walls,
+                world.x,world.y,world.z,&g87_source_floor));
 #else
           /* Without the original source-backed floor resolver, fail closed:
              transition can be selected but landing is never invented. */

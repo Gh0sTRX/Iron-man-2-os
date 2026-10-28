@@ -104,3 +104,16 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/ext
 add_executable(test_pause_fire test_pause_fire.c)
 target_include_directories(test_pause_fire PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 add_test(NAME paused_main_fire COMMAND test_pause_fire)
+
+execute_process(COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/extract_ground_contact.py"
+  "${PROJECT_SOURCE_DIR}/src/main.c" "${CMAKE_CURRENT_BINARY_DIR}/actual_ground_contact.inc"
+  COMMAND_ERROR_IS_FATAL ANY)
+add_executable(test_landing_contact test_landing_contact.c)
+target_include_directories(test_landing_contact PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_link_libraries(test_landing_contact PRIVATE im2_world im2_motion)
+add_test(NAME landing_source_contact COMMAND test_landing_contact)
+if(IM2_ASSET_ROOT)
+  add_test(NAME landing_original_road_authority COMMAND test_landing_contact
+    "${IM2_ASSET_ROOT}/assets/G66_original_collision.g66c" "${IM2_ASSET_ROOT}/assets/G66_city.g66m")
+  set_tests_properties(landing_original_road_authority PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/real")
+endif()
