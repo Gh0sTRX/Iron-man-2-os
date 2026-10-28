@@ -57,6 +57,7 @@ target_compile_definitions(test_suit_light_alpha PRIVATE B24_G75_ORIGINAL_SUN_LI
 target_link_libraries(test_suit_light_alpha PRIVATE m)
 add_test(NAME suit_light_alpha_state COMMAND test_suit_light_alpha)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_test(NAME diagnostic_package_boundary COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_device_package.py")
 add_test(NAME audio_preparation_structure COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_audio_preparation.py")
 add_test(NAME source_boundary COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/check_source_tree.py")
 add_test(NAME frame_trace_analysis COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_trace_analysis.py" "${CMAKE_CURRENT_BINARY_DIR}/frame-test.csv")

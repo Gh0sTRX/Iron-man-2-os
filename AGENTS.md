@@ -25,6 +25,17 @@ This is the **existing** Iron Man 2 iOS-to-PS Vita preservation/port project. Do
 
 ## Non-negotiable scope
 
+- **2026-10-28 newest explicit owner override:** the user supplied an IPA and
+  requests one current test VPK at the end of this work. This supersedes the
+  earlier no-new-VPK direction for a single locally delivered diagnostic only.
+  Build/test canonical source; include the existing verified owner assets and
+  external source tables. Keep all seven full-port gates false unless separately
+  proven. No installation, firmware or public Git/CI asset/package distribution.
+  The uploaded IPA could not be transferred: executor upload-download limit is
+  32 MiB. Do not claim it was read or converted. Preserve the original installed
+  title by using diagnostic title IM2DG0001 and version 00.02. Do not re-request
+  packaging authorization or call this a finished original port.
+
 - **2026-10-28 latest owner authorization:** the user explicitly requests
   autonomous completion of lighting, animation, sound effects and other missing
   port elements, and authorizes retrieving missing original inputs from the

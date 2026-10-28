@@ -70,3 +70,19 @@ in the configuration draft, not active in this runtime. Setup/start instructions
 and the canonical repository revision were refreshed and exercised locally;
 environment publication remains a user action. Source build/test automation runs
 on matching pushes; it does not represent a developer running after chat ends.
+
+## Latest explicitly requested device diagnostic
+
+The owner now explicitly requests one current test VPK and supplies an IPA.
+This overrides the earlier no-new-package scope for one diagnostic only; the
+seven full-port gates stay false and no device/firmware installation is allowed.
+The Sediment transfer rejected the IPA because it exceeds the executor's 32 MiB
+limit. It has not been read. Existing verified external assets remain available.
+
+`tools/device_test/build.py --diagnostic-current-state` now builds canonical
+source, runs host and sanitizer checks, produces the SDK SELF/SFO, and verifies
+one locally retained package. It includes 669 baseline-matching resources plus
+the external original table bank, uses IM2DG0001 / 00.02, and records all inputs
+and checks. New packaging boundary tests reject stale title/version, changed
+payload/SELF hashes, duplicate/traversing paths and truncated SFO allocations.
+The original audio bank and native lighting parity remain absent/unverified.
