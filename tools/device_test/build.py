@@ -17,7 +17,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[2]
 IMAGE='vitasdk/vitasdk@sha256:8227da1b596d981f4513cd9b36bda1e43857f6dae5bcf4312c1cd40167f7d9bb'
 TITLE_ID='IM2DG0001'
-VERSION='00.02'
+VERSION='00.03'
 RESOURCES=('models','animations','maps','assets')
 TABLE_SHA='e68d328a31636aeac5fc6347a69cda4f15a2a7fc20ac7094b35f90e9c48ea42a'
 
@@ -115,16 +115,16 @@ def main(args):
     elf=ROOT/'build-vita/im2_beta'
     header=elf.read_bytes()[:52]
     require(len(header)==52 and header[:7]==b'\x7fELF\x01\x01\x01' and struct.unpack_from('<H',header,18)[0]==40,'Not a little-endian ARM ELF32')
-    commands='''set -eu
+    commands=f'''set -eu
 vita-elf-create /workspace/build-vita/im2_beta /diagnostic/im2_beta.velf
 vita-make-fself -c -s /diagnostic/im2_beta.velf /diagnostic/eboot.bin
-vita-mksfoex -s TITLE_ID=IM2DG0001 -s APP_VER=00.02 -d ATTRIBUTE2=12 "Iron Man 2 - Source Test" /diagnostic/param.sfo
+vita-mksfoex -s TITLE_ID=IM2DG0001 -s APP_VER={VERSION} -d ATTRIBUTE2=12 "Iron Man 2 - Combat Test" /diagnostic/param.sfo
 '''
     checks['self']=run_check('self',['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/workspace:ro','-v',f'{out}:/diagnostic','-w','/workspace',IMAGE,'sh','-c',commands],out)
     # A VPK is a standard ZIP; preserve every SDK-produced metadata/SELF byte.
     # Assemble directly to avoid staging or linking proprietary asset directories.
-    vpk=out/'IronMan2_Source_Test_00.02.vpk';pending=vpk.with_suffix('.vpk.part')
+    vpk=out/f'IronMan2_Combat_Test_{VERSION}.vpk';pending=vpk.with_suffix('.vpk.part')
     with zipfile.ZipFile(pending,'x',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as archive:
         archive.write(out/'param.sfo','sce_sys/param.sfo');archive.write(out/'eboot.bin','eboot.bin')
         for name in sorted(files):archive.write(asset_root/name,name)
@@ -138,6 +138,8 @@ vita-mksfoex -s TITLE_ID=IM2DG0001 -s APP_VER=00.02 -d ATTRIBUTE2=12 "Iron Man 2
         elf_sha256=digest(elf),self_sha256=digest(out/'eboot.bin'),vpk_sha256=digest(vpk),
         vpk_bytes=vpk.stat().st_size,resource_count=len(files),resources_sha256=files,
         uploaded_ipa_read=False,original_audio_included=False,native_lighting_verified=False,
+        test_opponent={'model':'original Mark IV','original_enemy_ai':False,'prototype_health_and_stationary_sparring':True},
+        lighting_mode='experimental current-pose geometric normals using existing G75 policy',
         readiness_gates=json.loads(gates_path.read_text()),device_tested=False)
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     (out/'SHA256SUMS').write_text(digest(vpk)+'  '+vpk.name+'\n')

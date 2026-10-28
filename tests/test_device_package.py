@@ -13,7 +13,7 @@ spec=importlib.util.spec_from_file_location('diagnostic_package',ROOT/'tools/dev
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 
 
-def sfo(version='00.02',title='IM2DG0001'):
+def sfo(version=module.VERSION,title='IM2DG0001'):
     keys=b'TITLE_ID\0APP_VER\0';start=52;values=(start+len(keys)+3)&~3
     a=title.encode()+b'\0';b=version.encode()+b'\0'
     data=struct.pack('<5I',0x46535000,0x101,start,values,2)
@@ -45,10 +45,10 @@ class PackageBoundaryTests(unittest.TestCase):
     def verify(self):return module.verify_vpk(self.path,self.files,self.self_sha)
 
     def test_exact_inventory_and_metadata(self):
-        self.write_package();self.assertEqual(self.verify()['APP_VER'],'00.02')
+        self.write_package();self.assertEqual(self.verify()['APP_VER'],module.VERSION)
 
     def test_stale_version_or_wrong_installed_title(self):
-        for metadata in (sfo(version='00.01'),sfo(title='IM2DIFF01')):
+        for metadata in (sfo(version='00.01'),sfo(version='00.02'),sfo(title='IM2DIFF01')):
             self.write_package(metadata=metadata)
             with self.assertRaises(ValueError):self.verify()
 

@@ -25,6 +25,15 @@ This is the **existing** Iron Man 2 iOS-to-PS Vita preservation/port project. Do
 
 ## Non-negotiable scope
 
+- **2026-10-29 newest owner scope:** after requesting a simple original enemy,
+  the owner explicitly chose the available original Mark IV model as a clearly
+  labelled TEST OPPONENT, not original enemy AI. Prototype HP, damage feedback,
+  stationary sparring logic and test controls are authorized within that scope.
+  Do not claim native enemy/mission/AI recovery. The user also requests improved
+  lighting and one refreshed final diagnostic after these changes: version00.03,
+  title IM2DG0001. Preserve00.02 and the original installed game. No installation,
+  firmware or public asset/package upload; full-port gates remain false.
+
 - **2026-10-28 newest explicit owner override:** the user supplied an IPA and
   requests one current test VPK at the end of this work. This supersedes the
   earlier no-new-VPK direction for a single locally delivered diagnostic only.

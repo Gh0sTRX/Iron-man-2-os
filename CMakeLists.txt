@@ -24,7 +24,11 @@ if(IM2_BUILD_VITA)
   include(cmake/VitaSources.cmake)
   add_executable(im2_beta ${IM2_VITA_SOURCES}
     src/b24/b24_unified/im2_original_tables.c src/b24/b24_unified/im2_frame_trace.c
-    src/b24/b24_unified/im2_audio_catalog.c)
+    src/b24/b24_unified/im2_audio_catalog.c
+    src/b24/b24_unified/im2_suit_lighting.c
+    src/b24/b24_unified/im2_game_camera.c
+    src/b24/b24_unified/im2_test_opponent.c
+    src/b24/b24_unified/im2_test_opponent_vitagl.c)
   target_include_directories(im2_beta PRIVATE ${IM2_INCLUDE_DIRS})
   target_compile_definitions(im2_beta PRIVATE ${IM2_VITA_DEFINITIONS})
   if(IM2_FRAME_DIAGNOSTICS)
@@ -45,6 +49,16 @@ else()
   add_compile_options(-Wall -Wextra -Werror -pedantic)
   # Keep assertions enabled even when someone selects a Release host build.
   add_compile_options(-UNDEBUG)
+  add_library(im2_suit_light STATIC src/b24/b24_unified/im2_suit_lighting.c)
+  target_include_directories(im2_suit_light PUBLIC ${IM2_MODULE_DIR})
+  target_link_libraries(im2_suit_light PUBLIC m)
+  add_library(im2_test_actor STATIC src/b16_action.c src/b24/b24_unified/im2_test_opponent.c
+    src/b24/b24_unified/im2_game_camera.c src/b24/b24_unified/b24_gpu_camera.c
+    src/b24/b24_unified/b24_g164_camera_sky_framing.c
+    src/b24/b24_unified/b24_gpu_hud_native.c)
+  target_include_directories(im2_test_actor PUBLIC ${IM2_INCLUDE_DIRS})
+  target_compile_definitions(im2_test_actor PRIVATE B24_G164_HERO_CAMERA_FRAMING=1)
+  target_link_libraries(im2_test_actor PUBLIC im2_world m)
   add_library(im2_world STATIC src/b14_world.c
     src/b24/b24_unified/b24_g75_source_capsule.c
     src/b24/b24_unified/b24_g108_visible_original_wall_grid.c

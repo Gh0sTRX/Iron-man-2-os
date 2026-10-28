@@ -21,7 +21,11 @@ void b16_attack_begin(B16Action *a,unsigned now,int flying,int hand,int variant)
 void b16_apply_attack(B16Action *a,IM2Model *model,unsigned now);
 
 enum {B16_REPULSOR,B16_UNIBEAM,B16_MISSILE,B16_MELEE,B16_WEAPON_COUNT};
+/* Explicit prototype actor binding; never original NPC/mission HP. */
+typedef struct {float center[3],radius,hp;unsigned hits;int present;} B16TestTarget;
 typedef struct {
+  B16TestTarget *test_target;
+  float test_ray_origin[3],test_ray_direction[3],test_impact[3];int test_ray_valid,test_occluded,test_hit_this_shot;
   int mode,shots,total_hits,combo_step,active_missile;
   float energy,cooldown,hitpoints[3],missile_x,missile_y,missile_z,missile_t;
   unsigned wave;

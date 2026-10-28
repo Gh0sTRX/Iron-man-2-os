@@ -14,5 +14,6 @@ typedef struct {
  int overflow;
 } B24NativeHudGeometry;
 int b24_native_hud_build(B24NativeHudGeometry *geom,const B24Unified *game);
+void b24_native_hud_test_opponent(B24NativeHudGeometry *geom,int loaded,int spawned,float target_hp,float player_hp);
 int b24_native_hud_draw(const B24NativeHudGeometry *geom);
 #endif

@@ -2,6 +2,7 @@
 #include "b24_g10_practice_target.h"
 #endif
 #include "b24_gpu_runtime.h"
+#include "im2_game_camera.h"
 #if defined(B24_G164_CAMERA_RELATIVE_ORIGINAL_SKY) || defined(B24_G164_HERO_CAMERA_FRAMING)
 #include "b24_g164_camera_sky_framing.h"
 #endif
@@ -31,6 +32,10 @@ static int b24_runtime_hud_draw(void *userdata){
  /* HUD is CPU-authored QUADS and GPU-rasterized in one draw call;
     no full-screen bitmap generation or CPU->GPU texture upload. */
  if(!b24_native_hud_build(&r->native_hud,r->frame_game))return 0;
+#ifdef IM2_TEST_OPPONENT
+ b24_native_hud_test_opponent(&r->native_hud,r->test_opponent.loaded,r->test_opponent.state.spawned,
+   r->test_opponent.state.target.hp,r->test_opponent.state.player_hp);
+#endif
  return b24_native_hud_draw(&r->native_hud);
 #else
  return b24_gpu_hud_bridge_draw(&r->hud,r->frame_game);
@@ -106,6 +111,9 @@ int b24_gpu_runtime_open(B24GpuRuntime *r,const char *city_file){
  }
 #endif
  (void)b24_gpu_boot_trace_mark("33 GPU_RUNTIME_OPEN_OK");
+#ifdef IM2_TEST_OPPONENT
+ (void)im2_test_opponent_open(&r->test_opponent);
+#endif
  r->initialized=1;
  r->loaded_suit_index=-1;
  return 1;
@@ -141,43 +149,8 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  b24_gpu_profile_phase(&r->profile,B24P_MODEL_STREAM);
  /* One authoritative B17 Z-up orbit. Flying stage2/RUSH reduces the
     shoulder offset; free-look recenter remains the existing B24 controller. */
- float a=c->orbit, cp=cosf(c->pitch),sp=sinf(c->pitch);
- float fd=c->camera_distance;
-#ifdef B24_G164_HERO_CAMERA_FRAMING
- /* ONLY perspective, G161 MarkV original sourced 2.2355 unit model and
-  * original world collision G75/G66C coordinates remain BIT-IDENTICAL.
-  * Stage2/RUSH centered chase uses previous 72deg/distance. Ground and
-  * upright hover blend slightly closer when shoulder mode is active. */
- float g164_fov=72.f,g164_distance_multiplier=1.f;
- if(!b24_g164_camera_framing(
-      1.f-g->camera_base.shoulder_to_chase,
-      &g164_distance_multiplier,&g164_fov))return 0;
- fd*=g164_distance_multiplier;
-#endif
- if(!isfinite(a)||!isfinite(cp)||!isfinite(sp)||
-    !isfinite(fd)||fd<.1f)return 0;
- float fx=sinf(a),fy=cosf(a),rx=cosf(a),ry=-sinf(a);
- B24GpuCamera cam={
-  {c->cam_x-fx*fd*cp,
-   c->cam_y-fy*fd*cp,
-   c->cam_z+fd*sp},
-  {c->cam_x,c->cam_y,c->cam_z},
-  {0,0,1},
-#ifdef B24_G164_HERO_CAMERA_FRAMING
-  g164_fov,960.f/544.f,.15f,2600.f
-#else
-  72.f,960.f/544.f,.15f,2600.f
-#endif
- };
- /* Centered gun reticle but avatar left in GROUND/HOVER. B22 camera_base
-    carries the already-smoothed transition toward centered CRUISE/RUSH. */
- float shoulder=1.f-g->camera_base.shoulder_to_chase;
- if(!isfinite(shoulder))return 0;
- if(shoulder<0.f)shoulder=0.f;
- if(shoulder>1.f)shoulder=1.f;
- if(!b24_gpu_camera_apply_shoulder(&cam,rx,ry,1.05f*shoulder))return 0;
- B24GpuCameraMatrices matrices={0};
- if(!b24_gpu_camera_matrices(&cam,&matrices))return 0;
+ B24GpuCamera cam;B24GpuCameraMatrices matrices;
+ if(!im2_game_camera(c,g,&cam,&matrices))return 0;
  b24_gpu_profile_phase(&r->profile,B24P_CAMERA_SETUP);
  if(!r->frames)(void)b24_gpu_boot_trace_mark("43 SCENE_FRAME_BEGIN");
  if(!b24_gpu_owner_begin(&r->owner,&matrices))return 0;
@@ -220,6 +193,9 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
  if(b24_g10_practice_target_valid(&r->g92_practice_dummy))
   (void)b24_g10_practice_target_draw(&r->g92_practice_dummy);
 #endif
+#ifdef IM2_TEST_OPPONENT
+ if(!im2_test_opponent_draw(&r->test_opponent))return 0;
+#endif
  if(!r->frames)(void)b24_gpu_boot_trace_mark("44 SCENE_DRAW_OK");
  b24_gpu_profile_phase(&r->profile,B24P_SCENE_CALLS);
  /* Original B24 CPU flight stage drives the SAME animated armor GPU root.
@@ -243,6 +219,9 @@ int b24_gpu_runtime_draw(B24GpuRuntime *r,const IM2Model *m,
 }
 void b24_gpu_runtime_close(B24GpuRuntime *r){
  if(!r)return;
+#ifdef IM2_TEST_OPPONENT
+ im2_test_opponent_close(&r->test_opponent);
+#endif
  b24_gpu_hud_bridge_release(&r->hud);
  b24_gpu_suit_release(&r->suit);
  b24_gpu_im2_stream_free(&r->stream);

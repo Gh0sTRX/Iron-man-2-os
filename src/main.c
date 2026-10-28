@@ -16,6 +16,9 @@
 #include "b24/b24_unified/im2_suit_profile.h"
 #include "b24/b24_unified/im2_audio_catalog.h"
 #include "b24/b24_unified/im2_gameplay_clock.h"
+#ifdef IM2_TEST_OPPONENT
+#include "b24/b24_unified/im2_game_camera.h"
+#endif
 #include "b16_action.h"
 #include "b24/b24_unified/b24_unified.h"
 #ifdef B24_GPU_ENGINE
@@ -133,7 +136,7 @@ static int g137_real_scene_MissionPause_only(void *ctx,const B24G137Event *e){
 #endif
 #endif
 #endif
-#ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
+#if defined(B24_G92_STATIC_DUMMY_SOURCE_PREVIEW) && !defined(IM2_TEST_OPPONENT)
 #include "b24/b24_unified/b24_g10_practice_target.h"
 #include "b24/b24_unified/b24_g11_practice_melee_feedback.h"
 /* G92_STATIC_DUMMY_SOURCE_IN_SINGLE_MAIN */
@@ -356,6 +359,10 @@ int main(int argc,char **argv) {
     for(int i=0;i<SDL_NumJoysticks();i++)if(SDL_IsGameController(i)){pad=SDL_GameControllerOpen(i);break;}
     b8_init(&range);
     B16Combat combat; b16_combat_init(&combat);
+#ifdef IM2_TEST_OPPONENT
+    combat.test_target=&b24_gpu_rt.test_opponent.state.target;
+    int test_reset_requested=0,test_spawn_attempted=0;uint32_t test_last_spawn=0;
+#endif
     /* Optional original tables are owner-supplied assets, never code payload. */
     const int original_tables_ready=im2_original_tables_load("app0:data/source_tables.im2d");
     (void)original_tables_ready;
@@ -451,9 +458,15 @@ int main(int argc,char **argv) {
                 /* B24: Cross is an interaction input; suit switching moved to SELECT. */
                 /* B24: Square is reserved for melee, not repulsor. */
                 if(!b24_unified_paused(&b24_game) && e.cbutton.button==SDL_CONTROLLER_BUTTON_BACK){
-                    idx=(idx+1)%5;
-                    if(!load(idx))running=0;
-                    world.head_height=b15_suit_head(&model);
+#ifdef IM2_TEST_OPPONENT
+                    if(pad&&SDL_GameControllerGetButton(pad,SDL_CONTROLLER_BUTTON_LEFTSHOULDER))test_reset_requested=1;
+                    else
+#endif
+                    {
+                     idx=(idx+1)%5;
+                     if(!load(idx))running=0;
+                     world.head_height=b15_suit_head(&model);
+                    }
                 }
                 if(!b24_unified_paused(&b24_game) && e.cbutton.button==SDL_CONTROLLER_BUTTON_B){
                     b14_world_toggle_flight(&world);
@@ -623,6 +636,11 @@ int main(int argc,char **argv) {
               !world.flying||world.flight_stage<=1);
 #endif
           b14_world_target(&world);
+#ifdef IM2_TEST_OPPONENT
+          const float shot_from[]={combat.active_missile?combat.missile_x:world.x,
+            combat.active_missile?combat.missile_y:world.y,combat.active_missile?combat.missile_z:world.z+1.f};
+          combat.test_occluded=im2_test_segment_blocked(&b24_original_walls,shot_from,combat.test_target->center);
+#endif
           b16_combat_tick(&combat,&world,dt);
         }
         B24Observation b24_obs={0};
@@ -653,6 +671,26 @@ int main(int argc,char **argv) {
         b24_obs.energy_percent=combat.energy;
         b24_obs.wave=(int)combat.wave;
         b24_obs.real_enemies_loaded=0; /* no invisible B19 drones */
+#ifdef IM2_TEST_OPPONENT
+        /* This visible test actor is not a native NPC or B19 mission. */
+        b24_obs.player_health_known=b24_gpu_rt.test_opponent.loaded;
+        b24_obs.armor_percent=b24_gpu_rt.test_opponent.state.player_hp; /* test meter, not native HP */
+        b24_obs.shield_percent=0.f;
+        b24_obs.target_alive=combat.test_target->present&&combat.test_target->hp>0.f;
+        b24_obs.target_id=b24_obs.target_alive?4001:-1;b24_obs.target_world_valid=b24_obs.target_alive;
+        b24_obs.target_z_up=(Im2Vec3){combat.test_target->center[0],combat.test_target->center[1],combat.test_target->center[2]};
+        b24_obs.target_health_percent=combat.test_target->hp;
+        b24_obs.target_distance=hypotf(hypotf(world.x-combat.test_target->center[0],world.y-combat.test_target->center[1]),world.z+1.f-combat.test_target->center[2]);
+        b24_obs.target_occluded=combat.test_occluded;
+        IM2Camera test_view=camera;test_view.orbit=world.orbit;test_view.pitch=world.pitch;
+        test_view.cam_x=world.cam_x;test_view.cam_y=world.cam_y;test_view.cam_z=world.cam_z;
+        test_view.camera_distance=world.camera_distance;
+        B24GpuCamera test_cam;B24GpuCameraMatrices test_mat;float tx=0,ty=0,tz=0;
+        b24_obs.target_visible=b24_obs.target_alive&&im2_game_camera(&test_view,&b24_game,&test_cam,&test_mat)&&
+          b24_gpu_world_to_screen(&test_mat,(B24GpuVec3){combat.test_target->center[0],combat.test_target->center[1],combat.test_target->center[2]},480,272,&tx,&ty,&tz);
+        b24_obs.target_screen_x=(int)tx;b24_obs.target_screen_y=(int)ty;
+        world.visible=b24_obs.target_visible;world.screen_x=tx;world.screen_y=ty;
+#endif
         b24_obs.dt=dt;
         b24_unified_tick(&b24_game,&b24_obs);
         /* Every source pose/shot owner uses the SAME pause-adjusted timestamp.
@@ -660,6 +698,20 @@ int main(int argc,char **argv) {
         const uint32_t motion_now=im2_gameplay_clock_tick(
             &motion_clock,(uint32_t)now,b24_unified_paused(&b24_game));
         if(landing_stamp_pending){landing_started=motion_now;landing_stamp_pending=0;}
+#ifdef IM2_TEST_OPPONENT
+        Im2TestOpponentDraw *test_npc=&b24_gpu_rt.test_opponent;
+        if(!b24_unified_paused(&b24_game)&&test_npc->loaded){
+         if(test_reset_requested){
+          im2_test_opponent_reset(&test_npc->state);test_npc->selected[0]=0;test_npc->shot_visible=0;
+          combat.active_missile=0;combat.energy=100.f;combat.cooldown=0;combat.combo_step=0;
+          test_spawn_attempted=0;test_reset_requested=0;
+         }
+         if(!test_npc->state.spawned&&(!test_spawn_attempted||(uint32_t)(motion_now-test_last_spawn)>=1000u)){
+          (void)im2_test_opponent_spawn(&test_npc->state,&b24_original_walls,world.x,world.y,world.z,world.orbit,motion_now);
+          test_spawn_attempted=1;test_last_spawn=motion_now;
+         }
+        }
+#endif
 #ifdef B24_G153_REAL_SOURCE_MISSION_RETRY_LOOP
         /* G137 previously invoked source Mission000 only once at boot.
          * Retry EXACT blocked Lua event on later frames. G137's cursor
@@ -734,7 +786,7 @@ int main(int argc,char **argv) {
           (void)b24_g144_source_audio_pause(&g145_original_vita_channels,
                                            b24_unified_paused(&b24_game));
 #endif
-#ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
+#if defined(B24_G92_STATIC_DUMMY_SOURCE_PREVIEW) && !defined(IM2_TEST_OPPONENT)
         /* Exactly ONE debug target; initially invalid until ORIGINAL 2010
            G68 collision surface proves placement. Never fake an invisible
            support plane. Fixed for the remainder of this test session. */
@@ -779,7 +831,13 @@ int main(int argc,char **argv) {
 #endif
           {
            b24_g8_motion_melee_trigger(&b24_original_motion,motion_now);
-          #ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
+#ifdef IM2_TEST_OPPONENT
+           const float melee_origin[]={world.x,world.y,world.z+1.f};
+           combat.test_occluded=im2_test_segment_blocked(&b24_original_walls,melee_origin,combat.test_target->center);
+           const int previous_mode=combat.mode;combat.mode=B16_MELEE;
+           (void)b16_combat_fire(&combat,&world,melee_origin);combat.mode=previous_mode;
+#endif
+          #if defined(B24_G92_STATIC_DUMMY_SOURCE_PREVIEW) && !defined(IM2_TEST_OPPONENT)
            g92_debug_accepted_melee_edge=1;
           #endif
           }
@@ -856,12 +914,40 @@ int main(int argc,char **argv) {
               chosen)){running=0;break;}
         if(!b24_unified_paused(&b24_game) && idx==2 && world.flying && world.flight_stage==3)
             b17_rush_lean(&model,0.43f); /* PROTOTYPE tilt, NOT original Rush clip */
+#ifdef IM2_TEST_OPPONENT
+        B24GpuCamera firing_camera;B24GpuCameraMatrices firing_matrices;
+        combat.test_ray_valid=im2_game_camera(&camera,&b24_game,&firing_camera,&firing_matrices);
+        if(combat.test_ray_valid){
+         const float dx=firing_camera.target.x-firing_camera.eye.x,dy=firing_camera.target.y-firing_camera.eye.y,dz=firing_camera.target.z-firing_camera.eye.z;
+         const float length=sqrtf(dx*dx+dy*dy+dz*dz);
+         combat.test_ray_origin[0]=firing_camera.eye.x;combat.test_ray_origin[1]=firing_camera.eye.y;combat.test_ray_origin[2]=firing_camera.eye.z;
+         combat.test_ray_direction[0]=dx/length;combat.test_ray_direction[1]=dy/length;combat.test_ray_direction[2]=dz/length;
+        }
+#endif
         if(trigger && !b24_unified_paused(&b24_game)){
           const unsigned palm=attack.palm_r; /* B24: RIGHT REPULSOR ONLY */
           const unsigned emitter=combat.mode==B16_UNIBEAM?b17_chest_vertex:
                                  combat.mode==B16_MISSILE?b17_shoulder_vertex:palm;
           float muzzle[3];b16_model_palm(&model,&world,emitter,muzzle);
+#ifdef IM2_TEST_OPPONENT
+          const B24GpuSuitPose source_pose={world.x,world.y,world.z,world.heading,b24_game.visual_root.visual_pitch_rad,b24_game.visual_root.visual_roll_rad};
+          float source_root[16];
+          if(emitter<model.nv&&b24_gpu_suit_matrix(source_root,&source_pose,model.native_bind_min_z)){
+           const IM2Vertex vertex=model.vertices[emitter];
+           for(unsigned k=0;k<3;k++)muzzle[k]=source_root[k]*vertex.x+source_root[k+4]*vertex.y+source_root[k+8]*vertex.z+source_root[k+12];
+          }
+          combat.test_occluded=im2_test_segment_blocked(&b24_original_walls,muzzle,combat.test_target->center);
+#endif
           int fired=b16_combat_fire(&combat,&world,muzzle);
+#ifdef IM2_TEST_OPPONENT
+          if(fired>=0&&combat.mode!=B16_MISSILE&&combat.mode!=B16_MELEE&&combat.test_ray_valid){
+           for(unsigned k=0;k<3;k++){
+            test_npc->shot_line[k]=muzzle[k];
+            test_npc->shot_line[k+3]=combat.test_hit_this_shot?combat.test_impact[k]:combat.test_ray_origin[k]+combat.test_ray_direction[k]*30.f;
+           }
+           test_npc->shot_since=motion_now;test_npc->shot_visible=1;
+          }
+#endif
 #ifdef B24_G169_AUTHENTIC_BEAM_3_PHASE
            /* Exact 2010 authored original 3×Beam IM2V: ONLY when the
             * existing B16 combat accepted a unibeam energy/damage event.
@@ -1023,6 +1109,16 @@ int main(int argc,char **argv) {
 #endif
         if(!b24_unified_paused(&b24_game))
           b16_apply_attack(&attack,&model,motion_now);
+#ifdef IM2_TEST_OPPONENT
+        if(test_npc->loaded&&!b24_unified_paused(&b24_game)){
+         const float test_player_center[]={world.x,world.y,world.z+1.f};
+         test_npc->state.player_occluded=im2_test_segment_blocked(&b24_original_walls,test_player_center,combat.test_target->center);
+         im2_test_opponent_tick(&test_npc->state,world.x,world.y,world.z,motion_now,0);
+         if(!im2_test_opponent_pose(test_npc,motion_now)){test_npc->state.target.present=0;test_npc->state.spawned=0;}
+         test_npc->projectile_visible=combat.active_missile;
+         test_npc->projectile[0]=combat.missile_x;test_npc->projectile[1]=combat.missile_y;test_npc->projectile[2]=combat.missile_z;
+        }
+#endif
         camera.beam_time=world.beam_time;
         camera.shots=world.shots;camera.hits=world.hits;camera.completed=world.completed;
         camera.b16_active=1;camera.weapon_mode=combat.mode;camera.energy=combat.energy;

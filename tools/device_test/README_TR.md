@@ -1,11 +1,11 @@
-# Güncel kaynak cihaz testi — 28 Ekim 2026
+# Güncel çatışma cihaz testi — 29 Ekim 2026
 
 Kullanıcı bu oturum sonunda bir test VPK'sı açıkça istedi. Bu tek tanılama
 paketi, önceki yeni-VPK yasağının kapsamlı bir istisnasıdır. Yedi tam-port
 kabul kapısı değiştirilmez. Kurulum veya firmware işlemi yapılmaz; özgün
 kaynaklar ve VPK Git'e, herkese açık depoya veya CI çıktısına yüklenmez.
 
-Paket kimliği: **IM2DG0001 / Iron Man 2 - Source Test / 00.02**. Asıl oyun
+Paket kimliği: **IM2DG0001 / Iron Man 2 - Combat Test / 00.03**. Asıl oyun
 başlığından ayrıdır. Önceki IM2DG0001 tanılamasının yeni sürümüdür.
 
 ## Derleme ve paket doğrulama
@@ -20,7 +20,7 @@ export PATH=/workspace/im2-tools/bin:$PATH
 python3 tools/device_test/build.py --diagnostic-current-state \
   --asset-root /workspace/im2-private-assets \
   --baseline-manifest /workspace/im2-current/authorized-device-test-55f3392/manifest.json \
-  --output /workspace/im2-current/source-test-2026-10-28
+  --output /workspace/im2-current/combat-test-2026-10-29
 ```
 
 Çıktı klasörü önceden mevcut olmamalıdır. Önceden doğrulanmış 669 kaynak
@@ -70,3 +70,27 @@ Manifest ve bütün günlükler aynı dış dizinde. Bu paketi yeniden üretmede
 Sohbet eki teslimi mevcut araçlarla doğrulanamadı; çalışma alanı yolu bir ek
 indirildiği anlamına gelmez. Ağ taslağındaki GitHub API/yükleme izinleri hâlen
 çalışan ortamda etkin değil. Herkese açık dağıtım yapma.
+
+## Yeni istek: 00.03 çatışma tanılaması
+
+Kullanıcı özgün düşman modeli bulunmadığı açıklanınca mevcut özgün Mark IV
+modeliyle, açıkça etiketli **test rakibini** seçti. Özgün düşman AI'sı değildir.
+Bu onayla, önceki düzeltmelerden sonra yeni **00.03 / Combat Test / IM2DG0001**
+paketi hazırlanır;00.02 korunur. Başlangıç oyuncu konumu değiştirilmez.
+
+Test rakibi doğrulanmış zemin, gövde açıklığı ve kaynak görüş hattı bulunan bir
+noktaya yerleşir. Kendi canı ile oyuncunun test canı ayrıdır; görev tamamlanması,
+yeni dalgalar veya özgün NPC kurtarımı iddia edilmez. Rakip sabittir, yakından
+saldırır. Kaynak boşta/darbe/yakın dövüş/düşme klipleri kullanılır.
+
+- R: seçili prototip repulsor/unibeam/füze; yön tuşları sağ/sol silah seçimi.
+- Kare: desteklenen Iron Man zırhlarında yakından test hasarı.
+- L+SELECT: rakibi ve test canı/enerjisini sıfırla; SELECT tek başına zırh değişimi.
+- Kaynak çarpışma duvarının arkasında hedef canı azalmamalı.
+- START menüsünde atış, rakip saldırısı, animasyon ve sayaçlar durmalı.
+- Oyuncu veya hedef test canı bitince L+SELECT ile tekrar dene.
+- Yeni yüzey aydınlatmasını zırh döndüğünde ve animasyon sırasında karşılaştır.
+
+Füze çizgisi/işareti ve hasar sayıları prototiptir. Özgün ses bankası yoktur;
+özgün düşman AI'sı, orijinal shader/gölge ve gerçek cihaz/FPS eşliği çözülmedi.
+Bu sürüm önceki Mark V/iniş/duraklatma düzeltmelerini de içerir.

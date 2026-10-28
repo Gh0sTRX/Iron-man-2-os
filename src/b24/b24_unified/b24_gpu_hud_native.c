@@ -253,3 +253,15 @@ int b24_native_hud_build(B24NativeHudGeometry *g,const B24Unified *game){
  }
  return !g->overflow && g->count>0u && g->count<=B24_NATIVE_HUD_VERTICES;
 }
+
+void b24_native_hud_test_opponent(B24NativeHudGeometry *g,int loaded,int spawned,float hp,float player_hp){
+ if(!g)return;
+ label(g,150,28,"MARK IV TEST OPPONENT",0xf6d36fu,.7f);
+ if(!loaded){label(g,150,39,"ASSET UNAVAILABLE",0xfa6555u,.7f);return;}
+ if(!spawned){label(g,150,39,"NO CLEAR SOURCE FLOOR",0xfa6555u,.7f);return;}
+ bar(g,150,39,160,5,hp,0xfa6555u);
+ label(g,150,49,"TEST PLAYER",0x39cfeau,.7f);bar(g,150,58,160,4,player_hp,0x39cfeau);
+ label(g,150,67,"L SELECT RESET",0xb4dce9u,.7f);
+ if(hp<=0)label(g,190,78,"TARGET DOWN",0xf6d36fu,.7f);
+ else if(player_hp<=0)label(g,190,78,"PLAYER DOWN",0xfa6555u,.7f);
+}

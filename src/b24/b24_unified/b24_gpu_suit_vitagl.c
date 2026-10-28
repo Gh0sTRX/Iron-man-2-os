@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdlib.h>
 #ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
 /* G299: only original four Sun positions are sourced, NOT the original
  * GameLoft shading equation. Strictly experimental per-actor ambient. */
@@ -10,6 +11,7 @@
 #error "G299 only with G75 shared original CLARA four-Sun source and its candidate"
 #endif
 #include "b24_g75_original_sun_lighting_candidate.h"
+#include "im2_suit_lighting.h"
 #endif
 _Static_assert(sizeof(B24GpuSuitVertex)==20,"IM2T GPU animated vertex ABI");
 _Static_assert(sizeof(B24GpuSuitTriangle)==6,"IM2T GPU triangle ABI");
@@ -75,6 +77,12 @@ int b24_gpu_suit_prepare(B24GpuSuit *s,const B24GpuSuitSource *src){
  if(glGetError()!=GL_NO_ERROR){glDeleteTextures(1,&texture);return 0;}
  s->texture_id=texture;s->nv=src->nv;s->nt=src->nt;
  s->tw=src->tw;s->th=src->th;s->prepared=1;
+#ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
+ s->light_normals=calloc((size_t)src->nv*3,sizeof(float));
+ s->light_rgba=malloc((size_t)src->nv*4);
+ if(s->light_normals&&s->light_rgba)s->light_capacity=src->nv;
+ else{free(s->light_normals);free(s->light_rgba);s->light_normals=NULL;s->light_rgba=NULL;}
+#endif
  return 1;
 }
 int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
@@ -104,8 +112,9 @@ int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
 #ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
  /* G299 research candidate: reuse G95's four SOURCE-LOCAL Sun coords,
   * never guess original 2010 dynamic light type/shader or rig normals.
-  * Uniform actor color follows B14/G75 actual WORLD root each frame,
-  * with alpha=1 so original recovered IM2T atlas alpha is untouched.
+  * Current-pose mesh normals and the exact draw root drive per-vertex
+  * candidate RGB. Optional scratch failure keeps the prior uniform actor
+  * fallback. Color alpha=1 preserves the original IM2T atlas alpha.
   * The CLARA local->world light transform is NOT yet resolved; this is
   * diagnostic illumination only, not parity with original iOS. */
  GLint g299_prior_texture_env=GL_MODULATE;
@@ -115,7 +124,13 @@ int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
  const B24G75Vec test_up={0.f,0.f,1.f};
  const float g299_brightness=fminf(1.f,fmaxf(0.f,
                        b24_g75_light_factor(actor_xyz,test_up)));
- glColor4f(g299_brightness,g299_brightness,g299_brightness,1.f);
+ const int geometry_light=s->light_capacity>=src->nv&&s->light_normals&&s->light_rgba&&
+     im2_suit_lighting_colors(src,root,s->light_normals,s->light_rgba,s->light_capacity);
+ if(geometry_light){
+  glColor4f(1.f,1.f,1.f,1.f);
+  glEnableClientState(GL_COLOR_ARRAY);
+  glColorPointer(4,GL_UNSIGNED_BYTE,0,s->light_rgba);
+ }else glColor4f(g299_brightness,g299_brightness,g299_brightness,1.f);
 #else
  glColor4f(1.f,1.f,1.f,1.f);
 #endif
@@ -129,6 +144,7 @@ int b24_gpu_suit_draw(const B24GpuSuit *s,const B24GpuSuitSource *src,
  glDisableClientState(GL_VERTEX_ARRAY);
  glDisable(GL_TEXTURE_2D);
 #ifdef B24_G299_SUIT_ENVIRONMENT_CANDIDATE
+ if(geometry_light)glDisableClientState(GL_COLOR_ARRAY);
  glColor4f(1.f,1.f,1.f,1.f);
  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,g299_prior_texture_env);
 #endif
@@ -141,5 +157,6 @@ void b24_gpu_suit_release(B24GpuSuit *s){
     GLuint texture=s->texture_id;
     glDeleteTextures(1,&texture);
  }
+ free(s->light_normals);free(s->light_rgba);
  memset(s,0,sizeof(*s));
 }

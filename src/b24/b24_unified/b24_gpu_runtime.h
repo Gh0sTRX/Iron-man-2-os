@@ -18,8 +18,14 @@
 #include "b24_gpu_suit.h"
 #include "b24_gpu_suit_im2_adapter.h"
 #include "renderer.h"
+#ifdef IM2_TEST_OPPONENT
+#include "im2_test_opponent_vitagl.h"
+#endif
 typedef struct {
  B24GpuOwner owner;
+#ifdef IM2_TEST_OPPONENT
+ Im2TestOpponentDraw test_opponent;
+#endif
  B24CpuGpuProfile profile; /* CPU thread wall only; not GPU busy */
 #ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
  B24G10PracticeTarget g92_practice_dummy;

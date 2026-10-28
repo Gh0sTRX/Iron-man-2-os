@@ -17,4 +17,7 @@ int b24_g75_floor_crossed(const B24C1OriginalCollision *world,
 /* Exact accepted feet/support agreement, never just a nearby floor. */
 int b24_g75_support_at(const B24C1OriginalCollision *world,
  float x,float y,float feet_z,float *support_z);
+/* Read-only placement/body predicate, same existing source wall authority. */
+int b24_g75_body_clear_at(const B24C1OriginalCollision *world,float x,float y,
+                          float feet,float radius,float height);
 #endif

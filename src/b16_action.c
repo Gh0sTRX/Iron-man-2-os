@@ -115,12 +115,16 @@ void b16_combat_init(B16Combat *c){memset(c,0,sizeof(*c));c->energy=100.f;for(in
 void b16_combat_tick(B16Combat *c,B14World *w,float dt){
  dt=cap(dt,0,.12f);c->cooldown=fmaxf(0,c->cooldown-dt);c->hit_flash=fmaxf(0,c->hit_flash-dt);
  c->energy=fminf(100.f,c->energy+dt*9.f);
- if((unsigned)w->waves!=c->wave){c->wave=(unsigned)w->waves;for(int i=0;i<3;i++)c->hitpoints[i]=100.f;c->combo_step=0;c->active_missile=0;}
+ if(!c->test_target&&(unsigned)w->waves!=c->wave){c->wave=(unsigned)w->waves;for(int i=0;i<3;i++)c->hitpoints[i]=100.f;c->combo_step=0;c->active_missile=0;}
  if(c->active_missile){
   int i=w->hits<3?w->hits:2;
-  float dx=targets[i][0]-c->missile_x,dy=targets[i][1]-c->missile_y,dz=targets[i][2]-c->missile_z;
+  if(c->test_target&&(!c->test_target->present||c->test_target->hp<=0.f||c->test_occluded)){c->active_missile=0;return;}
+  const float *target=c->test_target?c->test_target->center:targets[i];
+  float dx=target[0]-c->missile_x,dy=target[1]-c->missile_y,dz=target[2]-c->missile_z;
   float dis=sqrtf(dx*dx+dy*dy+dz*dz);
-  if(dis<.55f){c->active_missile=0;damage(c,w,i,100.f);}
+  if(dis<(c->test_target?c->test_target->radius:.55f)){
+   c->active_missile=0;if(!c->test_target||!c->test_occluded)damage(c,w,i,100.f);
+  }
   else{float step=fminf(dis,8.0f*dt);if(dis>.0001f){c->missile_x+=step*dx/dis;c->missile_y+=step*dy/dis;c->missile_z+=step*dz/dis;}}
  }
 }
@@ -142,6 +146,11 @@ void b16_model_palm(const IM2Model *m,const B14World *w,unsigned v,float point[3
  point[2]=w->z+p.z-m->center_z;
 }
 static int damage(B16Combat *c,B14World *w,int i,float points){
+ if(c->test_target){
+  B16TestTarget *t=c->test_target;
+  if(!t->present||t->hp<=0.f||c->test_occluded)return 0;
+  t->hp=fmaxf(0.f,t->hp-points);t->hits++;c->hit_flash=.13f;return 1;
+ }
  if(i<0||i>=3||w->completed||i!=w->hits)return 0;
  if(c->hitpoints[i]<=0)return 0;
  c->hitpoints[i]-=points;c->hit_flash=.13f;
@@ -149,7 +158,14 @@ static int damage(B16Combat *c,B14World *w,int i,float points){
   if(w->hits==3){w->completed=1;w->wave_timer=1.35f;}else b14_world_target(w);return 1;}
  return 0;
 }
-static int target_camera_lock(const B14World *w,int target,float *impact){
+static int target_camera_lock(const B16Combat *c,const B14World *w,int target,float *impact){
+  if(c->test_target){
+   if(!c->test_target->present||c->test_target->hp<=0.f||!c->test_ray_valid||c->test_occluded)return 0;
+   float distance=0;
+   if(!b16_ray_sphere(c->test_ray_origin,c->test_ray_direction,c->test_target->center,c->test_target->radius,&distance))return 0;
+   if(impact)for(unsigned k=0;k<3;k++)impact[k]=c->test_ray_origin[k]+distance*c->test_ray_direction[k];
+   return 1;
+  }
   /* Reconstruct the camera ray through the HUD reticle using the exact
      third-person world_to_screen inverse, not a screen-space hit radius. */
   const float rcos=cosf(w->orbit),rsin=sinf(w->orbit);
@@ -170,16 +186,18 @@ static int target_camera_lock(const B14World *w,int target,float *impact){
   return 1;
 }
 int b16_combat_fire(B16Combat *c,B14World *w,const float muzzle[3]){
+ c->test_hit_this_shot=0;
  if(c->cooldown>0)return -1;
  if(c->mode==B16_UNIBEAM&&c->energy<50)return -2;
  if(c->mode==B16_MISSILE&&c->energy<25)return -2;
- if(w->completed){
+ if(w->completed&&!c->test_target){
   /* After clearing a wave, the player can still fire into space. */
   c->shots++;w->shots++;c->cooldown=.24f;w->beam_time=.15f;
   return 0;
  }
  int target=w->hits;if(target<0||target>2)return -3;
- float dx=targets[target][0]-muzzle[0],dy=targets[target][1]-muzzle[1],dz=targets[target][2]-muzzle[2];
+ const float *center=c->test_target?c->test_target->center:targets[target];
+ float dx=center[0]-muzzle[0],dy=center[1]-muzzle[1],dz=center[2]-muzzle[2];
  float dist=sqrtf(dx*dx+dy*dy+dz*dz);
  /* Genuine world-range and facing test, rather than an on-screen melee hit. */
  if(c->mode==B16_MELEE){
@@ -188,7 +206,7 @@ int b16_combat_fire(B16Combat *c,B14World *w,const float muzzle[3]){
   c->cooldown=.37f;c->shots++;w->shots++;
   damage(c,w,target,30.f+15.f*c->combo_step);return 1;
  }
- float hitpoint[3];int locked=target_camera_lock(w,target,hitpoint);
+ float hitpoint[3];int locked=target_camera_lock(c,w,target,hitpoint);
  if(c->mode==B16_MISSILE){
   if(!locked)return 0;
   c->energy-=25.f;c->cooldown=.8f;c->shots++;w->shots++;
@@ -206,7 +224,11 @@ int b16_combat_fire(B16Combat *c,B14World *w,const float muzzle[3]){
  if(len<1e-4f)return 0;
  for(int k=0;k<3;k++)vec[k]/=len;
  float distance=0;
- if(!b16_ray_sphere(muzzle,vec,targets[target],.58f,&distance))return 0;
- damage(c,w,target,c->mode==B16_UNIBEAM?130.f:35.f);
+ if(!b16_ray_sphere(muzzle,vec,center,c->test_target?c->test_target->radius:.58f,&distance))return 0;
+ const int hit=damage(c,w,target,c->mode==B16_UNIBEAM?130.f:35.f);
+ if(c->test_target&&hit){
+  c->test_hit_this_shot=1;
+  for(unsigned k=0;k<3;k++)c->test_impact[k]=muzzle[k]+vec[k]*distance;
+ }
  return 1;
 }

@@ -132,3 +132,27 @@ The source-build workflow also saves a small `diagnostics/source-checks.json`
 receipt on `evidence/source-checks-<run-id>`. It identifies the exact source
 commit and host/ARM job results, without uploading a binary. A receipt is not
 device playback, native lighting parity or a readiness-gate acceptance.
+
+## Explicit prototype combat diagnostic (00.03)
+
+The owner approved using the existing original Mark IV mesh as a labelled
+**TEST OPPONENT**, since no original enemy model is locally available. Default
+Vita `IM2_TEST_OPPONENT` routes test HP through the existing prototype B16 weapon
+cost/cooldown policy. It does not start the hidden B19 mission, change original
+readiness gates, or claim native NPC/AI/health/event recovery. Original idle,
+hurt, combo1 and death streams use the verified802v bank. Placement requires
+source support, body clearance and collision line-of-sight; the player spawn is
+unchanged. The stationary opponent can retaliate at close range. L+SELECT
+resets test HP/energy and repositions the opponent; SELECT alone changes armor.
+
+Test shots now use the same camera construction as the GPU's centred reticle;
+source collision triangles occlude test damage. Separate test HP avoids old
+invisible target waves. Actual collision impacts drive the short test tracer;
+missiles use a prototype marker. These are test effects, not original SFX/VFX.
+
+Experimental G299 armor lighting now derives area-weighted normals from the
+current animated geometry and uses the exact draw root for light queries. It
+reuses existing G75 candidate light parameters, preserves source XYZ/UV/atlas
+alpha, allocates bounded scratch once per model, and falls back to prior uniform
+lighting if optional scratch is unavailable. This is not native shader/shadow
+parity. No new source-light values, textures or shadow claims were invented.

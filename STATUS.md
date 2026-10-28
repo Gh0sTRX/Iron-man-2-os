@@ -175,3 +175,28 @@ passed host OFF/ON sanitizers and the full ARM ELF for runtime source `a710a9d`,
 including the Mark V consecutive-shot fix. Its exact-commit source-only receipt
 is `origin/evidence/source-checks-40774875755:diagnostics/source-checks.json`.
 No device test, package or owner-data publication was performed by CI.
+
+## Owner-approved Mark IV test opponent and geometry lighting — 29 October2026
+
+The latest owner request explicitly authorizes one refreshed00.03 diagnostic
+AFTER adding combat testing and lighting work. No original enemy mesh exists
+locally; owner chose the existing original Mark IV model as a clearly labelled
+TEST OPPONENT, not original enemy AI. Original802v idle/hurt/combo1/death streams
+are preflighted. Test HP, stationary close-range retaliation and L+SELECT reset
+are separate from the native mission and its unknown health rules. B19 remains
+inactive: no invisible enemies/waves. Placement requires existing source support,
+body clearance and collision line-of-sight; current-origin host probe finds a
+clear supported point near(0,5,.0725), a diagnostic placement, not native spawn.
+
+Prototype B16 combat binds this real visible actor, using the GPU camera's
+centred reticle and source collision occlusion for test hits. Repulsor, beam,
+missile, melee, prototype retaliation, pause, reset and no mission mutation
+have host coverage. New geometry lighting uses current-pose indexed normals and
+the exact suit draw transform with existing experimental G75 parameters. Source
+geometry/UV/atlas alpha remain unchanged; persistent scratch has uniform fallback.
+This is not native enemy AI, original damage timing, or native lighting/shadows.
+
+The new manual package version is00.03/IM2DG0001/Combat Test;00.02 stays unchanged.
+All original assets still remain external. Full-port gates stay false. The
+uploaded IPA remains unread due the32MiB transfer limit; original sound bank
+and genuine enemy assets remain unavailable. No hardware installation occurred.

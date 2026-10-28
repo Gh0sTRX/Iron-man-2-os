@@ -66,6 +66,12 @@ static int wall_clear(const B24C1OriginalCollision *world,
 #endif
  return 1;
 }
+int b24_g75_body_clear_at(const B24C1OriginalCollision *world,float x,float y,
+                         float feet,float radius,float height){
+ if(!world||!world->ready||!finite3(x,y,feet)||!isfinite(radius)||radius<.12f||radius>.9f||
+    !isfinite(height)||height<1.f||height>3.5f)return 0;
+ return wall_clear(world,x,y,feet,radius,height);
+}
 static int triangle_z(const B24C1OriginalCollisionFace *f,
  float x,float y,float *z){
  if(f->wall||x<f->minx-.0001f||x>f->maxx+.0001f||

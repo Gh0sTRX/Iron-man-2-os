@@ -169,8 +169,8 @@ void b24_unified_tick(B24Unified *g,const B24Observation *obs) {
         target.distance=lim(obs->target_distance,0.f,100000.f);
         /* Approximate cone ONLY for current B17 target demo. Real B19 enemy
            projection and wall occlusion must replace this before gameplay. */
-        float delta_x=(float)obs->target_screen_x-278.f;
-        float delta_y=(float)obs->target_screen_y-110.f;
+        float delta_x=(float)obs->target_screen_x-(obs->target_world_valid?240.f:278.f);
+        float delta_y=(float)obs->target_screen_y-(obs->target_world_valid?136.f:110.f);
         float dist2=delta_x*delta_x+delta_y*delta_y;
         target.aim_cos=lim(1.f-dist2/(200.f*200.f),-1.f,1.f);
         target.screen_x=obs->target_screen_x;

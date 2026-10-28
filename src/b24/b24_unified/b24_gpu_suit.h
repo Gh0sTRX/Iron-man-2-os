@@ -19,6 +19,9 @@ typedef struct {
  unsigned texture_id;
  uint32_t nv,nt,tw,th;
  int prepared;
+ float *light_normals;
+ unsigned char *light_rgba;
+ uint32_t light_capacity; /* optional persistent experimental shading scratch */
 } B24GpuSuit;
 int b24_gpu_suit_validate(const B24GpuSuitSource *src);
 int b24_gpu_suit_matrix(float out16[16],
