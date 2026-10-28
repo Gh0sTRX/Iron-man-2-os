@@ -13,6 +13,8 @@ G171 reconstruction pipeline are historical references, not source owners.
 - Mark IV and Stealth now use the geometry-verified 802-vertex original VI
   animation bank throughout movement/aim/beam selection; their event ownership
   stays separate. Three geometry payloads match exactly; textures remain distinct.
+- Mark V now routes its seven existing transition streams through G8. Its
+  consecutive accepted-shot filename conversion defect is fixed in source.
 - Audio catalog/conversion tooling and native music + voice + four effect
   channels are implemented. User pause covers all channels and recovers from
   individual port failures; worker lifecycle
@@ -22,9 +24,10 @@ G171 reconstruction pipeline are historical references, not source owners.
 - Suit texture upload failures now release the failed texture and permit retry.
   Current city/suit alpha and lighting-state tests preserve original alpha and
   texture state; they do not establish original lighting or shadows.
-- Local checks: 21/21 with external original geometry/tables, 21/21 with ASan/
-  UBSan, 16/16 source-only; full 89-translation-unit Vita ARM ELF links. No new
-  package or physical device test. CI owner-source inspection is pending.
+- Current source checks: 30/30 with external original geometry/tables and
+  30/30 with ASan/UBSan; 22/22 source-only plus seven separate Mach-O tests.
+  Full 89-unit Vita ARM ELF links. Physical Vita and owner-input inspection
+  remain unverified. The preserved diagnostic uses older source bccac1c.
 - Remote CI run [40604417762](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/40604417762)
   passed both host configurations and the full ARM ELF for source `05d9206`.
   Source-only receipt: branch `evidence/source-checks-40604417762`,
