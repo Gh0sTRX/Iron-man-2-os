@@ -152,3 +152,17 @@ The existing `00.02` VPK from `bccac1c` is preserved; **these newer fixes are no
 in that package**. No replacement package, installation or asset upload occurred.
 Original IPA access, native initial root, sound events, lighting/shadows and
 physical performance remain unresolved. Full-port gates remain false.
+
+A fourth, more severe Mark V defect was then reproduced using BOTH synthetic
+and original streams: the first accepted repulsor opened a suitcase_ clip;
+the next G8 frame tried to convert the pinned native-bank name again and
+returned0. Main treats that as a fatal animation error. The already opened,
+vertex-validated Mark V shot now retains its bank name. Other new selections
+still pass normal conversion; no weapon/hit/event policy changed. Consecutive
+stationary and direction-changing frames, exact clip end, hover and cancellation
+are covered. Original-data host30/30 and ASan/UBSan30/30 pass; source-only22/22
+plus the seven separate Mach-O tests pass; full ARM ELF links.
+
+Remote source CI run40774394201 passed host OFF/ON and ARM for the first three
+fixes at `b968905`. The final Mark V consecutive-shot fix is being submitted
+separately; that older green run must not be attributed to the final fix.

@@ -281,10 +281,18 @@ int b24_g8_motion_tick_g84(B24G8LiveOriginalMotion *a,const char *dir,
      * other clips continue through unchanged G85 conversion. */
     if(!b24_g173_is_authored_beam(4,desired)){
 #endif
-      if(strncmp(desired,"ironman_",8)!=0)return 0;
-      int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
-      if(n<=0||(size_t)n>=sizeof(g85_native_desired))return 0;
-      desired=g85_native_desired;
+      /* A running Mark V shot is pinned to the already opened suitcase_
+       * stream above. It has already been converted and vertex-validated;
+       * converting it again rejects frame two and stops the game. Only
+       * that owned shot may keep its selected native-bank name here. */
+      const int pinned_native_shot=g85_native_repulsor&&
+          desired==a->selected&&a->active&&!a->missing&&a->stream.file;
+      if(!pinned_native_shot){
+       if(strncmp(desired,"ironman_",8)!=0)return 0;
+       int n=snprintf(g85_native_desired,sizeof(g85_native_desired),"suitcase_%s",desired+8);
+       if(n<=0||(size_t)n>=sizeof(g85_native_desired))return 0;
+       desired=g85_native_desired;
+      }
 #ifdef B24_G173_AUTHORED_UNIBEAM_POSE_PRIORITY
     }
 #endif
