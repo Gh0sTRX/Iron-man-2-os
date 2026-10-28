@@ -122,3 +122,33 @@ is not writable. The active proxy excludes GitHub upload/API/Drive destinations;
 those destinations are saved only in the unpublished configuration draft. Do not
 claim a workspace path is a delivered attachment or create another VPK merely
 to retry delivery. Preserve both this package and the earlier 00.01 diagnostic.
+
+## Continued gameplay work — 29 October 2026
+
+The owner asked for more development after the diagnostic. Three further
+source defects were reproduced before changes:
+
+- Main's landing query acknowledged a floor 4cm before contact and disagreed
+  with the existing G75 road fallback. It now uses exact G75 support, matching
+  movement's native-first/optional-road authority. This does not establish that
+  original iOS treated every rendered road triangle as solid.
+- Seven existing Mark V transition streams were excluded by G83 despite matching
+  629-vertex bank/duration metadata. The current supported IronMan transition
+  path now includes Mark V; G8 keeps its existing suitcase conversion. Landing
+  still requires source support. No WM rig, native input or weapon rule is added.
+- Airborne descent checked floor crossing only at old XY. Entering a platform's
+  XY footprint in the same step could leave feet below its floor. Every actual
+  candidate/slide now queries the crossed source floor and checks head clearance
+  at accepted Z. No triangles, step limits or extra physics integrator changed.
+
+Local checks passed: 28/28 original-data CTest, the same28 with ASan/UBSan,
+seven separate synthetic Mach-O tests, and full Vita ARM ELF link. Additional
+coverage: 532 original road-only support samples; 312 suit/route original-stream
+matches with first/middle/end sampling; seven Mark V transition streams played
+through real G8;16 synthetic descending edge/obstruction cases at shifted Z.
+These are source/host observations, not physical Vita acceptance.
+
+The existing `00.02` VPK from `bccac1c` is preserved; **these newer fixes are not
+in that package**. No replacement package, installation or asset upload occurred.
+Original IPA access, native initial root, sound events, lighting/shadows and
+physical performance remain unresolved. Full-port gates remain false.
