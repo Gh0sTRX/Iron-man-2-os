@@ -92,3 +92,15 @@ if(IM2_ASSET_ROOT)
     add_test(NAME original_audio_catalog COMMAND test_audio_catalog "${IM2_ASSET_ROOT}/data/audio_catalog.im2a")
   endif()
 endif()
+
+add_executable(test_pause_motion test_pause_motion.c)
+target_link_libraries(test_pause_motion PRIVATE im2_motion)
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pause-motion")
+add_test(NAME pause_source_motion COMMAND test_pause_motion)
+set_tests_properties(pause_source_motion PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/pause-motion")
+execute_process(COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tools/extract_fire_event.py"
+  "${PROJECT_SOURCE_DIR}/src/main.c" "${CMAKE_CURRENT_BINARY_DIR}/actual_fire_event.inc"
+  COMMAND_ERROR_IS_FATAL ANY)
+add_executable(test_pause_fire test_pause_fire.c)
+target_include_directories(test_pause_fire PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+add_test(NAME paused_main_fire COMMAND test_pause_fire)

@@ -86,3 +86,19 @@ the external original table bank, uses IM2DG0001 / 00.02, and records all inputs
 and checks. New packaging boundary tests reject stale title/version, changed
 payload/SELF hashes, duplicate/traversing paths and truncated SFO allocations.
 The original audio bank and native lighting parity remain absent/unverified.
+
+## Gameplay fixes before the requested VPK
+
+The owner clarified: fix subsequent project problems before packaging. No new
+VPK has been produced yet. Two pause defects were reproduced as failing tests:
+G83/G8 source ages advanced across the menu pause, and the actual main fire
+block still accepted a repulsor shot while paused. One shared pause-adjusted
+clock now feeds pose/shot/beam/rigid-attachment owners. Paused presses are not
+queued; paused attack transforms, WM skill/cooldown ticks and hover bob stop.
+Raw SDL/G279/frame timing remains wall time. Authored durations/rates and the
+single B14 world integrator are unchanged. Baseline failures and current logs
+are external in `/workspace/im2-current/pause-gameplay-*.log`.
+
+The remote branch's four Mach-O feasibility commits were merged without source
+replacement; its seven synthetic parser tests remain separate compatibility
+research. A static parser is not an original engine loader or boot proof.

@@ -15,6 +15,7 @@
 #include "b24/b24_unified/im2_frame_trace.h"
 #include "b24/b24_unified/im2_suit_profile.h"
 #include "b24/b24_unified/im2_audio_catalog.h"
+#include "b24/b24_unified/im2_gameplay_clock.h"
 #include "b16_action.h"
 #include "b24/b24_unified/b24_unified.h"
 #ifdef B24_GPU_ENGINE
@@ -404,7 +405,7 @@ int main(int argc,char **argv) {
 #endif
     IM2Camera camera={0};camera.yaw=3.10f;camera.zoom=1.0f;
     float phase=0.0f,smooth_fps=0.0f;
-    Uint32 landing_started=0; int landing_now=0;
+    Uint32 landing_started=0; int landing_now=0,landing_stamp_pending=0;
     int trigger=0;
     int boost=0;
     int invert_move_x=0; /* G5 REAL VITA: inverted left stick was wrong; force natural L/R */
@@ -412,6 +413,8 @@ int main(int argc,char **argv) {
     int previous_flight_stage=0;
     Uint32 rush_begin=SDL_GetTicks();
     Uint32 last=SDL_GetTicks(),frame=0;
+    Im2GameplayClock motion_clock={0};
+    (void)im2_gameplay_clock_tick(&motion_clock,last,0);
 #if defined(IM2_FRAME_DIAGNOSTICS) && defined(B24_GPU_ENGINE)
     Im2FrameTrace frame_trace={0};
     (void)im2_frame_trace_open(&frame_trace,"ux0:data/ironman2_frame_profile.csv");
@@ -430,7 +433,7 @@ int main(int argc,char **argv) {
                 if(key==SDLK_f && !e.key.repeat)trigger=1;
                 if(key==SDLK_RIGHTBRACKET && !e.key.repeat)b16_combat_mode(&combat,1);
                 if(key==SDLK_LEFTBRACKET && !e.key.repeat)b16_combat_mode(&combat,-1);
-                if(key==SDLK_t && !e.key.repeat){boost=!boost;world.rush=boost;rush_begin=SDL_GetTicks();}
+                if(key==SDLK_t && !e.key.repeat){boost=!boost;world.rush=boost;rush_begin=motion_clock.game_ms;}
                 if(key==SDLK_v && !e.key.repeat){
 #ifndef B24_GPU_ENGINE
                   if(!b10_switch_display(window,&sdl,&display,&vsync_requested,&vsync_active,&profile_error))running=0;
@@ -440,7 +443,7 @@ int main(int argc,char **argv) {
                 if(!e.key.repeat){
                     if(key==SDLK_x||key==SDLK_SPACE){idx=(idx+1)%5;load(idx);world.head_height=b15_suit_head(&model);}
                     if(key==SDLK_z||key==SDLK_TAB)camera.wireframe=!camera.wireframe;
-                    if(key==SDLK_c){b14_world_toggle_flight(&world);landing_now=!world.flying;landing_started=SDL_GetTicks();}
+                    if(key==SDLK_c){b14_world_toggle_flight(&world);landing_now=!world.flying;landing_stamp_pending=1;}
                     if(key==SDLK_r){b14_world_init(&world);boost=0;landing_now=0;camera.zoom=1.f;}
                 }
             }
@@ -454,7 +457,7 @@ int main(int argc,char **argv) {
                 }
                 if(!b24_unified_paused(&b24_game) && e.cbutton.button==SDL_CONTROLLER_BUTTON_B){
                     b14_world_toggle_flight(&world);
-                    landing_now=!world.flying;landing_started=SDL_GetTicks();
+                    landing_now=!world.flying;landing_stamp_pending=1;
                 }
                 /* B24: D-pad Up moves vertically when airborne. */
                 /* B24: D-pad Down moves vertically when airborne. */
@@ -652,6 +655,11 @@ int main(int argc,char **argv) {
         b24_obs.real_enemies_loaded=0; /* no invisible B19 drones */
         b24_obs.dt=dt;
         b24_unified_tick(&b24_game,&b24_obs);
+        /* Every source pose/shot owner uses the SAME pause-adjusted timestamp.
+         * Keep `now` as raw SDL wall time for frame/G279 observations. */
+        const uint32_t motion_now=im2_gameplay_clock_tick(
+            &motion_clock,(uint32_t)now,b24_unified_paused(&b24_game));
+        if(landing_stamp_pending){landing_started=motion_now;landing_stamp_pending=0;}
 #ifdef B24_G153_REAL_SOURCE_MISSION_RETRY_LOOP
         /* G137 previously invoked source Mission000 only once at boot.
          * Retry EXACT blocked Lua event on later frames. G137's cursor
@@ -751,11 +759,11 @@ int main(int argc,char **argv) {
            (im2_suit_uses_802_bank(idx)||idx==4)&&g92_debug_accepted_melee_edge){
            (void)b24_g11_practice_melee_hit(&g92_debug_feedback,
              &b24_gpu_rt.g92_practice_dummy,
-             world.x,world.y,world.z,(uint32_t)now,1,1);
+             world.x,world.y,world.z,motion_now,1,1);
         }
         if(g92_debug_floor_found)
           b24_gpu_rt.g92_practice_dummy.hit_flash=
-            b24_g11_practice_hit_flash(&g92_debug_feedback,(uint32_t)now);
+            b24_g11_practice_hit_flash(&g92_debug_feedback,motion_now);
         g92_debug_accepted_melee_edge=0; /* one consumed debug latch */
         /* ORIGINAL HP/mission data/weapon fire events remain untouched. */
 #endif
@@ -770,7 +778,7 @@ int main(int argc,char **argv) {
            !world.flying && b24_unified_should_melee(&b24_game))
 #endif
           {
-           b24_g8_motion_melee_trigger(&b24_original_motion,(uint32_t)now);
+           b24_g8_motion_melee_trigger(&b24_original_motion,motion_now);
           #ifdef B24_G92_STATIC_DUMMY_SOURCE_PREVIEW
            g92_debug_accepted_melee_edge=1;
           #endif
@@ -784,7 +792,7 @@ int main(int argc,char **argv) {
         B24WMInput b24_wm_in={0};
         b24_wm_in.war_machine_selected=(idx==2);
         b24_wm_in.real_enemies_loaded=b24_obs.real_enemies_loaded;
-        b24_wm_in.trigger_skill_edge=(idx==2 &&
+        b24_wm_in.trigger_skill_edge=(!b24_unified_paused(&b24_game) && idx==2 &&
                 (b24_game.controls.held&IM2_BT_L)!=0 &&
                 b24_unified_should_melee(&b24_game));
         b24_wm_in.dt=dt;
@@ -793,12 +801,14 @@ int main(int argc,char **argv) {
         b24_wm_in.rocket_aim_direction=(B24WMVec3){0.f,1.f,0.f};
         b24_wm_in.targets=NULL;b24_wm_in.target_count=0;
         b24_wm_in.trigger_missile_edge=0; /* exact left muzzle unverified */
-        if(!b24_wm_tick(&b24_wm_shoulder,&b24_wm_in,&b24_wm_frame_events)){
+        if(b24_unified_paused(&b24_game))
+          b24_wm_frame_events=(B24WMOutput){0};
+        else if(!b24_wm_tick(&b24_wm_shoulder,&b24_wm_in,&b24_wm_frame_events)){
            running=0;break;
         }
 #endif
         world.camera_distance=b24_unified_chase_distance(&b24_game);
-        if(world.flight_stage==3 && previous_flight_stage!=3)rush_begin=now;
+        if(world.flight_stage==3 && previous_flight_stage!=3)rush_begin=motion_now;
         previous_flight_stage=world.flight_stage;
         camera.third_person=1;
         camera.player_x=world.x;camera.player_y=world.y;camera.player_z=world.z;
@@ -811,40 +821,42 @@ int main(int argc,char **argv) {
         camera.flight_stage=world.flight_stage;
         camera.waves=world.waves;
         camera.invert_x=invert_move_x;camera.invert_y=invert_camera_y;
-        camera.hover_bob=world.flying?.018f*sinf(phase):0.f;
+        if(!b24_unified_paused(&b24_game))
+          camera.hover_bob=world.flying?.018f*sinf(phase):0.f;
         camera.target_visible=world.visible;camera.target_screen_x=world.screen_x;
         camera.target_screen_y=world.screen_y;camera.target_radius=world.screen_radius;
         camera.aim_x=278.f;camera.aim_y=110.f;
         camera.beam_time=world.beam_time;
         camera.hits=world.hits;camera.shots=world.shots;camera.completed=world.completed;
-        phase+=dt*7.f;
+        if(!b24_unified_paused(&b24_game))phase+=dt*7.f;
         float immediate_fps=1.0f/fmaxf(raw_dt,.001f);
         smooth_fps=smooth_fps==0.0f?immediate_fps:smooth_fps*.95f+immediate_fps*.05f;
         camera.fps=smooth_fps;
         /* Diagnostic timings are deliberately measured separately. On real Vita
            this tells us whether the CPU rasterizer or SDL texture upload/present
            is the actual FPS limiter; do not infer from desktop FPS alone. */
-        if(landing_now && now-landing_started>800u)landing_now=0;
+        if(landing_now && motion_now-landing_started>800u)landing_now=0;
         const int has_move=world.speed>.16f;
         const Uint64 t0=SDL_GetPerformanceCounter();
         B17GateInput b24_analog={0};
         b24_analog.stick_x=move_x;b24_analog.stick_forward=move_y;
         b24_analog.airborne=world.flying;
-        b17_gate_step(&b24_gate,&b24_gate_cfg,&b24_analog);
+        if(!b24_unified_paused(&b24_game))
+          b17_gate_step(&b24_gate,&b24_gate_cfg,&b24_analog);
         const int ground_run=b24_gate.is_ground_running;
         B14Mode mode=b15_pose_pick(&motion13,world.flying,has_move,world.flight_stage,
-                                 world.flying?boost:ground_run,landing_now,now-rush_begin);
+                                 world.flying?boost:ground_run,landing_now,motion_now-rush_begin);
         const B13Clip *chosen=b16_idle_override(&attack,mode,idx);
         /* No neutral WM walk baked yet. Use REAL IronMan_run-to-WM skinned retarget
            rather than the known-bad, raised-hand Warmachine_Aim_Ground_move_F.
            This is interim locomotion, not verified original WM walking. */
         if(idx==2 && mode==B14_WALK && motion13.clips[B13_RUN].xyz)
             chosen=&motion13.clips[B13_RUN];
-        if(!b24_unified_paused(&b24_game) && !b14_pose_tick_ex(&animator,&model,&motion,&motion13,mode,(unsigned)now,
+        if(!b24_unified_paused(&b24_game) && !b14_pose_tick_ex(&animator,&model,&motion,&motion13,mode,(unsigned)motion_now,
               chosen)){running=0;break;}
         if(!b24_unified_paused(&b24_game) && idx==2 && world.flying && world.flight_stage==3)
             b17_rush_lean(&model,0.43f); /* PROTOTYPE tilt, NOT original Rush clip */
-        if(trigger){
+        if(trigger && !b24_unified_paused(&b24_game)){
           const unsigned palm=attack.palm_r; /* B24: RIGHT REPULSOR ONLY */
           const unsigned emitter=combat.mode==B16_UNIBEAM?b17_chest_vertex:
                                  combat.mode==B16_MISSILE?b17_shoulder_vertex:palm;
@@ -861,18 +873,18 @@ int main(int argc,char **argv) {
               (!world.flying||world.flight_stage<=1))
              (void)b24_g169_native_beam_begin(
                  &b24_g169_l1_source_beam_actor,idx,world.flying!=0,
-                 (uint32_t)now);
+                 motion_now);
 #endif
           if(fired>=0 && combat.mode==B16_REPULSOR && !attack.attack_active){
-              b16_attack_begin(&attack,now,world.flying,0,0);
+              b16_attack_begin(&attack,motion_now,world.flying,0,0);
 #ifdef B24_GPU_ENGINE
               /* Trigger on REAL accepted shot. Source _Att begins NEXT tick.
                  Existing B16 is fallback when exact IM2V is absent. */
-              b24_g8_motion_repulsor_trigger(&b24_original_motion,(uint32_t)now);
+              b24_g8_motion_repulsor_trigger(&b24_original_motion,motion_now);
 #endif
           }
-          trigger=0;
         }
+        trigger=0; /* paused presses cannot queue a shot for resume */
 #ifdef B24_GPU_ENGINE
         /* B14 has already computed SINGLE authoritative world pose and B13
            59-bank fallback. Only geometry-verified VI/IV/Stealth / War Machine
@@ -933,7 +945,7 @@ int main(int argc,char **argv) {
           g84_input.grounded_contact_verified=0;
 #endif
           B24G83Selection g84_route={0};
-          if(!b24_g83_timeline_tick(&g84_time,NULL,(uint32_t)now,
+          if(!b24_g83_timeline_tick(&g84_time,NULL,motion_now,
                 &g84_input,&g84_route)){running=0;break;}
           /* G301: the visual G83 selection may be a pinned authored
              800ms fly_ftol while B14's stick has already turned again.
@@ -949,7 +961,7 @@ int main(int argc,char **argv) {
                b24_g169_native_beam_clip(
                   &b24_g169_l1_source_beam_actor,idx,
                   world.flying!=0,world.flying?world.flight_stage:0,
-                  (uint32_t)now);
+                  motion_now);
            if(g169_original_source_beam_clip)
               g84_route.stem=g169_original_source_beam_clip;
 #endif
@@ -958,7 +970,7 @@ int main(int argc,char **argv) {
           if(!b24_g8_motion_tick_g84(&b24_original_motion,
                 "app0:animations",model.vertices,sizeof(IM2Vertex),
                 model.nv,idx,original_stage,move_x,move_y,
-                (uint32_t)now,g84_route.stem)){running=0;break;}
+                motion_now,g84_route.stem)){running=0;break;}
 #ifdef B24_G218_SOURCE_STATE_OBSERVER
           /* G218 observes the ACTUAL successfully opened original 2010
            * G8 selected source IM2V, not G83's intended candidate.
@@ -975,7 +987,7 @@ int main(int argc,char **argv) {
           if(!b24_g8_motion_tick(&b24_original_motion,
                 "app0:animations",
                 model.vertices,sizeof(IM2Vertex),model.nv,idx,
-                original_stage,move_x,move_y,(uint32_t)now)){
+                original_stage,move_x,move_y,motion_now)){
              running=0;break;
           }
 #endif
@@ -991,7 +1003,7 @@ int main(int argc,char **argv) {
              b24_original_motion.selected,
              b24_original_motion.stream.frames,
              b24_original_motion.stream.duration_ms,
-             b24_original_motion.started_ms,(uint32_t)now,
+             b24_original_motion.started_ms,motion_now,
              idx==2 && b24_original_motion.active &&
                     !b24_original_motion.missing,
              &wm_actor)){
@@ -1008,7 +1020,8 @@ int main(int argc,char **argv) {
            b24_g8_motion_melee_source_active(&b24_original_motion))
           attack.attack_active=0;
 #endif
-        b16_apply_attack(&attack,&model,now);
+        if(!b24_unified_paused(&b24_game))
+          b16_apply_attack(&attack,&model,motion_now);
         camera.beam_time=world.beam_time;
         camera.shots=world.shots;camera.hits=world.hits;camera.completed=world.completed;
         camera.b16_active=1;camera.weapon_mode=combat.mode;camera.energy=combat.energy;

@@ -82,6 +82,7 @@ else()
     src/b24/b24_unified/b24_g8_live_original_motion.c)
   target_sources(im2_motion PRIVATE
     src/b24/b24_unified/b24_g83_unified_movement_aim.c
+    src/b24/b24_unified/b24_g83_authentic_timed_router.c
     src/b24/b24_unified/b24_g82_original_combat_coordinator.c
     src/b24/b24_unified/b24_g76_original_native_damage_math.c
     src/b24/b24_unified/b24_g77_melee_source_radius.c

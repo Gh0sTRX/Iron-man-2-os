@@ -11,19 +11,20 @@
 #include <string.h>
 
 static B14World world;
-static int landing_now;
+static int landing_now,landing_stamp_pending;
 static unsigned landing_started;
 static int b24_game;
 static float last_proposed_z;
 enum {SDL_CONTROLLER_BUTTON_B=1};
 typedef struct {struct {int button;} cbutton;} SDL_Event;
 static int b24_unified_paused(const int *paused){return *paused;}
-static unsigned SDL_GetTicks(void){return 1234u;}
 static void circle(int paused){
  SDL_Event e={{SDL_CONTROLLER_BUTTON_B}};
  b24_game=paused;
- /* Generated from the ACTUAL guarded SDL event in work/src/main.c. */
+ /* Actual guarded canonical SDL event; main stamps the pending transition
+  * with the pause-adjusted clock after handling menu input. */
 #include "actual_circle_event.inc"
+ if(landing_stamp_pending){landing_started=1234u;landing_stamp_pending=0;}
 }
 
 static void support(B24C1OriginalCollision *city){

@@ -43,12 +43,15 @@ bulunsa da özgün efekt olayları ve fade süreleri tamamlanmış değildir. G2
    ile yerinde animasyonu ayır. Başlangıç dünya/ayak konumu hâlâ kabul bekler.
 4. Yerde START → Circle: kendiliğinden kalkış olmamalı. Circle ile kalk;
    havada START → Circle: kendiliğinden iniş olmamalı.
-5. Havadayken yön tuşları yukarı/aşağı, Triangle basılı rush ve sağ kamera
+5. R'ye basılıyken START ile duraklat. Menüde ateş/enerji tüketimi ve animasyon
+   ilerlemesi olmamalı; R'yi bırakıp devam ettiğinde beklemiş bir atış olmamalı.
+   Dönüş/saldırı animasyonu duraklatma süresi kadar atlamamalı.
+6. Havadayken yön tuşları yukarı/aşağı, Triangle basılı rush ve sağ kamera
    çubuğunu dene. Önceki yüksek zeminden kalkış/45 cm iniş düzeltmeleri dahildir.
-6. SELECT ile beş zırhı karşılaştır; Mark IV/Stealth paylaşılan animasyon bankası,
+7. SELECT ile beş zırhı karşılaştır; Mark IV/Stealth paylaşılan animasyon bankası,
    War Machine ve Mark V'nin ayrı bankalarını gözle. R ateş, kare yakın dövüş,
    yön tuşları sağ/sol silah seçimi mevcut deneme davranışlarıdır.
-7. Tekrar başlatmadan önce VitaShell ile şu dosyaları koru:
+8. Tekrar başlatmadan önce VitaShell ile şu dosyaları koru:
    `ux0:data/ironman2_g279_walk.csv`,
    `ux0:data/ironman2_frame_profile.csv`,
    `ux0:data/IronMan2_GPU_BOOT.txt` (oluşmuşsa).

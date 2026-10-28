@@ -84,7 +84,9 @@ Recorded: raw start-to-start interval; the actual world step and unified-control
 dt; actual animation **blend** dt; total CPU frame wall time; model stream,
 camera, scene/suit/HUD submission and swap wall time; world/GPU XYZ; pause state;
 CPU/GPU/BUS/XBAR frequencies read from the system. Clock rates are not changed.
-Animation clip age still uses its existing source clock. Differing dt caps are
+Animation/action clip ages use a shared pause-adjusted gameplay timestamp;
+raw frame/G279 observations keep SDL wall time. Authored clip rates and
+durations are unchanged. Differing dt caps are
 made observable, not replaced by a speculative physics/timing model.
 
 ```bash
