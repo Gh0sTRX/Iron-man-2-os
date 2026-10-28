@@ -169,3 +169,9 @@ plus the seven separate Mach-O tests pass; full ARM ELF links.
 Remote source CI run40774394201 passed host OFF/ON and ARM for the first three
 fixes at `b968905`. The final Mark V consecutive-shot fix is being submitted
 separately; that older green run must not be attributed to the final fix.
+
+Final remote CI [40774875755](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/40774875755)
+passed host OFF/ON sanitizers and the full ARM ELF for runtime source `a710a9d`,
+including the Mark V consecutive-shot fix. Its exact-commit source-only receipt
+is `origin/evidence/source-checks-40774875755:diagnostics/source-checks.json`.
+No device test, package or owner-data publication was performed by CI.
