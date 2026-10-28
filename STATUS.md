@@ -24,10 +24,10 @@ G171 reconstruction pipeline are historical references, not source owners.
 - Suit texture upload failures now release the failed texture and permit retry.
   Current city/suit alpha and lighting-state tests preserve original alpha and
   texture state; they do not establish original lighting or shadows.
-- Current source checks: 30/30 with external original geometry/tables and
-  30/30 with ASan/UBSan; 22/22 source-only plus seven separate Mach-O tests.
-  Full 89-unit Vita ARM ELF links. Physical Vita and owner-input inspection
-  remain unverified. The preserved diagnostic uses older source bccac1c.
+- Current combat diagnostic:35/35 original-data host checks,35/35 ASan/UBSan,
+  25/25 source-only plus seven separate Mach-O tests; full93-unit Vita ARM ELF.
+  Combat Test00.03 includes the approved Mark IV test opponent, geometric
+  experimental lighting and all prior gameplay fixes. Physical Vita untested.
 - Remote CI run [40604417762](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/40604417762)
   passed both host configurations and the full ARM ELF for source `05d9206`.
   Source-only receipt: branch `evidence/source-checks-40604417762`,
@@ -200,3 +200,28 @@ The new manual package version is00.03/IM2DG0001/Combat Test;00.02 stays unchang
 All original assets still remain external. Full-port gates stay false. The
 uploaded IPA remains unread due the32MiB transfer limit; original sound bank
 and genuine enemy assets remain unavailable. No hardware installation occurred.
+
+## Produced Combat Test00.03 — 29 October2026
+
+Source/package commit `8c0d567156486c3bf1e4d21a7582e068c9ada846`.
+`/workspace/im2-current/combat-test-2026-10-29/IronMan2_Combat_Test_00.03.vpk`
+94,842,544 bytes; IM2DG0001/00.03/Iron Man2 - Combat Test;670 verified resources.
+SHA256 `7a6b113a7279377a1e6f46ab4494bf2f8abb938f121e0ac269dc9095ebcbe63a`.
+The manual pipeline reran35/35 original-data CTest and seven Mach-O tests,
+repeated with ASan/UBSan, full93-unit ARM ELF, SDK SELF/SFO and full ZIP inventory,
+CRC, resource/SELF hashes and version identity. Source-only25/25 plus seven
+Mach-O tests passed separately. Old00.02 remains unchanged.
+
+[Remote CI40780136879](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/40780136879)
+passed host OFF/ON and ARM for this exact commit; its bounded receipt is
+`origin/evidence/source-checks-40780136879:diagnostics/source-checks.json`.
+CI used no owner data and published no package. Model/animations, VPK and full
+manifest stay external. The package and manifest explicitly state original enemy
+AI=false, native lighting verified=false, original audio included=false,
+uploaded IPA read=false, device tested=false. These limitations are intentional,
+not full-port acceptance. The owner approved the labelled prototype opponent.
+
+Current tools still do not expose chat attachment upload. A workspace file link
+is not a confirmed delivered downloadable attachment. GitHub API/upload grants
+are only in the unpublished configuration draft; do not claim a public/private
+release asset was uploaded. Preserve00.03 and retry delivery rather than rebuild.

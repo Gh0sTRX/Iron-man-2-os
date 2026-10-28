@@ -94,3 +94,21 @@ saldırır. Kaynak boşta/darbe/yakın dövüş/düşme klipleri kullanılır.
 Füze çizgisi/işareti ve hasar sayıları prototiptir. Özgün ses bankası yoktur;
 özgün düşman AI'sı, orijinal shader/gölge ve gerçek cihaz/FPS eşliği çözülmedi.
 Bu sürüm önceki Mark V/iniş/duraklatma düzeltmelerini de içerir.
+
+## Doğrulanmış00.03 çıktısı
+
+`/workspace/im2-current/combat-test-2026-10-29/IronMan2_Combat_Test_00.03.vpk`
+94.842.544 bayt; kaynak `8c0d567`; IM2DG0001/00.03/Combat Test.
+SHA256 `7a6b113a7279377a1e6f46ab4494bf2f8abb938f121e0ac269dc9095ebcbe63a`.
+35/35 host ve ASan/UBSan kontrolü,7 Mach-O testi,93 dosyalı ARM ELF, SELF/SFO ve
+paket CRC/tam dosya kümesi/hash doğrulaması geçti. GitHub CI40780136879 başarılı.
+670 özgün kaynak girdisi korunur; Mark IV modeli ve dört test animasyonu pakette.
+Yerel testte güncel tanılama başlangıcından(0,5,.0725) noktasında kaynak zemin,
+gövde açıklığı ve görüş hattı doğrulandı. Bu özgün senaryo başlangıcı değildir.
+
+Kendi test canı, sabit yakın dövüş rakibi, hasar/düşme, nişangâhla aynı kamera
+ışını, kaynak çarpışma engelleri, prototip atış izi/füze işareti ve L+SELECT reset
+bu sürümdedir. NPC özgün düşman AI'sı değildir; aydınlatma deneysel geometrik
+adaydır. Ses bankası ve yerel cihaz doğrulaması yok. Önceki dört Mark V/iniş ve
+duraklatma düzeltmesi00.03'e dahildir. Manifest ve günlükler aynı dış klasördedir.
+Sohbet eki teslimi hâlen doğrulanmadı; mevcut paketi tekrar üretmeden koru.
