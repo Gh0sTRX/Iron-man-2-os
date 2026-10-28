@@ -15,3 +15,4 @@ im2_flags+=("-DIM2_SANITIZERS=${IM2_SANITIZERS:-OFF}")
 "$im2_cmake" -S . -B "$im2_build" "${im2_flags[@]}"
 "$im2_cmake" --build "$im2_build" --parallel 4
 "$im2_ctest" --test-dir "$im2_build" --output-on-failure
+python3 -m unittest discover -s tests -p 'test_ios_macho.py' -v
