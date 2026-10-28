@@ -1,0 +1,9 @@
+{
+  "source_commit": "bccac1c9af6681bb1ece85f0dbc22c5bafadce49",
+  "run_id": "40765595338",
+  "host_with_and_without_sanitizers": "success",
+  "full_vita_arm_elf": "success",
+  "owner_data_used": false,
+  "package_created": false,
+  "device_tested": false
+}
