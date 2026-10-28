@@ -131,9 +131,11 @@ int b24_g83_select_original_motion(const B24G83Input *p,
  const char *stem=NULL;
  int oneshot=0;
  if(p->transition!=B24G83_EVENT_NONE){
-  /* Animated land requires an authentic physics foot-contact event.
+  /* VI-family and Mark V have separately verified source transition
+   * streams (802v versus 629v); G8 performs the existing bank conversion.
+   * Animated land requires an authentic physics foot-contact event.
    * No gesture/FPS-driven automatic landing or imaginary WM retarget. */
-  if(markvi &&
+  if(original_ironman_rig &&
      ((p->transition!=B24G83_EVENT_FLY_TO_GROUND &&
        p->transition!=B24G83_EVENT_FLY_TO_RUN) ||
       p->grounded_contact_verified)){
