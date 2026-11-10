@@ -4,7 +4,7 @@
 
 ## Original 1.0.3 comparison: BLOCKED, never pretend complete
 
-Original owner Google Drive file Iron Man 2 iOS 3.0.ipa, id 1qfwa0qm23l1KNAPgk0VW3A47kC8ZYrJB, size 275580565 bytes verified from connected Drive metadata. Authenticated Drive raw fetch returns HTTP 413: max 268435456 bytes. Anonymous GitHub Actions gdown cannot retrieve the public file (rate limit/public resolver) [run G143 failed](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39030926936). This is an ACCESS limit, not an asset decoder result. The sound banks across v1.0.0 and 1.0.3 have NOT been byte-compared; do not claim identical. A complete 1.0.3 RIFF/WAVE and SHA-by-filename scanner has been written in research/b24_unified/g143_version103_audio_research/g143_source_original_2010_103_sound_manifest.py; it accepts --v103 and optionally --v100 to produce true version diffs without exporting game bytes.
+Original owner Google Drive file Iron Man 2 iOS 3.0.ipa, id [private file ID removed], size 275580565 bytes verified from connected Drive metadata. Authenticated Drive raw fetch returns HTTP 413: max 268435456 bytes. Anonymous GitHub Actions gdown cannot retrieve the public file (rate limit/public resolver) [run G143 failed](https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/39030926936). This is an ACCESS limit, not an asset decoder result. The sound banks across v1.0.0 and 1.0.3 have NOT been byte-compared; do not claim identical. A complete 1.0.3 RIFF/WAVE and SHA-by-filename scanner has been written in research/b24_unified/g143_version103_audio_research/g143_source_original_2010_103_sound_manifest.py; it accepts --v103 and optionally --v100 to produce true version diffs without exporting game bytes.
 
 ## Additional source 2010 native facts (v1.0.0 Mach-O)
 
