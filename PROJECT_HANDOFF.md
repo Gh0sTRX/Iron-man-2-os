@@ -38,7 +38,7 @@ Pipeline: unzip; check four `.im2t` models; desktop C renderer preview; official
 5. Keep project docs and version states updated at each verified milestone. Never claim background tasks ran after the chat ended.
 
 ## Continuation recipe for a fresh ChatGPT chat
-Ask: "Continue the Iron Man 2 PS Vita reverse-engineering project. Read the private GitHub repo Gh0sTRX/Iron-man-2-os, especially PROJECT_HANDOFF.md and the latest GitHub Actions run. Four armors work on actual PS Vita. Continue the next verified gameplay prototype; preserve the existing VPK."
+Ask: "Continue the Iron Man 2 PS Vita reverse-engineering project. Read this project's GitHub repository, especially PROJECT_HANDOFF.md and the latest GitHub Actions run. Four armors work on actual PS Vita. Continue the next verified gameplay prototype; preserve the existing VPK."
 
 ## User preference
 Prioritize visibly useful milestones, efficient engineering, rigorous verification and straightforward instructions (the user isn't a programmer). The user mentioned future selectable fan-made armor packs; defer until engine/movement is established.
