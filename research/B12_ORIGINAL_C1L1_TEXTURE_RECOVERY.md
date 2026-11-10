@@ -16,7 +16,7 @@
 - `research/b11_material_inventory.py`, `research/b11_pointer_audit.py`, `research/b11_texture_catalog.py` and the successful GitHub Actions job https://github.com/Gh0sTRX/Iron-man-2-os/actions/runs/38275136012 verify the original texture references.
 - Local working bundle `IronMan2_B12_Vehicles_Parser_and_Research.zip` contains the reusable `build_b12.py`, old `pvr_v2_decode.py`, `extractor.py`, `bdae_scene_parser.py`, original texture reference/matching CSVs, preview and sample GLB.
 - Separate texture archive `IronMan2_B12_Original_C1L1_Texture_Atlases.zip` contains original-derived decoded PNGs and exact reference CSVs.
-- Backed up the full texture bundle to **private user Google Drive**: `https://drive.google.com/file/d/1nMiYcALq7anasa0PVo0Suy22nLwYkN1e/view`. Do not publicly redistribute it.
+- Backed up the full texture bundle to **private user Google Drive**: `[private Drive link removed]`. Do not publicly redistribute it.
 - Source ZIP and standalone GLB can also be downloaded from the originating ChatGPT conversation while it remains available; the user's original IPA and the B11 parser repository files are the reproducible raw sources.
 
 ## Next engineering work
