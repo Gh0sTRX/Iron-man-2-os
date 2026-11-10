@@ -175,7 +175,7 @@ tüm varlık SHA-256'ları, SELF ve SFO kimliği doğrulandı.
 
 **Belge tarihi:** 23 Ekim 2026  
 **Proje sahibi hedefi:** Gameloft'un orijinal **Iron Man 2 iOS 1.0.0/1.0.3** oyununu PS Vita için aslına sadık, gerçekten oynanabilir bir sürüm olarak yeniden çalıştırmak/portlamak. Ana öncelik Chapter 1 / Stark Expo'nun orijinal açılışı ve mekanikleridir.  
-**Özel depo:** `Gh0sTRX/Iron-man-2-os`  
+**Kaynak depo:** bu belgenin bulunduğu GitHub deposu  
 **TEK AKTİF geliştirme dalı:** `feature/b24-unified-gameplay`; eski `main` üzerinde çalışıp güncel değişiklikleri ezme.  
 **Bu devir anında dal HEAD:** `e1de61940e57db4bf9ad722eb8761cdf21c5963b` — G305 devir raporu, yalnızca doküman güncellemesi. İlk görevde `git fetch` yap, gerçek HEAD'i tekrar kontrol et; burada yazan SHA'yı ileride güncel sanma.
 
